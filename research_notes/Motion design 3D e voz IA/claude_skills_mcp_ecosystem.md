@@ -517,7 +517,31 @@ ElevenLabs' **local MCP (`elevenlabs-mcp`) is deprecated and archived**. Its **h
   - `npx skills add elevenlabs/skills`.
   - Skills: `text-to-speech`, `speech-to-text`, `speech-engine`, `agents`, `sound-effects`, `music`, `voice-changer`, `voice-isolator`, `dubbing`, `setup-api-key`.
   - Requires `ELEVENLABS_API_KEY`. SDKs: Python `elevenlabs`, JS `@elevenlabs/elevenlabs-js` (warns against the outdated `elevenlabs` npm package), CLI `@elevenlabs/cli`.
+- **Models used by the official ElevenLabs skills (read 2026-10-08):**
+  - `text-to-speech/SKILL.md` (MIT) — [elevenlabs/skills text-to-speech](https://github.com/elevenlabs/skills/blob/main/text-to-speech/SKILL.md):
+    - Covers "90+ languages". Examples "default to **`eleven_v4`**, the latest and highest-quality model" ("highest quality, emotional range, audio tags, voice cloning accuracy").
+    - `eleven_v4_turbo`: ~100 ms, real-time via a Text-to-Dialogue WebSocket.
+    - `eleven_flash_v2_5`: 32 languages, ~75 ms, lowest cost.
+    - `eleven_multilingual_v2`: 29 languages, "most stable on very long-form".
+    - `eleven_v3`: 70+ languages, "previous generation expressive model".
+    - `language_code` enforces pronunciation and normalization on supporting models.
+  - `music/SKILL.md` — [elevenlabs/skills music](https://github.com/elevenlabs/skills/blob/main/music/SKILL.md):
+    - Default model **`music_v2_5`** ("most advanced"); `music_v2`/`music_v1` only on request.
+    - APIs: `music.compose`, `composition_plan.create` (fine-grained section control), `compose_detailed` (+ `store_for_inpainting`), `compose_detailed_stream` (SSE with optional word timestamps), `music.upload` for inpainting.
+    - A video-to-music API combines videos in order with an optional description.
+  - `sound-effects/SKILL.md` — [elevenlabs/skills sound-effects](https://github.com/elevenlabs/skills/blob/main/sound-effects/SKILL.md):
+    - Model `eleven_text_to_sound_v2`; `duration_seconds` 0.5–30; `prompt_influence` 0–1 (default 0.3); **`loop=true`** for seamless loops; outputs `mp3_44100_128` (default) up to `pcm_44100`.
 - Third-party alternative: wynandw87/claude-code-elevenlabs-mcp (0★); 8 tools including TTS, SFX, music, cloning, isolation — [repo](https://github.com/wynandw87/claude-code-elevenlabs-mcp)
+- **Fish Audio:** no official MCP found (GitHub search 2026-10-08). Community options:
+  - da-okazaki/mcp-fish-audio-server: 14★, updated 2026-09-17.
+  - AceDataCloud/FishMCP: 1★, via AceDataCloud.
+  - kevinten-ai/mcp-voice-clone: 0★; Fish Audio + ElevenLabs.
+  - Sources: [da-okazaki/mcp-fish-audio-server](https://github.com/da-okazaki/mcp-fish-audio-server); [AceDataCloud/FishMCP](https://github.com/AceDataCloud/FishMCP)
+- **Azure Speech** (via search summary) — [Microsoft Learn: Azure Speech in Foundry Tools for agents](https://learn.microsoft.com/en-my/Azure/foundry/agents/how-to/tools/azure-ai-speech)
+  - Microsoft offers an "Azure Speech MCP Server" as a **remote MCP tool for agents in Microsoft Foundry Agent Service** (public preview). It requires a Foundry resource, an API key, a storage container SAS URL for audio output, and the Agent Service Enterprise tier for MCP tools. This is aimed at Foundry agents, not Claude Code.
+  - The separate **Azure MCP Server** also has a speech toolset (TTS/STT via natural language). I saw it only on a mirror of the Learn docs: azure/developer/azure-mcp-server/tools/ai-services-speech (UNVERIFIED official URL).
+- **OpenAI TTS:** no official OpenAI audio MCP found. Community: blacktop/mcp-tts and openrouter-mcp-multimodal (above). Azure/OpenAI TTS community MCPs found on GitHub are tiny (≤1★).
+- **MiniMax music:** the READMEs of MiniMax-MCP, MiniMax-MCP-JS and MiniMax `cli` contain no "music" mentions (grep, 2026-10-08), so music generation is **not exposed** via MiniMax's MCP as far as documented — [MiniMax-MCP-JS](https://github.com/MiniMax-AI/MiniMax-MCP-JS); [MiniMax cli](https://github.com/MiniMax-AI/cli)
 
 **Other TTS / voice MCPs**
 - **MiniMax official MCP** (MiniMax-AI/MiniMax-MCP) — [repo](https://github.com/MiniMax-AI/MiniMax-MCP)
@@ -636,6 +660,12 @@ No official Luma video MCP or Pika MCP was found.
 
 **Kling**
 - Reportedly an official hosted MCP at `https://kling.ai/mcp` with ~16 tools (`text_to_video`, `image_to_video`, `text_to_image`, `image_to_image`, `motion_control`…) and login-based auth. A Kuaishou financial report mentions "officially launched Kling MCP and Kling CLI". **UNVERIFIED (secondary sources only)** — [aituber.app guide](https://aituber.app/blog/kling-ai-mcp-server/); [yespress Kling profile](https://yespress.io/products/kling-ai.md); [LongPort news](https://longportapp.cn/news/296359117)
+
+**Replicate (resumed research, 2026-10-08; via search summary)**
+- Replicate runs an **official hosted MCP** to "find, compare, and run" models through its HTTP API.
+- Claude Code: `claude mcp add replicate https://mcp.replicate.com/sse --transport sse --scope user`, then `/mcp` for browser auth; requires a Replicate API token.
+- The older community `deepfates/mcp-replicate` is no longer developed.
+- Sources: [Replicate docs: MCP](https://replicate.com/docs/reference/mcp); [mcp.replicate.com](https://mcp.replicate.com/)
 
 **Luma**
 - No official Luma Labs video MCP found. There are community servers (bobtista/luma-ai-mcp-server: 5 s/9 s clips, Luma API key; and AceDataCloud hosted).
@@ -836,7 +866,7 @@ Columns: feasibility in the container (✅ works / ⚠️ needs testing or paid 
 
 ## PENDENTE / NÃO PESQUISADO
 
-Research was stopped early on the coordinator's instruction (2026-10-08). The following were not finished. Concrete next steps are given for each.
+Research was stopped early on the coordinator's instruction (2026-10-08), resumed, then stopped again because session credits ran low. Items marked DONE / PARTIALLY DONE were addressed in the resumed pass; everything else is still open. The following were not finished. Concrete next steps are given for each.
 
 1. ~~**Repo licenses**~~ — **DONE (2026-10-08):** see Q9 "License check". Most are MIT/Apache. Restrictive: onetake, video-talkcraft and anything2explainer (PolyForm NC); OpenChatCut and OpenMontage (AGPL). Still open: remotion-dev/skills has no root LICENSE (presumably the Remotion license).
 2. ~~**Anthropic community marketplace**~~ — **DONE (2026-10-08):** 2,284 plugins; relevant entries are listed in Q8. Still open: the community plugins (djclaude, easing-wizard, voice-bridge, voxflow, framecraft, videozero, future-video-studio) were not opened or vetted.
@@ -850,10 +880,7 @@ Research was stopped early on the coordinator's instruction (2026-10-08). The fo
    - measure Cycles CPU render time for a 1080×1920 frame on 4 cores.
 6. **CPU WebGL in headless Chromium** — **PARTIALLY DONE (2026-10-08):** Remotion's docs recommend `--gl=swangle` on machines without a GPU ("Rendering might be slow"). There is an official `template-three` with a 3D phone plus a video texture (see Q4). Still open: an actual render benchmark at 1080×1920/30 fps in this container. This overlaps with the coordinator's separate "3D programático e viabilidade sem GPU" task.
 7. **Hosted-MCP auth through the TLS proxy** — **PARTIALLY DONE (2026-10-08):** all endpoints answer 401 (auth required) through the proxy, so they are reachable (see Q9). Still open: whether the OAuth browser flow of `claude mcp add --transport http …` completes from the cloud container. I did not run it, because it changes the user's MCP config.
-8. **Voice vendors not verified:**
-   - official MCPs or skills from OpenAI (gpt-4o-mini-tts), Azure Speech, Fish Audio, Replicate;
-   - whether MiniMax MCP has music generation (`grep -i music` on its README showed nothing);
-   - ElevenLabs model IDs, pt-BR voices and pricing (hand off to the voice researcher).
+8. **Voice vendors** — **MOSTLY DONE (2026-10-08):** see Q5. ElevenLabs skills default to `eleven_v4`, `music_v2_5` and `eleven_text_to_sound_v2`. There is no official Fish Audio or OpenAI audio MCP; Azure's Speech MCP is Foundry-agent-only (preview); Replicate has an official hosted MCP (SSE); MiniMax's MCP does not expose music. Still open: pt-BR voice quality and pricing per vendor (hand off to the voice researcher), and whether Replicate's SSE transport works through the proxy (`curl -N https://mcp.replicate.com/sse`).
 9. **Not searched at all:**
    - Editly (`"editly" mcp OR skill`);
    - Cavalry (`cavalry mcp`, `scenegroup cavalry ai`);
