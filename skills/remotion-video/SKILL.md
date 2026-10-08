@@ -103,6 +103,23 @@ const AnimatedButton = () => {
 4. Render: `npx remotion render <CompositionId> out/video.mp4` (still: `npx remotion still`).
 5. Check a few frames in the Studio before the full render.
 
+## "After Effects" polish (learned on the Rotina video, see `rotina-video/` in this repo)
+
+- **Easing:** `Easing.bezier(0.16, 1, 0.3, 1)` (expo out) for entrances and `Easing.bezier(0.83, 0, 0.17, 1)` for whip pans. Wrap them in one `tween(frame, range, out, easing)` helper that always clamps.
+- **Motion blur:** wrap the scene in `<CameraMotionBlur shutterAngle={200} samples={10}>` from `@remotion/motion-blur`. Render time grows with `samples`.
+  - Keep static backgrounds **outside** the blur, because stacked samples on dark gradients cause banding.
+  - Put film grain on top, outside the blur: an SVG `feTurbulence` with `seed={frame % 12}`, opacity ~0.09, `mix-blend-mode: overlay`.
+  - Don't count numbers frame by frame under motion blur, because the digits ghost. Swap the value once and add a spring "pop".
+- **Text animator:** per-letter stagger of translateY + `filter: blur()` + opacity. Exit with blur and fade upward.
+- **Phone mockup:** design screens at 390pt width and `transform: scale()` them into the device frame. Animate the device with rotateX/rotateY under `perspective`, and add a scale "punch-out" during whips.
+- **Screens in a strip:** put the screens side by side and translate the strip for transitions. Start each screen's local animation a few frames before it slides in, so a whip never reveals an empty screen.
+
+## Rendering in a sandbox / offline
+
+- Bundle fonts in `public/fonts` and load them with `FontFace` + `staticFile` + `delayRender`. `@remotion/google-fonts` fails behind a TLS-intercepting proxy.
+- Use an existing Chromium: `--browser-executable=/path/to/headless_shell` (Playwright's `chromium_headless_shell`).
+- Check stills at key frames (`npx remotion still … --frame=N`) and tile them with `ffmpeg … hstack` before the full render.
+
 ## Reusing other skills
 
 - `button-animation` and `thumbnail-carousel` hold UI/animation ideas (springs, scale-in, staggered thumbnails). Their code is interactive React, so port the *motion values* into `interpolate`/`spring`, don't copy the components verbatim.
