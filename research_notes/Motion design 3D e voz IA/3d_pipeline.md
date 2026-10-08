@@ -40,6 +40,8 @@ In this container WebGL2 works headless. All six `--gl` values, and passing no f
   - **MEASURED, upgrade path:** `remotion` / `@remotion/cli` / `@remotion/three` **4.0.534** install cleanly next to React 18.3.1 + R3F 8.18.0 + drei 9.122 (37 s `npm install`). The peer dependencies of `@remotion/three@4.0.534` are still `react >=16.8`, `@react-three/fiber >=8.0.0` and `three >=0.137` (`npm view`). Upgrading the user's React 18 project does **not** force React 19 or R3F v9.
   - **MEASURED, L1 (4.0.534):** basic scene (procedural phone, PNG screen texture, HDRI, 5 metal coins, no post), 1080×1920, `--gl=swangle --concurrency=1 --frames=0-19`: **20 frames in 11.96 s wall, including browser launch and h264 encode**, from a pre-built bundle. That is **≤ 0.6 s per frame**, and nearly all of it is fixed start-up cost. Frames 0, 10 and 19 were inspected: each frame is distinct and correct (phone rotation, camera dolly, coin motion).
   - **MEASURED, O1 (4.0.250 + my workaround):** `<ThreeCanvas frameloop="never" onCreated={s => ref.current = s}>`, plus a main-tree `useLayoutEffect` per frame that does `delayRender` → 2× `requestAnimationFrame` → `ref.current.advance(performance.now())` → `continueRender`. Same scene: **20 frames in 11.57 s wall**. So on 4.0.250 the slowness came entirely from R3F's default `frameloop='always'` loop, and it can be fixed without upgrading.
+  - **MEASURED, L2 (4.0.534):** the same basic scene at `--concurrency=4`: **20 frames in 14.5 s wall**, which is *slower* than concurrency 1 (12.0 s). For short shots, extra tabs only add start-up cost, and SwiftShader is already multi-threaded. Concurrency scaling for long renders was not measured.
+  - **MEASURED, L3 (4.0.534, post-processing chain, concurrency 4):** stopped after about 11 s at the coordinator's wrap-up request. **No result.** Post-processing cost per frame in a sequence is still unmeasured.
 
 ### Inferences
 - In this container `--gl` makes no practical difference. Every mode falls back to SwiftShader through ANGLE/Vulkan. Use `--gl=swangle` as documented.
@@ -69,13 +71,20 @@ Pre-rendering each app screen as its own Remotion composition and mapping it as 
 - **MEASURED, PNG route (works):** I rendered one frame of the DOM screen composition to `public/screen.png` with `remotion still`. The phone scene loads it with `useLoader(THREE.TextureLoader, staticFile('screen.png'))`; Suspense is handled by ThreeCanvas. The result is crisp and correct on the 3D phone, both without post (still `phone-basic-f30.png`) and with DOF/bloom/AgX (still `B-png-post.png`).
 - **MEASURED, `useOffthreadVideoTexture` route (failed on 4.0.250):** Source was `staticFile('screen.mp4')`, 1080×2340 h264, pre-rendered from the DOM composition. In both test stills the screen showed **no UI**: the fallback colour appeared because the texture was `null` at capture time (still `A-video-nopost.png`). With post on, the screen looked uniformly washed-out grey (`phone-full-f30.png`). Rendering the screen composition to mp4 itself worked (60 frames in 11.7 s).
 - **MEASURED, UV mapping:** `THREE.ShapeGeometry` of a rounded rectangle has UVs in raw shape coordinates. Remapping them with `uv = ((x + w/2)/w, (y + h/2)/h)` makes the full screen texture fill the rounded screen exactly; this was verified visually. For the phone body, an `ExtrudeGeometry` with bevel gives material group 0 = front/back caps (black glass) and group 1 = sides and bevel (titanium `MeshPhysicalMaterial`, metalness 1, roughness 0.3). This gives an iPhone-like body with no model file.
+- **MEASURED (session 2):** the screen composition rendered as a JPEG image sequence (`remotion render build Screen public/seq --sequence --image-format=jpeg --jpeg-quality=92`) gives 60 files named `element-00.jpeg … element-59.jpeg` in **6.5 s wall**. I wrote an image-sequence texture component (`SeqScreen` in `r3f/src/PhoneScene.tsx`). It keeps one stable `THREE.Texture`, and each frame swaps `.image` under `delayRender`, sets `needsUpdate`, calls `advance(performance.now())` and then `continueRender`. Its benchmark run was not reached before the wrap-up, so it is **unverified**.
+- **DOCS (drei `<Html>`):** the content "is a DOM element, not drawn inside WebGL". It is placed over the canvas and, in `transform` mode, positioned with CSS `matrix3d`. The page warns transform mode "may appear blurry". `occlude` can hide it behind meshes (`occlude="blending"` "only correctly occludes rectangular HTML elements" by default). Lighting influence and shadows need a custom `material` ("Shadows only work with a custom material"). Post-processing (bloom/DOF) is not covered by the docs. — [drei Html docs](https://drei.docs.pmnd.rs/misc/html)
+- **DOCS (Remotion transparent videos), for compositing 3D shots over 2D:**
+  - ProRes 4444: `--image-format=png --pixel-format=yuva444p10le --codec=prores --prores-profile=4444`.
+  - WebM alpha: `--image-format=png --pixel-format=yuva420p --codec=vp8` (or vp9).
+  - Playback: `<OffthreadVideo transparent>` ("Without it, no alpha layer is used"; it slightly slows rendering), or `<Video>` from `@remotion/media` (recommended, no prop needed).
+  - Caveat: transparent WebM can flicker at Lambda chunk boundaries. — [Remotion: Transparent videos](https://www.remotion.dev/docs/transparent-videos)
 
 ### Inferences
 - On 4.0.250, the likely cause of the video-texture failure is a race: `continueRender` fires right after `setState(texture)`, before R3F's reconciler commits and draws. The newer `frameloop='never'` + `advance()` design is probably meant to fix this kind of race. Until upgrading, the most reliable path measured here is an **image-sequence texture**. Render each screen composition to PNG/JPEG frames (`remotion render --sequence` or `remotion still` per frame) and load frame N per Remotion frame under `delayRender`. This is not yet tested.
 - drei `<Html transform>` keeps the UI as real DOM. It is crisp and costs no texture, but it sits outside WebGL, so it gets no DOF, bloom, scene lighting or reflections, and is not occluded by the phone body. This is a known property of `Html` (it is a CSS overlay), but I did not check the drei docs in this session.
 
 ### Gaps
-- drei `<Html transform>` / `occlude` and "DOM to canvas texture" options (html2canvas, `drawElement`/`html-in-canvas`) were not researched.
+- drei `<Html transform>` / `occlude` and "DOM to canvas texture" options (html2canvas, `drawElement`/`html-in-canvas`) were not researched. drei `Html` was, see above.
 - `useOffthreadVideoTexture` was not tested on the latest Remotion, and the template-three approach (`@remotion/media` `<Video onVideoFrame>`) was not tested on 4.0.250. That approach needs `@remotion/media`, which may require a newer Remotion.
 
 ## 3. Phone models (GLB/GLTF), procedural phone, UV mapping, Apple trademark/licensing
@@ -86,12 +95,18 @@ Not researched beyond the procedural build. A procedural iPhone-like phone (Extr
 ### Cited Findings
 - **MEASURED:** The procedural phone used these numbers: proportions 71.6 × 146.6 × 8.25 mm scaled so 1 unit = 100 mm, corner radius 0.105, bevel 0.03, a dynamic-island capsule, a 3-lens camera bump from `RoundedBox` + cylinders, and a side button. With a Poly Haven 1k studio HDRI it renders with plausible titanium and glass reflections (`phone-basic-f30.png`).
 - **SOURCE:** template-three also builds its phone procedurally (extruded rounded rectangle). — [remotion-dev/template-three](https://github.com/remotion-dev/template-three)
+- **DOCS (Apple, Guidelines for Using Apple Trademarks and Copyrights):**
+  - "Apple does not support the use of its logos, company names, product names, or images of Apple products". Such use "may create the perception that Apple endorses or sponsors the product".
+  - Showing an Apple product to indicate compatibility is allowed only if "The image is an actual photograph of the genuine Apple product and not an artist's rendering". Using Apple-owned photos needs express written permission.
+  - Do not use Apple marks in your own product names.
+  - — [Apple: guidelines for third parties](https://www.apple.com/legal/intellectual-property/guidelinesfor3rdparties.html)
+- **DOCS (Poly Haven):** all assets (HDRIs, textures, models) are "licensed as CC0" ("effectively Public Domain"). "You can use our assets for any purpose", including commercial work, and "You do not need to give credit". — [Poly Haven license](https://polyhaven.com/license)
 
 ### Inferences
 - For ads, a generic "modern smartphone" (procedural, no Apple logo and no exact iPhone camera layout) reduces trademark and trade-dress risk. This needs a legal source.
 
 ### Gaps
-- The following were not researched: Sketchfab CC-BY/CC0 phone models, Poly Pizza, Poly Haven model license pages, Apple trademark and marketing guidelines for showing iPhones in ads, and drei `RoundedBox` limits (I believe radius ≤ depth/2, which prevents separate corner and edge radii, but that is unverified).
+- The following were not researched: Sketchfab CC-BY/CC0 phone models, Poly Pizza (Poly Haven and Apple are now answered above), and drei `RoundedBox` limits (I believe radius ≤ depth/2, which prevents separate corner and edge radii, but that is unverified).
 
 ## 4. Look development: HDRI, MeshPhysicalMaterial, contact shadows, @react-three/postprocessing under software rendering
 
@@ -137,12 +152,19 @@ Blender is easy to get into the container. The Blender **5.2.2** Linux x64 tarba
 ### Cited Findings
 - **MEASURED:** `https://download.blender.org/release/` lists Blender4.4 → Blender5.2. `blender-5.2.2-linux-x64.tar.xz` is 383 MB, took 9 s to download through the proxy and 24 s to extract. It is at `/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/blender-dl/blender-5.2.2-linux-x64/blender`.
 - **MEASURED (environment):** Mesa llvmpipe DRI (`libgl1-mesa-dri` 25.2.8) and `libGL`/`libgbm`/`libvulkan` are installed, but there is no Mesa `libEGL` and no Mesa Vulkan driver (lavapipe). The Chromium folder has a SwiftShader Vulkan ICD (`vk_swiftshader_icd.json`).
+- **SOURCE (Blender commit, Aug 2022, "Introduce headless OpenGL rendering on Linux"):** when normal initialisation fails, Blender retries with EGL's surfaceless Mesa platform, which makes `blender -b` work without a display. This applies to Linux only. — [bf-blender-cvs, 2022-08](https://lists.blender.org/pipermail/bf-blender-cvs/2022-August/176810.html); [commit rB3195a38](https://developer.blender.org/rB3195a38)
+- **FORUM (older, Blender 2.8 era):** "EEVEE always uses OpenGL". Rendering Eevee via `xvfb-run` + Mesa llvmpipe works "but is super slow". Cycles on CPU does not need OpenGL. — [devtalk.blender.org thread](https://devtalk.blender.org/t/blender-2-8-unable-to-open-a-display-by-the-rendering-on-the-background-eevee/1436)
+- **SOURCE (blender-mcp README):**
+  - The add-on "creates a socket server within Blender to receive and execute commands". Blender must be open with the add-on's server running, started automatically or via the **Start MCP Server** button. The Docker option hosts only the MCP server, "which connects out to the Blender addon". Headless mode is not covered.
+  - Tools include `execute_blender_code`, `generate_3d` (Tripo, Hunyuan3D, Hyper3D Rodin) and `search_assets`/`import_asset` (Poly Haven, Sketchfab, Poly Pizza).
+  - Warning: the socket server "has no authentication or encryption".
+  - — [ahujasid/blender-mcp](https://github.com/ahujasid/blender-mcp)
 
 ### Inferences
 - Cycles runs fully on CPU and should work headless with `blender -b`. Eevee probably needs Xvfb plus Mesa llvmpipe (GLX), or Mesa EGL/lavapipe installed via apt, or a Vulkan backend. All of this is untested.
 
 ### Gaps
-- None of the following was done: Eevee/Cycles timings at 1080×1920; Blender motion blur and DOF cost; the bpy camera-keyframe script; image-sequence textures from Remotion; the alpha round-trip (PNG / ProRes 4444) into Remotion; and the blender-mcp (ahujasid/blender-mcp) GUI requirement.
+- None of the following was done: Eevee/Cycles timings at 1080×1920; Blender motion blur and DOF cost; the bpy camera-keyframe script; image-sequence textures from Remotion; the alpha round-trip (PNG / ProRes 4444) into Remotion; and whether this machine's missing Mesa `libEGL` (only `libwayland-egl` is present) breaks the EGL fallback. The blender-mcp GUI question is answered above.
 
 ## 7. Spline, mockup tools (Rotato/Previewed), AI video (Higgsfield/Seedance, Runway, Veo, Kling)
 
@@ -161,59 +183,69 @@ Not researched.
 ## 8. Feasibility matrix for this environment and recommended pipeline
 
 ### Takeaway
-Measured so far, full-length (60 s, 1800 frames) real-time-3D rendering via R3F + SwiftShader on Remotion 4.0.250 is impractical. The sequence rate was more than 11.7 s per frame, which extrapolates to roughly 6 h or more for 1800 frames. Short 3D hero shots of 2–4 s (60–120 frames) are feasible. The best route found is a hybrid. Keep the DOM/CSS pipeline for most of the video. Make 2–4 short R3F hero shots with the app screen as a pre-rendered image texture, after upgrading Remotion or fixing the frameloop. Render them as separate compositions or clips and composite them into the main timeline. Fallbacks are an improved CSS-3D look, or Blender Cycles for a few hero shots once timed.
+**Updated after session 2.** Real 3D with React Three Fiber inside Remotion **is feasible** on this 4-CPU, no-GPU container, provided R3F does not run its default continuous loop. That means Remotion 4.0.534's `ThreeCanvas` (`frameloop='never'` + `advance()` per frame), or my workaround on 4.0.250. A basic phone scene rendered at ≤ 0.6 s per frame, including start-up. 4.0.250 as shipped was more than 11.7 s per frame. Post-processing cost in a sequence and Blender remain unmeasured.
 
 ### Cited Findings
-- **MEASURED, CSS/DOM route:** about 0.2 s per frame for a 1080×2340 DOM composition (60 frames in 11.7 s including bundling). Extrapolated, 1800 frames ≈ 6 min before motion blur. CameraMotionBlur multiplies by the sample count (my inference).
-- **MEASURED, R3F + SwiftShader (4.0.250):** one still costs 8.4–10.7 s without post and 24–25 s with the full post chain (including CLI start-up and shader compilation). A 60-frame sequence did not finish in 11.7 min (more than 11.7 s per frame, on a shared machine).
-- **MEASURED, Blender Eevee/Cycles:** not measured. Only the install was verified (33 s download + extract).
-- **DOCS:** For no-GPU rendering, `swangle` "is recommended. Rendering might be slow". `angle` has known memory leaks, so split long renders. — [Remotion: --gl options](https://www.remotion.dev/docs/gl-options)
+- **MEASURED, CSS/DOM:** about 0.2 s per frame (60 frames at 1080×2340 in 11.7 s, including bundling).
+- **MEASURED, R3F on 4.0.250 as shipped (`frameloop='always'`):** more than 11.7 s per frame. The 60 frames did not finish in 11.7 min (session 1, shared machine).
+- **MEASURED, R3F with the frameloop fix (session 2, idle machine), 1080×1920, 20 frames, including browser start-up and encode:**
+  - 4.0.534 at concurrency 1: **11.96 s**.
+  - 4.0.250 + workaround at concurrency 1: **11.57 s**.
+  - 4.0.534 at concurrency 4: **14.5 s**.
+- **MEASURED, R3F single stills (session 1):** post-processing (DOF + Bloom + CA + Noise + Vignette + AgX, MSAA 4) raised a one-frame CLI run from about 8.4 s to about 24.2 s. This includes shader compilation; there is no sequence number yet.
+- **MEASURED, Blender:** only the install (Blender 5.2.2: 9 s download, 24 s extract). No render timings.
+- **DOCS:** for no GPU, "`swangle` is recommended. Rendering might be slow". `angle` has known memory leaks, so split long renders. — [Remotion: --gl options](https://www.remotion.dev/docs/gl-options)
+- **DOCS:** alpha output uses ProRes 4444 or VP8/VP9 with `yuva*` pixel formats, played back with `<OffthreadVideo transparent>`. — [Remotion: Transparent videos](https://www.remotion.dev/docs/transparent-videos)
 
 ### Inferences
-Recommended pipeline (provisional, pending the experiments in the next section):
-1. Keep the app screens as React/DOM compositions in Remotion. Render each screen loop to a PNG/JPEG image sequence (or mp4) at the screen's native aspect (for example 1080×2340).
-2. Build 3D hero shots in a separate R3F composition using the procedural phone, the `ShapeGeometry` UV remap, a Poly Haven studio HDRI, Bloom and light DOF, and animate the camera with `interpolate`/`spring` from `useCurrentFrame()`. Keep each shot short (2–4 s). Do not leave R3F's default `frameloop="always"` running: upgrade Remotion to a version whose `ThreeCanvas` forces `frameloop='never'`, or test a workaround on 4.0.250. Use `--gl=swangle` and a modest MSAA (≤ 4).
-3. Render the hero shots as standalone clips. Then use them as `<OffthreadVideo>`/`<Video>` in the main 2D timeline, or render with alpha (ProRes 4444 / PNG sequence) if they must sit over 2D backgrounds.
-4. Fallback A: improve the CSS-3D look (fake reflections, gradient lighting, drop shadows, CameraMotionBlur) for the full length. Fallback B: Blender Cycles CPU for 1–2 offline hero shots, only if measured time per frame is acceptable.
+Recommended pipeline:
+1. **Upgrade** the Rotina project to `remotion`/`@remotion/*` **4.0.534**, all on the same version. This was verified to work with React 18 + R3F 8.18 + drei 9.122 + three 0.170. If upgrading is not possible, apply the 4.0.250 workaround: `frameloop="never"`, `onCreated` storing state, and a per-frame `delayRender` → 2×rAF → `advance()` → `continueRender`.
+2. **Screens:** keep them as React/DOM compositions. Pre-render them to a PNG still (verified) or a JPEG image sequence (6.5 s per 60 frames, verified). Map them onto a **procedural, generic phone** (ExtrudeGeometry + `ShapeGeometry` UV remap; verified). A generic phone also follows Apple's guidelines, which do not support renderings of Apple products.
+3. **Look:** a CC0 Poly Haven studio HDRI, MeshPhysicalMaterial (metal sides, clearcoat glass), and Bloom through emissive `toneMapped={false}` materials. Use light DOF focused on the screen. Avoid transparent "glass" overlays when using `flat` + EffectComposer, because they lift the blacks.
+4. **Extrapolation, not measured:** at ≤ 0.6 s per frame, a 60 s video (1800 frames) of basic 3D would take on the order of 10–20 min. Post-processing may multiply that by about 3 (based on stills). Keep 3D to hero shots, or accept longer renders.
+5. **Concurrency:** use `--concurrency=1` for short 3D shots (measured faster than 4). Test 2 for long renders.
+6. **Compositing:** nest the 3D composition directly in the main Remotion timeline. Alternatively, render ProRes 4444 with alpha and use `<OffthreadVideo transparent>`.
+7. **Fallbacks:** improve the CSS-3D look, or use Blender Cycles on CPU for one or two offline hero shots once timed. Eevee depends on headless EGL/llvmpipe and is unverified here. blender-mcp needs the GUI, so headless `blender -b -P script.py` with Claude-written bpy is the realistic route.
 
 ### Gaps
-- R3F per-frame cost after the frameloop fix, the Blender numbers, and the concurrency scaling (concurrency 1/2/4) are all unmeasured, so the matrix is incomplete.
+- Not yet measured:
+  - post-processing per frame in a sequence;
+  - whether image-sequence and `useOffthreadVideoTexture` textures work on 4.0.534;
+  - a full 1800-frame render;
+  - concurrency 2;
+  - Blender Eevee and Cycles timings.
 
 ## PENDENTE / NÃO PESQUISADO
 
-What was not finished, with concrete next steps. The experiment project is at `/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/r3f/`: `src/PhoneScene.tsx`, `src/Screen.tsx`, `src/Probe.tsx`, `public/screen.mp4|png|studio.hdr`, and stills in `out/`. In the commands below, `BX` is the headless-shell path `/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell`, `B` is the Blender binary path from section 6, and `<file>` is any test `.blend`.
+**Done in session 2:**
+- [x] R3F sequence timing with the frameloop fix (4.0.534, and the workaround on 4.0.250).
+- [x] Latest Remotion version (4.0.534; no 5.x on npm) and its React 18 compatibility.
+- [x] Remotion transparent-video docs.
+- [x] drei `Html` docs.
+- [x] blender-mcp: needs the GUI.
+- [x] Poly Haven license: CC0.
+- [x] Apple third-party guidelines.
+- [x] Blender headless EGL history.
 
-1. **R3F sequence timing (most important).**
-   - Re-run on an idle machine:
-     `npx remotion render build Phone out/basic.mp4 --gl=swangle --browser-executable=$BX --concurrency=1|2|4 --props='{"post":false,"shadows":false,"video":false,"msaa":0}' --frames=0-29`
-   - Then pass `frameloop="demand"` (or `"never"` plus `advance()`) to `<ThreeCanvas>` on 4.0.250 and compare.
-   - Then upgrade a copy of the project to the latest Remotion (`npx remotion upgrade`) and re-time. Check the GitHub releases for the version that added the `frameloop='never'` override: https://github.com/remotion-dev/remotion/releases
-2. **Screen texture.**
-   - Test an image-sequence texture: `remotion render Screen --sequence --image-format=jpeg`, then load frame N per Remotion frame with `TextureLoader` + `delayRender`.
-   - Test `useOffthreadVideoTexture` on the latest Remotion.
-   - Test the template-three approach (`@remotion/media` `<Video onVideoFrame>` → CanvasTexture → `advance()`).
-   - Find the moved docs page (the `/docs/use-offthread-video-texture` URL returned 404) and the video-as-texture guide at https://www.remotion.dev/docs/videos/as-threejs-texture
-3. **Blender timing.**
-   - Eevee: `$B -b --factory-startup --python-expr "import bpy,time; s=bpy.context.scene; s.render.engine='BLENDER_EEVEE'; s.render.resolution_x=1080; s.render.resolution_y=1920; s.render.filepath='/tmp/.../eevee'; t=time.time(); bpy.ops.render.render(write_still=True); print('T',time.time()-t)"`
-     - The engine ID changed across 4.2–5.x (`BLENDER_EEVEE_NEXT` vs `BLENDER_EEVEE`); verify it.
-     - If Eevee fails headless, try `apt-get install -y xvfb libegl1 libegl-mesa0 mesa-vulkan-drivers` and `xvfb-run -a $B -b ...`, or `--gpu-backend vulkan`.
-   - Cycles: the same with `engine='CYCLES'`, `s.cycles.device='CPU'`, `s.cycles.samples=32|64|128`, `s.cycles.use_denoising=True` (OIDN).
-   - Also test motion blur (`s.render.use_motion_blur`) and camera DOF.
-   - Docs to read:
-     - Command line: https://docs.blender.org/manual/en/latest/advanced/command_line/render.html
-     - Eevee: https://docs.blender.org/manual/en/latest/render/eevee/index.html
-     - blender-mcp: https://github.com/ahujasid/blender-mcp. It is believed to need the GUI add-on socket server, so bpy scripts via `blender -b -P` would replace it headless; verify this.
-4. **Assets and licensing (not researched).**
-   - Licenses: Sketchfab https://sketchfab.com/licenses, Poly Haven https://polyhaven.com/license (believed CC0; verify), Poly Pizza https://poly.pizza
-   - Apple trademark/marketing guidelines: https://www.apple.com/legal/intellectual-property/guidelinesfor3rdparties.html
-   - 3D icon sources and their licenses.
-   - AI 3D generators (Meshy, Tripo, Hunyuan3D, Higgsfield `generate_3d`) and their GLB output and licensing.
-5. **Look-dev docs (not read).**
-   - @react-three/postprocessing: https://react-postprocessing.docs.pmnd.rs/
-   - drei `Environment`/`ContactShadows`/`Html`/`RoundedBox`: https://drei.docs.pmnd.rs/
-   - Isolate per-effect cost (DOF / Bloom / MSAA / ContactShadows) with `--frames=0-29` runs.
-6. **Spline** (https://docs.spline.design/, `@splinetool/r3f-spline`): check deterministic frame-by-frame rendering in Remotion (the runtime has its own clock) and licensing.
-7. **Alternatives:**
-   - Rotato (https://rotato.app) and Previewed (https://previewed.app): export with transparent screen or alpha.
-   - AI video (Higgsfield/Seedance, Runway, Veo, Kling): pros and cons for consistency with the real UI.
-8. **Alpha compositing:** check the Remotion transparent-video docs (https://www.remotion.dev/docs/transparent-videos) for ProRes 4444 / WebM VP9 alpha and `<OffthreadVideo transparent>`.
+**Still open, with next steps.** Paths: scratch root `/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/`, projects `r3f` (4.0.250) and `r3f-latest` (4.0.534), and the benchmark script `bench.sh`. In the commands, `BX` is the headless-shell path `/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell`, `B` is the Blender binary path from section 6, and `<file>` is any test `.blend`.
+
+1. **Post-processing in a sequence (top priority).** Run:
+   `cd r3f-latest && npx remotion render build Phone out/L3.mp4 --gl=swangle --browser-executable=$BX --concurrency=1 --frames=0-19 --props='{"post":true,"shadows":false,"screen":"png","msaa":4,"loop":"default"}'`
+   Then repeat with `"shadows":true` and MSAA 0 to isolate each cost.
+2. **Texture modes on 4.0.534.** Run with `"screen":"seq"` and `"screen":"offthread"`, then inspect frames: `ffmpeg -i out/X.mp4 -vf "select='eq(n\,0)+eq(n\,19)',scale=360:-1,tile=2x1" -frames:v 1 t.jpg`.
+3. **Full length.** Render 1800 frames of the basic scene to confirm the 10–20 min extrapolation. Also test `--concurrency=2`.
+4. **Blender timings:**
+   - Eevee: `$B -b --factory-startup --python-expr "<set engine BLENDER_EEVEE, 1080x1920, render>"`.
+   - If it fails, run `apt-get install -y libegl1 libegl-mesa0` (or `xvfb`, then `xvfb-run -a`).
+   - Cycles: `CYCLES`, CPU, 32/64/128 samples, OIDN denoise.
+   - Docs: https://docs.blender.org/manual/en/latest/advanced/command_line/render.html
+5. **Find the Remotion version that added `ManualFrameRenderer`:** `npm pack @remotion/three@4.0.X` and `grep ManualFrameRenderer`, bisecting between 4.0.250 and 4.0.534.
+6. **Not researched yet:**
+   - Asset licenses: Sketchfab (https://sketchfab.com/licenses), Poly Pizza (https://poly.pizza).
+   - 3D icon packs.
+   - AI 3D generators (Meshy, Tripo, Hunyuan3D; blender-mcp `generate_3d` supports Tripo, Hunyuan3D and Rodin): output formats and licenses.
+   - Spline: deterministic rendering in Remotion and licensing (https://docs.spline.design/, `@splinetool/r3f-spline`).
+   - Rotato (https://rotato.app) and Previewed (https://previewed.app).
+   - AI video for B-roll (Higgsfield/Seedance, Runway, Veo, Kling).
+   - @react-three/postprocessing docs (https://react-postprocessing.docs.pmnd.rs/).
+   - The drei `RoundedBox` radius limit.

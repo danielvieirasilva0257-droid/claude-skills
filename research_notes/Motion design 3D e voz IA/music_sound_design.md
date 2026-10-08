@@ -2,7 +2,7 @@
 
 Scope reminder: ~60 s vertical promos built with Claude Code + Remotion, pt-BR TTS voiceover, currently an original 120 BPM numpy-synthesized track mixed with ffmpeg (sidechaincompress ducking + loudnorm −14 LUFS). Goal: professional music + SFX legally usable in Meta paid ads, plus concrete mix settings and an ffmpeg/Remotion sync workflow.
 
-Status: work in progress — this file is updated incrementally. Many vendor prices below come from third-party price trackers (flagged); always confirm on the live vendor page before buying.
+Status: FINAL (research stopped early at coordinator request; open items listed in "PENDENTE / NÃO PESQUISADO" at the end). Many vendor prices below come from third-party price trackers (flagged); always confirm on the live vendor page before buying. Items marked "inference" or "unsourced" are the researcher's reasoning, not cited facts.
 
 ---
 
@@ -117,17 +117,25 @@ For paid Meta ads you need a tier that explicitly says "paid ads / digital adver
 - Soundraw Creator ≈US$16.99/mo (ads covered per one listing; free tier no downloads); Beatoven Creator ≈US$10/mo or US$100/yr (30 download-minutes); Mubert Creator/Pro/Business US$14/39/199/mo, Render standard licenses prohibit Content ID registration; AIVA Standard €15/mo (€11 annual), Pro €49 (€33 annual) — only Pro transfers copyright and allows commercial projects beyond YouTube/Twitch/TikTok/Instagram monetization — [Costbench AIVA vs Soundraw](https://www.costbench.com/compare/aiva-vs-soundraw/); [Costbench Beatoven](https://costbench.com/software/ai-music-apis/beatoven-ai/); [Jack Righteous: Mubert review](https://jackrighteous.com/es/blogs/music-creation-process-guide/mubert-ai-review-licensing-limits-and-best-uses-for-creators); [Mubert Render subscription agreement](https://mubert.com/render/docs/subscription-agreement); [Costbench AIVA](https://costbench.com/software/ai-music-generators/aiva/)
 
 ### Inferences
-- (To be completed after remaining searches.)
+- Best fit for an API-driven, GPU-less Linux pipeline: ElevenLabs Eleven Music (paid plan; `music_v2`/`music_v2_5`; 3 s–5 min; section-level composition/inpainting; docs explicitly list "advertising" among commercial uses) or Google Lyria via Gemini API (≈US$0.04 per 30 s clip / ≈US$0.08 per full song; 44.1 kHz stereo; WAV available), plus Lyria RealTime when an exact BPM (60–200) and stem-like variants (`mute_drums`, `mute_bass`, `only_bass_and_drums`) are needed.
+- Suno v6 is attractive for full "songs" but has no official API (invite-only program), UMG/Sony litigation continues, and it pledged watermark/fingerprinting — usable for ads only from a paid plan, keep generation records; not automatable from Claude Code without unofficial wrappers.
+- Udio: not usable (no downloads). MusicGen: weights non-commercial → avoid for ads. ACE-Step 1.5 (MIT) and DiffRhythm (Apache-2.0) are commercially licensable open weights, but self-hosting realistically needs a GPU (not available in the container) — CPU speed not verified.
+- Prompted BPM/structure is never guaranteed in text-to-music models (except Lyria RealTime's explicit `bpm`): after generating, run librosa/Essentia beat tracking and either re-time the animation to the detected beats or time-stretch the audio (ffmpeg `atempo`) — inference.
+- Purely AI-generated music has weak/no copyright protection (per secondary legal guides cited in search results), so a competitor could reuse it; acceptable for ads but no exclusivity — inference.
 
 ### Gaps
-- (To be completed.)
+- Suno's current ToS, prices and download caps not read from a primary source; outcome of UMG/Sony v. Suno pending.
+- ElevenLabs Music per-plan commercial-rights table and whether stems are exposed via API not retrieved.
+- Google's commercial-use/indemnity position for Lyria on Gemini API vs Vertex AI not confirmed from Google docs.
+- Stable Audio 2.5 official specs (max duration, inpainting details) — announcement page redirected and was not read; current API price after Aug 2025 not confirmed.
+- No independent blind-listening quality comparison found (ACE-Step/Suno claims are self-reported). Riffusion/Producer.ai, Soundraw/Beatoven/Mubert APIs not researched.
 
 ---
 
 ## 3. Sound effects for motion graphics (libraries, AI SFX, which SFX, layering/timing)
 
 ### Takeaway
-(Section in progress.) Cleanest no-credit SFX sources for ads: SFX bundled in a paid music plan (Artlist Music & SFX Pro, Epidemic, Envato, Motion Array, Uppbeat), ZapSplat Gold, Freesound filtered to CC0, ElevenLabs SFX on a paid plan. Avoid Freesound CC-BY-NC and free ZapSplat without credit.
+Timing principle: a "rush-into-a-hit" whoosh must peak on the landing frame and be followed by an impact on the contact frame; because viewers detect early audio sooner (≈45 ms) than late audio (≈125 ms), never lead the visual hit by more than ~1 frame at 30 fps. Cleanest no-credit SFX sources for ads: SFX bundled in a paid music plan (Artlist Music & SFX Pro, Epidemic, Envato, Motion Array, Uppbeat), ZapSplat Gold, Freesound filtered to CC0, ElevenLabs SFX on a paid plan. Avoid Freesound CC-BY-NC and free ZapSplat without credit.
 
 ### Cited Findings
 - ZapSplat: two licenses — Standard (free, attribution required) and Gold (paid, no attribution; ≈US$4–5/mo per guides, conflicting); downloads made while Gold stay credit-free after cancelling; no redistribution as standalone SFX; WAV may be Gold-only (contested) — [LicenseOrg ZapSplat guide](https://licenseorg.com/guide/music-audio/zapsplat); [FilmDaft SFX libraries](https://filmdaft.com/royalty-free-sound-effects-online/)
@@ -146,14 +154,23 @@ For paid Meta ads you need a tier that explicitly says "paid ads / digital adver
 - Web app billing reported at 40 credits per second when duration is set explicitly (Japanese test) — [Classmethod](https://dev.classmethod.jp/articles/elevenlabs-sound-effects-web-ui-trial/)
 
 ### Inferences
+- Animation → SFX map for an app promo (inference from the cited craft guidance): kinetic text/word pop-ins → short pops/clicks/blips (pitch-varied per word); phone-mockup taps → UI tap/click; swipes/slides → swish; toggles/checkmarks → switch click/"ding" (habits); notifications → chime; finance numbers → coin/cash-register; workout → whistle/heartbeat/weight clank; scene changes → whoosh into low thump; tension intro → drone/swell; "problem" beats → glitch; text entry → typing; logo reveal → riser or reverse cymbal ending exactly on the drop + braam/sub-drop/impact.
+- Layering recipe: transient (click/tick) + body (low thump) + tail (air/reverb); bigger/heavier moves = lower and slower layers; vary pitch/speed on repeated SFX.
+- Placement (inference; the "6–15 frames of whoosh lead" figure appeared only as unsourced general practice): start whooshes ~6–15 frames before the landing so their peak coincides with the fastest frames/landing; put impact transients ON the contact frame (or at most 1 frame = 33 ms early); end risers exactly on the bar line of the drop.
+- In Remotion: keep one timeline constants file (scene start frames, beat grid) and drive both animations and `<Sequence from={...}><Audio .../></Sequence>` SFX from it, so retiming an animation moves its SFX automatically.
+- Phone speakers: keep SFX mostly mono/narrow and high-passed (except impacts), since phones lose most content below ~500 Hz (see section 4).
+- Cheapest custom SFX: ElevenLabs SFX API on a paid plan (prompt with "whoosh", "impact", "braam", "glitch", "riser", "one-shot"; WAV 48 kHz); otherwise use the SFX bundled with the chosen music subscription.
+
 ### Gaps
+- No authoritative source for exact whoosh lead-in frame counts (School of Motion content paywalled; Reddit r/sounddesign / r/MotionDesign not read).
+- UI sound pack vendors, Epidemic/Artlist/Envato SFX catalog sizes, and current Soundsnap/ZapSplat prices not verified.
 
 ---
 
 ## 4. Mixing for short-form (loudness, levels, ducking, EQ, voice chain, ffmpeg)
 
 ### Takeaway
-(Section in progress.) Neither Meta nor TikTok publishes an official loudness spec; the de-facto target used across tools is −14 LUFS integrated, ≤ −1 dBTP true peak.
+Neither Meta nor TikTok publishes an official loudness spec; the de-facto target used across tools is −14 LUFS integrated, ≤ −1 dBTP true peak (−1.5 to −2 dBTP safer for AAC re-encoding). Voice must dominate: high-pass + presence EQ + de-ess + compression on the voice, a static 2–5 kHz dip in the music, sidechain ducking of ~6–12 dB, mono-safe low end with saturated bass harmonics for phone speakers, then two-pass loudnorm.
 
 ### Cited Findings
 - Common target −14 LUFS integrated, −1 dBTP; some sources suggest −14 to −16 LUFS; one outlier says −10 to −12; none traces to official Meta/TikTok documentation — [OpenClip: normalization targets](https://openclip.app/learn/audio-normalization); [VloggingPro loudness tool](https://vloggingpro.com/tools/audio-loudness/); [Opus Clip](https://opus.pro/blog/best-loudness-normalizers); [video-use project constants](https://instagit.com/browser-use/video-use/social-media-loudness-normalization-targets/)
