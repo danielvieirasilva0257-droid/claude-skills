@@ -72,7 +72,7 @@ For paid Meta ads you need a tier that explicitly says "paid ads / digital adver
 ## 2. AI music generation (Oct 2026): quality, control, API, commercial terms, legal situation
 
 ### Takeaway
-(Section in progress.) Legal landscape changed sharply: Suno settled with Warner (Nov 2025) and launched "licensed" v6 models on 9 Sep 2026 (with WMG, BMG, Believe) but UMG and Sony are still suing; Udio settled with UMG/Warner and turned into a walled garden (downloads disabled since Oct 2025). For ad use, the lowest-risk AI options are those with clear commercial terms and API access: ElevenLabs Eleven Music (paid plans, music_v2 API), Google Lyria 3/3.5 (Gemini API ~US$0.04–0.08/track, SynthID watermark), Stable Audio 2.5 (API ~US$0.20/generation; "commercially safe" licensed training data). Open weights: ACE-Step 1.5 (MIT per HF model card) is usable commercially; MusicGen weights are CC-BY-NC (non-commercial).
+The legal landscape has changed sharply. Suno settled with Warner (Nov 2025) and launched "licensed" v6 models on 9 Sep 2026 (with WMG, BMG, Believe) but UMG and Sony are still suing; Udio settled with UMG/Warner and turned into a walled garden (downloads disabled since Oct 2025). For ad use, the lowest-risk AI options are those with clear commercial terms and API access: ElevenLabs Eleven Music (paid plans, music_v2 API), Google Lyria 3/3.5 (Gemini API ~US$0.04–0.08/track, SynthID watermark), Stable Audio 2.5 (API ~US$0.20/generation; "commercially safe" licensed training data). Open weights: ACE-Step 1.5 (MIT per HF model card) is usable commercially; MusicGen weights are CC-BY-NC (non-commercial).
 
 ### Cited Findings
 
@@ -189,14 +189,35 @@ Neither Meta nor TikTok publishes an official loudness spec; the de-facto target
 - Auphonic: credit-based; free 2 h/month; yearly-billed tiers S 9 h US$11, M 21 h US$24, L 45 h US$49, XL 100 h US$99 per month; multitrack (with ducking/leveling) limited to <20 min on free/monthly tiers; loudness targets (LUFS + true peak) on all tiers; REST API + CLI — [Auphonic pricing](https://auphonic.com/pricing); [Tooliverse review](https://tooliverse.ai/tools/auphonic)
 
 ### Inferences
+- Proposed ffmpeg chain (option names checked against the ffmpeg docs; values are starting points; NOT executed in this session — test on ffmpeg 6.1). Inputs: 0 = music, 1 = voice, 2.. = SFX already placed (e.g., with `adelay=1500|1500`). Thresholds are written as linear amplitude (0.1 ≈ −20 dBFS, 0.05 ≈ −26 dBFS):
+  ```
+  ffmpeg -i music.wav -i voice.wav -i sfx_bus.wav -filter_complex "
+  [1:a]highpass=f=80,equalizer=f=250:t=q:w=1:g=-2,equalizer=f=3000:t=q:w=1.4:g=3,treble=g=1.5:f=9000,
+       deesser=i=0.4:m=0.5:f=0.5,
+       acompressor=threshold=0.1:ratio=3:attack=5:release=120:knee=4:makeup=1.6,asplit=2[vox][key];
+  [0:a]highpass=f=30,equalizer=f=3500:t=q:w=1:g=-3,volume=-4dB[mus];
+  [mus][key]sidechaincompress=threshold=0.05:ratio=6:attack=10:release=400:knee=4:detection=rms[ducked];
+  [2:a]highpass=f=120,volume=-3dB[sfx];
+  [ducked][vox][sfx]amix=inputs=3:normalize=0:duration=longest,alimiter=limit=0.89:level=disabled[out]
+  " -map "[out]" -ar 48000 mix_pre.wav
+  ```
+  then loudnorm two-pass: pass 1 `ffmpeg -i mix_pre.wav -af loudnorm=I=-14:TP=-1.5:LRA=7:print_format=json -f null -` → pass 2 `ffmpeg -i mix_pre.wav -af loudnorm=I=-14:TP=-1.5:LRA=7:measured_I=<..>:measured_TP=<..>:measured_LRA=<..>:measured_thresh=<..>:offset=<..>:linear=true:print_format=summary -ar 48000 final.wav` (always set `-ar 48000`; linear mode silently falls back to dynamic if the target can't be met — check the summary).
+- Why these values: `amix` normalizes by default (would drop each input's level) → `normalize=0`; ducking attack 5–20 ms keeps the first syllable clear, release 300–500 ms avoids pumping between words (vendor ranges above); the static music dip at 3–3.5 kHz frees the voice presence band; `highpass` default is 3000 Hz, so `f` must always be set.
+- Level starting points (unsourced rule of thumb, tune by ear): music bed ~10–15 dB under the voice while speaking; music back up near voice level where there is no VO (drop/logo reveal); SFX hits ~3–6 dB under voice peaks.
+- Phone translation: keep everything below ~120 Hz mono (`stereotools` or mono sum of the bass), add harmonics to the 808/bass, check the final mix summed to mono and on a phone speaker.
+- Alternative to hand-tuning: Auphonic multitrack (voice + music) does leveling, auto-ducking and loudness targeting via API; free 2 h/month suffices for 60 s ads.
+
 ### Gaps
+- No official Meta/TikTok loudness spec found; AES TD1008 PDF not read directly (secondary summaries only).
+- No authoritative published voice-vs-music dB ratio for social ads; numbers above are rules of thumb.
+- The ffmpeg chain was not executed in this session.
 
 ---
 
 ## 5. Editing music to picture (BPM for 30 fps, bar-accurate cuts, hit points, Remotion APIs, beat detection)
 
 ### Takeaway
-(Section in progress.)
+Pick a BPM whose beat is a whole number of frames at 30 fps (frames/beat = 1800/BPM: 120→15, 150→12, 100→18, 90→20), build one shared beat-grid/timeline constants file that drives both Remotion animations and audio `<Sequence>`s, and use beat tracking (librosa/Essentia) to snap cuts on third-party or AI-generated tracks. Remotion's current audio API is `<Audio>` from `@remotion/media` (legacy `<Html5Audio>`, formerly `<Audio>`), with `trimBefore`/`trimAfter` replacing `startFrom`/`endAt`.
 
 ### Cited Findings
 - Remotion: `<Html5Audio>` (previously called `<Audio>`) from `remotion`; Remotion now recommends `<Audio>` from `@remotion/media` for new projects. Props: `volume` (number; callback `(frame)=>number` still supported but no longer recommended — use `useCurrentFrame()` + `interpolate()`), values capped 0–1 unless `useWebAudioApi`; `trimBefore`/`trimAfter` (renamed from `startFrom`/`endAt` in v4.0.319), `durationInFrames` (v4.0.530), `playbackRate`, `loop`, `loopVolumeCurveBehavior` ("repeat"|"extend"), `muted`, `toneFrequency` (0.01–2, render-time only), `audioStreamIndex`, `name`, `showInTimeline` — [Remotion: Html5Audio](https://www.remotion.dev/docs/html5-audio)
@@ -207,15 +228,22 @@ Neither Meta nor TikTok publishes an official loudness spec; the de-facto target
 
 ### Inferences
 - Frame math at 30 fps: frames per beat = 1800 / BPM. Integer values: 90 BPM = 20 f, 100 = 18 f, 112.5 = 16 f, 120 = 15 f, 128.57 = 14 f, 150 = 12 f, 180 = 10 f. 128 BPM = 14.0625 f/beat (drifts 1 frame every 16 beats). At 120 BPM 4/4: beat 15 f, bar 60 f = 2 s; 60 s = 30 bars = 1800 frames (own calculation).
+- At 150 BPM (phonk/funk energy): beat 12 f, bar 48 f = 1.6 s; 36 bars = 1728 f = 57.6 s → leaves 72 f (2.4 s) for a stinger/logo tail (own calculation).
+- Structure for a 60 s promo at 120 BPM (inference): bars 1–4 tension intro (drone/swell), bars 5–6 riser (2 bars = 4 s) ending on the drop at the logo/hook, section changes on 4- or 8-bar boundaries with an impact on each downbeat, final 1–2 bars stinger/ending hit on the end card.
+- Cutting a licensed track to length (inference): detect beats (librosa `beat_track`) → choose edit points on downbeats → join with a short `acrossfade` (10–50 ms) and prefer the library's official short/ending versions or stems when offered.
+- Remotion implementation (inference): `const FPS=30, BPM=120, FPB=FPS*60/BPM; const beat=(n)=>Math.round(n*FPB);` then `<Sequence from={beat(16)}><Audio src={staticFile('sfx/impact.wav')} /></Sequence>`; music volume automation with `interpolate(frame, [...])` driven by the same constants (e.g., lift the bed during non-VO sections); export beats detected by librosa as JSON and import them into the composition for tracks whose tempo drifts; drive bass-reactive scale/glow from the first bins of `visualizeAudio()`.
+- Practical render split (inference): render the Remotion video, then do the final mix in ffmpeg (section 4) from separate stems (music, VO, SFX bus), so mixing can be re-run without re-rendering video.
 
 ### Gaps
+- Props of the new `@remotion/media` `<Audio>` were not fetched (only `<Html5Audio>` verified).
+- Downbeat (bar-1) detection tools (madmom, BeatNet, all-in-one) and aubio's beat tracker not researched.
 
 ---
 
 ## 6. Brazil / Instagram context (trending styles; trending copyrighted audio in paid ads; Meta Sound Collection)
 
 ### Takeaway
-(Section in progress.) Instagram's in-app licensed music library is for personal/non-commercial use and is restricted for many business accounts; it is not a license for ads. Meta Sound Collection (royalty-free, 14,000+ tracks per Meta help text) is the platform-provided alternative, cleared only for Facebook/Instagram.
+Instagram's in-app licensed music library is for personal/non-commercial use and is restricted for many business accounts; it is not a license for ads (Meta's Music Guidelines: commercial use "prohibited unless you have obtained appropriate licenses"). Brazilian phonk / funk-derived sounds are the clearest documented 2026 trend (TikTok-led), relevant to workout content. Meta Sound Collection (royalty-free, 14,000+ tracks per Meta help text) is the platform-provided alternative, cleared only for Facebook/Instagram.
 
 ### Cited Findings
 - Meta's help center frames the licensed in-app catalog as personal, non-commercial; some business profiles/post types lose access; Sound Collection (14k+ royalty-free tracks) is offered as alternative for Reels/Stories — [Instagram Help](https://help.instagram.com/ipad-app/402084904469945); [Soundstripe: Instagram music library](https://www.soundstripe.com/blogs/instagram-music-library)
@@ -231,9 +259,26 @@ Neither Meta nor TikTok publishes an official loudness spec; the de-facto target
 - Funk in advertising: academic study links growing use of funk in TV ads to funk culture's growth and consumer acceptance; GR6 exec says brands focus on funk and trap because of audience — [Unisinos repository](https://repositorio.jesuita.org.br/handle/UNISINOS/11006?show=full); [Propmark](https://propmark.com.br/?p=1945)
 
 ### Inferences
+- Never put trending label tracks (in-app library) in Rotina's paid ads or brand-account posts; use (a) a subscription library tier that names paid ads, (b) paid-plan AI music with commercial terms, or (c) Meta Sound Collection only for Meta-only placements; keep license proof per ad and a backup cut with cleared audio in case an ad gets muted.
+- Sound Collection tracks are not cleared for TikTok/YouTube cross-posting → for multi-platform ads, a library or AI license covering all platforms is simpler.
+- Style direction (inference from the trend data; no data specific to fitness/finance app ads): "Brazilian phonk"/funk-inspired instrumentals (≈130–150 BPM; 150 BPM gives 12 frames/beat at 30 fps) for workout energy; hybrid cinematic trailer (braams, risers, impacts) for the logo reveal; dark synthwave/electronic as an on-brand alternative; lo-fi for calmer habit/finance explainers. Generate or license instrumentals "in the style of" the genre — never imitate a specific copyrighted hit.
+
 ### Gaps
+- No data on which music styles perform best in Brazilian app/fitness/finance ads (Meta Ad Library scan not done).
+- Meta's own Sound Collection license text and Ads Manager "Add music" docs not retrieved; TikTok Commercial Music Library rules not researched.
 
 ---
 
 ## PENDENTE / NÃO PESQUISADO
-(Updated at the end of the research.)
+Research was cut short at the coordinator's request. Open items and concrete next steps:
+1. **TikTok Commercial Music Library (CML)**: rules for business accounts and TikTok ads (not researched). Next: TikTok Business Help Center → "Commercial Music Library".
+2. **Meta primary sources**: Sound Collection license text (facebook.com/sound/collection) and the Ads Manager "Add music" help article. Only third-party summaries plus Meta's Music Guidelines were read.
+3. **Vendor confirmations in writing** (before buying): Epidemic Pro, Artlist Music & SFX Pro, Uppbeat (post-2 Sep 2026 terms), Envato (per-project registration for ad variants). Ask about paid/boosted Meta ads, TikTok ads, and whether ads stay licensed after cancellation. Official Epidemic and Musicbed prices were not visible (only trackers).
+4. **AI music primary terms**: Suno ToS and current prices/download caps; ElevenLabs Music per-plan commercial-rights table, stems via API, and `composition_plan` parameter names; Google Lyria commercial-use/indemnity on Gemini API vs Vertex AI; Stable Audio 2.5 specs (the announcement URL now redirects to stability.ai/news-updates/…) and current API price.
+5. **Not researched at all**: Riffusion/Producer.ai, Soundful/Loudly, the Beatoven/Soundraw/Mubert APIs, AIVA's official license text, and independent quality comparisons.
+6. **Remotion**: props of the new `@remotion/media` `<Audio>` (fetch remotion.dev/docs/media/audio); confirm the volume-callback support there.
+7. **Beat tools**: downbeat detection (madmom, BeatNet, all-in-one) and aubio, to make bar-accurate cuts automatic.
+8. **Sound-design craft sources**: School of Motion and SonicSkills (paywalled) and Reddit threads (r/sounddesign, r/MotionDesign) were not read. The whoosh lead-in frame counts remain unsourced.
+9. **Loudness**: the AES TD1008 PDF was not read directly, and no official Meta/TikTok loudness spec was found. Next: measure real top-performing Reels with `ffmpeg -af ebur128` to see their actual levels.
+10. **Testing**: the proposed ffmpeg chain (section 4) has not been run. Next: run it on the user's container (ffmpeg 6.1) with the current VO and music, and check the loudnorm JSON (target −14 LUFS, TP ≤ −1.5 dBTP).
+11. **Brazil ad creative data**: scan the Meta Ad Library (Brazil) for fitness, habit and finance app ads to see which music styles competitors use.
