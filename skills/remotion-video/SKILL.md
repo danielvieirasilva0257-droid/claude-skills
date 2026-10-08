@@ -103,6 +103,36 @@ const AnimatedButton = () => {
 4. Render: `npx remotion render <CompositionId> out/video.mp4` (still: `npx remotion still`).
 5. Check a few frames in the Studio before the full render.
 
+## "After Effects" polish (learned on the Rotina video, see `rotina-video/` in this repo)
+
+- **Easing:** `Easing.bezier(0.16, 1, 0.3, 1)` (expo out) for entrances and `Easing.bezier(0.83, 0, 0.17, 1)` for whip pans. Wrap them in one `tween(frame, range, out, easing)` helper that always clamps.
+- **Motion blur:** wrap the scene in `<CameraMotionBlur shutterAngle={200} samples={10}>` from `@remotion/motion-blur`. Render time grows with `samples`.
+  - Keep static backgrounds **outside** the blur, because stacked samples on dark gradients cause banding.
+  - Put film grain on top, outside the blur: an SVG `feTurbulence` with `seed={frame % 12}`, opacity ~0.09, `mix-blend-mode: overlay`.
+  - Don't count numbers frame by frame under motion blur, because the digits ghost. Swap the value once and add a spring "pop".
+- **Text animator:** per-letter stagger of translateY + `filter: blur()` + opacity. Exit with blur and fade upward.
+- **Phone mockup:** design screens at 390pt width and `transform: scale()` them into the device frame. Animate the device with rotateX/rotateY under `perspective`, and add a scale "punch-out" during whips.
+- **Screens in a strip:** put the screens side by side and translate the strip for transitions. Start each screen's local animation a few frames before it slides in, so a whip never reveals an empty screen.
+
+## App explainer with voice and music (see `rotina-video/src/explainer`)
+
+- **Script first.** Write one voice line per beat, generate each line separately, trim the silence (`ffmpeg silenceremove` + `areverse`), and measure its duration. Then lay out the timeline from the real durations.
+- **Voice:** `edge-tts` (≥ 7.x) with `pt-BR-AntonioNeural` / `pt-BR-FranciscaNeural`. Behind a TLS proxy, append the proxy CA to the venv's `certifi` bundle.
+- **Music:** pick a BPM where a beat is a whole number of frames (120 BPM = 15 frames). Put section changes on bars and add a riser into the logo "drop" plus an impact on each section.
+- **Mix in ffmpeg, not in Remotion:** use `sidechaincompress` with the voice as the key to duck the music, then `loudnorm=I=-14` for Instagram/TikTok. Play the result with a single `<Audio>`.
+- **Sync visuals to words:** `wordAt(line, word)` estimates the frame from the word's character position in the sentence. Use it for captions, taps, selections and pop-outs.
+- **Camera:** write `kf(frame, [[f, v, easing?], ...])` keyframes for scale/rotate/translate, like AE graph keys. Use a 360° spin (phone with a back plate and `backfaceVisibility: hidden`) to change sections, and slide pushes within a section. Zoom in on the area being narrated.
+- **Make it intuitive:**
+  - Show a tap ripple wherever the narration implies an action.
+  - Use pop-out badges/cards with `translateZ` for key numbers.
+  - Keep captions short and keyword-based (not a transcript), with accent colors.
+
+## Rendering in a sandbox / offline
+
+- Bundle fonts in `public/fonts` and load them with `FontFace` + `staticFile` + `delayRender`. `@remotion/google-fonts` fails behind a TLS-intercepting proxy.
+- Use an existing Chromium: `--browser-executable=/path/to/headless_shell` (Playwright's `chromium_headless_shell`).
+- Check stills at key frames (`npx remotion still … --frame=N`) and tile them with `ffmpeg … hstack` before the full render.
+
 ## Reusing other skills
 
 - `button-animation` and `thumbnail-carousel` hold UI/animation ideas (springs, scale-in, staggered thumbnails). Their code is interactive React, so port the *motion values* into `interpolate`/`spring`, don't copy the components verbatim.

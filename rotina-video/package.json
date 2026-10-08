@@ -1,0 +1,23 @@
+{
+  "name": "rotina-video",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "studio": "remotion studio",
+    "render": "remotion render Rotina out/rotina.mp4 --codec h264 --crf 16",
+    "render:explainer": "remotion render RotinaExplainer out/rotina-explainer.mp4 --codec h264 --crf 17 --audio-codec aac --audio-bitrate 256k"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.250",
+    "@remotion/motion-blur": "4.0.250",
+    "@remotion/transitions": "4.0.250",
+    "lucide-react": "0.263.1",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.250"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.3",
+    "typescript": "5.5.4"
+  }
+}
