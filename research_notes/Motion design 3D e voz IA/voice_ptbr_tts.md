@@ -68,7 +68,30 @@ No pt-BR-specific blind test or leaderboard turned up. The only large blind-pref
 - **Brazilian community and blog opinions** (not independent tests): ElevenLabs is named most often as the best for PT-BR (an accountant-focused blog calls it "o melhor TTS do mercado em PT-BR"). Others recommend Hume Octave for emotion control and Murf for ease of use. — [Roberto Dias Duarte](https://www.robertodiasduarte.com.br/ferramentas-de-ia-para-contadores/elevenlabs/); [SimilarLabs PT](https://similarlabs.com/pt/blog/best-ai-voice-generators-2026); [NarrationBox](https://narrationbox.com/blog/top-ai-voices-for-portuguese-content-in-2025)
 - **Known pt-BR pitfalls named by a vendor**: the final "L" in "Brasil" and the palatalized "t" in "tia". These are useful test words. — [AnySpeech PT (vendor page)](https://anyspeech.io/pt/portuguese-text-to-speech)
 
+**Batch C (resumed session, 2026-10-08): pt-BR-specific quality evidence**
+- **Google Cloud TTS Gemini-TTS** (docs updated 2026-10-07):
+  - **`pt-BR` is GA; `pt-PT` is Preview.**
+  - Models in Cloud TTS: `gemini-3.1-flash-tts-preview` (Preview), `gemini-2.5-flash-tts`, `gemini-2.5-flash-lite-preview-tts` (Preview), `gemini-2.5-pro-tts`. Gemini 3.8 Flash and Flash-Lite TTS are "Preview only through the Gemini Enterprise API, not Cloud TTS".
+  - 30 prebuilt voices. Style is set with natural-language prompts.
+  - Markup tags (Preview): `[sigh]`, `[laughing]`, `[uhm]`, `[whispering]`, `[shouting]`, `[extremely fast]`, `[short pause]` / `[medium pause]` / `[long pause]`. Adjective tags such as `[curious]` get *spoken aloud* ("likely an undesired side effect").
+  - No timestamps are mentioned. Output tops out at about 655 s, and text + prompt at 8,000 bytes.
+  — [Cloud TTS Gemini-TTS docs](https://docs.cloud.google.com/text-to-speech/docs/gemini-tts)
+- **The only hands-on pt-BR comparison found** (Brazilian blog, apparently early May 2026; author's opinion, not blind): ElevenLabs (Creator) versus Gemini 3.1 Flash TTS on a 45 s UGC ad script, with Brazilian Portuguese among the languages tested.
+  - Gemini's Portuguese "soaram visivelmente mais fluentes", and pt-BR output would "genuinamente ... passar" a native speaker's sanity check.
+  - On a hook under 30 s the author "teria dificuldade de te dizer qual clipe veio de qual ferramenta".
+  - Observed timbre drift "perto do minuto 3" on a long clip.
+  - The article's per-minute Gemini cost estimate ($0.70–1.00/min) is inconsistent with its own token prices ($1/M text in, $20/M audio out), so treat it as an error (see Inferences).
+  — [NemoVideo PT-BR](https://nemovideo.com/pt-BR/blog/gemini-3-1-flash-tts-vs-elevenlabs)
+- **ElevenLabs accent is chosen by the voice, not by the language code.** In a support thread, a user who wanted European Portuguese got a Brazilian accent; the replies pointed to specific voices and `eleven_multilingual_v2` (forum, not official docs). A Segmind template says "pt" covers both pt-BR and pt-PT and advises picking voices trained on native speakers. — [Vapi support thread](https://support.vapi.ai/t/29188411/portuguese-accent-from-portugal); [Segmind ElevenLabs Portuguese](https://www.segmind.com/pixelflows/elevenlabs-portuguese-tts-api)
+- **Vendor-run comparison** (competitor; language unspecified): Azure WER 3.18% versus ElevenLabs 2.83%. — [Cartesia vs page](https://www.cartesia.ai/vs/elevenlabs-vs-microsoft-azure-text-to-speech)
+- **Academic pt-BR baselines are older**: an ICASSP 2023 paper (Alana AI) compares VITS, GlowTTS and GradTTS fine-tuned on the TTS-Portuguese corpus. — [ICASSP 2023](https://rc.signalprocessingsociety.org/conferences/icassp-2023/spsicassp23vid1912); [TTS-Portuguese Corpus (arXiv)](https://arxiv.org/abs/2005.05144v4)
+- Search engines returned **no Reddit threads** comparing pt-BR TTS in 2026; results were dominated by vendor pages.
+
 ### Inferences
+- **[INFERENCE] Gemini's real per-minute cost.** At about 25 audio tokens per second (Google's own conversion, cited in Q2), one minute is about 1,500 tokens, or **$0.03/min** at $20/M. The blog's $0.70–1.00/min is about 30x too high.
+- **[INFERENCE] Avoiding European-Portuguese drift.**
+  - ElevenLabs: pick a voice whose library metadata and sample are Brazilian (Voice Library filter: Portuguese, Brazilian accent).
+  - Google: Cloud TTS with `languageCode: pt-BR` is the GA path. Gemini 3.8 Flash via the Gemini API only says "Portuguese", so add a style prompt such as "sotaque brasileiro (paulistano), locutor de comercial".
 - **[INFERENCE]** edge-tts serves the same neural voices Azure sells; a Hugging Face discussion says the same voices are sold through Azure ([HF thread](https://huggingface.co/spaces/innoai/Edge-TTS-Text-to-Speech/discussions/22)). If so, `pt-BR-AntonioNeural` belongs to the "Azure Neural" row (Elo 1035). Eleven v4 at 1324 is about 290 Elo higher, which under the Elo formula means it would win about 84% of English pairwise votes. Gemini 3.8 Flash (1276) would win about 80%. That suggests a large perceptual upgrade, but it is not proven for pt-BR.
 - **[INFERENCE]** Realistic pt-BR shortlist to A/B test with one Rotina script:
   1. ElevenLabs v4, plus Multilingual v2 as a stable fallback
@@ -160,7 +183,37 @@ The Google Cloud TTS pricing page fetch came back truncated: [Google Cloud TTS p
 
 - Every Chatterbox output carries an inaudible "Perth" neural watermark. — [resemble-ai/chatterbox](https://github.com/resemble-ai/chatterbox)
 
+**Batch B (resumed session, verified 2026-10-08): commercial-use terms from primary sources**
+- **ElevenLabs help center** (primary source; supersedes the BIGVU claim above):
+  - The free plan "cannot be used for any commercial purpose".
+  - Publishing content made on the free plan or while signed out requires including "elevenlabs.io" or "11.ai" **in the title**.
+  - "All paid plans include a commercial license, provided you're not using Beta Services."
+  - "content generated using Beta Services cannot be used for any commercial purpose or in any production environment."
+  - "Content created outside of a paid subscription (before or after) cannot be used commercially." Content generated *during* a paid subscription can be used commercially indefinitely.
+  — [ElevenLabs: Can I publish the content I generate?](https://elevenlabs.io/docs/help-center/legal/can-i-publish-the-content-i-generate-on-the-platform)
+- **Gemini API Additional Terms** (effective 2026-03-23, updated 2026-04-28):
+  - Unpaid services: "Google uses the content you submit to the Services and any generated responses to provide, improve..."; "human reviewers may read, annotate, and process your API input and output"; do not submit sensitive or personal information.
+  - Paid services: "Google doesn't use your prompts or responses to improve our products." AI Studio counts as paid if the Cloud project has an active billing account.
+  - "Google won't claim ownership over that content." The service is for "professional or business purposes, not for consumer use". Users must be 18+.
+  - In the EEA, Switzerland or the UK, only Paid Services may be used when making API clients available. Brazil is not on that list.
+  - No explicit clause on commercial use of outputs and no voice-specific disclosure rule.
+  — [Gemini API terms](https://ai.google.dev/gemini-api/terms)
+- **OpenAI TTS guide**:
+  - `gpt-4o-mini-tts` is the newest and most reliable model; `tts-1` and `tts-1-hd` are older. There are 13 voices: "For best quality, we recommend using `marin` or `cedar`."
+  - The `instructions` prompt can control "accent, emotional range, intonation, impressions, speed, tone, and whispering".
+  - Language support "generally follows the Whisper model" (Portuguese included), but "Voices are currently optimized for English."
+  - Output formats: mp3, opus, aac, flac, wav, pcm (24 kHz). **No word timestamps** are mentioned.
+  - Custom voices need a consent recording.
+  - **Disclosure rule:** "Our usage policies require you to provide a clear disclosure to end users that the TTS voice they are hearing is AI-generated and not a human voice."
+  — [OpenAI TTS guide](https://developers.openai.com/api/docs/guides/text-to-speech)
+- **Azure Speech free tier (F0)**: Neural TTS "0.5 million characters free per month". The S0 USD prices did not render in my fetch. Per a Microsoft pricing page seen only via search, the free allowance covers only prebuilt **non-HD** neural voices; HD, Azure OpenAI voices, Custom Neural Voice and Personal Voice are excluded. **[last point UNVERIFIED]** — [Azure Speech pricing](https://azure.microsoft.com/en-us/pricing/details/speech/); [Azure pricing (alt page)](https://azure.microsoft.com/pricing/details/cognitive-services/speech-services)
+- **Microsoft Services Agreement** (2023 update, "AI Services" section): "Unless explicitly permitted, you may not use web scraping, web harvesting, or web data extraction methods to extract data from the AI services." A general anti-circumvention clause also exists (secondary source). No clause names Edge Read Aloud, and it is unclear whether Read Aloud counts as an "AI service". — [VentureBeat](https://venturebeat.com/ai/microsoft-changes-services-agreement-to-add-restrictions-for-ai-offerings); [The Register](https://www.theregister.com/2024/08/14/microsoft_services_agreement_update_warns/); [ConductAtlas (secondary)](https://conductatlas.com/platform/microsoft/microsoft-services-agreement-legacy/provision/CA-P-016921/prohibition-on-circumventing-service-restrictions/)
+
 ### Inferences
+- **[INFERENCE] ElevenLabs timing.** Subscribe *before* generating the final takes. Anything generated on Free (including v4 tests) must be regenerated on a paid plan to be used in ads. Also check that the chosen model is not flagged as alpha/beta ("Beta Services"), since Eleven v3 was branded "alpha" at launch. The models page now calls v3 "previous generation" but does not state v4's status.
+- **[INFERENCE] Gemini free tier.** It is usable from Brazil and Google claims no ownership of outputs. However, scripts and outputs may be human-reviewed and used for training, so unreleased campaign copy belongs on a billed project. At about $0.0135/min the billed tier is negligible anyway.
+- **[INFERENCE] OpenAI disclosure.** If OpenAI TTS is used, the Reel must disclose the AI voice (e.g., an on-screen "Narração gerada por IA"). The other vendors' pages I read impose no such explicit rule, but platform rules and the Brazilian bill may (see Q5).
+- **[INFERENCE] edge-tts versus Azure.** The edge-tts endpoint has no published terms that grant automated or commercial use. Azure F0 offers the same prebuilt neural voices with 0.5M chars/month free, about 500 one-minute Reels, under explicit service terms. This makes Azure F0 the legally clean free replacement.
 - **[INFERENCE] Characters per Reel.** A 60 s pt-BR read is roughly 750–1,000 characters (DigitalApplied normalises with 750–1,000 chars/min).
 - **[INFERENCE] Cost per Reel.** About 1,000 credits on ElevenLabs Multilingual v2, so Starter (30k) covers about 30 full takes a month and Creator (121k) about 121. With 3–5 takes per line while directing, **Creator** is the practical plan; it also unlocks 192 kbps and Professional Voice Cloning. At API list prices one Reel costs about $0.08 on v4, $0.014 on Gemini 3.8 Flash, $0.015–0.022 on Azure, and $0.04–0.05 on Cartesia.
 - **[INFERENCE] Compliant drop-in.** Moving from edge-tts to the paid Azure Speech service with the same AntonioNeural voice, or a Dragon HD Omni pt-BR voice, removes the terms-of-service ambiguity at almost no cost.
@@ -243,14 +296,46 @@ The Google Cloud TTS pricing page fetch came back truncated: [Google Cloud TTS p
 - **Gemini 3.8 Flash TTS and Chirp 3 HD** docs do not mention timepoints or word timestamps. — [Gemini 3.8 page](https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash-tts); [Chirp 3 HD](https://docs.cloud.google.com/text-to-speech/docs/chirp3-hd)
 - **Open aligner**: `mms-300m-1130` forced aligner, said to cover 1,100+ languages. **[UNVERIFIED comparison-site claim]** — [AI Indigo](https://aiindigo.com/compare/distil-whisper-large-v3-ptbr-vs-mms-300m-1130-forced-aligner)
 
+**Batch A (resumed session, verified 2026-10-08): Remotion caption tooling and forced aligners**
+- **Remotion `Caption` type** (source code): `{ text: string; startMs: number; endMs: number; timestampMs: number | null; confidence: number | null; pageBreakAfter?: boolean }`. — [remotion caption.ts](https://raw.githubusercontent.com/remotion-dev/remotion/main/packages/captions/src/caption.ts)
+- **`createTikTokStyleCaptions({captions, combineTokensWithinMilliseconds, breakOnSilenceAfterMilliseconds?})`** returns `{pages}`.
+  - Each page is `{text, startMs, durationMs, tokens: [{text, fromMs, toMs, pageBreakAfter}]}`.
+  - A higher `combineTokensWithinMilliseconds` puts more words per page; a low value gives word-by-word.
+  - "Spaces are used as delimiters, and omitting them will cause the entire text to merge into a single line or page", so each word's `text` must include its **leading space**. Render with `white-space: pre`.
+  - `breakOnSilenceAfterMilliseconds` exists from v4.0.514; `pageBreakAfter` from v4.0.517.
+  — [Remotion createTikTokStyleCaptions](https://www.remotion.dev/docs/captions/create-tiktok-style-captions)
+- **Display pattern**: `fetch(staticFile('captions.json'))` held with `useDelayRender()`; map pages to `<Sequence>` with `startFrame = (page.startMs / 1000) * fps`; a token is active when `token.fromMs <= absoluteTimeMs && token.toMs > absoluteTimeMs`; use `whiteSpace: 'pre'`. — [Remotion displaying captions](https://www.remotion.dev/docs/captions/displaying)
+- **Built-in transcription routes and their converters to `Caption`**:
+  - `@remotion/install-whisper-cpp`: server, free, offline, `toCaptions()`
+  - `@remotion/whisper-webgpu`: browser GPU
+  - `@remotion/whisper-web`: WASM, "Slow"
+  - `@remotion/openai-whisper`: paid, `openaiWhisperApiToCaptions()`
+  - `@remotion/elevenlabs`: ElevenLabs Speech-to-Text, paid, `elevenLabsTranscriptToCaptions()`
+  — [Remotion transcribing](https://www.remotion.dev/docs/captions/transcribing); [@remotion/captions API](https://www.remotion.dev/docs/captions/api)
+- **`@remotion/install-whisper-cpp` `transcribe()`**:
+  - Input must be "a 16-bit, 16KHz, WAVE file".
+  - Models run from tiny to large-v3 / large-v3-turbo; turbo needs a whisper.cpp build from Nov 2024+ and Remotion ≥ 4.0.229.
+  - `tokenLevelTimestamps` adds `--dtw` ("Recommended to get actually accurate timings"); prefer `t_dtw` over `offsets`.
+  - `language: 'pt'` and `splitOnWord` are supported.
+  — [Remotion transcribe()](https://www.remotion.dev/docs/install-whisper-cpp/transcribe)
+- **ElevenLabs Forced Alignment API** takes audio plus a plain-string transcript and returns a time-aligned transcript (use cases include "Matching subtitles to a video recording"). It supports "Portuguese (Brazil, Portugal)". Limits are 3 GB, 10 h and 675,000 characters. Price: "Same rate as the Speech to Text API". No diarization. — [ElevenLabs forced alignment](https://elevenlabs.io/docs/overview/capabilities/forced-alignment)
+- **WhisperX** (BSD-2-Clause) gets word timestamps from wav2vec2 forced alignment. Its default Portuguese align model is `"pt": "jonatasgrosman/wav2vec2-large-xlsr-53-portuguese"`. `whisperx.align(transcript, model, metadata, audio, device, interpolate_method="nearest", return_char_alignments=False)` aligns **whatever segments you pass** (`start`, `end`, `text`), so a known script can be aligned if each segment window brackets its speech. CPU mode: `--compute_type int8 --device cpu`. — [WhisperX README](https://github.com/m-bain/whisperX); [whisperx/alignment.py](https://raw.githubusercontent.com/m-bain/whisperX/main/whisperx/alignment.py)
+- **stable-ts** (MIT): `model.align('audio.mp3', text, language=...)` aligns plain text at word level and exports SRT/VTT/ASS (with karaoke) and JSON. **The repo was archived on May 30, 2026** ("Development on this repository is indefinitely paused"). — [stable-ts](https://github.com/jianfch/stable-ts)
+- **ctc-forced-aligner** (code BSD-2): forced alignment of known text with CTC models, using ISO 639-3 codes (e.g., `--language "por"`) and `--romanize` with the default model, on CPU or CUDA. **Caution:** "the default model has CC-BY-NC 4.0 License, so make sure to use a different model for commercial usage". — [ctc-forced-aligner](https://github.com/MahmoudAshraf97/ctc-forced-aligner)
+
 ### Inferences
 - **[INFERENCE] Turning ElevenLabs output into word timings.** Split `alignment.characters` on whitespace. Each word starts at its first character's start time and ends at its last character's end time. Convert to ms for Remotion. Use the original-text `alignment`, not `normalized_alignment`, so captions show the script exactly as written.
 - **[INFERENCE] If `with-timestamps` rejects `eleven_v4`:** (a) generate on Multilingual v2 with timestamps; (b) generate on v4 and send the audio plus script to ElevenLabs Forced Alignment (same vendor, HTTPS); or (c) run a local aligner.
 - **[INFERENCE] Vendors with no timestamps (Gemini, OpenAI, Chirp).** Forced alignment against the known script is more accurate than ASR word timestamps, because the text is known and spelling in captions stays exact.
+- **[INFERENCE] ElevenLabs alignment to Remotion captions.** For word *i*, emit `{text: (i === 0 ? '' : ' ') + word, startMs, endMs, timestampMs: startMs, confidence: null}`, with times taken from the first and last characters × 1000. Save as `public/captions.json`, then call `createTikTokStyleCaptions({captions, combineTokensWithinMilliseconds: 800–1200})` for 2–4-word pages, or a low value for word-by-word kinetic text. Set `pageBreakAfter: true` on the last word of each scene so pages never straddle scene cuts.
+- **[INFERENCE] ASR versus alignment.** Remotion's whisper.cpp route is *transcription* (ASR). It may misspell brand words or loanwords ("Rotina", "deload", "PIX"), so the caption text can diverge from the script. For TTS audio the script is known, so prefer **alignment**: TTS-native timings, ElevenLabs Forced Alignment, or WhisperX `align()` with the known text. Use whisper.cpp only as a fallback, and fix its words against the script.
+- **[INFERENCE] License check for aligners in commercial work.** Avoid the CC-BY-NC MMS aligner model, or swap the model. The WhisperX pt model's license was not checked.
 
 ### Gaps
-- None of the Remotion caption tooling was verified this session: `@remotion/captions` (`Caption` type, `createTikTokStyleCaptions`), `@remotion/install-whisper-cpp` (`transcribe`, `toCaptions`), `@remotion/openai-whisper`.
-- Local aligners were not verified for pt-BR or for CPU speed: WhisperX (wav2vec2 pt model), stable-ts `align()`, whisper-timestamped, whisper.cpp word timestamps, Montreal Forced Aligner pt-BR model, ctc-forced-aligner (MMS), aeneas.
+- License of `jonatasgrosman/wav2vec2-large-xlsr-53-portuguese` was not checked.
+- CPU speed of WhisperX alignment for a 60 s clip was not measured.
+- Montreal Forced Aligner pt-BR model, whisper-timestamped and aeneas were not checked. They are lower priority now that WhisperX `align()` is confirmed to accept a known transcript.
+- Exact signature of `elevenLabsTranscriptToCaptions()` was not checked (it is for STT output, not for the TTS `/with-timestamps` alignment).
 - Not confirmed: Cartesia pt timestamps, ElevenLabs v3/v4 timestamp support, edge-tts WordBoundary mode.
 
 ---
@@ -366,15 +451,19 @@ Not researched before the stop. No sourced findings.
 What I did not finish, with concrete next steps:
 
 1. **ElevenLabs v4 × timestamps × pt-BR.** Not confirmed. *Next:* with a Starter key, call `GET /v1/models` and check `eleven_v4` capabilities. POST a pt-BR test sentence ("O app Rotina organiza seu dia: Brasil, tia, PIX, deload.") to `/with-timestamps` with `model_id=eleven_v4`, then inspect the `alignment` arrays and listen for European-Portuguese drift.
-2. **ElevenLabs Terms of Service.** Free-plan attribution and no-commercial-use wording, output ownership, and v4 credit cost per character on plans. *Next:* read elevenlabs.io/terms and the help-center article on commercial use and credit multipliers.
-3. **Remotion caption tooling** (not researched). *Next:* read remotion.dev/docs/captions, /docs/captions/caption, /docs/captions/create-tiktok-style-captions, /docs/install-whisper-cpp (transcribe with `tokenLevelTimestamps`, `toCaptions`), and /docs/openai-whisper (`openAiWhisperApiToCaptions`). Confirm the `Caption` type fields.
-4. **Forced alignment for pt-BR on CPU** (not researched). *Next:* check the WhisperX README (pt default align model, CPU int8), stable-ts `model.align(audio, text, language='pt')`, ctc-forced-aligner (MMS, `--language por`), the MFA `portuguese_brazil_mfa` acoustic model and dictionary, and whisper.cpp `-ml 1` / DTW word timestamps. Measure speed on a 60 s clip with 4 cores.
+2. **ElevenLabs Terms of Service.** **[MOSTLY DONE, Batch B]** The help-center article confirms: Free is never commercial; a title attribution is needed for publishing; paid plans are commercial except Beta Services; free-plan content stays non-commercial after upgrading. *Still open:* v4 credit cost per character on plans, whether v4 is GA or "beta", and Service-Specific Terms for Voice Library voices in ads.
+3. ~~**Remotion caption tooling**~~ **[DONE, Batch A]** `Caption` type, `createTikTokStyleCaptions`, the display pattern, transcription converters and whisper.cpp `transcribe()` options are now in Q4.
+4. **Forced alignment for pt-BR on CPU.** **[MOSTLY DONE, Batch A]**
+   - WhisperX: pt model and known-text `align()` confirmed.
+   - stable-ts: archived May 2026.
+   - ctc-forced-aligner: default model is non-commercial.
+   - Still open: actual CPU timing on a 60 s clip, the license of the WhisperX pt model, and the MFA pt-BR model.
 5. **Azure details.** Not verified: F0 free quota (I believe 0.5M chars/month, unconfirmed), current Neural and HD prices, the full pt-BR voice list (Antonio, Francisca, Thalita/Macerio Multilingual...), whether the `pt-BR-*:DragonHDOmniLatestNeural` naming works, and whether Speech SDK word-boundary events pass the TLS proxy (WebSocket). *Next:* read the Azure language-support page and pricing page, then run a test.
 6. **Google.** The official pricing page fetch was truncated. *Next:* confirm Gemini 3.8 Flash TTS and Chirp 3 HD prices and free tiers; whether a pt-BR accent can be forced (language code or prompt); whether any timepoints exist (Cloud TTS v1beta1 `enableTimePointing` with SSML `<mark>`, which may not apply to Chirp 3 HD or Gemini); and Gemini API terms for commercial use of free-tier output.
-7. **OpenAI.** *Next:* confirm on platform.openai.com the current TTS models and prices, the `instructions` parameter, the absence of timestamps, and pt-BR quality.
+7. **OpenAI.** **[MOSTLY DONE, Batch B]** Models, voices, `instructions`, the "optimized for English" note, the absence of timestamps and the disclosure rule are now in Q2. *Still open:* official current price page and pt-BR listening quality.
 8. **Other commercial vendors** not checked for pt-BR or timestamps: Qwen-Audio-3.1 TTS (Alibaba Model Studio), Inworld Realtime TTS-2 (timestamps), Speechify Simba 3.2, MiniMax Speech 2.8 (`subtitle_enable`), Hume Octave 2 (timestamps), Murf Falcon 2, Fish Audio S2.1 Pro API, Resemble, PlayHT (status), LOVO, xAI Grok TTS, Mistral Voxtral API, and Brazilian providers. *Next:* read each vendor's languages page and API reference.
 9. **Open-source models not covered**: Piper pt_BR voices (faber, cadu, jeff, edresson? and their licenses; piper1-gpl), StyleTTS2, Higgs Audio V3, Dia, Zonos, IndexTTS, CosyVoice 3, MaskGCT, Spark-TTS, Kyutai TTS, NeuTTS, Orpheus multilingual, Sesame CSM, VibeVoice, NVIDIA Magpie-Multilingual (language list), Qwen3-TTS (official HF card: languages, 0.6B pt support, CPU feasibility). *Next:* read the HF model cards for language lists and licenses, and test Kokoro `pf_dora` / `pm_alex` plus the Chatterbox pt-BR pack on CPU.
-10. **Community pt-BR quality evidence**: Reddit (r/ElevenLabs, r/TextToSpeech, r/LocalLLaMA, r/brdev) and Brazilian YouTube comparisons ("melhor voz IA português brasileiro 2026"). Known issues to look for: European-Portuguese drift and English loanwords.
+10. **Community pt-BR quality evidence.** **[PARTLY DONE, Batch C]** Found one hands-on pt-BR blog test (Gemini 3.1 versus ElevenLabs), the voice-driven-accent evidence, and Cloud TTS pt-BR GA. Search engines surfaced no Reddit threads. *Still open:* Brazilian YouTube comparisons (YouTube search not available here) and direct Reddit search. **The decisive step is the user's own blind A/B on one Rotina script** (ElevenLabs v4 Brazilian voice, Gemini pt-BR, Azure HD Omni pt-BR, Cartesia pt).
 11. **Brazilian legal framework for voice cloning and AI ads**: LGPD (biometric/sensitive data, consent), Civil Code art. 20, Constitution art. 5 (image and voice), PL 2338/2023 status in the Câmara, ANPD guidance, CONAR guidance on AI in advertising, and Meta's AI-content labelling. *Next:* search official planalto.gov.br / camara.leg.br / gov.br/anpd pages.
 12. **Post-processing chain for an ad voice** (not researched). *Next:* source ffmpeg filter docs (`highpass`, `equalizer`, `acompressor`, `deesser`, `aecho` / `afir` for light room, `loudnorm` two-pass) and a credible Reels/Instagram loudness reference. Commonly cited targets are about -14 LUFS integrated and -1 dBTP; this is unverified.
-13. **Microsoft terms for the Edge Read Aloud endpoint.** *Next:* read the Microsoft Services Agreement and Edge terms for clauses on automated access and commercial use, and check any edge-tts GitHub issues where the maintainer discusses terms.
+13. **Microsoft terms for the Edge Read Aloud endpoint.** **[PARTLY DONE, Batch B]** The MSA "AI Services" anti-scraping clause was found, but there is no Edge-specific clause, and Azure F0 (0.5M chars/month free) is confirmed as the clean alternative. *Still open:* full MSA text and the Edge browser license terms. This is low priority, because the recommendation is to move off edge-tts anyway.

@@ -30,7 +30,34 @@ Remotion's official AI integration is now **Agent Skills, not MCP**. You install
 - The docs are "AI-ready": a copy-as-Markdown button, `.md` suffix URLs (e.g. `remotion.dev/docs/player.md`), and `Accept: text/markdown` content negotiation. Pasting a doc link into Claude Code makes it fetch Markdown automatically — [Remotion docs: AI](https://www.remotion.dev/docs/ai/)
 - `remotion.dev/llms.txt` exists as a Markdown index of the docs. Its AI section links `/docs/ai/index.md` and `/docs/ai/coding-agents.md` — [remotion.dev/llms.txt](https://www.remotion.dev/llms.txt)
 - **The Remotion MCP is deprecated.** It "duplicates the `/remotion-docs` skill", its data "can be less current", and the hosted MCP shuts down no earlier than Aug 31, 2026. Migration: run `npx remotion skills add`, use `/remotion-docs`, and remove `remotion-documentation` from your MCP config — [Remotion docs: MCP](https://www.remotion.dev/docs/ai/mcp); [GitHub issue #9055](https://github.com/remotion-dev/remotion/issues/9055)
-- remotion-dev/skills has ~4.9k★ according to the Agent-Skills-Hub-generated list. Not checked directly on GitHub — [zhuyansen/awesome-claude-video-skills](https://github.com/zhuyansen/awesome-claude-video-skills)
+- remotion-dev/skills has ~4.9k★ according to the Agent-Skills-Hub-generated list; the GitHub page also shows "4.9k" stars and 88 commits — [zhuyansen/awesome-claude-video-skills](https://github.com/zhuyansen/awesome-claude-video-skills); [remotion-dev/skills](https://github.com/remotion-dev/skills)
+- **Depth of the official skills (resumed research, 2026-10-08; I read the SKILL.md files, version 4.0.534):**
+  - **`remotion-best-practices` is a router.** It loads `remotion-create`, `remotion-markup`, `remotion-maps`, `remotion-multimedia`, `remotion-interactivity`, `remotion-studio`, `remotion-render`, `remotion-captions`, `remotion-saas`, `remotion-docs` and `remotion-upgrade` reference files on demand. Agent rules: preserve user edits; open Studio (`npx remotion studio`, or `--no-open` for agents with an in-app browser) instead of rendering by default; render only when the user explicitly asks (`npx remotion render`). It notes "The Studio supports WebMCP tools" — [remotion-best-practices SKILL.md](https://github.com/remotion-dev/skills/blob/main/skills/remotion-best-practices/SKILL.md)
+  - **`remotion-markup` (17.9 KB), core rules:**
+    - drive everything with `useCurrentFrame()` + `interpolate()`; CSS transitions/animations and Tailwind animation classes "will not render correctly";
+    - use `Easing.bezier()` / `Easing.spring()`; the example easing is `Easing.bezier(0.16, 1, 0.3, 1)`;
+    - `output: 'perceptual-scale'` for scale animations;
+    - prefer the CSS `scale`/`translate`/`rotate` properties over `transform`;
+    - `premountFor={fps}` on timed components;
+    - `Interactive.withSchema` so Studio can edit props.
+    - Source: [remotion-markup SKILL.md](https://github.com/remotion-dev/skills/blob/main/skills/remotion-markup/SKILL.md)
+  - **`remotion-markup` reference files:** `3d.md`, `sfx.md`, `audio.md`, `audio-visualization.md`, `transitions.md`, `motion-blur.md`, `text-highlights.md`, `google-fonts.md`, `timing-props.md`, `effects.md`, `html-in-canvas.md`, `ffmpeg.md`, `silence-detection.md`.
+  - **It documents `@remotion/effects`**, built-in GPU-style effects applied via `<HtmlInCanvas effects=…>`:
+    - lighting: `glow()`, `lightLeak()`, `shine()`, `starburst()`, `vignette()`, `dropShadow()`;
+    - blur: `zoomBlur()`, `lightTrail()`, progressive and region blur;
+    - distortion: `chromaticAberration()`, `barrelDistortion()`, `cornerPin()`, `fisheye()`;
+    - grading: `lut()`, `levels()`, `colorCorrection()`, `duotone()`;
+    - textures: `noise()`, `paper()`, `halftone()`;
+    - pixelation transitions;
+    - custom `createEffect()`.
+    - It also covers `@remotion/rive` (`<RemotionRiveCanvas>`), `@remotion/shapes` and `@remotion/gif` — [remotion-markup SKILL.md](https://github.com/remotion-dev/skills/blob/main/skills/remotion-markup/SKILL.md)
+  - **Motion blur (`motion-blur.md`):**
+    - `<HtmlInCanvasMotionBlur>` (Remotion ≥ 4.0.529) "is the state of the art in Remotion for blurring animated HTML": it captures fractional frames and averages pixels in a canvas; `shutterAngle` default 180 (0–360), `samples` default 8 (1–64).
+    - The docs add that `<CameraMotionBlur>` (the user's current approach) uses "layered blending [that] can change colors and opacity", and that HTML-in-canvas must be enabled for *preview*, while "rendering needs no configuration".
+    - Sources: [skill motion-blur.md](https://github.com/remotion-dev/skills/blob/main/skills/remotion-markup/motion-blur.md); [Remotion docs: Motion blur](https://www.remotion.dev/docs/motion-blur)
+  - **Transitions (`transitions.md`):** `<TransitionSeries>` with `.Transition` (crossfade/slide/wipe; shortens the timeline) and `.Overlay` (e.g. a light leak over the cut, without shortening). Install `npx remotion add @remotion/transitions` — [skill transitions.md](https://github.com/remotion-dev/skills/blob/main/skills/remotion-markup/transitions.md)
+  - **SFX (`sfx.md`):** a small hosted list on `https://remotion.media/` with generic UI sounds (whoosh, whip, switch, mouse-click, shutter, ding, page-turn) and meme sounds. The library is small and **depends on the remotion.media CDN**, which video-shotcraft notes may be blocked in some environments — [skill sfx.md](https://github.com/remotion-dev/skills/blob/main/skills/remotion-markup/sfx.md); [video-shotcraft](https://github.com/Vincentwei1021/video-shotcraft)
+  - **3D (`3d.md`):** `npx remotion add @remotion/three`; wrap 3D content in `<ThreeCanvas width height>` with explicit lighting; otherwise follow R3F best practices — [skill 3d.md](https://github.com/remotion-dev/skills/blob/main/skills/remotion-markup/3d.md)
 - Remotion license: "free for individuals and small teams; companies may need a paid license" (as summarized in a third-party README) — [video-shotcraft README](https://github.com/Vincentwei1021/video-shotcraft); [Remotion LICENSE](https://github.com/remotion-dev/remotion/blob/main/LICENSE.md)
 - Several unrelated community projects also use the name "remotion-mcp": `npx -y remotion-mcp` (export videos/stills/GIFs), mcp-use/remotion-mcp-app (inline player), and a Glama-listed voice-over server (via search summary) — [mcp.so remotion-mcp](https://mcp.so/server/remotion-mcp/Vidhanvyrs); [mcp-use/remotion-mcp-app](https://github.com/mcp-use/remotion-mcp-app)
 
@@ -398,6 +425,18 @@ There are many community MCP servers for **After Effects**: Dakkshin's is the re
 - Sources: [auteur](https://github.com/agiwhitelist/auteur); [genjutsu](https://github.com/AThevon/genjutsu)
 - HyperFrames has a Three.js adapter — [HyperFrames](https://github.com/heygen-com/hyperframes). remotion-superpowers lists `@remotion/three` "Three.js scenes and 3D product showcases" — [remotion-superpowers](https://github.com/DojoCodingLabs/remotion-superpowers). motion-video-kit has `three-js-patterns.md` and `product-hero-realism.md` — [motion-video-kit](https://github.com/echris6/motion-video-kit)
 
+**Remotion's own 3D and GPU guidance (resumed research, 2026-10-08)**
+- **`@remotion/three`** (`npm i three @react-three/fiber @remotion/three @types/three`) — [Remotion docs: @remotion/three](https://www.remotion.dev/docs/three)
+  - `<ThreeCanvas>` lets R3F scenes use `useCurrentFrame()`.
+  - `<ThreeWebGPUCanvas>` uses Three.js `WebGPURenderer` with TSL node materials.
+  - `useVideoTexture()` / `useOffthreadVideoTexture()` map a Remotion video onto a 3D surface.
+  - The official starter **`remotion-dev/template-three` "features a 3D phone with a video inside which you can effortlessly swap out"**, with editable color, size, thickness and corner radius. This is directly analogous to Rotina's phone mockup — [remotion-dev/template-three](https://github.com/remotion-dev/template-three)
+- **GL backends (`--gl`)** — [Remotion docs: --gl flag](https://www.remotion.dev/docs/gl-options); [Remotion docs: Using the GPU](https://www.remotion.dev/docs/gpu)
+  - Options: `null` (Remotion 4 default, Chrome decides), `angle` (Remotion 5 default, auto-falls back to SwiftShader), `egl`, `swiftshader`, `vulkan`, `angle-egl`, `swangle` (Lambda/Cloud Run default).
+  - "**On a machine with no GPU, `swangle` is recommended. Rendering might be slow.**"
+  - In headless mode Chromium disables the GPU, and WebGL (Three.js), `filter: blur()`, gradients, shadows and transforms are listed as GPU-accelerated content that slows down without it.
+  - Set it via `--gl=swangle`, `Config.setChromiumOpenGlRenderer("swangle")` or `chromiumOptions.gl`.
+
 **React Three Fiber MCPs** (all tiny)
 - nikolas-sapa/ns-ui: 18★.
 - glbforge/glbforge: 2★; GLB optimize + R3F viewers, CLI + MCP.
@@ -556,6 +595,23 @@ No official Luma video MCP or Pika MCP was found.
   - `motion_control`, `upscale_image/video`, `outpaint_image`, `reframe`, `remove_background`, `relight_image`, `virality_predictor`;
   - Marketing Studio presets (product shots, UGC/ads), "Genjutsu" motion transfer/object replacement, AI Influencer character sheets, and a website-builder workflow;
   - `models_explore(action:'recommend')` for choosing a model.
+- **Official Higgsfield MCP page (fetched 2026-10-08)** — [higgsfield.ai/mcp](https://higgsfield.ai/mcp)
+  - Endpoint `https://mcp.higgsfield.ai/mcp`. Clients named: Claude, Claude Code (tabs "Claude / Claude Code / CLI / Other"), a ChatGPT plugin, OpenClaw, Hermes Agent, NemoClaw. "No API key is required."
+  - Models named: Nano Banana Pro, Google Omni Flash, Seedance 2.5, Seedream 5.0 Lite, Seedance 2.0, Kling 3, GPT Image 2, Soul 2.0; "30+ models" claimed. Veo and Sora are not named on this page.
+  - Skill bundles:
+    - "Paid Ads": localization, recreation, resizing, hooks/headlines.
+    - **"Motion Design" — After Effects workflows** (illustration animation, paper collage, presentations, SaaS, whiteboard).
+    - **"Production"** — Blender (destruction, exploded views, scene building, cartoon shaders), Premiere Pro, After Effects VFX, Illustrator, Photoshop, TouchDesigner, DaVinci Resolve. The page notes these "need local software installed".
+    - Faceless/UGC formats.
+  - The page states no plan, credit or rate-limit details.
+- **Tool schema actually exposed in this session (via ToolSearch, 2026-10-08):**
+  - `scene_builder_3d_generate_video`: "Generate a **paid Seedance 2.5** video in a 3D Jutsu project".
+    - Modes: t2v, omni_reference (image/start_image/end_image/video/audio references), video_edit, video_extension.
+    - **It can use "a published Blender render as start_image"** (operationId/artifactId).
+    - aspectRatio includes **9:16**; duration 4–30 s; resolution 480p/720p/1080p; `draft` (480p) then `draftJobId` 1080p finalization; `generateAudio` default true.
+    - Up to 30 images / 10 videos / 10 audio refs; requestId-based idempotent retries.
+  - `show_katana_result`: displays a finished "Katana" video export.
+  - The broader tool set described in the connector's server instructions (Q6 bullet above) was not individually loadable as deferred tools here. (Primary observation, no public URL.)
 - Higgsfield prompt-engineering skills (community):
   - OSideMedia/higgsfield-ai-prompt-skill: 703★; Seedance 2.5/2.0, Cinema Studio, Kling 3.0 Motion Control.
   - beshuaxian/higgsfield-seedance2-jineng: 937★.
@@ -663,7 +719,33 @@ The main sources are:
 - **claude-plugins-official**: install with `/plugin install {plugin-name}@claude-plugins-official` or browse `/plugin > Discover`. The README warns "Make sure you trust a plugin before installing". My parse of marketplace.json on 2026-10-08 counted **315 plugins** — [anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official)
   - Media/design-relevant entries: `hyperframes`, `runway-api`, `frontend-design`, `adobe-for-creativity`, `canva`, `figma`, `cloudinary`, `togetherai-skills` (audio/video/images), `save-to-spotify` (TTS episodes), `playground`, `superdesign`, `amd-skills`.
   - No ElevenLabs, Remotion or Blender entries matched my keyword filter.
-- **anthropics/claude-plugins-community** marketplace exists (referenced by Runway's install instructions). Its marketplace.json was downloaded but **not analyzed** — [runwayml/skills](https://github.com/runwayml/skills)
+- **anthropics/claude-plugins-community** (marketplace name `claude-community`): my parse of its marketplace.json on 2026-10-08 counted **2,284 plugins**. Install pattern: `claude plugin marketplace add anthropics/claude-plugins-community` → `claude plugin install <name>@claude-community` — [anthropics/claude-plugins-community marketplace.json](https://github.com/anthropics/claude-plugins-community/blob/main/.claude-plugin/marketplace.json); [runwayml/skills](https://github.com/runwayml/skills). Media and motion entries found (names and descriptions are as listed in the marketplace; I did not open the individual repos):
+  - Remotion and motion:
+    - `remotion-skills-marketplace` (pasie15): "packaging the official Remotion skills… one comprehensive skill with 39 rule files covering Animation & Timing, Audio…". Likely an older single-skill repackaging; prefer the official `npx remotion skills add`.
+    - `hyperframes-by-heygen`.
+    - `easing-wizard` (roydigerhund): "Generate professional CSS easing curves, audit animations, and get expert motion design advice".
+    - `animation-helper`: CSS/Framer Motion.
+    - `videozero`: 2D animations, kinetic typography, explainer videos.
+    - `framecraft` (vaddisrinivas): demo videos from one prompt — story structure, visual design, narration, orchestrating Playwright and FFmpeg.
+    - `narrateai-demomaker`: record and narrate demo videos of a running web app.
+    - `notes-to-video`: 3Blue1Brown-style.
+    - `golpo` / `golpo-video`: AI explainer videos.
+    - `eversince`: creative agent across video, image, audio and motion graphics.
+    - `future-video-studio`: hosted "FVS MCP" cinematic AI video.
+    - `muapi-marketing-video`.
+    - `nemovideo-ai-video-tools`.
+    - `inference-sh`: 150+ models incl. Veo.
+    - `cellcog`: any-to-any incl. music and 3D models.
+    - `together-ai-skills`.
+    - `runway-api-skills`.
+  - Audio and voice:
+    - `djclaude` (kevdogg102396-afk): "AI music generation for Claude Code using Google Lyria 3. Generate 30-second clips or full 2-3 minute songs… genre, mood, BPM".
+    - `voice-bridge` (Tomorrow-You): multi-engine TTS with "edge-tts, ElevenLabs, Kokoro, macOS say, espeak-ng".
+    - `voxflow` (VoxFlowStudio): "200+ voices across 40+ languages", podcast/transcribe/video skills.
+    - `slidecast`: HTML slides → voiced MP4 via ElevenLabs, bring your own key.
+    - `audiorective`: Web Audio toolkit with React/three.js bindings.
+  - Video watching and QA: `claude-video-vision`, `watch-video`, `peepshow`, `letmewatch`, `heimdall`, `video-to-code-skill`, `twelvelabs`.
+  - No ElevenLabs-official, Blender, Lottie or Higgsfield plugin matched my keyword filter in either Anthropic marketplace.
 - **zhuyansen/awesome-claude-video-skills** — 480★, created 2026-09-27 — [repo](https://github.com/zhuyansen/awesome-claude-video-skills)
   - Covers 252 repos, each "read and security-graded by Agent Skills Hub" (the GitHub description says 180 repos — a discrepancy).
   - Live filterable page: agentskillshub.top/best/claude-video-skills, refreshed every 8 h.
@@ -710,6 +792,21 @@ Desktop-bound MCPs (AE, C4D, Houdini, Premiere, Resolve, Unity, Unreal, Rive) an
 - After Effects MCPs require AE 2022+ desktop — [Dakkshin/after-effects-mcp](https://github.com/Dakkshin/after-effects-mcp). Resolve MCP requires Resolve Studio scripting — [davinci-resolve-mcp](https://github.com/samuelgursky/davinci-resolve-mcp). Rive MCP is Mac Early Access — [Rive docs](https://rive.app/docs/editor/mcp/integration). mockup-studio is macOS Apple Silicon only — [mockup-studio](https://github.com/yusuftuhh/mockup-studio)
 - Local Stable Audio 3 recommends 32 GB-class RAM — [agent-audio](https://github.com/AIEGOBOT/agent-audio). claude-code-video-toolkit's open models run on a rented cloud GPU — [toolkit](https://github.com/digitalsamba/claude-code-video-toolkit)
 - ElevenLabs skills use REST/SDK with `ELEVENLABS_API_KEY` — [elevenlabs/skills](https://github.com/elevenlabs/skills)
+- **License check (resumed research, 2026-10-08).** I read each repo's LICENSE file via raw.githubusercontent.com:
+  - **Apache-2.0:** video-shotcraft, mberg/kokoro-tts-mcp. HyperFrames is Apache-2.0 per its README.
+  - **MIT:** appshot, echris6/motion-video-kit, diffusionstudio/lottie (MIT-style "Permission is hereby granted", © 2026 Diffusion Studio Inc.), 3dviz-pro-max, remotion-superpowers, claude-code-video-toolkit, claude-video-vision, greensock/gsap-skills, mcp-for-blender, blenderwright, runwayml/skills, MiniMax-MCP, Dakkshin/after-effects-mcp, davinci-resolve-mcp, vibeframe, genjutsu, auteur, 30x-video, apple-motion, Liamrjohnston/remotion-motion-graphics-skill, welingtondesosa/video-motion, smit-vanani/claude-promo-video, bang-motion, lemo-opuscar.
+  - **Custom (Transitions.dev):** commercial use is allowed — "use them in unlimited personal and commercial projects… The tooling is MIT" — but you may not redistribute the library as a competing pack.
+  - **Restrictive:** Vincentwei1021/anything2explainer is PolyForm Noncommercial. 0xsline/OpenChatCut is AGPL-3.0. (onetake and video-talkcraft are PolyForm Noncommercial per their READMEs.)
+  - **remotion-dev/skills:** no LICENSE file at the repo root. It is generated from the Remotion monorepo, so presumably covered by the Remotion license (UNVERIFIED).
+  - Sources: [video-shotcraft LICENSE](https://github.com/Vincentwei1021/video-shotcraft/blob/main/LICENSE); [appshot LICENSE](https://github.com/trunghaiy/appshot/blob/main/LICENSE); [motion-video-kit LICENSE](https://github.com/echris6/motion-video-kit/blob/main/LICENSE); [transitions.dev LICENSE](https://github.com/Jakubantalik/transitions.dev/blob/main/LICENSE); [anything2explainer LICENSE](https://github.com/Vincentwei1021/anything2explainer/blob/main/LICENSE); [OpenChatCut LICENSE](https://github.com/0xsline/OpenChatCut/blob/main/LICENSE)
+- **Hosted MCP reachability through the container's TLS proxy (tested 2026-10-08).** I sent a JSON-RPC `initialize` POST from this container to each endpoint:
+  - `https://api.elevenlabs.io/v1/mcp` → 401 "OAuth bearer token required for the hosted MCP."
+  - `https://mcp.higgsfield.ai/mcp` → 401.
+  - `https://mcp.fal.ai/mcp-relay` and `https://mcp.fal.ai/mcp` → 401 "Authentication required".
+  - `https://mcp.lottiefiles.com/mcp` → 401 "Missing or invalid MCP bearer token".
+  - `https://kling.ai/mcp` → 401 (empty body).
+  - `https://docs.fal.ai/mcp` → 308 redirect to `https://fal.ai/docs/mcp`.
+  - So the endpoints are **reachable over plain HTTPS through the proxy, and all require auth**. The OAuth browser flow from a headless container was **not** tested. Higgsfield already works here because it is attached as a claude.ai connector.
 
 ### Ranked shortlist (inference, based on the findings above)
 Columns: feasibility in the container (✅ works / ⚠️ needs testing or paid / ❌ not feasible) and cost.
@@ -717,13 +814,13 @@ Columns: feasibility in the container (✅ works / ⚠️ needs testing or paid 
 | # | Item | Why for Rotina | Install | Container | Cost |
 |---|---|---|---|---|---|
 | 1 | **Remotion Agent Skills** (official) | Keeps the existing Remotion 4 stack. Gives best practices for markup, captions, render and docs. Replaces the deprecated Remotion MCP. | `npx remotion skills add` (inside the project) or `npx skills add remotion-dev/skills` | ✅ | Free (Remotion license terms apply) |
-| 2 | **video-shotcraft** | 150+ shot recipe cards with tuned easing/timing TSX, 2.5D camera, beat-sync, 149-SFX library, QA methodology and headless notes. Must be re-composed from 16:9 to 9:16. | `npx skills add Vincentwei1021/video-shotcraft` | ✅ (needs `--concurrency=1`) | Free; repo license to verify |
-| 3 | **Motion taste layer:** echris6/motion-video-kit + greensock/gsap-skills + Anthropic frontend-design (+ optional transitions.dev, diffusionstudio/lottie) | Motion grammar from 28 launch films, critic loop, loudness/frozen-time checks, product-hero realism (3D device motion, motion blur). GSAP/Lottie for micro-motion. | cp `business-motion-film` to `~/.claude/skills`; `npx skills add https://github.com/greensock/gsap-skills`; `/plugin install frontend-design@claude-plugins-official`; `npx skills add diffusionstudio/lottie` | ✅ | Free (motion-video-kit license to verify) |
+| 2 | **video-shotcraft** | 150+ shot recipe cards with tuned easing/timing TSX, 2.5D camera, beat-sync, 149-SFX library, QA methodology and headless notes. Must be re-composed from 16:9 to 9:16. | `npx skills add Vincentwei1021/video-shotcraft` | ✅ (needs `--concurrency=1`) | Free; **Apache-2.0** (bundled Mixkit audio under Mixkit license) |
+| 3 | **Motion taste layer:** echris6/motion-video-kit + greensock/gsap-skills + Anthropic frontend-design (+ optional transitions.dev, diffusionstudio/lottie) | Motion grammar from 28 launch films, critic loop, loudness/frozen-time checks, product-hero realism (3D device motion, motion blur). GSAP/Lottie for micro-motion. | cp `business-motion-film` to `~/.claude/skills`; `npx skills add https://github.com/greensock/gsap-skills`; `/plugin install frontend-design@claude-plugins-official`; `npx skills add diffusionstudio/lottie` | ✅ | Free; motion-video-kit, gsap-skills and lottie are **MIT** |
 | 4 | **claude-video-vision** plugin | Lets Claude *watch* its own render (frames + audio transcript) to close the critique loop. | `/plugin marketplace add https://github.com/jordanrendric/claude-video-vision` → `/plugin install claude-video-vision` | ✅ (local Whisper CPU, or Gemini key) | Free / Gemini free tier |
 | 5 | **ElevenLabs official skills** | High-quality TTS (pt-BR to be validated), sound effects and music generation via API. The local MCP is archived; the hosted MCP is agent-centric. | `npx skills add elevenlabs/skills` + `ELEVENLABS_API_KEY` | ✅ (HTTPS) | Paid / free credits tier |
 | 6 | **Higgsfield MCP** (already connected) | Cinematic B-roll (Seedance/Kling/Veo), 3D scene builder video, image → GLB, upscale/reframe to 9:16. | Already attached; `https://mcp.higgsfield.ai/mcp` | ⚠️ works via connector; credits | Paid subscription + credits |
 | 7 | **HyperFrames** plugin (Apache-2.0) | Alternative or companion renderer with GSAP/Three.js/Lottie adapters, an audio-mixing skill and product-launch workflow. Segments can be rendered and composited into Remotion. | `claude plugin marketplace add heygen-com/hyperframes` + `claude plugin install hyperframes@hyperframes` | ✅ | Free |
-| 8 | **appshot** | App-store-preview-style vertical scenes (886×1920 default) with iPhone/Pixel frames, auto-scanning the app codebase. A good reference for the Rotina format. | `npx skills add trunghaiy/appshot` | ✅ | Free (license to verify) |
+| 8 | **appshot** | App-store-preview-style vertical scenes (886×1920 default) with iPhone/Pixel frames, auto-scanning the app codebase. A good reference for the Rotina format. | `npx skills add trunghaiy/appshot` | ✅ | Free; **MIT** |
 | 9 | **3D upgrade path:** `@remotion/three` + GLB phone model (3dviz-pro-max / motion-video-kit Three.js patterns; Meshy MCP or Higgsfield `generate_3d` for assets) | True 3D phone with real lighting instead of CSS-3D. | `npx skills add …` / `npx add-mcp @meshy-ai/meshy-mcp-server --env MESHY_API_KEY=…` | ⚠️ CPU WebGL speed untested | Free / Meshy paid |
 | 10 | **Runway skills or fal MCP** (alternatives to Higgsfield) | Pay-as-you-go video, image and audio models; Runway is in the official marketplace. | `npx skills add runwayml/skills` / `claude mcp add --transport http --scope user fal https://mcp.fal.ai/mcp-relay` | ✅/⚠️ (OAuth flow) | Runway $10 min prepaid; fal per use |
 | 11 | **MCP for Blender** | Asset pipeline (Poly Haven, Sketchfab, Rodin/Hunyuan3D) and Cycles renders. | `claude mcp add blender uvx mcp-for-blender` + Blender + add-on | ⚠️ needs Blender under Xvfb; heavy; untested | Free (generators paid) |
@@ -741,21 +838,18 @@ Columns: feasibility in the container (✅ works / ⚠️ needs testing or paid 
 
 Research was stopped early on the coordinator's instruction (2026-10-08). The following were not finished. Concrete next steps are given for each.
 
-1. **Repo licenses:** video-shotcraft, appshot, motion-video-kit, diffusionstudio/lottie, 3dviz-pro-max, remotion-superpowers, claude-code-video-toolkit.
-   - Next step: `curl -sS https://raw.githubusercontent.com/<owner>/<repo>/HEAD/LICENSE | head -5` for each. This matters because Rotina promos are commercial.
-2. **Anthropic community marketplace:** already downloaded to `/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/mkt/community_marketplace.json` (1.5 MB) but not parsed.
-   - Next step: grep names and descriptions for video, remotion, motion, blender, three, eleven, tts, music, sfx, lottie, higgsfield.
-3. **Higgsfield official docs:** confirm the tool list, plan requirements and per-generation credit cost. The help URL returned 404.
-   - Next step: try `https://higgsfield.ai/mcp` or the help-center search. Also list the tools in-session via ToolSearch for "higsfield".
-4. **Kling official MCP:** verify `https://kling.ai/mcp`, its 16 tools and pricing (only secondary sources so far).
+1. ~~**Repo licenses**~~ — **DONE (2026-10-08):** see Q9 "License check". Most are MIT/Apache. Restrictive: onetake, video-talkcraft and anything2explainer (PolyForm NC); OpenChatCut and OpenMontage (AGPL). Still open: remotion-dev/skills has no root LICENSE (presumably the Remotion license).
+2. ~~**Anthropic community marketplace**~~ — **DONE (2026-10-08):** 2,284 plugins; relevant entries are listed in Q8. Still open: the community plugins (djclaude, easing-wizard, voice-bridge, voxflow, framecraft, videozero, future-video-studio) were not opened or vetted.
+3. **Higgsfield official docs** — **MOSTLY DONE (2026-10-08):** the official page https://higgsfield.ai/mcp and the in-session tool schema are summarized in Q6. Still open: per-generation credit prices (e.g., Seedance 2.5 at 1080p, 9:16, 5–10 s) and plan requirements. Neither appears on the MCP page; check https://higgsfield.ai/pricing.
+4. **Kling official MCP** — **PARTIALLY DONE (2026-10-08):** `https://kling.ai/mcp` exists and answers 401 (auth required) through the proxy. A web search found no primary Kling documentation page. Still open: the official tool list and pricing (check the Kling developer docs or app.klingai.com).
 5. **Blender headless feasibility:**
    - test `blender -b` with mcp-for-blender's add-on server;
    - test Blender under `xvfb-run`;
    - check the bpy-dev/blender-mcp README ("standalone bpy"; my fetch returned only 14 bytes);
    - check whether Blender Lab MCP works in background mode;
    - measure Cycles CPU render time for a 1080×1920 frame on 4 cores.
-6. **CPU WebGL in headless Chromium:** benchmark `@remotion/three` with a GLB phone at 1080×1920, 30 fps (SwiftShader/ANGLE flags such as `--gl=swangle` / `--chromiumOptions.gl`). Check the Remotion docs on `gl` options.
-7. **Hosted-MCP auth through the TLS proxy:** test `claude mcp add --transport http` for ElevenLabs (`https://api.elevenlabs.io/v1/mcp`), fal (`https://mcp.fal.ai/mcp-relay`), LottieFiles (`https://mcp.lottiefiles.com/mcp`), and whether the OAuth browser flow can complete from the cloud container. Also test SSE/WebSocket transports.
+6. **CPU WebGL in headless Chromium** — **PARTIALLY DONE (2026-10-08):** Remotion's docs recommend `--gl=swangle` on machines without a GPU ("Rendering might be slow"). There is an official `template-three` with a 3D phone plus a video texture (see Q4). Still open: an actual render benchmark at 1080×1920/30 fps in this container. This overlaps with the coordinator's separate "3D programático e viabilidade sem GPU" task.
+7. **Hosted-MCP auth through the TLS proxy** — **PARTIALLY DONE (2026-10-08):** all endpoints answer 401 (auth required) through the proxy, so they are reachable (see Q9). Still open: whether the OAuth browser flow of `claude mcp add --transport http …` completes from the cloud container. I did not run it, because it changes the user's MCP config.
 8. **Voice vendors not verified:**
    - official MCPs or skills from OpenAI (gpt-4o-mini-tts), Azure Speech, Fish Audio, Replicate;
    - whether MiniMax MCP has music generation (`grep -i music` on its README showed nothing);
@@ -771,6 +865,6 @@ Research was stopped early on the coordinator's instruction (2026-10-08). The fo
 10. **Motion Canvas / Revideo activity:** check the last commits on github.com/motion-canvas/motion-canvas and github.com/redotvideo/revideo, plus npm publish dates.
 11. **Motion AI Kit:** open https://motion.dev/docs/ai-kit-install directly to confirm the MCP URL, install command and which parts are free (only a search summary so far).
 12. **LottieFiles and Rive:** open https://docs.lottiefiles.com/en/platform/mcp and https://rive.app/docs/editor/mcp/integration to confirm details (search summaries only so far).
-13. **Remotion skill depth:** open `remotion-dev/skills` rule files (e.g. `packages/skills/*/rules/*.md` in remotion-dev/remotion). Check coverage of springs, interpolate easing, `@remotion/three`, `@remotion/motion-blur` and transitions.
+13. ~~**Remotion skill depth**~~ — **DONE (2026-10-08):** see Q1 "Depth of the official skills". It covers easing/spring, perceptual scale, `@remotion/effects`, `<HtmlInCanvasMotionBlur>`, TransitionSeries overlays, 3D via `@remotion/three` and a small remotion.media SFX list. Still open: whether `<HtmlInCanvas>`/`<HtmlInCanvasMotionBlur>` and `@remotion/effects` render in this container's Chromium headless shell (build 1194) without a GPU, `remotion.media` IS reachable through the proxy (whoosh.wav → HTTP 200, 2026-10-08).
 14. **Plainly Videos pricing,** and whether it supports 1080×1920 AE templates.
 15. **Security vetting:** check Agent Skills Hub grades for each shortlisted repo at agentskillshub.top. howseen-ai/claude-motion-design is graded CAUTION.
