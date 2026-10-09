@@ -2,6 +2,12 @@
 
 Este repositório existe para o Claude usar e ir melhorando. Ele guarda skills do Claude, anotações e relatórios de pesquisa, e os projetos de vídeo do app "Rotina".
 
+## Antes de qualquer tarefa (economia de créditos)
+
+1. Leia **só** o `HABILIDADES.txt`, o índice de habilidades com uma linha por item e o caminho de cada uma.
+2. Escolha a habilidade e abra apenas o arquivo indicado. Não percorra o repositório para descobrir o que existe.
+3. Ao criar, mudar ou remover uma habilidade, atualize o `HABILIDADES.txt` no mesmo commit.
+
 ## Combinado com o usuário
 
 - **Idioma:** fale com o usuário em português do Brasil. Ele está aprendendo inglês aos poucos, então:
