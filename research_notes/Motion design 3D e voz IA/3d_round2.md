@@ -22,6 +22,18 @@ How to read:
   - frames 30→60: 0.77 s/frame.
   - Cost rises as the camera dollies in and the phone (MeshPhysicalMaterial) covers more pixels.
 - 22:05, run **B** (MEASURED, partial). Core post (DOF + Bloom + Vignette + AgX ToneMapping, `multisampling=4`), c1. The container restarted at frame 16/60, about 32 s into the log. Per-frame cost was 1.79 s/frame over frames 1→16 (1.95 s for frames 1→10 including warm-up; about 1.5 s for frames 12→16). It is re-run below.
+- 2026-10-09 06:00, environment note (MEASURED). After a container restart, other researchers' jobs shared the 4 CPUs: `node tools/render.mjs ...` with Chrome, `piper_bench.py`, and a Chrome renderer at about 90% CPU. Load average reached 8.4. Re-running B under this load gave about 3.5–4.9 s/frame, against about 1.5–1.9 s/frame before the restart. From here on every run goes through `r2/runner.py`. It records wall time, the CPU-seconds of my own process tree (as child subreaper, via `RUSAGE_CHILDREN`) and the CPU-seconds used by all other processes during the run (from `/proc/stat`).
+- DOCS (online, 2026-10-09):
+  - "Using a video as a texture in Three.js" — [Remotion docs](https://www.remotion.dev/docs/videos/as-threejs-texture):
+    - The recommended route is `@remotion/media` `<Video headless onVideoFrame>` drawing into an `OffscreenCanvas` → `THREE.CanvasTexture`. It is marked available from 4.0.387.
+    - "During rendering, <ThreeCanvas> sets `frameloop='never'`". "Use `advance()` inside `onVideoFrame` to synchronously re-render the scene before the screenshot is taken."
+    - "Using `invalidate()` would only schedule an asynchronous re-render, which can lead to stale frames ... especially with concurrency greater than 1."
+    - A code comment says the second `advance()` is needed because frame extraction resolves after the canvas has already rendered with the stale texture.
+    - `useOffthreadVideoTexture()` and `useVideoTexture()` are both marked "deprecated in favor of using `@remotion/media`". Reasons given for useOffthreadVideoTexture: it needs the whole video downloaded first, does not work in client-side rendering, and "creates a new texture for each frame". For useVideoTexture: it "has all the drawbacks of the <Html5Video> tag".
+  - [ThreeCanvas docs](https://www.remotion.dev/docs/three-canvas): "During rendering, `<ThreeCanvas>` overrides the `frameloop` prop to `'never'` regardless of what you pass." For asynchronous texture updates, use `advance(performance.now())` instead of `invalidate()`.
+  - The `remotion-dev/template-three` code cloned on 2026-10-08 (`src/Phone.tsx`) still calls **`invalidate()`** in `onVideoFrame`. That is the pattern the docs say "can lead to stale frames", and it is tested below as mode `media`.
+  - [Blender requirements](https://www.blender.org/download/requirements/): the minimum GPU is "OpenGL 4.3, Vulkan 1.3" with GL_ARB_shader_draw_parameters and GL_ARB_clip_control. Software GPUs are not mentioned.
+  - `blender --help` (5.2.2 LTS, MEASURED): `--gpu-backend` accepts 'opengl' or 'vulkan'.
 
 ## PENDENTE / NÃO PESQUISADO
 - (filled at the end)
