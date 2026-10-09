@@ -1,4 +1,2 @@
-# motion-studio (kit motion-video)
-motion-studio/node_modules/
-motion-studio/.venv/
-motion-studio/projects/*/out/
+# sobras locais de testes antigos (o kit agora fica na main, em skills/motion-video)
+motion-studio/
