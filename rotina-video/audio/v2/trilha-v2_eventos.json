@@ -1,0 +1,96 @@
+[
+ {
+  "evento": "riser_intro",
+  "t": 3.333,
+  "frame": 100,
+  "fim": 5.333
+ },
+ {
+  "evento": "intro_snare_roll",
+  "t": 3.833,
+  "frame": 115,
+  "fim": 5.083
+ },
+ {
+  "evento": "impacto",
+  "t": 5.333,
+  "frame": 160,
+  "intensidade": 1.0
+ },
+ {
+  "evento": "drop",
+  "t": 5.333,
+  "frame": 160
+ },
+ {
+  "evento": "fill",
+  "t": 10.833,
+  "frame": 325,
+  "fim": 11.333
+ },
+ {
+  "evento": "impacto",
+  "t": 11.333,
+  "frame": 340,
+  "intensidade": 0.6
+ },
+ {
+  "evento": "fill",
+  "t": 18.833,
+  "frame": 565,
+  "fim": 19.333
+ },
+ {
+  "evento": "impacto",
+  "t": 19.333,
+  "frame": 580,
+  "intensidade": 0.6
+ },
+ {
+  "evento": "build_snare_roll",
+  "t": 25.333,
+  "frame": 760,
+  "fim": 26.333
+ },
+ {
+  "evento": "riser_build",
+  "t": 25.333,
+  "frame": 760,
+  "fim": 26.333
+ },
+ {
+  "evento": "impacto",
+  "t": 26.333,
+  "frame": 790,
+  "intensidade": 0.75
+ },
+ {
+  "evento": "riser_final",
+  "t": 27.333,
+  "frame": 820,
+  "fim": 29.333
+ },
+ {
+  "evento": "break",
+  "t": 27.333,
+  "frame": 820,
+  "fim": 28.333
+ },
+ {
+  "evento": "final_snare_roll",
+  "t": 28.333,
+  "frame": 850,
+  "fim": 29.333
+ },
+ {
+  "evento": "impacto",
+  "t": 29.333,
+  "frame": 880,
+  "intensidade": 1.0
+ },
+ {
+  "evento": "final_hit",
+  "t": 29.333,
+  "frame": 880
+ }
+]

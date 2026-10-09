@@ -607,6 +607,15 @@ const Series: React.FC<{f: number}> = ({f}) => {
 					<Trophy size={15} /> Novo recorde: 110 kg
 				</div>
 			</Card>
+			<Card style={{marginTop: 10, padding: '11px 14px', display: 'flex', alignItems: 'center', gap: 10, ...rise(l, 10)}}>
+				<div style={{width: 34, height: 34, borderRadius: 10, background: c.redBg, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+					<Dumbbell size={17} color={c.redHi} />
+				</div>
+				<div style={{flex: 1}}>
+					<div style={{fontSize: 14, fontWeight: 600}}>Próximo: Supino Inclinado</div>
+					<div style={{fontSize: 12, color: c.muted}}>Descanso 01:30 · 4 × 10</div>
+				</div>
+			</Card>
 		</Screen>
 	);
 };
@@ -664,6 +673,19 @@ const Visao: React.FC<{f: number}> = ({f}) => {
 						);
 					})}
 				</div>
+			</Card>
+			<Card style={{marginTop: 10, ...rise(l, 12)}}>
+				<Label style={{marginBottom: 6}}>Próximas contas</Label>
+				{[
+					['12/10', 'Curso de inglês', 350],
+					['15/10', 'Internet', 99],
+				].map(([d, t, v], i) => (
+					<div key={t as string} style={{display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', borderTop: i ? `1px solid ${c.border}` : 'none'}}>
+						<span style={{fontSize: 12, color: c.faint, width: 40}}>{d}</span>
+						<span style={{flex: 1, fontSize: 14, fontWeight: 600}}>{t}</span>
+						<span style={{fontFamily: display, fontSize: 17, fontWeight: 700, color: c.redHi}}>R$ {(v as number).toLocaleString('pt-BR')}</span>
+					</div>
+				))}
 			</Card>
 		</Screen>
 	);
@@ -830,7 +852,8 @@ const Despesas: React.FC<{f: number}> = ({f}) => {
 			<Card style={{marginBottom: 10, ...rise(l, 6)}}>
 				<Label style={{marginBottom: 8}}>Cronograma de outubro</Label>
 				{SCHEDULE.map((x, i) => {
-					const at = sch + i * 3;
+					const at = D_START + 8 + i * 3;
+					const hl = tween(f, [sch + 6 + i * 3, sch + 10 + i * 3], [0, 1]) * (1 - tween(f, [sch + 16 + i * 3, sch + 26 + i * 3], [0, 1]));
 					return (
 						<div
 							key={x.desc}
@@ -838,7 +861,10 @@ const Despesas: React.FC<{f: number}> = ({f}) => {
 								display: 'flex',
 								alignItems: 'center',
 								gap: 10,
-								padding: '7px 0',
+								padding: '7px 6px',
+								margin: '0 -6px',
+								borderRadius: 8,
+								background: `rgba(204,0,0,${0.16 * hl})`,
 								borderTop: i ? `1px solid ${c.border}` : 'none',
 								opacity: tween(f, [at, at + 6], [0, 1]),
 								transform: `translateX(${tween(f, [at, at + 12], [30, 0])}px)`,
