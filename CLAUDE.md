@@ -4,7 +4,9 @@ Este repositório existe para o Claude usar e ir melhorando. Ele guarda skills d
 
 ## Combinado com o usuário
 
-- **Idioma:** fale com o usuário em português do Brasil. **Tudo o que for enviado ou mostrado a ele, inclusive arquivos, propostas de skill e relatórios, deve estar em português.** O usuário não lê inglês. Termos técnicos e código podem ficar como estão.
+- **Idioma:** fale com o usuário em português do Brasil. Ele está aprendendo inglês aos poucos, então:
+  - **Em português, sempre:** o essencial, para ele não precisar traduzir. Isso inclui conversas, resumos, perguntas e decisões, relatórios, propostas de skill para aprovação e instruções de uso.
+  - **Pode ficar em inglês:** material técnico e de apoio, como código, comentários de código, logs e anotações brutas de pesquisa.
 - **Skills precisam de aprovação.** Ao encontrar uma versão melhor de uma skill, ou ao querer mudar uma, mostre primeiro a skill atualizada e pergunte antes de salvá-la no repositório. As skills ficam em `skills/` e `.claude/skills/`.
   - Escreva a proposta no scratchpad, envie com SendUserFile e resuma o que mudou.
 - **Conhecimento pode ser atualizado livremente.** Anotações de pesquisa, relatórios e documentação podem ser criados e atualizados sem perguntar, para a base ficar cada vez melhor. Ficam em `research_notes/`, `reports/` e nos READMEs.
