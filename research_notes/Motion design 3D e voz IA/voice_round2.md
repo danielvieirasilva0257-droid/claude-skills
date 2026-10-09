@@ -180,4 +180,21 @@ So no Piper pt_BR voice is cleanly commercial. Treat them as legally grey and ge
 (pending)
 
 ## PENDENTE / NÃO PESQUISADO
-(pending)
+
+1. **Gemini TTS pt-BR in Google AI Studio (suggested by the user). Not tested: it needs an API key, and I did not create one.** What the user needs:
+   - **Key.** Sign in at aistudio.google.com with a Google account and create a free Gemini API key (Get API key). Keep it private: put it in an env var `GEMINI_API_KEY`, never in the repo.
+   - **[MEASURED] Reachability.** `generativelanguage.googleapis.com` is reachable from this container through the proxy. A request with a placeholder key returned HTTP 400 `API_KEY_INVALID`, so a real key should work here.
+   - **[ONLINE] Models and price** ([pricing](https://ai.google.dev/gemini-api/docs/pricing)):
+     - "Free of charge" Free Tier for `gemini-3.8-flash-tts`, `gemini-3.8-flash-lite-tts`, `gemini-3.1-flash-tts-preview` and `gemini-2.5-flash-preview-tts`. `gemini-2.5-pro-preview-tts` is "Not available" on Free.
+     - Paid 3.8 Flash TTS: $0.50/M text in, $9.00/M audio out until 2026-12-31, doubling from 2027-01-01.
+     - **Free-plan content is "used to improve our products"** (not on paid), so unreleased ad copy may be seen by Google; see round 1 terms.
+   - **[ONLINE] How to call it** ([speech-generation docs](https://ai.google.dev/gemini-api/docs/speech-generation)):
+     - `POST https://generativelanguage.googleapis.com/v1beta/interactions`
+     - Header `x-goog-api-key: $GEMINI_API_KEY`
+     - Body `{"model":"gemini-3.8-flash-tts","input":[{"type":"user_input","content":[{"type":"text","text":"..."}]}],"response_format":{"type":"audio"},"generation_config":{"speech_config":[{"voice":"Kore"}]}}`
+     - Output is WAV, 24 kHz mono 16-bit.
+     - "The TTS models detect the input language automatically". The language table lists "Portuguese" with **no pt-BR locale**, so add a style prompt asking for a Brazilian accent (e.g. "locutor publicitário brasileiro, sotaque paulistano, animado").
+     - 30 prebuilt voices, e.g. Puck "Upbeat", Fenrir "Excitable", Charon "Informative", Kore "Firm", Orus "Firm", Algenib "Gravelly", Sadachbia "Lively".
+     - The docs mention no word timestamps, so run the Q4 aligner on the audio.
+   - **Test to run once the key exists:** synthesise lines 01, 03 and 07 plus the test sentence with 3–4 male voices (Puck, Fenrir, Orus, Charon), then run `align_wx.py` and the ASR check from this round on the outputs.
+2. (more pending items are added at the end of the run)
