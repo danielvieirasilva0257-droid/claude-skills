@@ -60,6 +60,45 @@ How to read:
   - Still `r2/stills/blender_cycles64.png`: clean, noise-free, crisp screen texture, realistic chrome edge highlights. The emissive ring has no bloom (Cycles has none without the compositor). Coins fell out of frame because of my Z-up/Y-up cylinder mapping.
   - Blender 5.2 in background mode prints no per-sample progress, so I added a `bpy.app.handlers.render_stats` printer for later runs.
 - Citation for the H.264 problem: Remotion's docs say earlier versions downloaded "the free version of Chromium, which would not include codecs for the proprietary H.264 and H.265 codecs", and that it moved to Chrome Headless Shell — [Remotion: Installing Chrome v4.0.247](https://remotion.dev/docs/miscellaneous/thorium-browser). The Playwright `chromium_headless_shell-1194` used here is an open-source Chromium build, which fits the `Cannot decode` result (inference).
+- 06:20, run **B** re-run via runner (core post DOF + Bloom + Vignette + AgX, MSAA 4, static PNG screen, c1, 60 frames, 1080×1920; MEASURED). **340.3 s wall, my-tree CPU 486.0 s** (8.1 CPU-s/frame including start-up). Other processes used 64% of 4 cores.
+  - The same scene without post costs 150.6 CPU-s (E) to 160.6 CPU-s (F), so **post-processing costs about 3.1–3.2× the CPU of the no-post scene**. This agrees with round 1's still-frame ratio (about 3×) and with the idle pre-restart partial (1.5–1.95 s/frame against 0.40–0.77 s/frame).
+- 06:20, re-run **B** frame check (MEASURED): **no blank frame 0** this time; luma for frames 0–3 is 44.6, 44.6, 45.3, 46.6. Same bundle as the first B run, which did have a blank frame 0. **So the blank first frame with EffectComposer is intermittent (1 of 2 runs), a race.** `<AdvanceAfterMount/>` is still the safe pattern; it is verified in K2.
+- 06:21, Blender **EVX** (MEASURED): **Eevee WORKS headless under Xvfb + Mesa 25.2.8 llvmpipe (GLX).**
+  - Command: `xvfb-run -a -s "-screen 0 1920x1080x24" blender -b --factory-startup -P phone_scene.py -- EEVEE 64 <out> 1`. Engine id in 5.2.2: `BLENDER_EEVEE`, 64 TAA samples, 1080×1920.
+  - `render.render()` took **296.4 s**; process wall 299.3 s; **my CPU 343.1 s**. Other processes used 71% of 4 cores.
+  - **This is more CPU than Cycles 64 spp + OIDN (190.9 CPU-s).** The single frame includes one-time GLSL shader compilation on llvmpipe; a 3-frame run (EVX3, 16 samples) is queued to separate the two.
+  - Still `r2/stills/blender_eevee_xvfb.png`: visually close to Cycles. Same framing, crisp screen, clean metal edges, slightly softer glow on the ring.
+- 06:21, Blender **EVV** (MEASURED): Vulkan with Chromium's SwiftShader ICD (`VK_ICD_FILENAMES=.../chrome-linux/vk_swiftshader_icd.json blender -b --gpu-backend vulkan ...`). **FAILED in 1.2 s.**
+  - `gpu.vulkan | WARNING Device [SwiftShader Device (Subzero)] does not meet minimum requirements. Missing features are [geometry shaders, multi viewport, logical operations, dual source blending, shader draw parameters]`, then `ERROR No Vulkan device found that meets the minimum requirements`. It then falls back to OpenGL, gets `Couldn't open libEGL.so.1`, and aborts.
+  - Mesa lavapipe (`mesa-vulkan-drivers`) is not installed and was not tested.
+- 06:22, run **A** re-run via runner (no post, PNG screen, c1, 60 frames; MEASURED). 101.5 s wall under contention, against **45.2 s on the idle machine** before the restart. **My-tree CPU: 150.7 s.**
+  - So on an idle machine, Remotion + SwiftShader used 150.7 / 45.2 ≈ **3.3 effective cores** of 4. I use this to convert CPU-s measured under contention into idle wall estimates.
+  - CPU ratio core-post / no-post: B / A = 486.0 / 150.7 = **3.22×**.
+- 06:24, run **C** (no post, PNG screen, **`--concurrency=2`**, 60 frames; MEASURED). **107.4 s wall, my-tree CPU 158.2 s.** Others used 63% of 4 cores, the same contention as the A re-run (63%).
+  - Against A at c1 (101.5 s, 150.7 CPU-s), **c2 is not faster (about 6% slower) and uses about 5% more CPU.**
+  - This fits round 1 (c4 slower than c1) and the about 3.3 effective cores that SwiftShader already uses at c1: the theoretical ceiling for c2 would be about 4/3.3 ≈ 1.2×.
+- 06:25, **correction on the blank frame 0** (MEASURED + SOURCE). Run **C** (no post, c2) also has a **blank frame 0** (luma 6.0; frames 1+ are 19.4+). So the problem is **not specific to EffectComposer**.
+  - Tally so far: A c1 no post, 0 of 2 runs blank; B c1 post, 1 of 2; C c2 no post, 1 of 1.
+  - Source, `@remotion/three` 4.0.534 `ThreeCanvas.js`: the per-frame `delayRender("Waiting for R3F to render frame N")` is skipped when `frame === 0` (`if (!isRendering || frame === 0) return;`). Frame 0 then relies on `onCreated`'s `advance()`, which runs when the R3F root is created, **before** suspended content (drei `<Environment files>`, `useLoader` textures) mounts.
+  - The SuspenseLoader's `delayRender` can be released before `ManualFrameRenderer`'s mount `advance()`, so Remotion can capture an empty canvas: a **race on frame 0 only**. Frames N > 0 are protected by the per-frame handle, including the first frame of each concurrency tab.
+  - The EffectComposer `setSize`-in-`useEffect` ordering is a second reason to render once more after mount.
+  - **Robust fix** (replaces the earlier `AdvanceAfterMount`, which took its `delayRender` inside a subtree that can be rendered and then discarded during Suspense, risking a leaked handle):
+    - In the DOM-tree component that never suspends: `const [firstHandle] = useState(() => delayRender('first R3F content frame'));`
+    - As the LAST child inside `<ThreeCanvas>`: `<FirstContentFrame handle={firstHandle}/>`, which does `useEffect(() => { advance(performance.now()); continueRender(handle); }, [])`. Effects only run on commit, so no handle can leak.
+    - Verified in E2/K2 (below).
+- 06:26, Blender **CYANIM** (MEASURED). Cycles CPU, 32 samples + OIDN, 4-frame animation (phone turns, camera dollies), `render.use_persistent_data = True`, 1080×1920. Command: `blender -b --factory-startup -P phone_scene.py -- CYCLES 32 <out_prefix> 4 1`.
+  - Process wall 304.4 s, **my CPU 402.1 s ≈ 100 CPU-s per frame**. Other processes used 67% of 4 cores.
+  - Per-frame times from `render_stats`: **74.9 / 74.4 / 72.8 / 80.6 s** (mean 75.7 s/frame under contention).
+  - Frame 1 setup (sync, BVH, image loading, light importance map) took 2.1 s; later frames re-sync in about 0.06 s thanks to persistent data. Saving took 0.4–1.0 s.
+  - So **cost ≈ path tracing + denoise and scales linearly with samples**: about 3.0 CPU-s per sample-frame at 1080×1920 (64 spp ≈ 186 CPU-s, 32 spp ≈ 100 CPU-s).
+  - **Idle-machine estimate (inference):** Cycles parallelises well (about 3.8–3.9 of 4 cores), so about **26 s/frame at 32 spp + OIDN** and about **48–50 s/frame at 64 spp + OIDN**.
+- 06:29, Blender **EVX3** (MEASURED). Eevee under Xvfb + llvmpipe, **16 TAA samples, 3-frame animation**, 1080×1920. Command: `xvfb-run -a -s "-screen 0 1920x1080x24" blender -b --factory-startup -P phone_scene.py -- EEVEE 16 <out_prefix> 3`.
+  - Process wall 192.3 s, **my CPU 256.4 s ≈ 85 CPU-s per frame**. Others used 66% of 4 cores.
+  - Per-frame times: **56.6 / 69.4 / 64.6 s**. Time before the first sample was 11.0 s on frame 1 (including shader compilation) and 5.6–7.6 s on later frames, so **shader compilation is a small part**. Software Eevee cost scales about linearly with samples (64 samples ≈ 343 CPU-s in EVX).
+  - **Software Eevee is not cheaper than Cycles CPU here.** Eevee 16 ≈ 85 CPU-s/frame against Cycles 32 + OIDN ≈ 100. Eevee 64 ≈ 343 against Cycles 64 + OIDN ≈ 186.
+  - Visual (crop `r2/stills/eevee16_vs_cycles32_f3_crop.jpg`): Eevee at 16 samples shows no visible noise and crisp text. Its look is close to Cycles; the dynamic-island pill renders light grey in Eevee and near-black in Cycles. Frames: `r2/stills/evanim_000{1,2,3}.png`, `r2/stills/cyanim_000{1..4}.png`.
+- 06:30, run **D** (core post, MSAA 4, PNG screen, **c2**, 60 frames; MEASURED). **335.7 s wall, my-tree CPU 491.3 s.** Others used 63% of 4 cores. Against B at c1 (340.3 s, 486.0 CPU-s, others 64%): **c2 is about 1% faster in wall time and uses about 1% more CPU, i.e. no meaningful gain.**
+- Frame-0 tally on the unfixed bundle (MEASURED with `r2/blank_check.py`): frame 0 was blank in **3 of 9 renders**. B: 1 of 2; C: 1 of 1; D: 1 of 1; A: 0 of 2; E, F, G: 0 of 1 each. Blank frames never appeared after frame 0. **This is an intermittent race, independent of post and concurrency**, consistent with the `frame === 0` skip in ThreeCanvas.
 
 ## PENDENTE / NÃO PESQUISADO
 - (filled at the end)
