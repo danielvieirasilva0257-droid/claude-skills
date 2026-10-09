@@ -1,0 +1,15 @@
+motion-video · kit para Claude Code (Mac e Windows)
+===================================================
+
+1. Descompacte o zip onde quiser (ex.: Documentos).
+2. Abra a pasta "motion-video-kit" no Claude Code (app desktop ou terminal).
+   Windows: o Claude Code precisa do Git instalado (https://git-scm.com).
+3. Mande:  "Prepara o motion-studio para eu usar."
+   (o Claude confere Node, FFmpeg e Python e instala o que faltar, com sua permissão)
+4. Depois é só pedir:  "Faz um vídeo em motion de 15s sobre..."
+
+O passo a passo completo, com imagens, está em "LEIA-ME - Guia motion-video.pdf".
+
+Obs.: a pasta .claude começa com ponto e pode ficar oculta.
+Mac: Cmd + Shift + .   ·   Windows: Explorador > Exibir > Itens ocultos.
+Ela precisa ir junto: é lá que fica a skill.

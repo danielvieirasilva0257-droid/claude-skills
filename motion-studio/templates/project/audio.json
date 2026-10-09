@@ -1,0 +1,10 @@
+{
+  "_music_exemplo": {
+    "path": "/caminho/musica.mp3",
+    "align": { "musicTime": 11.79, "frame": 240 },
+    "gain": 0.56, "fadeIn": 0.25, "fadeOut": 1.6
+  },
+  "sfxBoost": { "fromFrame": 999999, "gain": 1.0 },
+  "duck": [],
+  "loudness": -14
+}

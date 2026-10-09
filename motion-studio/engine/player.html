@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Motion Studio</title>
+<style>
+  body{margin:0;background:#111;color:#ddd;font:13px ui-monospace,monospace}
+  canvas{display:block;width:100%;max-width:1280px;margin:0 auto;background:#000}
+  .ui{max-width:1280px;margin:10px auto;display:flex;gap:12px;align-items:center;padding:0 16px}
+  input[type=range]{flex:1}
+  button{background:#FF4D00;border:0;color:#000;font:inherit;font-weight:700;padding:6px 14px;border-radius:6px;cursor:pointer}
+</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<div class="ui"><button id="play">pause</button><input id="seek" type="range" min="0" value="0"><span id="lbl">0</span></div>
+<script>
+// ?p=projects/<nome>  → carrega project.js, style do projeto, engine, scenes
+const load = src => new Promise((ok, err) => {
+  const s = document.createElement('script'); s.src = src + '?t=' + Date.now(); s.onload = ok; s.onerror = () => err(new Error('falhou: ' + src));
+  document.head.appendChild(s);
+});
+(async () => {
+  try {
+    const dir = new URLSearchParams(location.search).get('p');
+    await load('../' + dir + '/project.js');
+    window.PROJECT.dir = dir;
+    await load('../styles/' + window.PROJECT.style + '/style.js');
+    if (window.STYLE.fonts.css) {
+      const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = window.STYLE.fonts.css;
+      await new Promise(r => { l.onload = r; l.onerror = r; document.head.appendChild(l); });
+    }
+    // fontes locais (styles/*/style.js → fonts.files) — não dependem de rede
+    for (const ff of (window.STYLE.fonts.files || [])) {
+      const face = new FontFace(ff.family, `url(../fonts/${ff.file})`, ff.descriptors || {});
+      document.fonts.add(await face.load());
+    }
+    await load('engine.core.js');
+    await load('../' + dir + '/scenes.js');
+    await load('engine.runtime.js');
+    window.dispatchEvent(new Event('motion:ready'));
+  } catch (e) { window.EXPORT_ERR = String(e); console.error('EXPORT_ERR ' + e); }
+})();
+</script>
+</body>
+</html>
