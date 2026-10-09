@@ -376,7 +376,7 @@ def roll(t0, t1, start_div=8, end_div=32, g0=0.12, g1=0.5, tone0=180.0, tone1=27
         t += step
 
 
-roll(beat_t(7), beat_t(9.5), g0=0.08, g1=0.42)
+roll(beat_t(7), beat_t(9.5), g0=0.06, g1=0.3)
 ev('intro_snare_roll', beat_t(7), fim=round(beat_t(9.5), 3))
 for (a, bb) in [(beat_t(21), beat_t(22)), (beat_t(37), beat_t(38))]:
     roll(a, bb, start_div=16, end_div=32, g0=0.18, g1=0.45)
@@ -385,11 +385,11 @@ for (a, bb) in [(beat_t(21), beat_t(22)), (beat_t(37), beat_t(38))]:
     ev('fill', a, fim=round(bb, 3))
 roll(beat_t(50), T_F, start_div=8, end_div=32, g0=0.12, g1=0.5)
 ev('build_snare_roll', beat_t(50), fim=round(T_F, 3))
-roll(T_BACK, T_HIT, start_div=8, end_div=32, g0=0.10, g1=0.48)
+roll(T_BACK, T_HIT, start_div=8, end_div=32, g0=0.06, g1=0.26)
 ev('final_snare_roll', T_BACK, fim=round(T_HIT, 3))
 
 # ---- impacts, crashes, risers
-add(fx, riser(T_DROP - beat_t(6)), beat_t(6), 0.28)
+add(fx, riser(T_DROP - beat_t(6)), beat_t(6), 0.2)
 ev('riser_intro', beat_t(6), fim=round(T_DROP, 3))
 add(fx, reverse_crash(1.0), T_DROP - 1.0, 0.45)
 for t, big in [(T_DROP, 1.0), (T_B, 0.6), (T_C, 0.6), (T_F, 0.75), (T_HIT, 1.0)]:
@@ -400,7 +400,7 @@ for (a, bb) in [(beat_t(21), T_B), (beat_t(37), T_C)]:
     add(fx, riser(bb - a, 800, 9000, tone=False), a, 0.16)
 add(fx, riser(T_F - beat_t(50), 500, 9000), beat_t(50), 0.22)
 ev('riser_build', beat_t(50), fim=round(T_F, 3))
-add(fx, riser(T_HIT - T_BREAK, 300, 10000), T_BREAK, 0.4)
+add(fx, riser(T_HIT - T_BREAK, 300, 10000), T_BREAK, 0.24)
 ev('riser_final', T_BREAK, fim=round(T_HIT, 3))
 add(fx, reverse_crash(0.8), T_HIT - 0.8, 0.35)
 ev('drop', T_DROP)

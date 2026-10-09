@@ -917,10 +917,10 @@ type Item = {at: number; el: (f: number) => React.ReactNode; slide?: number};
 export const TIMELINE: Item[] = [
 	{at: 182, el: (f) => <Habitos f={f} />},
 	{at: 266, el: (f) => <Metricas f={f} />, slide: 9},
-	{at: 336, el: (f) => <Plano f={f} />},
+	{at: 335, el: (f) => <Plano f={f} />},
 	{at: 393, el: (f) => <Estilos f={f} />, slide: 9},
 	{at: 478, el: (f) => <Series f={f} />, slide: 9},
-	{at: 578, el: (f) => <Visao f={f} />},
+	{at: 577, el: (f) => <Visao f={f} />},
 	{at: 632, el: (f) => <Transacoes f={f} />, slide: 9},
 	{at: 706, el: (f) => <Despesas f={f} />, slide: 9},
 	{at: W(12, 'Hábitos') - 3, el: (f) => <Habitos f={f + 400} />, slide: 7},

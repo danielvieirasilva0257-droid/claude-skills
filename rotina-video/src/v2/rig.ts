@@ -18,7 +18,7 @@ export type Pose = {x: number; y: number; z: number; rx: number; ry: number; rz:
 
 // Poses in screen pixels (center of the phone at z = 0) for readability
 const POSES = {
-	logo: {x: 540, y: 760},
+	logo: {x: 540, y: 360}, // projects to (540, 760) at z = -9
 	habitos: {x: 600, y: 1130, rx: 0.08, ry: -0.32, rz: 0.035},
 	metricas: {x: 400, y: 1150, rx: 0.06, ry: 0.3, rz: -0.03},
 	treino: {x: 540, y: 1180, rx: 0.1, ry: -0.22, rz: 0.02},
@@ -27,13 +27,13 @@ const POSES = {
 	financeiro: {x: 520, y: 1170, rx: 0.08, ry: 0.25, rz: -0.02},
 	transacoes: {x: 420, y: 1180, rx: 0.07, ry: 0.3, rz: -0.03},
 	despesas: {x: 620, y: 1200, rx: 0.08, ry: -0.26, rz: 0.03},
-	final: {x: 540, y: 1150, rx: 0.05, ry: 0.0, rz: 0},
+	final: {x: 540, y: 1300, rx: 0.05, ry: 0.0, rz: 0},
 };
 
 const TAU = Math.PI * 2;
 
 export const phonePose = (f: number): Pose => {
-	if (f < 182 || f > 847) return {x: 0, y: 0, z: 0, rx: 0, ry: 0, rz: 0, visible: false};
+	if (f < 182 || f > 846) return {x: 0, y: 0, z: 0, rx: 0, ry: 0, rz: 0, visible: false};
 	const p = POSES;
 	// entrance from the logo: one heavy spring for everything (lands ~f204, small overshoot)
 	const e = sp(f, 182, {stiffness: 110, damping: 17});
@@ -106,27 +106,27 @@ export const phonePose = (f: number): Pose => {
 		[586, 0, ease.in],
 		[628, 0.15],
 		[702, 0.2],
-		[786, 0.22],
-		[800, 0.05],
-		[832, 0.3],
+		[786, 0.2],
+		[800, -0.3],
+		[832, -0.2],
 	]);
 
 	// zoom through the screen (f832-847): face the camera, center, fly into the glass
 	if (f >= 832) {
 		const t = kf(f, [
-			[832, 0],
-			[847, 1, ease.in],
+			[836, 0],
+			[846, 1, ease.in],
 		]);
 		const c = kf(f, [
-			[832, 0],
-			[840, 1, ease.out],
+			[835, 0],
+			[843, 1, ease.out],
 		]);
 		x += (540 - x) * c;
 		y += (960 - y) * c;
 		rx += (TAU - rx) * c;
 		ry += (-TAU - ry) * c;
 		rz += (0 - rz) * c;
-		z = 0.3 + (2.75 - 0.3) * t;
+		z += (2.75 - z) * t;
 	}
 
 	// never still: tiny float and sway (fades out during the zoom)

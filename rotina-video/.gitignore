@@ -1,3 +1,7 @@
 node_modules
 out
 audio/music.wav
+
+# v2: frames generated from code (see PASSO-A-PASSO on main): re-render instead of committing
+public/v2/tela/
+public/v2/celular/

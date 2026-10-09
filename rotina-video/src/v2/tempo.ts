@@ -45,7 +45,7 @@ export const SEC = {
 	despesas: 706,
 	final: 790, // "Hábitos, treino e dinheiro" (beat)
 	zoom: 838, // zoom through the screen
-	cta: 846, // red end card ("Baixe" at 843)
+	cta: 847, // red end card ("Baixe" at 843); the phone covers the frame at 846
 	finalHit: 880, // bar, end of "bio"
 	end: END,
 };
