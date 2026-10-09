@@ -1,14 +1,21 @@
 {
-  "compilerOptions": {
-    "target": "ES2018",
-    "module": "commonjs",
-    "jsx": "react-jsx",
-    "strict": true,
-    "noEmit": true,
-    "lib": ["es2020", "dom", "dom.iterable"],
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
-  },
-  "include": ["src"]
+	"compilerOptions": {
+		"target": "ES2018",
+		"module": "commonjs",
+		"jsx": "react-jsx",
+		"strict": true,
+		"noEmit": true,
+		"lib": [
+			"es2020",
+			"dom",
+			"dom.iterable"
+		],
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true
+	},
+	"include": [
+		"src"
+	]
 }
