@@ -34,6 +34,17 @@ How to read:
   - The `remotion-dev/template-three` code cloned on 2026-10-08 (`src/Phone.tsx`) still calls **`invalidate()`** in `onVideoFrame`. That is the pattern the docs say "can lead to stale frames", and it is tested below as mode `media`.
   - [Blender requirements](https://www.blender.org/download/requirements/): the minimum GPU is "OpenGL 4.3, Vulkan 1.3" with GL_ARB_shader_draw_parameters and GL_ARB_clip_control. Software GPUs are not mentioned.
   - `blender --help` (5.2.2 LTS, MEASURED): `--gpu-backend` accepts 'opengl' or 'vulkan'.
+- 06:04, orphaned run **B** finished (MEASURED). The killed batch's render could not be stopped: the auto-mode classifier blocked `kill`, so it ran to completion under heavy shared load. **Timing is contaminated**: 60 frames, log span 277.8 s, 4.54 s/frame for frames 10→60.
+  - **Bug found: frame 0 of B is blank.** Its mean luma is 6.0 against 44–48 for frames 1+. A blank-frame detector (mean luma < 8 on frames downscaled to 108×192 via ffmpeg + numpy) finds only frame 0. Frames 1–59 are correct: purple bloom on the HDR ring, DOF on the coins, vignette, AgX. Run A (no post) has no blank frames.
+  - Cause, read in source:
+    - In `@react-three/postprocessing` 2.19.1 (`dist/EffectComposer.js`), `composer.setSize(size.width, size.height)` and `gl.toneMapping = NoToneMapping` both run in passive `useEffect`s.
+    - ThreeCanvas 4.0.534 renders its `ManualFrameRenderer` as an earlier sibling of the scene children, so its `useEffect` → `advance()` runs first, before the composer is sized.
+    - Frames > 0 are fine because the composer is already sized.
+  - Fix written: an `<AdvanceAfterMount/>` placed after `<EffectComposer>`. It takes a `delayRender` in a `useState` initializer, and in `useEffect` calls `advance(performance.now())` and then `continueRender`. Being a later sibling, its effect runs after the composer's. Verification is queued (runs K2/B2).
+- 06:06, run **E** (sequence texture, no post, c1), MEASURED. 72.0 s wall, my-tree CPU 150.6 s, other processes 39% of the 4 cores. **The screen stayed black on every frame.** The cause is my own test code, not Remotion: the swap texture was seeded with a 2×2 canvas. On WebGL2, three.js allocates immutable storage with `texStorage2D` on the first upload, so the later 1080×2340 images cannot be uploaded into it. Fix: seed with a placeholder of the same size as the frames (1080×2340 canvas). The re-test is run **E2**.
+- 06:08, run **F** (raw `useOffthreadVideoTexture({src: staticFile('screen.mp4')})`, no post, c1, 4.0.534), MEASURED. 121.8 s wall, my-tree CPU 160.6 s, others 40% of 4 cores.
+  - **FAILED visually.** Frame 0 shows the null-texture fallback colour. Frames 1–59 show a uniform light-grey screen (about #e6e6e6) with no UI at all; still `r2/stills/F_f30.jpg`, tiles `r2/stills/F-offthread-none-c1_sync.jpg`.
+  - This is the same "washed-out grey" symptom round 1 saw on 4.0.250 with post. The hook is deprecated in the docs; I did not debug the root cause.
 
 ## PENDENTE / NÃO PESQUISADO
 - (filled at the end)

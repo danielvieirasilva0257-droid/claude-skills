@@ -1,11 +1,11 @@
 # YouTube round 2: remaining transcripts on Claude (Claude Code, skills, MCP) for motion graphics, 3D (Blender) and AI voice (as of 2026-10-08)
 
-> Status: IN PROGRESS (incremental saves). Round 2 of the YouTube research; round 1 is in `youtube_and_community.md` (same folder), which lists every video's title/channel/date/views and analyzed 14 transcripts in full. This file covers the ~39 transcripts that were downloaded but not analyzed. Source of each finding = YouTube auto-captions (transcript) of the linked video, read on 2026-10-08 from the scratchpad copies (`yt/txt/<id>.txt`). Auto-captions mangle names ("Clot Code" = Claude Code, "Emotion" = Remotion, "Hixfield" = Higgsfield); quotes below are verbatim from the captions, translations in brackets are mine. "Full" = transcript read entirely; "skim" = intro + the ~6–22 most keyword-dense 30-s chunks + ending.
+> Status: FINAL, completed 2026-10-09. Round 2 of the YouTube research; round 1 is in `youtube_and_community.md` (same folder), which lists every video's title/channel/date/views and analyzed 14 transcripts in full. This file covers the ~39 transcripts that were downloaded but not analyzed. Source of each finding = YouTube auto-captions (transcript) of the linked video, read on 2026-10-08 from the scratchpad copies (`yt/txt/<id>.txt`). Auto-captions mangle names ("Clot Code" = Claude Code, "Emotion" = Remotion, "Hixfield" = Higgsfield); quotes below are verbatim from the captions, translations in brackets are mine. "Full" = transcript read entirely; "skim" = intro + the ~6–22 most keyword-dense 30-s chunks + ending.
 
 ## Q1. Per-transcript takeaways (video ID, title/channel, language, 3–8 concrete takeaways)
 
 ### Takeaway
-(see end of file — written after all transcripts were processed)
+All 39 transcripts left over from round 1 were processed (12 read in full, 26 skimmed via intro + densest chunks, 1 contained only song lyrics), plus 2 Blender videos newly found during the Supernova search (one transcript, one description). New relative to round 1: concrete PT-BR workflows (Mateus Dias's two-skill pipeline at extra/max effort with "edite com excelência e faça refinamento"; Fernando Araujo's design-system extraction + text→UI→realism triad and his Opus-5.5-in-Blender commercial; Felipe Borges's font/Lottie anti-slop rules), Andy Lo's six-stage pipeline with a storyboard approval gate, Claude Design's transcript-synced animations as a parallel route, and repeated evidence that audio (music, VO) is the weakest link of code-made videos.
 
 ### Cited Findings
 
@@ -183,3 +183,114 @@
 
 **tKrVYOUvrtA — "Claude Opus 5.5 Made a Music Video About AI Taking Over" — Imaginative Prompting — EN** — captions are only song lyrics; no workflow information. [YouTube](https://www.youtube.com/watch?v=tKrVYOUvrtA)
 
+### Inferences
+- Round 2 mostly confirms round 1's "harness over model" thesis; the genuinely new, transferable items are listed under Q4 (phase gates with storyboard approval, ban lists + font choice, VO-first timing, audio as the weak link, per-channel skills, reference video over description).
+
+### Gaps
+- 26 transcripts were skimmed, not read in full (keyword-dense chunks only); exact prompts shown only on screen (not spoken) are missing from captions (e.g., Roboverse's app-ad prompt, Deborah Folloni's template, Felipe Borges's SRT prompt).
+
+## Q2. Which Brazilian creators show Claude/Remotion/Blender workflows, and what do they recommend for pt-BR voice and Brazilian audiences?
+
+### Takeaway
+Eleven Brazilian videos (ten from round 1's list plus Fernando Araujo's newly found Blender test) show Claude Code / Claude Design workflows with Remotion, HyperFrames, Higgsfield, OpenArt and Blender. **None demonstrates or evaluates an AI voice in Brazilian Portuguese**: Brazilian creators narrate with their own recorded voice (talking-head formats) or ship without narration; the only pt-BR voice advice is generic ("use ElevenLabs"). Their Brazil-relevant advice is about process and brand fidelity: real design systems and screenshots, per-channel style skills, high effort, scene-by-scene prompting, short punchy on-screen lines and local cues (R$, Brazilian flag).
+
+### Cited Findings
+**Who shows what**
+- Mateus Dias — talking-head pipeline: decupagem skill (Python silence cutter, >100 ms gaps, replacing the paid AutoCut plugin) + one animation skill per channel; Opus at extra/max ("Eu não consegui bons resultados abaixo do extra"); spoken "abre nota… fecha nota" directions; Max 20x plan; Fable 5.1 animates better but "gasta muito, muito mesmo". — [YouTube](https://www.youtube.com/watch?v=61u9wOT-Cds)
+- Fernando Araujo — Nomad (Brazilian fintech) commercial, Claude vs GPT: site/design-system extraction, 13–14-scene triad text → UI motion → realism (Higgsfield Seedance 2.5); Claude won thanks to word-by-word kinetic text — [YouTube](https://www.youtube.com/watch?v=rfplFJXmIjg); 100% 3D commercial scripted in Blender with Cycles — [YouTube](https://www.youtube.com/watch?v=12lznI7jD1s). He sells a "skill de motion design" and a "Diretor Brabo" in his course (desc).
+- Felipe Borges (Fala IA!) — Claude Design animations synced to an SRT, Switzer font, Lottie-JSON icons, PiP face masks in Premiere. — [YouTube](https://www.youtube.com/watch?v=XTtTBqECLPs)
+- Macks Wendhell — Remotion + "Watch Video" skill + Higgsfield collage textures; 97 Higgsfield credits for a ~2-min video; <40% of a daily Claude Pro session. — [YouTube](https://www.youtube.com/watch?v=0I5AWAuPFj0)
+- Deborah Folloni — scenes → components mental model and a scene-by-scene prompt template (32-s promo, ~1 h including script). — [YouTube](https://www.youtube.com/watch?v=5HjN2NytHVE)
+- Rafa Voss — video-use (cuts) + HyperFrames (overlays) with a cut-first approval gate. — [YouTube](https://www.youtube.com/watch?v=SjlKBdgWrZ4)
+- Fernando Valon — beginner: green-background overlays for CapCut/Premiere, SRT-driven captions, ProRes/H.264/H.265 export. — [YouTube](https://www.youtube.com/watch?v=ntHLmj-GqF0)
+- Maestros da IA — HyperFrames for vertical talking heads (placeholders first) — [YouTube](https://www.youtube.com/watch?v=OtqpA9ZEPQw); Remotion install basics — [YouTube](https://www.youtube.com/watch?v=wopu5lYP0MM). Well Pires — Remotion skills intro — [YouTube](https://www.youtube.com/watch?v=vii97F4Slkw).
+
+**pt-BR voice (what little exists)**
+- Only explicit recipe: Well Pires — "utilizar o [Eleven] Labs para fazer a voz": write the product-presentation script, convert it to audio, then give Claude Code both the written script and the audio file so the Remotion piece follows the narration; alternatively dictate with your own voice. — [YouTube](https://www.youtube.com/watch?v=vii97F4Slkw)
+- HyperFrames' intake asked "se a gente vai utilizar uma voz em português, se a gente vai narrar o vídeo… ou então… sem voz" — he chose no voice. — [YouTube](https://www.youtube.com/watch?v=OtqpA9ZEPQw)
+- Mateus Dias, Rafa Voss, Felipe Borges and Macks Wendhell use their own on-camera voice; Fernando Araujo's ads rely on on-screen text + music/SFX (own sound design on the Blender piece). — [YouTube](https://www.youtube.com/watch?v=61u9wOT-Cds); [YouTube](https://www.youtube.com/watch?v=SjlKBdgWrZ4); [YouTube](https://www.youtube.com/watch?v=XTtTBqECLPs); [YouTube](https://www.youtube.com/watch?v=0I5AWAuPFj0); [YouTube](https://www.youtube.com/watch?v=12lznI7jD1s)
+- A grep of all 54 local transcripts for "portugu / brasil / brazil / sotaque / pt-br" found no discussion of Portuguese TTS quality; besides the HyperFrames question, the only hit is Fernando Araujo noting the BRL→EUR scene "poderia ter trazido a bandeirinha do Brasil". — [YouTube](https://www.youtube.com/watch?v=rfplFJXmIjg)
+
+**Advice aimed at Brazilian creators/audiences**
+- Don't reuse a shared skill as-is — "Só não vai usar igual… vai ficar padrão". — [Mateus Dias](https://www.youtube.com/watch?v=61u9wOT-Cds)
+- Extract the brand's real design system before the "prompt definitivo"; keep on-screen phrases to "três, quatro, no máximo cinco palavras em apenas uma linha"; close on a vectorized logo animation. — [Fernando Araujo](https://www.youtube.com/watch?v=rfplFJXmIjg)
+- Change the font first (Switzer/Fontshare, Typewolf) and feed Lottie icons. — [Felipe Borges](https://www.youtube.com/watch?v=XTtTBqECLPs)
+- Magic phrase "edite com excelência e faça refinamento" + extra/max effort. — [Mateus Dias](https://www.youtube.com/watch?v=61u9wOT-Cds)
+- Cost framing in BRL: Claude "plano plus… R$ 100 por mês" vs ChatGPT Pro "R$ 500" (his words) — [Fernando Araujo](https://www.youtube.com/watch?v=rfplFJXmIjg); Higgsfield "menos de 100 créditos" per 2-min video — [Macks Wendhell](https://www.youtube.com/watch?v=0I5AWAuPFj0).
+
+### Inferences
+- Because no Brazilian creator shows a pt-BR AI narrator, the voice choice for "Rotina" must come from dedicated TTS research (the voice researcher's notes), not from YouTube practice. The Brazilian norm is the creator's real voice; recording a human pt-BR VO and letting Claude retime scenes to it (VO-first, as MoSidd and Well Pires do) is the creator-proven path.
+- Brazilian viewers notice local cues (R$, local flags/apps, natural short pt-BR lines); Fernando Araujo flagged the missing Brazilian flag at first glance.
+
+### Gaps
+- No pt-BR TTS comparison anywhere in the 54 transcripts. PT-BR videos not downloaded (e66pc9qvTks Clonex Studio 35 min, tT5ya2HKazo Macks Wendhell, woQ180jz92k Paulo Castellano, SrL4vZvNJDs Fernando Araujo, j9-p6WRNqtQ Gabriel Adamuchi) might cover voice.
+
+## Q3. What do the Blender MCP / Blender-scripting videos show about 3D phone/product shots and combining them with Remotion?
+
+### Takeaway
+No analyzed video builds a 3D phone/app-mockup shot or composites Blender renders inside Remotion. What they do show: (a) Opus 5.5 can script a whole multi-shot 3D product commercial in Blender via Python and render it photoreal in Cycles, but the render took ~5 h on a consumer GPU; (b) MCP-driven Blender shines at scene assembly, materials, lighting variants, scattering and asset generation, and works best for users who already know Blender; (c) reference images are the main steering tool. On YouTube the Remotion-side 3D route is still React Three Fiber / Three.js inside Remotion (round 1).
+
+### Cited Findings
+- Fernando Araujo: Opus 5.5 (high effort) wrote Python that built an Amazon-style commercial in Blender (box burst, Alexa/products, card, truck with speed-matched motion blur, logo); reference stills fixed a flat first look; switching to Cycles for realism meant ~5 h of rendering on his GPU (overnight); delivered the MP4 plus a `.blend` organized as per-scene "mini estúdios"; finished with grain + Lumetri + his own sound design; self-critique: stops "muito duro", needs softer easing and secondary motion; ~50% of a 5-h usage window. — [YouTube](https://www.youtube.com/watch?v=12lznI7jD1s)
+- Muska (desc): a Midjourney still as reference → Opus 5.5 rebuilt the interior through the Blender MCP, "keeping the materials, proportions, lighting and architectural composition as close as possible". — [YouTube](https://www.youtube.com/watch?v=bILKJ8u5ERE)
+- Max Novak: lighting-variant collections per mood, procedural assembly from his own parts via JSON metadata, renaming/organizing scenes; "none of this would be possible if I didn't have that pre-existing knowledge of how to use Blender". — [YouTube](https://www.youtube.com/watch?v=r7H60u0kHRA)
+- Stefan 3D AI: official Blender MCP add-on (Blender 5.1) + Claude's "Blender" connector; 3D-generation skills/MCPs (Tripo P1, Hunyuan, Trellis 2), generated PBR materials, Geometry-Nodes scatter with density control, auto-LODs; generated objects land "a little bit off" in position. — [YouTube](https://www.youtube.com/watch?v=wSY1kHXSap0)
+- RandomAI: top 3D results come from Opus orchestrating MCPs (voice, music, Blender); cites a Blender-MCP piece by "Kevin NGO". — [YouTube](https://www.youtube.com/watch?v=OIAWkkSO4WY)
+- Code-only 3D shorts without Blender (Claude writes the 3D code and renders MP4 via FFmpeg in 2–3 min). — [Danny Why](https://www.youtube.com/watch?v=-76YAQ5Pv9Y)
+- HyperFrames now handles "assets 3D" (per Maestros da IA). — [YouTube](https://www.youtube.com/watch?v=OtqpA9ZEPQw)
+- Hardware caveat: Bart Slodyczka's subject-separation skill runs a local AI model and needs direct machine access ("Cowork… can't access your computer's graphics chip"). — [YouTube](https://www.youtube.com/watch?v=6yWPy5aVHb8)
+- Round-1 reminders: Blender MCP + HyperFrames camera moves and a Pinterest laptop-product recreation — [YouTube](https://www.youtube.com/watch?v=f2yPoquP77g); R3F inside Remotion with Sketchfab models — [YouTube](https://www.youtube.com/watch?v=NTfXwQ85suw).
+
+### Inferences
+- For a phone hero shot in a no-GPU container, Fernando Araujo's ~5-h GPU render argues against long Cycles renders; plausible variants are short clips/turntables at low samples with denoising, rendered as PNG sequences with alpha and composited in Remotion, or staying with R3F/CSS-3D inside Remotion. CPU feasibility belongs to the 3D researcher's notes.
+- Transferable steering tips: give reference stills for look/lighting; ask for a scene-organized `.blend`; demand eased stops and secondary motion; keep text/UI in code (Remotion), not in the 3D render.
+
+### Gaps
+- No video found that shows a phone mockup with an app-screen texture via Blender, or Blender→Remotion compositing; CPU render times never reported.
+
+## Q4. Cross-video patterns: what consistently separates professional results from generic ones?
+
+### Takeaway
+Across EN, FR and PT-BR creators the same levers recur: (1) a real brief beats more effort; (2) ban the defaults and pick fonts/brand assets deliberately; (3) show a reference instead of describing a style; (4) build in phases with a cheap storyboard approval before expensive renders, iterating scene by scene; (5) treat audio as a first-class track (VO-first timing, external music, synthesized SFX), since it is the weakest link of code-made video; (6) let the agent review its own frames and codify what worked into skills; (7) use AI video only for what code cannot do (texture, realism) and keep text/graphics in code.
+
+### Cited Findings
+- Brief > effort: low ≈20 min, high ≈30 min, Ultra Code 8 h; "if you think your issue… is an effort problem, it's probably not. It's probably just your prompts." — [Chase AI](https://www.youtube.com/watch?v=rscb1DgJtNg); "lazy generic prompt… dumb boring result" — [RandomAI](https://www.youtube.com/watch?v=OIAWkkSO4WY); one-liners "vai ficar bom? Não." — [Deborah Folloni](https://www.youtube.com/watch?v=5HjN2NytHVE); "the way I'd explain it to an editor… second by second" — [Roboverse](https://www.youtube.com/watch?v=6_rCyryA6hg); single-prompt reels "all… look the same… no real idea" — [Jad M.H](https://www.youtube.com/watch?v=zke3bTtvmLo).
+- Ban defaults / fonts: "if you don't ban the defaults, it goes back to that. Center text, everything fading in" — [Jad M.H](https://www.youtube.com/watch?v=zke3bTtvmLo); font = "Dr. Slop… the biggest giveaway" — [Jack Roberts](https://www.youtube.com/watch?v=RDytbVDzMF4); font first + Lottie icons — [Felipe Borges](https://www.youtube.com/watch?v=XTtTBqECLPs).
+- Real brand inputs: design-system extraction — [Fernando Araujo](https://www.youtube.com/watch?v=rfplFJXmIjg); reusable design system — [Futurepedia](https://www.youtube.com/watch?v=97Y5cz7H8SM); product screenshots "what's really important" — [Cynthia](https://www.youtube.com/watch?v=9EpI5e0roFQ).
+- Reference over description: "em vez de eu tentar descrever o estilo… eu mostro para ele um exemplo" — [Macks Wendhell](https://www.youtube.com/watch?v=0I5AWAuPFj0); technique mining from showcase repos into a production skill — [Andy Lo](https://www.youtube.com/watch?v=mCjJKq2_JJU).
+- Phases and gates: plan → build → assets → check → render → deliver, storyboard approval because "a full video render costs time and tokens" — [Andy Lo](https://www.youtube.com/watch?v=LIM3P4rWG2U); three-phase prompts — [Andy Lo](https://www.youtube.com/watch?v=mCjJKq2_JJU); cut first, overlays second — [Rafa Voss](https://www.youtube.com/watch?v=SjlKBdgWrZ4); "do one thing at a time" — [Remotion](https://www.youtube.com/watch?v=5NRAOnKc3c8); edit a copy, say what you like too — [Roboverse](https://www.youtube.com/watch?v=6_rCyryA6hg).
+- Audio: "the main constraint for AI video workflows like this"; bring music from outside (ElevenLabs, Suno, Stable Audio 3.0, ACE-Step 1.5) — [Andy Lo](https://www.youtube.com/watch?v=LIM3P4rWG2U); explicitly ask for SFX/music or it may be silent; AI-written script "a little bit weak" — [RandomAI](https://www.youtube.com/watch?v=OIAWkkSO4WY); "motion graphics without sound feel like a PowerPoint" — [Jad M.H](https://www.youtube.com/watch?v=zke3bTtvmLo); "Each scene should start and end on its own narration" — [MoSidd](https://www.youtube.com/watch?v=7wuYBfE131U); script timed to visuals via Gemini — [Cynthia](https://www.youtube.com/watch?v=9EpI5e0roFQ).
+- Self-review and codifying: both agents screenshotted and regenerated off-brief shots — [Fernando Araujo](https://www.youtube.com/watch?v=rfplFJXmIjg); scene-by-scene HTML review page — [Bart Slodyczka](https://www.youtube.com/watch?v=6yWPy5aVHb8); per-channel skills — [Mateus Dias](https://www.youtube.com/watch?v=61u9wOT-Cds); a 1,400-line style skill — [Christian Peverelli](https://www.youtube.com/watch?v=HzXD4GVqXwM).
+- Phone/vertical legibility: 9:16 safe zones, bigger fonts — [Sabrina Ramonov](https://www.youtube.com/watch?v=M4cmrdoUKxI); 1080×1920 @ 30 fps reel setup — [MoSidd](https://www.youtube.com/watch?v=xOhh274Ayac).
+- Effort reported: extra/max — [Mateus Dias](https://www.youtube.com/watch?v=61u9wOT-Cds); high — [Fernando Araujo](https://www.youtube.com/watch?v=12lznI7jD1s); medium — [Bart Slodyczka](https://www.youtube.com/watch?v=6yWPy5aVHb8), [Macks Wendhell](https://www.youtube.com/watch?v=0I5AWAuPFj0); low for ideation — [Danny Why](https://www.youtube.com/watch?v=-76YAQ5Pv9Y).
+- Hybrid AI-video + code: render AI clips without text, overlay text/graphics/SFX in code — [Tao Prompts](https://www.youtube.com/watch?v=EcxvHRccXnc); collage textures from Higgsfield, motion from Remotion — [Macks Wendhell](https://www.youtube.com/watch?v=0I5AWAuPFj0).
+
+### Inferences
+- For "Rotina", the biggest gains are process and audio rather than new effects: a written brief/storyboard with approval, a brand/font/ban-list rules file, VO-first timing with a real pt-BR voice plus external music and synthesized SFX, and a rendered-frame review loop with phone-size checks.
+
+### Gaps
+- Evidence is creator anecdote, not controlled comparison; quality judgments are subjective; sponsor/affiliate segments (Higgsfield, Envato, Artlist, Fish Audio) bias tool claims.
+
+## Q5. Has the Supernova Studio (@ssupernova.studio) tutorial (Opus 5.5 + Remotion + Blender) been published?
+
+### Takeaway
+Not found on YouTube as of 2026-10-09 (three days after the "this week" promise).
+
+### Cited Findings
+- yt-dlp 2026.08.19 flat searches on 2026-10-09 ("supernova studio" ×25, "ssupernova" ×20, "supernova studio claude motion design" ×15, "supernova studio ai content" ×15, "opus 5.5 remotion blender" ×20, "claude blender remotion motion design tutorial" ×20) returned no Supernova Studio / @ssupernova.studio video; the hits were unrelated (aespa "Supernova", A Supernova Studios covers, a "Supernova Studio" design-to-app tool, Supernova Ent.). — [YouTube search](https://www.youtube.com/results?search_query=supernova+studio)
+- Date-sorted search (`ytsearchdate`) is rejected by this yt-dlp build ("Unsupported url scheme"); the Instagram profile is still login-walled. — [Instagram](https://www.instagram.com/ssupernova.studio/)
+- Closest public equivalents of the stack: Fernando Araujo's PT-BR Blender commercial — [YouTube](https://www.youtube.com/watch?v=12lznI7jD1s); Muska's Midjourney → Blender MCP interior — [YouTube](https://www.youtube.com/watch?v=bILKJ8u5ERE); also surfaced, not analyzed: "I Let AI Animate and Dress My Game Characters in Blender (Claude Opus 5.5)" (Furry Fang Studios, 106 views) — [YouTube](https://www.youtube.com/watch?v=-cyWxXMt5Dk).
+
+### Inferences
+- The tutorial may come out on Instagram/TikTok only, or later; the user is the fastest route (forward it if it shows in the feed).
+
+### Gaps
+- Instagram, TikTok and X could not be checked without login.
+
+## PENDENTE / NÃO PESQUISADO
+- Supernova Studio tutorial: still missing on 2026-10-09; recheck Instagram reels of @ssupernova.studio (logged-in), TikTok and YouTube later.
+- Transcripts never downloaded (method works: the bgutil PO-token server lives in scratchpad `potsrv/bgutil-ytdlp-pot-provider/server` (`node build/main.js`), then `ytvenv/bin/yt-dlp` with `player_client=mweb`; VTT→text via `scripts/vtt2txt.py`): PT-BR e66pc9qvTks (Clonex Studio, 35 min), tT5ya2HKazo (Macks Wendhell), woQ180jz92k (Paulo Castellano), SrL4vZvNJDs (Fernando Araujo, Remotion), j9-p6WRNqtQ (Gabriel Adamuchi); EN PFHVxq1S6F0 (57-min Remotion masterclass), OX80FZjHJ7o, Ci9Xc-VPc04 (Code Bear, Blender MCP pro scenes), qhi9A_j-1Gc (Blender character animation), wHTkD5eagGU (ElevenLabs MCP launch), 7gmPM-Xq5Zo, QzvMFvKdvc4, rjLuHtvrmMo, TojQChim9mM (Blender MCP model showdown), rvm1PFSWF4Q, FDRb03XPiRo (Blender MCP author demo); newly surfaced: aBuOwgC7DLI (Website Learners, 81k), lxmrK4RCWQQ (Paul J Lipsky, Claude Design, 133k), t8cv3ac4HpY (lustoykov, Claude Design), RG_B3iPohJM (Brendan Jowett), -cyWxXMt5Dk (Blender characters, Opus 5.5).
+- Skimmed only (could be re-read in full if needed): 0I5AWAuPFj0, vii97F4Slkw, OtqpA9ZEPQw, wopu5lYP0MM, r7H60u0kHRA, wSY1kHXSap0, -76YAQ5Pv9Y, 12lznI7jD1s, OIAWkkSO4WY, mCjJKq2_JJU, IpyzkbesRz4, 97Y5cz7H8SM, RDytbVDzMF4, 6yWPy5aVHb8, rscb1DgJtNg, LIM3P4rWG2U, xAUifztpib8, 7wuYBfE131U, xOhh274Ayac, EcxvHRccXnc, zke3bTtvmLo, oWkUwno6b0E, fOY0_WCR3eY, M4cmrdoUKxI, HzXD4GVqXwM, YTOwQj-n7ME, a89tqIS2kMI, sCc7O9K92Mg, b0oRpP1eJAs, 5NRAOnKc3c8.
+- Linked resources not opened: Fernando Araujo's motion skill/"Diretor Brabo" (paid course), Mateus Dias's animation skill (Google Drive), Macks Wendhell's studio repo (Remotion + Watch Video), Deborah Folloni's prompt (newsletter), Felipe Borges's prompt/links (community), Chase AI's video skill, Bart Slodyczka's separation skill (GitHub), the video-use repo, Danny Why's Google Doc, MoSidd's Skool prompts.
+- Unverified claims: Anthropic/Blender Development Fund episode (Stefan 3D AI); Opus "chartography 89%" benchmark (Mateus Dias); BRL plan prices (Fernando Araujo); Christian Peverelli's "$27 per video" arithmetic; HyperFrames "assets 3D" support.
+- Not tested anywhere: pt-BR TTS quality (ElevenLabs v3, Fish Audio, Google) — use the voice researcher's notes; CPU-only feasibility of ACE-Step 1.5, Cycles renders and local subject-separation models in this container.

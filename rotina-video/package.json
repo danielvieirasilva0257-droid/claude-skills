@@ -8,13 +8,13 @@
     "render:explainer": "remotion render RotinaExplainer out/rotina-explainer.mp4 --codec h264 --crf 17 --audio-codec aac --audio-bitrate 256k"
   },
   "dependencies": {
-    "@remotion/cli": "4.0.250",
-    "@remotion/motion-blur": "4.0.250",
-    "@remotion/transitions": "4.0.250",
+    "@remotion/cli": "4.0.534",
+    "@remotion/motion-blur": "4.0.534",
+    "@remotion/transitions": "4.0.534",
     "lucide-react": "0.263.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "remotion": "4.0.250"
+    "remotion": "4.0.534"
   },
   "devDependencies": {
     "@types/react": "18.3.3",
