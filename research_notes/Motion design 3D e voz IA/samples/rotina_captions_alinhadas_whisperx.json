@@ -1,0 +1,996 @@
+[
+ {
+  "text": "Controle",
+  "startMs": 300,
+  "endMs": 741,
+  "timestampMs": 520,
+  "confidence": 0.786
+ },
+ {
+  "text": " da",
+  "startMs": 761,
+  "endMs": 861,
+  "timestampMs": 811,
+  "confidence": 0.834
+ },
+ {
+  "text": " sua",
+  "startMs": 942,
+  "endMs": 1102,
+  "timestampMs": 1022,
+  "confidence": 0.752
+ },
+ {
+  "text": " rotina...",
+  "startMs": 1162,
+  "endMs": 1623,
+  "timestampMs": 1392,
+  "confidence": 0.921
+ },
+ {
+  "text": " em",
+  "startMs": 1864,
+  "endMs": 1944,
+  "timestampMs": 1904,
+  "confidence": 0.853
+ },
+ {
+  "text": " planilhas",
+  "startMs": 2004,
+  "endMs": 2446,
+  "timestampMs": 2225,
+  "confidence": 0.945
+ },
+ {
+  "text": " de",
+  "startMs": 2466,
+  "endMs": 2526,
+  "timestampMs": 2496,
+  "confidence": 0.895
+ },
+ {
+  "text": " Excel,",
+  "startMs": 2546,
+  "endMs": 2967,
+  "timestampMs": 2756,
+  "confidence": 0.829
+ },
+ {
+  "text": " no",
+  "startMs": 3268,
+  "endMs": 3348,
+  "timestampMs": 3308,
+  "confidence": 0.705
+ },
+ {
+  "text": " celular?",
+  "startMs": 3388,
+  "endMs": 3869,
+  "timestampMs": 3628,
+  "confidence": 0.964
+ },
+ {
+  "text": " Você",
+  "startMs": 4140,
+  "endMs": 4381,
+  "timestampMs": 4260,
+  "confidence": 1.0
+ },
+ {
+  "text": " tem",
+  "startMs": 4421,
+  "endMs": 4542,
+  "timestampMs": 4482,
+  "confidence": 0.828
+ },
+ {
+  "text": " seus",
+  "startMs": 4582,
+  "endMs": 4763,
+  "timestampMs": 4672,
+  "confidence": 0.796
+ },
+ {
+  "text": " treinos",
+  "startMs": 4803,
+  "endMs": 5104,
+  "timestampMs": 4954,
+  "confidence": 0.928
+ },
+ {
+  "text": " montados",
+  "startMs": 5145,
+  "endMs": 5667,
+  "timestampMs": 5406,
+  "confidence": 0.938
+ },
+ {
+  "text": " e",
+  "startMs": 5687,
+  "endMs": 5747,
+  "timestampMs": 5717,
+  "confidence": 0.336
+ },
+ {
+  "text": " sabe",
+  "startMs": 5848,
+  "endMs": 6109,
+  "timestampMs": 5978,
+  "confidence": 0.917
+ },
+ {
+  "text": " quanto",
+  "startMs": 6149,
+  "endMs": 6370,
+  "timestampMs": 6260,
+  "confidence": 0.792
+ },
+ {
+  "text": " faturou.",
+  "startMs": 6410,
+  "endMs": 6812,
+  "timestampMs": 6611,
+  "confidence": 0.895
+ },
+ {
+  "text": " Mas",
+  "startMs": 7736,
+  "endMs": 7897,
+  "timestampMs": 7816,
+  "confidence": 1.0
+ },
+ {
+  "text": " você",
+  "startMs": 7937,
+  "endMs": 8198,
+  "timestampMs": 8068,
+  "confidence": 0.917
+ },
+ {
+  "text": " realmente",
+  "startMs": 8238,
+  "endMs": 8760,
+  "timestampMs": 8499,
+  "confidence": 0.877
+ },
+ {
+  "text": " tem",
+  "startMs": 8821,
+  "endMs": 8921,
+  "timestampMs": 8871,
+  "confidence": 0.844
+ },
+ {
+  "text": " controle",
+  "startMs": 8981,
+  "endMs": 9363,
+  "timestampMs": 9172,
+  "confidence": 0.969
+ },
+ {
+  "text": " disso?",
+  "startMs": 9423,
+  "endMs": 9765,
+  "timestampMs": 9594,
+  "confidence": 0.933
+ },
+ {
+  "text": " Com",
+  "startMs": 10100,
+  "endMs": 10201,
+  "timestampMs": 10150,
+  "confidence": 0.949
+ },
+ {
+  "text": " o",
+  "startMs": 10261,
+  "endMs": 10342,
+  "timestampMs": 10302,
+  "confidence": 0.002
+ },
+ {
+  "text": " app",
+  "startMs": 10443,
+  "endMs": 10625,
+  "timestampMs": 10534,
+  "confidence": 0.771
+ },
+ {
+  "text": " Rotina,",
+  "startMs": 10685,
+  "endMs": 11149,
+  "timestampMs": 10917,
+  "confidence": 0.998
+ },
+ {
+  "text": " você",
+  "startMs": 11432,
+  "endMs": 11674,
+  "timestampMs": 11553,
+  "confidence": 1.0
+ },
+ {
+  "text": " tem.",
+  "startMs": 11734,
+  "endMs": 11956,
+  "timestampMs": 11845,
+  "confidence": 0.875
+ },
+ {
+  "text": " Comece",
+  "startMs": 12400,
+  "endMs": 12863,
+  "timestampMs": 12632,
+  "confidence": 0.842
+ },
+ {
+  "text": " pelo",
+  "startMs": 12903,
+  "endMs": 13124,
+  "timestampMs": 13014,
+  "confidence": 0.927
+ },
+ {
+  "text": " checklist",
+  "startMs": 13184,
+  "endMs": 13627,
+  "timestampMs": 13406,
+  "confidence": 0.729
+ },
+ {
+  "text": " de",
+  "startMs": 13647,
+  "endMs": 13728,
+  "timestampMs": 13688,
+  "confidence": 0.774
+ },
+ {
+  "text": " hábitos:",
+  "startMs": 13788,
+  "endMs": 14271,
+  "timestampMs": 14030,
+  "confidence": 0.937
+ },
+ {
+  "text": " marque",
+  "startMs": 14532,
+  "endMs": 14854,
+  "timestampMs": 14693,
+  "confidence": 0.583
+ },
+ {
+  "text": " e",
+  "startMs": 14874,
+  "endMs": 14894,
+  "timestampMs": 14884,
+  "confidence": 0.0
+ },
+ {
+  "text": " desmarque",
+  "startMs": 14914,
+  "endMs": 15417,
+  "timestampMs": 15166,
+  "confidence": 0.69
+ },
+ {
+  "text": " seus",
+  "startMs": 15457,
+  "endMs": 15578,
+  "timestampMs": 15518,
+  "confidence": 0.981
+ },
+ {
+  "text": " afazeres",
+  "startMs": 15618,
+  "endMs": 16141,
+  "timestampMs": 15880,
+  "confidence": 0.961
+ },
+ {
+  "text": " do",
+  "startMs": 16182,
+  "endMs": 16242,
+  "timestampMs": 16212,
+  "confidence": 1.0
+ },
+ {
+  "text": " dia.",
+  "startMs": 16322,
+  "endMs": 16584,
+  "timestampMs": 16453,
+  "confidence": 1.0
+ },
+ {
+  "text": " E",
+  "startMs": 16960,
+  "endMs": 16980,
+  "timestampMs": 16970,
+  "confidence": 0.008
+ },
+ {
+  "text": " acompanhe",
+  "startMs": 17020,
+  "endMs": 17502,
+  "timestampMs": 17261,
+  "confidence": 0.842
+ },
+ {
+  "text": " gráficos",
+  "startMs": 17562,
+  "endMs": 18004,
+  "timestampMs": 17783,
+  "confidence": 0.95
+ },
+ {
+  "text": " completos",
+  "startMs": 18044,
+  "endMs": 18606,
+  "timestampMs": 18325,
+  "confidence": 0.968
+ },
+ {
+  "text": " com",
+  "startMs": 18646,
+  "endMs": 18747,
+  "timestampMs": 18696,
+  "confidence": 0.835
+ },
+ {
+  "text": " as",
+  "startMs": 18787,
+  "endMs": 18847,
+  "timestampMs": 18817,
+  "confidence": 0.75
+ },
+ {
+  "text": " suas",
+  "startMs": 18867,
+  "endMs": 19068,
+  "timestampMs": 18968,
+  "confidence": 0.995
+ },
+ {
+  "text": " métricas",
+  "startMs": 19128,
+  "endMs": 19610,
+  "timestampMs": 19369,
+  "confidence": 0.949
+ },
+ {
+  "text": " e",
+  "startMs": 19650,
+  "endMs": 19710,
+  "timestampMs": 19680,
+  "confidence": 0.967
+ },
+ {
+  "text": " a",
+  "startMs": 19750,
+  "endMs": 19790,
+  "timestampMs": 19770,
+  "confidence": 0.515
+ },
+ {
+  "text": " sua",
+  "startMs": 19891,
+  "endMs": 20031,
+  "timestampMs": 19961,
+  "confidence": 0.984
+ },
+ {
+  "text": " evolução.",
+  "startMs": 20071,
+  "endMs": 20493,
+  "timestampMs": 20282,
+  "confidence": 0.867
+ },
+ {
+  "text": " No",
+  "startMs": 22240,
+  "endMs": 22340,
+  "timestampMs": 22290,
+  "confidence": 0.856
+ },
+ {
+  "text": " treino,",
+  "startMs": 22420,
+  "endMs": 22741,
+  "timestampMs": 22580,
+  "confidence": 0.899
+ },
+ {
+  "text": " você",
+  "startMs": 23082,
+  "endMs": 23322,
+  "timestampMs": 23202,
+  "confidence": 1.0
+ },
+ {
+  "text": " monta",
+  "startMs": 23403,
+  "endMs": 23663,
+  "timestampMs": 23533,
+  "confidence": 0.742
+ },
+ {
+  "text": " seus",
+  "startMs": 23723,
+  "endMs": 23864,
+  "timestampMs": 23794,
+  "confidence": 0.918
+ },
+ {
+  "text": " treinos",
+  "startMs": 23924,
+  "endMs": 24204,
+  "timestampMs": 24064,
+  "confidence": 0.845
+ },
+ {
+  "text": " diários",
+  "startMs": 24244,
+  "endMs": 24605,
+  "timestampMs": 24424,
+  "confidence": 1.0
+ },
+ {
+  "text": " e",
+  "startMs": 24645,
+  "endMs": 24685,
+  "timestampMs": 24665,
+  "confidence": 0.94
+ },
+ {
+  "text": " o",
+  "startMs": 24725,
+  "endMs": 24766,
+  "timestampMs": 24746,
+  "confidence": 0.5
+ },
+ {
+  "text": " seu",
+  "startMs": 24806,
+  "endMs": 24906,
+  "timestampMs": 24856,
+  "confidence": 1.0
+ },
+ {
+  "text": " plano",
+  "startMs": 24986,
+  "endMs": 25227,
+  "timestampMs": 25106,
+  "confidence": 0.884
+ },
+ {
+  "text": " semanal.",
+  "startMs": 25267,
+  "endMs": 25728,
+  "timestampMs": 25498,
+  "confidence": 0.942
+ },
+ {
+  "text": " Escolha",
+  "startMs": 26020,
+  "endMs": 26441,
+  "timestampMs": 26230,
+  "confidence": 0.921
+ },
+ {
+  "text": " o",
+  "startMs": 26461,
+  "endMs": 26501,
+  "timestampMs": 26481,
+  "confidence": 0.5
+ },
+ {
+  "text": " estilo",
+  "startMs": 26521,
+  "endMs": 26802,
+  "timestampMs": 26662,
+  "confidence": 0.999
+ },
+ {
+  "text": " de",
+  "startMs": 26842,
+  "endMs": 26922,
+  "timestampMs": 26882,
+  "confidence": 0.75
+ },
+ {
+  "text": " cada",
+  "startMs": 26982,
+  "endMs": 27223,
+  "timestampMs": 27102,
+  "confidence": 0.808
+ },
+ {
+  "text": " semana:",
+  "startMs": 27303,
+  "endMs": 27704,
+  "timestampMs": 27504,
+  "confidence": 0.962
+ },
+ {
+  "text": " força,",
+  "startMs": 28025,
+  "endMs": 28426,
+  "timestampMs": 28226,
+  "confidence": 0.889
+ },
+ {
+  "text": " hipertrofia,",
+  "startMs": 28606,
+  "endMs": 29308,
+  "timestampMs": 28957,
+  "confidence": 0.932
+ },
+ {
+  "text": " resistência",
+  "startMs": 29609,
+  "endMs": 30271,
+  "timestampMs": 29940,
+  "confidence": 0.865
+ },
+ {
+  "text": " ou",
+  "startMs": 30331,
+  "endMs": 30391,
+  "timestampMs": 30361,
+  "confidence": 0.734
+ },
+ {
+  "text": " deload.",
+  "startMs": 30431,
+  "endMs": 30892,
+  "timestampMs": 30662,
+  "confidence": 0.876
+ },
+ {
+  "text": " Registre",
+  "startMs": 31000,
+  "endMs": 31461,
+  "timestampMs": 31230,
+  "confidence": 0.871
+ },
+ {
+  "text": " carga,",
+  "startMs": 31541,
+  "endMs": 31902,
+  "timestampMs": 31722,
+  "confidence": 0.917
+ },
+ {
+  "text": " repetições",
+  "startMs": 32142,
+  "endMs": 32783,
+  "timestampMs": 32462,
+  "confidence": 0.869
+ },
+ {
+  "text": " e",
+  "startMs": 32803,
+  "endMs": 32843,
+  "timestampMs": 32823,
+  "confidence": 1.0
+ },
+ {
+  "text": " séries,",
+  "startMs": 32944,
+  "endMs": 33344,
+  "timestampMs": 33144,
+  "confidence": 0.946
+ },
+ {
+  "text": " e",
+  "startMs": 33625,
+  "endMs": 33665,
+  "timestampMs": 33645,
+  "confidence": 1.0
+ },
+ {
+  "text": " veja",
+  "startMs": 33745,
+  "endMs": 33966,
+  "timestampMs": 33856,
+  "confidence": 1.0
+ },
+ {
+  "text": " o",
+  "startMs": 33986,
+  "endMs": 34026,
+  "timestampMs": 34006,
+  "confidence": 0.5
+ },
+ {
+  "text": " gráfico",
+  "startMs": 34066,
+  "endMs": 34466,
+  "timestampMs": 34266,
+  "confidence": 0.879
+ },
+ {
+  "text": " completo",
+  "startMs": 34507,
+  "endMs": 35008,
+  "timestampMs": 34758,
+  "confidence": 0.937
+ },
+ {
+  "text": " da",
+  "startMs": 35028,
+  "endMs": 35108,
+  "timestampMs": 35068,
+  "confidence": 1.0
+ },
+ {
+  "text": " sua",
+  "startMs": 35208,
+  "endMs": 35348,
+  "timestampMs": 35278,
+  "confidence": 0.993
+ },
+ {
+  "text": " evolução.",
+  "startMs": 35388,
+  "endMs": 35809,
+  "timestampMs": 35598,
+  "confidence": 0.95
+ },
+ {
+  "text": " No",
+  "startMs": 36540,
+  "endMs": 36621,
+  "timestampMs": 36580,
+  "confidence": 0.992
+ },
+ {
+  "text": " financeiro,",
+  "startMs": 36681,
+  "endMs": 37243,
+  "timestampMs": 36962,
+  "confidence": 0.972
+ },
+ {
+  "text": " o",
+  "startMs": 37545,
+  "endMs": 37585,
+  "timestampMs": 37565,
+  "confidence": 0.505
+ },
+ {
+  "text": " controle",
+  "startMs": 37645,
+  "endMs": 38047,
+  "timestampMs": 37846,
+  "confidence": 0.833
+ },
+ {
+  "text": " total",
+  "startMs": 38087,
+  "endMs": 38429,
+  "timestampMs": 38258,
+  "confidence": 0.999
+ },
+ {
+  "text": " está",
+  "startMs": 38489,
+  "endMs": 38670,
+  "timestampMs": 38580,
+  "confidence": 1.0
+ },
+ {
+  "text": " na",
+  "startMs": 38710,
+  "endMs": 38791,
+  "timestampMs": 38750,
+  "confidence": 0.998
+ },
+ {
+  "text": " sua",
+  "startMs": 38871,
+  "endMs": 39032,
+  "timestampMs": 38952,
+  "confidence": 1.0
+ },
+ {
+  "text": " mão.",
+  "startMs": 39092,
+  "endMs": 39193,
+  "timestampMs": 39142,
+  "confidence": 1.0
+ },
+ {
+  "text": " Veja",
+  "startMs": 39680,
+  "endMs": 39921,
+  "timestampMs": 39800,
+  "confidence": 0.888
+ },
+ {
+  "text": " cada",
+  "startMs": 40022,
+  "endMs": 40202,
+  "timestampMs": 40112,
+  "confidence": 0.895
+ },
+ {
+  "text": " entrada",
+  "startMs": 40242,
+  "endMs": 40624,
+  "timestampMs": 40433,
+  "confidence": 0.881
+ },
+ {
+  "text": " e",
+  "startMs": 40644,
+  "endMs": 40684,
+  "timestampMs": 40664,
+  "confidence": 0.512
+ },
+ {
+  "text": " cada",
+  "startMs": 40724,
+  "endMs": 40925,
+  "timestampMs": 40824,
+  "confidence": 0.877
+ },
+ {
+  "text": " saída,",
+  "startMs": 41005,
+  "endMs": 41387,
+  "timestampMs": 41196,
+  "confidence": 0.869
+ },
+ {
+  "text": " seus",
+  "startMs": 41628,
+  "endMs": 41828,
+  "timestampMs": 41728,
+  "confidence": 0.938
+ },
+ {
+  "text": " bancos,",
+  "startMs": 41869,
+  "endMs": 42270,
+  "timestampMs": 42070,
+  "confidence": 0.975
+ },
+ {
+  "text": " seus",
+  "startMs": 42551,
+  "endMs": 42732,
+  "timestampMs": 42642,
+  "confidence": 0.813
+ },
+ {
+  "text": " cartões",
+  "startMs": 42752,
+  "endMs": 43214,
+  "timestampMs": 42983,
+  "confidence": 0.88
+ },
+ {
+  "text": " e",
+  "startMs": 43234,
+  "endMs": 43294,
+  "timestampMs": 43264,
+  "confidence": 0.667
+ },
+ {
+  "text": " suas",
+  "startMs": 43354,
+  "endMs": 43575,
+  "timestampMs": 43464,
+  "confidence": 0.875
+ },
+ {
+  "text": " despesas.",
+  "startMs": 43595,
+  "endMs": 44257,
+  "timestampMs": 43926,
+  "confidence": 0.979
+ },
+ {
+  "text": " Configure",
+  "startMs": 44450,
+  "endMs": 44972,
+  "timestampMs": 44711,
+  "confidence": 0.962
+ },
+ {
+  "text": " despesas",
+  "startMs": 45012,
+  "endMs": 45554,
+  "timestampMs": 45283,
+  "confidence": 0.951
+ },
+ {
+  "text": " fixas",
+  "startMs": 45615,
+  "endMs": 45956,
+  "timestampMs": 45786,
+  "confidence": 0.9
+ },
+ {
+  "text": " ou",
+  "startMs": 45976,
+  "endMs": 46056,
+  "timestampMs": 46016,
+  "confidence": 0.668
+ },
+ {
+  "text": " pontuais,",
+  "startMs": 46137,
+  "endMs": 46679,
+  "timestampMs": 46408,
+  "confidence": 0.908
+ },
+ {
+  "text": " e",
+  "startMs": 47000,
+  "endMs": 47040,
+  "timestampMs": 47020,
+  "confidence": 0.976
+ },
+ {
+  "text": " tenha",
+  "startMs": 47081,
+  "endMs": 47221,
+  "timestampMs": 47151,
+  "confidence": 0.301
+ },
+ {
+  "text": " um",
+  "startMs": 47261,
+  "endMs": 47302,
+  "timestampMs": 47282,
+  "confidence": 1.0
+ },
+ {
+  "text": " cronograma",
+  "startMs": 47342,
+  "endMs": 47844,
+  "timestampMs": 47593,
+  "confidence": 0.888
+ },
+ {
+  "text": " completo",
+  "startMs": 47904,
+  "endMs": 48386,
+  "timestampMs": 48145,
+  "confidence": 0.971
+ },
+ {
+  "text": " dos",
+  "startMs": 48426,
+  "endMs": 48526,
+  "timestampMs": 48476,
+  "confidence": 0.574
+ },
+ {
+  "text": " seus",
+  "startMs": 48587,
+  "endMs": 48747,
+  "timestampMs": 48667,
+  "confidence": 0.999
+ },
+ {
+  "text": " gastos",
+  "startMs": 48808,
+  "endMs": 49189,
+  "timestampMs": 48998,
+  "confidence": 0.917
+ },
+ {
+  "text": " por",
+  "startMs": 49229,
+  "endMs": 49350,
+  "timestampMs": 49290,
+  "confidence": 0.831
+ },
+ {
+  "text": " categoria.",
+  "startMs": 49390,
+  "endMs": 49952,
+  "timestampMs": 49671,
+  "confidence": 0.964
+ },
+ {
+  "text": " Treino,",
+  "startMs": 50400,
+  "endMs": 50721,
+  "timestampMs": 50560,
+  "confidence": 0.839
+ },
+ {
+  "text": " finanças",
+  "startMs": 51002,
+  "endMs": 51543,
+  "timestampMs": 51272,
+  "confidence": 0.937
+ },
+ {
+  "text": " e",
+  "startMs": 51584,
+  "endMs": 51644,
+  "timestampMs": 51614,
+  "confidence": 0.399
+ },
+ {
+  "text": " hábitos.",
+  "startMs": 51704,
+  "endMs": 52165,
+  "timestampMs": 51934,
+  "confidence": 0.813
+ },
+ {
+  "text": " Tudo",
+  "startMs": 53028,
+  "endMs": 53269,
+  "timestampMs": 53148,
+  "confidence": 0.836
+ },
+ {
+  "text": " em",
+  "startMs": 53309,
+  "endMs": 53369,
+  "timestampMs": 53339,
+  "confidence": 0.751
+ },
+ {
+  "text": " um",
+  "startMs": 53409,
+  "endMs": 53489,
+  "timestampMs": 53449,
+  "confidence": 0.756
+ },
+ {
+  "text": " só",
+  "startMs": 53570,
+  "endMs": 53710,
+  "timestampMs": 53640,
+  "confidence": 0.8
+ },
+ {
+  "text": " lugar.",
+  "startMs": 53750,
+  "endMs": 54071,
+  "timestampMs": 53910,
+  "confidence": 1.0
+ },
+ {
+  "text": " Rotina.",
+  "startMs": 54520,
+  "endMs": 55024,
+  "timestampMs": 54772,
+  "confidence": 0.97
+ },
+ {
+  "text": " Sua",
+  "startMs": 56031,
+  "endMs": 56212,
+  "timestampMs": 56122,
+  "confidence": 0.999
+ },
+ {
+  "text": " vida",
+  "startMs": 56313,
+  "endMs": 56514,
+  "timestampMs": 56414,
+  "confidence": 0.99
+ },
+ {
+  "text": " no",
+  "startMs": 56554,
+  "endMs": 56635,
+  "timestampMs": 56594,
+  "confidence": 0.754
+ },
+ {
+  "text": " controle.",
+  "startMs": 56675,
+  "endMs": 57179,
+  "timestampMs": 56927,
+  "confidence": 0.963
+ }
+]

@@ -1,113 +1,272 @@
-# 3D round 2: measured feasibility of real 3D phone shots (Remotion R3F + Blender) in a 4-CPU / no-GPU Linux container
+# 3D round 2: measured feasibility of real 3D phone shots (Remotion R3F and Blender) in a 4-CPU, no-GPU Linux container
 
-Status: IN PROGRESS (this file is updated after each result).
+**Status:** COMPLETE for the four key questions, with caveats on clean timing listed in the PENDENTE section.
 
-How to read:
-- **MEASURED** = my own experiment in this container on 2026-10-08 (round 2), with exact versions and commands.
-- **DOCS/SOURCE** = claim from an official page or package source, with a link.
-- Machine: 4 vCPU, 15 GB RAM, no GPU, idle at start (load average 0.16). Chromium headless shell 141.0.7390.37 (Playwright build 1194). Node 22, ffmpeg 6.1.
-- Scratch root: `/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/` (called `$S` below). Remotion project: `$S/r3f-latest`. Round-2 script, logs and outputs: `$S/r2/`.
-- Stack: remotion, @remotion/cli, @remotion/three and @remotion/media 4.0.534; react 18.3.1; three 0.170.0; @react-three/fiber 8.18.0; @react-three/drei 9.122.0; @react-three/postprocessing 2.19.1; postprocessing 6.39.5.
+**How to read:**
+- **MEASURED** = my own experiment in this container, 2026-10-08 22:04 and 2026-10-09 05:58–06:55 UTC, with exact versions and commands.
+- **DOCS/SOURCE** = a claim from an official page or a package's source code, with a link.
+- Everything else is marked as an inference.
 
-(Results are added below as they arrive.)
+**Machine:** 4 vCPU, 15 GB RAM, no GPU.
+- Chromium headless shell from Playwright build 1194 (Chrome 141).
+- Mesa 25.2.8 GLX/llvmpipe and Xvfb are installed. There is **no libEGL** and no lavapipe.
+- Node 22, ffmpeg 6.1.
 
-## Running log of raw results (newest last)
-- 2026-10-08 22:04, prep (MEASURED). `npx remotion bundle src/index.ts --out-dir=build` took 10.0 s. Screen composition (1080×2340, 60 frames, now with a big yellow frame-number badge for sync checks):
-  - JPEG sequence (`--sequence --image-format=jpeg --jpeg-quality=92`): 5.9 s.
-  - h264 MP4: 9.9 s.
-  - PNG still: 2.9 s.
-- 22:04, run **A** (MEASURED). No post, static PNG screen texture, `--concurrency=1`, 60 frames 1080×1920: **45.2 s wall**. Per-frame steady state from timestamped progress lines:
-  - frames 1→10: 0.40 s/frame;
-  - frames 10→30: 0.53 s/frame;
-  - frames 30→60: 0.77 s/frame.
-  - Cost rises as the camera dollies in and the phone (MeshPhysicalMaterial) covers more pixels.
-- 22:05, run **B** (MEASURED, partial). Core post (DOF + Bloom + Vignette + AgX ToneMapping, `multisampling=4`), c1. The container restarted at frame 16/60, about 32 s into the log. Per-frame cost was 1.79 s/frame over frames 1→16 (1.95 s for frames 1→10 including warm-up; about 1.5 s for frames 12→16). It is re-run below.
-- 2026-10-09 06:00, environment note (MEASURED). After a container restart, other researchers' jobs shared the 4 CPUs: `node tools/render.mjs ...` with Chrome, `piper_bench.py`, and a Chrome renderer at about 90% CPU. Load average reached 8.4. Re-running B under this load gave about 3.5–4.9 s/frame, against about 1.5–1.9 s/frame before the restart. From here on every run goes through `r2/runner.py`. It records wall time, the CPU-seconds of my own process tree (as child subreaper, via `RUSAGE_CHILDREN`) and the CPU-seconds used by all other processes during the run (from `/proc/stat`).
-- DOCS (online, 2026-10-09):
-  - "Using a video as a texture in Three.js" — [Remotion docs](https://www.remotion.dev/docs/videos/as-threejs-texture):
-    - The recommended route is `@remotion/media` `<Video headless onVideoFrame>` drawing into an `OffscreenCanvas` → `THREE.CanvasTexture`. It is marked available from 4.0.387.
-    - "During rendering, <ThreeCanvas> sets `frameloop='never'`". "Use `advance()` inside `onVideoFrame` to synchronously re-render the scene before the screenshot is taken."
-    - "Using `invalidate()` would only schedule an asynchronous re-render, which can lead to stale frames ... especially with concurrency greater than 1."
-    - A code comment says the second `advance()` is needed because frame extraction resolves after the canvas has already rendered with the stale texture.
-    - `useOffthreadVideoTexture()` and `useVideoTexture()` are both marked "deprecated in favor of using `@remotion/media`". Reasons given for useOffthreadVideoTexture: it needs the whole video downloaded first, does not work in client-side rendering, and "creates a new texture for each frame". For useVideoTexture: it "has all the drawbacks of the <Html5Video> tag".
-  - [ThreeCanvas docs](https://www.remotion.dev/docs/three-canvas): "During rendering, `<ThreeCanvas>` overrides the `frameloop` prop to `'never'` regardless of what you pass." For asynchronous texture updates, use `advance(performance.now())` instead of `invalidate()`.
-  - The `remotion-dev/template-three` code cloned on 2026-10-08 (`src/Phone.tsx`) still calls **`invalidate()`** in `onVideoFrame`. That is the pattern the docs say "can lead to stale frames", and it is tested below as mode `media`.
-  - [Blender requirements](https://www.blender.org/download/requirements/): the minimum GPU is "OpenGL 4.3, Vulkan 1.3" with GL_ARB_shader_draw_parameters and GL_ARB_clip_control. Software GPUs are not mentioned.
-  - `blender --help` (5.2.2 LTS, MEASURED): `--gpu-backend` accepts 'opengl' or 'vulkan'.
-- 06:04, orphaned run **B** finished (MEASURED). The killed batch's render could not be stopped: the auto-mode classifier blocked `kill`, so it ran to completion under heavy shared load. **Timing is contaminated**: 60 frames, log span 277.8 s, 4.54 s/frame for frames 10→60.
-  - **Bug found: frame 0 of B is blank.** Its mean luma is 6.0 against 44–48 for frames 1+. A blank-frame detector (mean luma < 8 on frames downscaled to 108×192 via ffmpeg + numpy) finds only frame 0. Frames 1–59 are correct: purple bloom on the HDR ring, DOF on the coins, vignette, AgX. Run A (no post) has no blank frames.
-  - Cause, read in source:
-    - In `@react-three/postprocessing` 2.19.1 (`dist/EffectComposer.js`), `composer.setSize(size.width, size.height)` and `gl.toneMapping = NoToneMapping` both run in passive `useEffect`s.
-    - ThreeCanvas 4.0.534 renders its `ManualFrameRenderer` as an earlier sibling of the scene children, so its `useEffect` → `advance()` runs first, before the composer is sized.
-    - Frames > 0 are fine because the composer is already sized.
-  - Fix written: an `<AdvanceAfterMount/>` placed after `<EffectComposer>`. It takes a `delayRender` in a `useState` initializer, and in `useEffect` calls `advance(performance.now())` and then `continueRender`. Being a later sibling, its effect runs after the composer's. Verification is queued (runs K2/B2).
-- 06:06, run **E** (sequence texture, no post, c1), MEASURED. 72.0 s wall, my-tree CPU 150.6 s, other processes 39% of the 4 cores. **The screen stayed black on every frame.** The cause is my own test code, not Remotion: the swap texture was seeded with a 2×2 canvas. On WebGL2, three.js allocates immutable storage with `texStorage2D` on the first upload, so the later 1080×2340 images cannot be uploaded into it. Fix: seed with a placeholder of the same size as the frames (1080×2340 canvas). The re-test is run **E2**.
-- 06:08, run **F** (raw `useOffthreadVideoTexture({src: staticFile('screen.mp4')})`, no post, c1, 4.0.534), MEASURED. 121.8 s wall, my-tree CPU 160.6 s, others 40% of 4 cores.
-  - **FAILED visually.** Frame 0 shows the null-texture fallback colour. Frames 1–59 show a uniform light-grey screen (about #e6e6e6) with no UI at all; still `r2/stills/F_f30.jpg`, tiles `r2/stills/F-offthread-none-c1_sync.jpg`.
-  - This is the same "washed-out grey" symptom round 1 saw on 4.0.250 with post. The hook is deprecated in the docs; I did not debug the root cause.
-- 06:11, run **G** (`useOffthreadVideoTexture` + my per-frame hold), MEASURED. A per-frame `delayRender` in `useLayoutEffect([frame])`, then `advance()` + `continueRender` in `useEffect([tex])` once the new texture is committed. 181.0 s wall, my-tree CPU 271.7 s, against 160.6 s for F, because of the extra draw per frame. **Same grey screen as F.** So the problem is the texture content, not the timing. Not debugged further; the hook is deprecated.
-- 06:11–06:12, runs **H** (template-three pattern: `@remotion/media` `<Video headless onVideoFrame>` + `invalidate()`) and **I** (same, with `advance()`), MEASURED. Both **crashed at frame 0**.
-  - The log shows `[@remotion/media] Cannot decode /public/screen.mp4, falling back to <OffthreadVideo>`, then `Error: R3F: Img is not part of the THREE namespace!`. The `<OffthreadVideo>` fallback renders an `<Img>`, which cannot exist inside the R3F reconciler tree.
-  - Interpretation: the Playwright Chromium headless shell (open-source Chromium build 141) cannot decode **H.264** with WebCodecs, probably because proprietary codecs are not included; this is not yet cited.
-  - Re-test with a **VP9 WebM** source: `ffmpeg -i screen.mp4 -c:v libvpx-vp9 -b:v 6M -deadline realtime -cpu-used 8 -row-mt 1 screen.webm` took 4.2 s for 60 frames at 1080×2340. These are runs **H2/I2**.
-- 06:15, run **J** (`useVideoTexture(ref)` + `<Html5Video ref src=screen.mp4>`), MEASURED. **Failed (timeout):** `A delayRender() "Waiting for texture in useVideoTexture() to be loaded" was called but not cleared after 118000ms`. The `<video>` element never fired `loadeddata`, which fits the missing H.264 decoder. Not re-tested with WebM, since the hook is deprecated.
-- 06:12, Blender **EVB**: Eevee with plain `blender -b --factory-startup -P phone_scene.py` (no display), MEASURED. **Aborted (SIGABRT) after 1.7 s** with `Couldn't open libEGL.so.1: libEGL.so.1: cannot open shared object file`. Blender 5.2.2's headless GPU path needs libEGL, which this container does not have (only libGL/libGLX + Mesa GLX). Next tries: Xvfb + GLX (Mesa llvmpipe), and Vulkan via Chromium's SwiftShader ICD.
-- Blender smoke test (MEASURED): Cycles, 1 sample, 10% resolution (108×192), no denoise. Scene setup took 12.9 s, `render.render()` 42.6 s, and about 105 s from process start to saved PNG, all under heavy shared load. This is a large fixed overhead per Blender invocation (startup, image loading, BVH, kernel loading).
-- 06:16, Blender **CY64** (MEASURED). Cycles CPU, 64 samples + OpenImageDenoise, 1080×1920, 1 frame, `blender -b --factory-startup -P r2/phone_scene.py -- CYCLES 64 <out> 1 1`.
-  - `render.render()` took **184.3 s**; process wall time 186.3 s.
-  - My CPU: 190.9 CPU-s. Other researchers' processes used **74% of the 4 cores** during the run (load average mean 15.5, max 28.9), so Blender effectively got about 1 core.
-  - **Idle-machine estimate (inference, not measured):** about 190 CPU-s ÷ about 3.8 effective cores ≈ **50 s per frame**.
-  - Still `r2/stills/blender_cycles64.png`: clean, noise-free, crisp screen texture, realistic chrome edge highlights. The emissive ring has no bloom (Cycles has none without the compositor). Coins fell out of frame because of my Z-up/Y-up cylinder mapping.
-  - Blender 5.2 in background mode prints no per-sample progress, so I added a `bpy.app.handlers.render_stats` printer for later runs.
-- Citation for the H.264 problem: Remotion's docs say earlier versions downloaded "the free version of Chromium, which would not include codecs for the proprietary H.264 and H.265 codecs", and that it moved to Chrome Headless Shell — [Remotion: Installing Chrome v4.0.247](https://remotion.dev/docs/miscellaneous/thorium-browser). The Playwright `chromium_headless_shell-1194` used here is an open-source Chromium build, which fits the `Cannot decode` result (inference).
-- 06:20, run **B** re-run via runner (core post DOF + Bloom + Vignette + AgX, MSAA 4, static PNG screen, c1, 60 frames, 1080×1920; MEASURED). **340.3 s wall, my-tree CPU 486.0 s** (8.1 CPU-s/frame including start-up). Other processes used 64% of 4 cores.
-  - The same scene without post costs 150.6 CPU-s (E) to 160.6 CPU-s (F), so **post-processing costs about 3.1–3.2× the CPU of the no-post scene**. This agrees with round 1's still-frame ratio (about 3×) and with the idle pre-restart partial (1.5–1.95 s/frame against 0.40–0.77 s/frame).
-- 06:20, re-run **B** frame check (MEASURED): **no blank frame 0** this time; luma for frames 0–3 is 44.6, 44.6, 45.3, 46.6. Same bundle as the first B run, which did have a blank frame 0. **So the blank first frame with EffectComposer is intermittent (1 of 2 runs), a race.** `<AdvanceAfterMount/>` is still the safe pattern; it is verified in K2.
-- 06:21, Blender **EVX** (MEASURED): **Eevee WORKS headless under Xvfb + Mesa 25.2.8 llvmpipe (GLX).**
-  - Command: `xvfb-run -a -s "-screen 0 1920x1080x24" blender -b --factory-startup -P phone_scene.py -- EEVEE 64 <out> 1`. Engine id in 5.2.2: `BLENDER_EEVEE`, 64 TAA samples, 1080×1920.
-  - `render.render()` took **296.4 s**; process wall 299.3 s; **my CPU 343.1 s**. Other processes used 71% of 4 cores.
-  - **This is more CPU than Cycles 64 spp + OIDN (190.9 CPU-s).** The single frame includes one-time GLSL shader compilation on llvmpipe; a 3-frame run (EVX3, 16 samples) is queued to separate the two.
-  - Still `r2/stills/blender_eevee_xvfb.png`: visually close to Cycles. Same framing, crisp screen, clean metal edges, slightly softer glow on the ring.
-- 06:21, Blender **EVV** (MEASURED): Vulkan with Chromium's SwiftShader ICD (`VK_ICD_FILENAMES=.../chrome-linux/vk_swiftshader_icd.json blender -b --gpu-backend vulkan ...`). **FAILED in 1.2 s.**
-  - `gpu.vulkan | WARNING Device [SwiftShader Device (Subzero)] does not meet minimum requirements. Missing features are [geometry shaders, multi viewport, logical operations, dual source blending, shader draw parameters]`, then `ERROR No Vulkan device found that meets the minimum requirements`. It then falls back to OpenGL, gets `Couldn't open libEGL.so.1`, and aborts.
-  - Mesa lavapipe (`mesa-vulkan-drivers`) is not installed and was not tested.
-- 06:22, run **A** re-run via runner (no post, PNG screen, c1, 60 frames; MEASURED). 101.5 s wall under contention, against **45.2 s on the idle machine** before the restart. **My-tree CPU: 150.7 s.**
-  - So on an idle machine, Remotion + SwiftShader used 150.7 / 45.2 ≈ **3.3 effective cores** of 4. I use this to convert CPU-s measured under contention into idle wall estimates.
-  - CPU ratio core-post / no-post: B / A = 486.0 / 150.7 = **3.22×**.
-- 06:24, run **C** (no post, PNG screen, **`--concurrency=2`**, 60 frames; MEASURED). **107.4 s wall, my-tree CPU 158.2 s.** Others used 63% of 4 cores, the same contention as the A re-run (63%).
-  - Against A at c1 (101.5 s, 150.7 CPU-s), **c2 is not faster (about 6% slower) and uses about 5% more CPU.**
-  - This fits round 1 (c4 slower than c1) and the about 3.3 effective cores that SwiftShader already uses at c1: the theoretical ceiling for c2 would be about 4/3.3 ≈ 1.2×.
-- 06:25, **correction on the blank frame 0** (MEASURED + SOURCE). Run **C** (no post, c2) also has a **blank frame 0** (luma 6.0; frames 1+ are 19.4+). So the problem is **not specific to EffectComposer**.
-  - Tally so far: A c1 no post, 0 of 2 runs blank; B c1 post, 1 of 2; C c2 no post, 1 of 1.
-  - Source, `@remotion/three` 4.0.534 `ThreeCanvas.js`: the per-frame `delayRender("Waiting for R3F to render frame N")` is skipped when `frame === 0` (`if (!isRendering || frame === 0) return;`). Frame 0 then relies on `onCreated`'s `advance()`, which runs when the R3F root is created, **before** suspended content (drei `<Environment files>`, `useLoader` textures) mounts.
-  - The SuspenseLoader's `delayRender` can be released before `ManualFrameRenderer`'s mount `advance()`, so Remotion can capture an empty canvas: a **race on frame 0 only**. Frames N > 0 are protected by the per-frame handle, including the first frame of each concurrency tab.
-  - The EffectComposer `setSize`-in-`useEffect` ordering is a second reason to render once more after mount.
-  - **Robust fix** (replaces the earlier `AdvanceAfterMount`, which took its `delayRender` inside a subtree that can be rendered and then discarded during Suspense, risking a leaked handle):
-    - In the DOM-tree component that never suspends: `const [firstHandle] = useState(() => delayRender('first R3F content frame'));`
-    - As the LAST child inside `<ThreeCanvas>`: `<FirstContentFrame handle={firstHandle}/>`, which does `useEffect(() => { advance(performance.now()); continueRender(handle); }, [])`. Effects only run on commit, so no handle can leak.
-    - Verified in E2/K2 (below).
-- 06:26, Blender **CYANIM** (MEASURED). Cycles CPU, 32 samples + OIDN, 4-frame animation (phone turns, camera dollies), `render.use_persistent_data = True`, 1080×1920. Command: `blender -b --factory-startup -P phone_scene.py -- CYCLES 32 <out_prefix> 4 1`.
-  - Process wall 304.4 s, **my CPU 402.1 s ≈ 100 CPU-s per frame**. Other processes used 67% of 4 cores.
-  - Per-frame times from `render_stats`: **74.9 / 74.4 / 72.8 / 80.6 s** (mean 75.7 s/frame under contention).
-  - Frame 1 setup (sync, BVH, image loading, light importance map) took 2.1 s; later frames re-sync in about 0.06 s thanks to persistent data. Saving took 0.4–1.0 s.
-  - So **cost ≈ path tracing + denoise and scales linearly with samples**: about 3.0 CPU-s per sample-frame at 1080×1920 (64 spp ≈ 186 CPU-s, 32 spp ≈ 100 CPU-s).
-  - **Idle-machine estimate (inference):** Cycles parallelises well (about 3.8–3.9 of 4 cores), so about **26 s/frame at 32 spp + OIDN** and about **48–50 s/frame at 64 spp + OIDN**.
-- 06:29, Blender **EVX3** (MEASURED). Eevee under Xvfb + llvmpipe, **16 TAA samples, 3-frame animation**, 1080×1920. Command: `xvfb-run -a -s "-screen 0 1920x1080x24" blender -b --factory-startup -P phone_scene.py -- EEVEE 16 <out_prefix> 3`.
-  - Process wall 192.3 s, **my CPU 256.4 s ≈ 85 CPU-s per frame**. Others used 66% of 4 cores.
-  - Per-frame times: **56.6 / 69.4 / 64.6 s**. Time before the first sample was 11.0 s on frame 1 (including shader compilation) and 5.6–7.6 s on later frames, so **shader compilation is a small part**. Software Eevee cost scales about linearly with samples (64 samples ≈ 343 CPU-s in EVX).
-  - **Software Eevee is not cheaper than Cycles CPU here.** Eevee 16 ≈ 85 CPU-s/frame against Cycles 32 + OIDN ≈ 100. Eevee 64 ≈ 343 against Cycles 64 + OIDN ≈ 186.
-  - Visual (crop `r2/stills/eevee16_vs_cycles32_f3_crop.jpg`): Eevee at 16 samples shows no visible noise and crisp text. Its look is close to Cycles; the dynamic-island pill renders light grey in Eevee and near-black in Cycles. Frames: `r2/stills/evanim_000{1,2,3}.png`, `r2/stills/cyanim_000{1..4}.png`.
-- 06:30, run **D** (core post, MSAA 4, PNG screen, **c2**, 60 frames; MEASURED). **335.7 s wall, my-tree CPU 491.3 s.** Others used 63% of 4 cores. Against B at c1 (340.3 s, 486.0 CPU-s, others 64%): **c2 is about 1% faster in wall time and uses about 1% more CPU, i.e. no meaningful gain.**
-- Frame-0 tally on the unfixed bundle (MEASURED with `r2/blank_check.py`): frame 0 was blank in **3 of 9 renders**. B: 1 of 2; C: 1 of 1; D: 1 of 1; A: 0 of 2; E, F, G: 0 of 1 each. Blank frames never appeared after frame 0. **This is an intermittent race, independent of post and concurrency**, consistent with the `frame === 0` skip in ThreeCanvas.
-- 06:31, Blender **CY16** (MEASURED). Cycles CPU, **16 samples + OIDN**, 1 frame, 1080×1920.
-  - `render.render()` took 60.6 s; process wall 62.2 s; **my CPU 78.1 s**. Others used 68% of 4 cores.
-  - Visual (crop `r2/stills/cycles16_vs_64_crop.jpg`): **nearly identical to 64 spp** in this scene, where the emissive screen dominates. The only visible artefact is a slightly blotchy, brownish dynamic-island area: denoiser smearing in a dark region.
-  - Derived cost model (inference from CY16 / CY64 / CYANIM): about 2.3–3 CPU-s per sample-frame, plus about 30–35 CPU-s fixed per frame (OIDN at 1080×1920, light tree, sync, save).
-  - **Idle estimate: about 19 s/frame at 16 spp + OIDN.**
-- 06:37, run **E2** (MEASURED): fixed **JPEG image-sequence texture** (full-size 1080×2340 placeholder canvas, prefetch of 4 frames ahead with `img.decode()`) plus the `FirstContentFrame` frame-0 fix. No post, c1, 60 frames, bundle `build2`.
-  - **122.3 s wall, my-tree CPU 174.1 s.** Others used 64% of 4 cores.
-  - **Frame sync is exact.** The screen badge reads **00, 01, 02, 30, 59** on output frames 0, 1, 2, 30, 59, and the progress ring reads 20%, 21%, 23%, 59%, 85%, matching the Screen composition (`r2/stills/E2-seqfix-none-c1_sync.jpg`). **No blank frames**; frame 0 luma is 18.6.
-  - **Cost of the per-frame texture:** +23.4 CPU-s over the static PNG (A re-run, 150.7 CPU-s) = **+0.39 CPU-s/frame (+15%)** for JPEG decode and 1080×2340 texture upload. That is about +0.12 s/frame of idle wall time at 3.3 effective cores.
+**Stack:**
+- `remotion`, `@remotion/cli`, `@remotion/three` and `@remotion/media` 4.0.534.
+- React 18.3.1, three 0.170.0, @react-three/fiber 8.18.0, @react-three/drei 9.122.0.
+- @react-three/postprocessing 2.19.1, postprocessing 6.39.5.
+- Blender **5.2.2 LTS** (Linux x64 tarball).
+
+**Files:** `$S` = `/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/`. The session scratchpad may be deleted.
+- Remotion test project: `$S/r3f-latest`. Scene: `src/PhoneScene.tsx`. Bundles: `build/` is the original bundle; `build2/` has the two fixes.
+- Scripts and logs in `$S/r2/`: `bench3.sh`, `bench4.sh`, `runner.py`, `blank_check.py`, `sync_tiles.sh`, `phone_scene.py` (Blender), `bench3.log`, `blender.log`, `logs/`.
+- Outputs: `out/*.mp4` and `stills/`.
+
+**IMPORTANT caveat on timings.** The container restarted at 05:56. From then on, other researchers' jobs shared the 4 CPUs: Chrome renders, TTS/ASR benchmarks such as `piper_bench.py`, `cbx_bench.py` and `asr_check.py`. They used **28–89% of the 4 cores** during my runs, and load average reached 28.
+- Every run therefore went through `r2/runner.py`. It records wall time, the CPU-seconds of my own process tree (as child subreaper, via `RUSAGE_CHILDREN`) and the CPU-seconds of all other processes (from `/proc/stat`).
+- **CPU-seconds are the robust number.** Contended wall times are pessimistic.
+- Clean idle wall times exist only for run A and the first 16 frames of run B (2026-10-08 22:04–22:06, before the restart).
+- The idle → CPU conversion measured from A is **150.7 CPU-s ÷ 45.2 s ≈ 3.3 effective cores** for Remotion + SwiftShader.
+- I could not kill an orphaned render because the auto-mode classifier blocked `kill` on PIDs it could not attribute; it finished on its own.
+
+## 1. Remotion 4.0.534: 60-frame 1080×1920 phone scene WITH vs WITHOUT post-processing (Bloom + DepthOfField + Vignette + ToneMapping), `--concurrency` 1 vs 2, `--gl=swangle`: s/frame and extrapolation to 1,800 frames
+
+### Takeaway
+Without post, the R3F phone scene renders at about **0.67 s/frame on an idle machine** (measured), so **1,800 frames take about 20 min** (12–23 min depending on how much of the frame the phone fills).
+
+The 4-effect post chain costs **3.2× the CPU** (measured: 486 against 151 CPU-s per 60 frames). That is about **1.8–2.4 s/frame idle**, so **1,800 frames take about 55–75 min**.
+
+**`--concurrency=2` gave no speed-up** with or without post: wall time within ±6%, 1–5% more CPU. Use c1.
+
+**Found and fixed:** an intermittent **blank frame 0**, in 3 of 9 renders, caused by ThreeCanvas 4.0.534 itself.
+
+### Cited Findings
+- **MEASURED, run table.** All runs: Phone composition, 1080×1920, 30 fps, 60 frames (`--frames=0-59`), `--gl=swangle`, h264, Playwright headless shell unless noted.
+
+| Run | Config | Wall | My CPU | Others' share of 4 cores | Notes |
+|---|---|---|---|---|---|
+| A (idle, 10-08 22:04) | no post, static PNG screen, c1 | **45.2 s** | n/a | ≈0 (idle) | 0.40 / 0.53 / 0.77 s/frame for frames 1→10 / 10→30 / 30→60 |
+| B partial (idle, 22:05) | core post, MSAA 4, c1 | stopped at frame 16 by the restart | n/a | ≈0 | **1.79 s/frame** for frames 1→16 (1.95 for 1→10; about 1.5 for 12→16) |
+| A re-run | no post, PNG, c1 | 101.5 s | **150.7 s** | 63% | |
+| A3 | no post, PNG, c1, **Remotion's Chrome Headless Shell 157** | 71.8 s | **151.2 s** | 46% | same CPU as the Playwright shell |
+| C | no post, PNG, **c2** | 107.4 s | **158.2 s** | 63% | blank frame 0 |
+| B re-run | **core post**, MSAA 4, PNG, c1 | 340.3 s | **486.0 s** | 64% | |
+| D | **core post**, MSAA 4, PNG, **c2** | 335.7 s | **491.3 s** | 63% | blank frame 0 |
+| B, orphaned first re-run | core post, c1 | log span 277.8 s | n/a | heavy | 4.54 s/frame for frames 10→60; blank frame 0 |
+| E2 | no post, **JPEG-sequence screen** (fixed), c1, frame-0 fix | 122.3 s | **174.1 s** | 64% | exact sync |
+| K | core post + broken sequence texture, c1 | 324.8 s | 498.6 s | 60% | |
+| K2 | **core post + JPEG-sequence screen**, **c2**, frame-0 fix | 235.5 s | **545.4 s** | 28% | exact sync, no blank frames |
+
+- **MEASURED, core post chain** (`src/PhoneScene.tsx`):
+  - Composer: `<EffectComposer multisampling={4}>` containing `<DepthOfField target={[0,0,0]} focalLength={0.06} bokehScale={3}/>`, `<Bloom mipmapBlur luminanceThreshold={1} intensity={1.1}/>`, `<Vignette offset={0.3} darkness={0.65}/>` and `<ToneMapping mode={ToneMappingMode.AGX}/>`.
+  - Canvas: `<ThreeCanvas flat gl={{antialias:false}}>`, so the composer does its own MSAA.
+  - Without post: R3F defaults (antialias on, ACES).
+- **MEASURED, exact command:**
+  - `cd $S/r3f-latest && npx remotion bundle src/index.ts --out-dir=build2`
+  - then `npx remotion render build2 Phone out.mp4 --gl=swangle --browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell --concurrency=1 --frames=0-59 --timeout=120000 --props='{"post":"core","shadows":false,"screen":"seq","msaa":4}'`
+  - Each render invocation also pays about 8–12 s of fixed start-up (CLI, browser launch, bundle load, first-frame shader compilation). Round 1 measured 20 frames in 11.96 s.
+- **MEASURED, concurrency:**
+  - Under the same contention, c2 against c1 was 107.4 against 101.5 s without post, and 335.7 against 340.3 s with post.
+  - CPU was +5% and +1%.
+  - SwiftShader already uses about 3.3 of the 4 cores at c1, so the theoretical ceiling for c2 is about 1.2×.
+- **MEASURED, per-frame cost depends on the shot.** Without post, cost rose from 0.40 to 0.77 s/frame as the camera dollied in and the phone (MeshPhysicalMaterial, HDRI) covered more pixels.
+- **MEASURED + SOURCE, blank frame 0 (race):**
+  - Detector `r2/blank_check.py`: mean luma of frames downscaled to 108×192 is below 8.
+  - Unfixed bundle: frame 0 was blank in 3 of 9 renders (B 1/2, C 1/1, D 1/1, A 0/2, E/F/G 0/1). It happens with and without post, at c1 and c2. **Blank frames never appeared after frame 0.**
+  - In `@remotion/three` 4.0.534 `dist/cjs/ThreeCanvas.js`, the per-frame `delayRender("Waiting for R3F to render frame N")` is skipped when `frame === 0` (`if (!isRendering || frame === 0) return;`). Frame 0 relies on `onCreated` → `state.advance()`, which runs before Suspense content mounts (drei `<Environment files>`, `useLoader` textures).
+  - In addition, `@react-three/postprocessing` 2.19.1 `EffectComposer` calls `composer.setSize()` and sets `gl.toneMapping = NoToneMapping` in passive `useEffect`s. These run after ThreeCanvas's own `ManualFrameRenderer` `advance()`, because that renderer is an earlier sibling.
+- **MEASURED, fix (no blank frames in E2, K2, I2, H2, I3, A3):**
+  ```tsx
+  // in the DOM-tree component that renders <ThreeCanvas> (never suspends, so the handle can't leak):
+  const [firstHandle] = useState(() => delayRender('first R3F content frame'));
+  // ...as the LAST child inside <ThreeCanvas>, after <Scene/> / <EffectComposer>:
+  const FirstContentFrame: React.FC<{handle: number}> = ({handle}) => {
+    const advance = useThree((s) => s.advance);
+    useEffect(() => { advance(performance.now()); continueRender(handle); }, [advance, handle]);
+    return null;
+  };
+  ```
+  A first attempt took the `delayRender` inside a `useState` initializer of a component in the suspending subtree. That can leak a handle when React discards a suspended render, so it was replaced.
+- **MEASURED, look issue:** the fullscreen `ToneMapping(AGX)` pass also tone-maps the phone UI even though the screen material has `toneMapped={false}`. The yellow badge turns beige and white text greys; compare `stills/A-png-none-c1_f30.png` with `stills/B-png-core-c1_f30.png`.
+- **DOCS:** "During rendering, `<ThreeCanvas>` overrides the `frameloop` prop to `'never'` regardless of what you pass", and the scene is "only re-rendered on demand via `advance()`". — [Remotion: ThreeCanvas](https://www.remotion.dev/docs/three-canvas)
+- **DOCS (from round 1):** for no GPU, "`swangle` is recommended. Rendering might be slow." — [Remotion: --gl options](https://www.remotion.dev/docs/gl-options). Round 1 measured that every `--gl` value ends up on SwiftShader here.
+
+### Inferences
+- **Extrapolation to 1,800 frames (60 s at 30 fps), single render at c1, idle machine:**
+  - **No post:** 0.67 s/frame × 1,800 ≈ **20 min** (range 12–23 min). With the image-sequence screen texture (+0.12 s/frame) it is about **24 min**.
+  - **Core post:**
+    - CPU route: 486 CPU-s ÷ 3.3 cores ÷ 60 ≈ 2.4 s/frame.
+    - Idle partial measurement: 1.8 s/frame on the cheaper early frames.
+    - Result: **1.8–2.4 s/frame ≈ 55–75 min**. With the image-sequence texture: **about 60–80 min**.
+  - **Under contention like today's** (others using about 60% of the CPUs), multiply by about 2.2 (A: 101.5 s against 45.2 s).
+- Practical budget: render the 3D shots **as separate segments** (a 3–5 s hero shot with post takes about 3–6 min). Use post only where it pays off, and keep the rest of the 60 s in 2D/DOM (round 1: about 0.2 s/frame).
+- Neither `--gl` nor the browser (A3) changes cost; **concurrency should stay at 1**.
+- For brand-accurate UI under post, use `ToneMappingMode.NEUTRAL`, drop the tone-mapping pass, or reduce exposure (untested).
+
+### Gaps
+- Clean idle wall times exist only for A and the first 16 frames of B. The other numbers are CPU-based estimates, because the machine was shared. No full 1,800-frame render was attempted (memory growth and leaks over long renders are unknown).
+- Per-effect cost (DOF vs Bloom vs MSAA 4) and `resolutionScale` / half-resolution effects were not isolated.
+- c2 on an idle machine was not measured; only the ceiling (about 1.2×) is inferred.
+
+## 2. Screen texture on 4.0.534: (a) pre-rendered image sequence (`staticFile` JPEG per frame) vs (b) `useOffthreadVideoTexture` / `useVideoTexture` with an MP4, plus the documented `@remotion/media` route
+
+### Takeaway
+**(a) The JPEG image sequence works, with exact frame sync and the lowest cost:** +0.39 CPU-s/frame, single render per frame. It needs two gotchas handled: a full-size placeholder texture, and the frame-0 fix.
+
+**(b) Both hooks failed here and are deprecated in the docs.**
+- `useOffthreadVideoTexture` shows a uniform grey screen.
+- `useVideoTexture` + `<Html5Video>` timed out because the Playwright Chromium cannot decode H.264.
+
+**The documented `@remotion/media` route works with exact sync**: `<Video headless onVideoFrame>` → `CanvasTexture` + `advance()`. It needs a codec the browser can decode: VP9 WebM, or H.264 with Remotion's own Chrome Headless Shell. It costs about 2× the CPU of the sequence route because of decode plus a second render per frame.
+
+**The template-three pattern, which calls `invalidate()`, gave stale frames** (29 shown at frame 30) and an empty frame 0.
+
+### Cited Findings
+- **MEASURED, sync test method:** the Screen composition (1080×2340) shows its own frame number in a big yellow badge. Tiles of output frames 0/1/2/30/59 are cropped around the badge (`r2/sync_tiles.sh`, outputs `stills/<run>_sync.jpg`).
+- **MEASURED, asset prep for (a):**
+  - `npx remotion render build Screen public/seq --sequence --image-format=jpeg --jpeg-quality=92 --browser-executable=$BX` → 60 files `element-00.jpeg … element-59.jpeg` in **5.9 s**, 5.6 MB (about 93 KB/frame, so about 170 MB for 1,800 frames).
+  - The h264 MP4 of the same composition took 9.9 s. VP9 WebM via `ffmpeg -i screen.mp4 -c:v libvpx-vp9 -b:v 6M -deadline realtime -cpu-used 8 -row-mt 1 screen.webm` took 4.2 s.
+- **MEASURED, (a) working pattern** (`SeqScreen` in `src/PhoneScene.tsx`, run E2):
+  - One stable `THREE.Texture`, created on a **1080×2340 placeholder canvas**.
+  - Frames are prefetched 4 ahead with `new Image(); img.src = staticFile('seq/element-NN.jpeg'); img.decode()`.
+  - In `useLayoutEffect([idx])`: on a cache hit, set `texture.image = img; texture.needsUpdate = true` synchronously, and ThreeCanvas's own `advance()` draws it (one draw per frame). On a miss, `delayRender` → decode → set image → `advance(performance.now())` → `continueRender`.
+  - E2 result: **badges 00/01/02/30/59 exactly** (`stills/E2-seqfix-none-c1_sync.jpg`), 174.1 CPU-s against 150.7 for a static PNG = **+0.39 CPU-s/frame**.
+  - With post at c2 (K2): exact sync, +0.9 CPU-s/frame against PNG + post (D).
+- **MEASURED, gotcha 1 (run E, first version):** with a 2×2 placeholder the phone screen stayed **black on every frame**. On WebGL2, three.js allocates immutable storage (`texStorage2D`) on the first upload, so the 1080×2340 frames could not be uploaded into it. The placeholder must match the frame size, or call `texture.dispose()` before changing size.
+- **MEASURED, gotcha 2:** the frame-0 race described in section 1. Fix: `FirstContentFrame`.
+- **MEASURED, (b1) `useOffthreadVideoTexture({src: staticFile('screen.mp4')})`, run F:** frame 0 showed the null-texture colour, and frames 1–59 a **uniform light-grey screen with no UI** (`stills/F_f30.jpg`).
+  - Holding each frame until the new texture committed, then calling `advance()` (run G), gave the same grey result at 271.7 against 160.6 CPU-s.
+  - Run OD, a DOM-only `<OffthreadVideo src={staticFile('screen.mp4')}/>` still at frame 30, was **correct** (`stills/OD_offthreadvideo_dom_f30.png`). So frame extraction works and the hook's texture path fails. Not debugged further.
+- **MEASURED, (b2) `useVideoTexture(ref)` + `<Html5Video ref src=screen.mp4>`, run J:** failed with `A delayRender() "Waiting for texture in useVideoTexture() to be loaded" was called but not cleared after 118000ms`, consistent with H.264 not decodable in the Playwright shell. Not re-tested with WebM.
+- **MEASURED, `@remotion/media` route on the Playwright shell + H.264 (runs H, I):** both crashed at frame 0.
+  - The log shows `[@remotion/media] Cannot decode /public/screen.mp4, falling back to <OffthreadVideo>`, then `Error: R3F: Img is not part of the THREE namespace!`.
+  - The fallback renders an `<Img>` inside the R3F tree.
+- **MEASURED, `@remotion/media` + `advance()` with VP9 WebM (run I2):** **exact sync** (00/01/02/30/59), 352.7 CPU-s, **about 2× the sequence route**.
+- **MEASURED, the same with H.264 on Remotion's Chrome Headless Shell (run I3):**
+  - The shell came from `npx remotion browser ensure`: version `157.0.8080.0-remotion-v3`, 98.9 MB, downloaded in 6 s into `node_modules/.remotion/chrome-headless-shell/linux64/chrome-headless-shell-linux64/chrome-headless-shell`.
+  - Result: **no decode error, exact sync**, 328.7 CPU-s.
+- **MEASURED, template-three `invalidate()` pattern with WebM (run H2):**
+  - Frame 0's screen was empty, frames 1–2 happened to be correct, and **frames 30 and 59 showed 29 and 58** (`stills/I2_top_H2_bottom_sync.jpg`, I2 on top).
+  - 228.3 CPU-s. The I2 − H2 difference of 124 CPU-s, about 2 CPU-s/frame, is the cost of the second render.
+- **MEASURED, `@remotion/media` + `advance()` + core post at c2 (run M2):** RESULT_M2
+- **DOCS:**
+  - "We recommend that you mount a <Video> tag in headless mode and use the onVideoFrame prop"; it is available from 4.0.387.
+  - "Use `advance()` inside `onVideoFrame` to synchronously re-render the scene before the screenshot is taken. Using `invalidate()` would only schedule an asynchronous re-render, which can lead to stale frames ... especially with concurrency greater than 1."
+  - `useOffthreadVideoTexture()` and `useVideoTexture()` are both "deprecated in favor of using `@remotion/media`". The former "creates a new texture for each frame" and "requires the whole video to be downloaded to disk first".
+  - — [Remotion: Using a video as a texture in Three.js](https://www.remotion.dev/docs/videos/as-threejs-texture)
+- **SOURCE:** `remotion-dev/template-three` `src/Phone.tsx`, cloned 2026-10-08, still calls `invalidate()` in `onVideoFrame`. — [remotion-dev/template-three](https://github.com/remotion-dev/template-three)
+- **DOCS:** earlier Remotion versions downloaded "the free version of Chromium, which would not include codecs for the proprietary H.264 and H.265 codecs", and Remotion moved to Chrome Headless Shell. — [Remotion: Installing Chrome v4.0.247](https://remotion.dev/docs/miscellaneous/thorium-browser)
+
+### Inferences
+- **Recommended for the promo:** keep every app screen as a Remotion composition, render it to a JPEG sequence (about 6 s per 60 frames), and map it with the `SeqScreen` pattern. It is deterministic, single-render, the cheapest option, and browser-independent.
+- Use `@remotion/media` `<Video headless onVideoFrame>` + `advance()` only when the source is a real screen recording. It needs VP9/WebM, or Remotion's own Chrome Headless Shell for H.264. With post it renders the expensive chain twice per frame.
+- **Do not use the template-three `invalidate()` code as is.**
+- In the real project, run `npx remotion browser ensure` and drop `--browser-executable` pointing at the Playwright shell, so H.264 assets work. A3 showed the same 3D cost on both browsers.
+
+### Gaps
+- Root cause of the `useOffthreadVideoTexture` grey screen; `useVideoTexture` with WebM; the prefetch cache hit rate (not logged); PNG sequence against JPEG quality and cost; memory use over 1,800-frame sequences.
+
+## 3. Blender 5.2.2 headless (`blender -b -P script.py`): Eevee without GPU/display; Cycles CPU 64 spp + OIDN; extrapolation to a 3–5 s hero shot
+
+### Takeaway
+- **Plain `blender -b` with Eevee fails here** (`Couldn't open libEGL.so.1`, SIGABRT).
+- **Eevee works under `xvfb-run` + Mesa llvmpipe (GLX)**, but on CPU it is **not cheaper than Cycles**: 85 CPU-s/frame at 16 samples, 343 at 64.
+- The Vulkan backend on Chromium's SwiftShader is rejected for missing features.
+- **Cycles CPU + OpenImageDenoise** at 1080×1920 costs about **73 / 100 / 186 CPU-s per frame at 16 / 32 / 64 spp**: about 19 / 26 / 49 s/frame on an idle machine (estimate).
+- A **3–5 s hero shot (90–150 frames)** therefore takes about **30–50 min at 16 spp, 40–65 min at 32 spp, or 75–125 min at 64 spp**. That is 10–25× slower per frame than R3F.
+- Quality: a clean "product render" look. 16 spp + OIDN is nearly indistinguishable from 64 spp in this scene.
+
+### Cited Findings
+- **MEASURED, scene:** `$S/r2/phone_scene.py` (bpy, 5.2.2).
+  - Extruded rounded-rectangle phone with a 0.03 bevel modifier (angle-limited), titanium Principled sides and black-glass caps, camera bump with 3 lenses.
+  - Emission screen with an image texture (`screen.png`, strength 1.5), 5 gold coins, an emissive ring.
+  - Poly Haven `studio_small_09` 1k HDRI for lighting and reflections, with a dark #07070b background for camera rays (Light Path mix).
+  - Area key light, AgX view transform, camera DOF at f/1.4, 1080×1920.
+  - Coordinates match the R3F scene: three.js space under a +90° X root; Euler mode `ZYX` matches three's 'XYZ'.
+  - Usage: `blender -b --factory-startup -P phone_scene.py -- <CYCLES|EEVEE> <samples> <out> [frames] [denoise]`.
+  - In 5.2.2 the engine enum shows only `BLENDER_EEVEE`; Cycles is an add-on, but `scene.render.engine='CYCLES'` works.
+  - Background mode prints no per-sample progress, so the script prints timestamped `bpy.app.handlers.render_stats` stage changes.
+- **MEASURED, Blender runs:**
+
+| Run | Engine / settings (1080×1920) | Render time (contended) | My CPU | Others' share | Notes |
+|---|---|---|---|---|---|
+| EVB | Eevee, plain `blender -b` | abort after 1.7 s | n/a | n/a | `Couldn't open libEGL.so.1: libEGL.so.1: cannot open shared object file` |
+| EVX | Eevee 64 samples, `xvfb-run -a -s "-screen 0 1920x1080x24" blender -b ...` | **296.4 s** | **343.1 s** | 71% | **works** (GLX → Mesa llvmpipe) |
+| EVX3 | Eevee 16 samples, 3 frames, Xvfb | 56.6 / 69.4 / 64.6 s per frame | **256.4 s (≈85/frame)** | 66% | time before first sample: 11.0 s on frame 1 (shaders), 5.6–7.6 s after |
+| EVV | Eevee, `VK_ICD_FILENAMES=.../vk_swiftshader_icd.json blender -b --gpu-backend vulkan` | abort after 1.2 s | n/a | n/a | "SwiftShader Device ... does not meet minimum requirements. Missing features are [geometry shaders, multi viewport, logical operations, dual source blending, shader draw parameters]", then the libEGL abort |
+| CY64 | Cycles CPU 64 spp + OIDN, 1 frame | **184.3 s** | **190.9 s** | 74% | `stills/blender_cycles64.png` |
+| CYANIM | Cycles CPU 32 spp + OIDN, 4 frames, persistent data | 74.9 / 74.4 / 72.8 / 80.6 s per frame | **402.1 s (≈100/frame)** | 67% | frame 1 setup 2.1 s (light tree), later re-sync about 0.06 s; save 0.4–1 s |
+| CY16 | Cycles CPU 16 spp + OIDN, 1 frame | 60.6 s | **78.1 s** | 68% | nearly identical to 64 spp |
+| smoke | Cycles 1 spp, 10% resolution, cold start | 42.6 s render, about 105 s process | n/a | heavy | cold-cache start-up is expensive |
+
+- **DOCS:** Blender's minimum GPU requirement is "OpenGL 4.3, Vulkan 1.3", with mandatory GL_ARB_shader_draw_parameters and GL_ARB_clip_control. Software GPUs are not mentioned. — [Blender requirements](https://www.blender.org/download/requirements/)
+- **MEASURED (`blender --help`, 5.2.2):** `--gpu-backend` accepts 'opengl' or 'vulkan'. The manual lists `--gpu-backend` under command-line arguments. — [Blender manual: command line arguments](https://docs.blender.org/manual/de/latest/advanced/command_line/arguments.html)
+- **SOURCE:** a Blender commit from August 2022, "Introduce headless OpenGL rendering on Linux", makes `-b` retry with EGL's Mesa surfaceless platform. That path needs libEGL, which is missing here. — [bf-blender-cvs 2022-08](https://lists.blender.org/pipermail/bf-blender-cvs/2022-August/176810.html)
+- **FORUM (Blender 2.8 era):** Eevee via `xvfb-run` + Mesa llvmpipe works "but is super slow". — [devtalk.blender.org](https://devtalk.blender.org/t/blender-2-8-unable-to-open-a-display-by-the-rendering-on-the-background-eevee/1436)
+
+### Inferences
+- **Idle-machine estimates.** These assume Cycles uses about 3.8 of 4 cores and llvmpipe about 3.5; neither was measured idle.
+  - Cycles 16 spp + OIDN ≈ 19 s/frame; 32 spp ≈ 26 s/frame; 64 spp ≈ 49 s/frame.
+  - Eevee/llvmpipe at 16 samples ≈ 24 s/frame; at 64 samples ≈ 98 s/frame.
+- **3–5 s hero shot at 30 fps (90–150 frames):**
+  - Cycles 16 spp ≈ 28–48 min; 32 spp ≈ 39–65 min; 64 spp ≈ 74–123 min.
+  - Eevee 16 ≈ 36–60 min.
+  - About 2.2–3× longer under today's kind of shared load.
+  - For comparison, R3F with post takes about 3–6 min for the same shot.
+- Cost model: about 2.3–3 CPU-s per sample-frame plus about 30–35 CPU-s fixed per frame (OIDN at 1080×1920, sync, save).
+- Practical Blender route, if used at all: Cycles CPU at 16–32 spp + OIDN, `use_persistent_data`, run in the background for at most 1–2 hero shots, and composite into Remotion.
+  - For the composite, use `film_transparent` + PNG sequence, or the screen baked in as here. This is untested.
+  - Installing `libegl1 libegl-mesa0` would probably let plain `-b` Eevee use EGL surfaceless (same llvmpipe speed). Untested.
+- blender-mcp is GUI-bound (round 1), so headless `blender -b -P script.py` with Claude-written bpy is the workable automation.
+
+### Gaps
+- No idle-machine Blender timings.
+- Not tested:
+  - Mesa lavapipe (`mesa-vulkan-drivers`) for the Vulkan backend;
+  - the libEGL install;
+  - Blender motion blur and DOF cost isolation;
+  - OIDN temporal flicker across an animated sequence (only 4 frames were rendered);
+  - the alpha round-trip into Remotion.
+
+## 4. Visual quality comparison (stills saved in `$S/r2/stills/`)
+
+### Takeaway
+At equal framing, **Cycles and Eevee give the most "real product render" look**: physically based reflections, clean edges and accurate screen colours. **R3F without post is crisp but plainly CG.** **R3F with the core post chain looks the most "motion-design"**, with glow, DOF and vignette, but AgX tone mapping washes out the UI colours. For a promo where the app UI must read clearly, R3F, with or without light post, is good enough at a fraction of the cost. Blender is only justified for one or two hero product beauty shots.
+
+### Cited Findings
+- **MEASURED, R3F no post, frame 30** (`A-png-none-c1_f30.png`; tiles 0/30/59 in `A_tiles.jpg`):
+  - Sharp UI with exact colours (`toneMapped={false}` screen) and a plausible titanium frame from the HDRI.
+  - Gold coins; the HDR ring clips to flat white without bloom. A clean but synthetic look.
+- **MEASURED, R3F core post, frame 30** (`B-png-core-c1_f30.png`; `B_tiles.jpg`): purple bloom halo on the ring, DOF blur on coins and off-focus screen corners, vignette, an AgX filmic look. The UI is desaturated: yellow badge turns beige, text slightly grey.
+- **MEASURED, Cycles 64 spp + OIDN** (`blender_cycles64.png`):
+  - Noise-free, soft realistic reflections and chrome-edge highlights; the screen is crisp.
+  - The emissive ring shows no bloom (none without the compositor).
+  - Coins fell out of frame in the still (Z-up/Y-up mapping in my script); they are visible in `cyanim_0001.png`.
+- **MEASURED, Cycles 16 against 64 spp** (`cycles16_vs_64_crop.jpg`): practically identical, apart from slight OIDN blotching in the dark dynamic-island area.
+- **MEASURED, Eevee 64 under llvmpipe** (`blender_eevee_xvfb.png`) and **Eevee 16** (`evanim_000{1,2,3}.png`; crop against Cycles 32 in `eevee16_vs_cycles32_f3_crop.jpg`): very close to Cycles. The dynamic-island pill renders light grey instead of black. No visible noise at 16 samples.
+- **MEASURED, sync tiles:**
+  - Correct: `E2-seqfix-none-c1_sync.jpg`, `K2-seqfix-core-c2_sync.jpg`, `I3-mediaadv-h264-cft-none-c1_sync.jpg`, and `I2_top_H2_bottom_sync.jpg` (top half).
+  - Broken: H2 in the bottom half of the same file (stale), and F/G (grey).
+
+### Inferences
+- The fidelity gap between R3F and Cycles is mostly lighting realism and highlight rolloff. For a fast vertical promo with motion and UI focus, it is less important than UI legibility and timing.
+- A light, UI-safe post (Bloom on emissives only, mild vignette, a neutral or no tone-mapping pass, DOF focused on the screen plane) is the best value. This is untested as a combination.
+
+### Gaps
+- No side-by-side at exactly matched camera/animation frames across all engines: the Blender stills use frame 30 of the R3F move, but its coins differ. No motion-blur comparison. No viewer or A/B preference test.
 
 ## PENDENTE / NÃO PESQUISADO
-- (filled at the end)
+- [ ] **Clean idle timings.** Every run after the 05:56 restart was contended (28–89% of the CPUs used by other researchers). Wall times for post, c2, Blender and Eevee are estimates from CPU-seconds. Re-run `bench3.sh B D` and `blender_bench2.sh CY64B` on a quiet machine.
+- [ ] **Full-length 1,800-frame render** (memory, leaks, stability) of the R3F scene, with and without post; and real per-frame cost for a promo-like shot mix.
+- [ ] Per-effect post cost (DOF / Bloom / MSAA 4 / ToneMapping) and effect `resolutionScale`; a UI-safe post preset (NEUTRAL tone mapping or none).
+- [ ] Root cause of the `useOffthreadVideoTexture` grey screen; `useVideoTexture` with WebM. Both are deprecated, so this is low priority.
+- [ ] Mesa lavapipe (`apt-get install mesa-vulkan-drivers`) for Blender's Vulkan backend, and `libegl1 libegl-mesa0` for plain `-b` Eevee. Both untested; they would not make Eevee faster than llvmpipe.
+- [ ] Blender: alpha round-trip into Remotion (`film_transparent` → PNG sequence or ProRes 4444 → `<OffthreadVideo transparent>`); OIDN temporal flicker over a longer sequence; motion blur cost.
+- [ ] `@remotion/media` + post cost (M2): see section 2 for status.
+- [ ] Still open from round 1: Spline, Rotato/Previewed, AI video B-roll, Sketchfab/Poly Pizza licensing, AI 3D generators, 3D icon packs, Remotion release that introduced `ManualFrameRenderer`.
+
+## Resumo (3 linhas)
+1. Remotion 4.0.534 + R3F on CPU (SwiftShader): about 0.67 s/frame without post (≈20 min per 1,800 frames) and about 1.8–2.4 s/frame with Bloom + DOF + Vignette + ToneMapping (≈55–75 min). `--concurrency=2` gives no gain. Fix the intermittent blank frame 0 with `FirstContentFrame`.
+2. App screen on the 3D phone: the JPEG image sequence (`staticFile` per frame, full-size placeholder, prefetch) gives exact sync at +0.39 CPU-s/frame. `@remotion/media` + `advance()` also works (VP9, or H.264 with Remotion's Chrome Headless Shell) at about 2× the cost. The deprecated hooks and template-three's `invalidate()` failed or gave stale frames.
+3. Blender 5.2.2 headless: Eevee only via `xvfb-run` + llvmpipe and no cheaper than Cycles. Cycles CPU + OIDN costs about 19/26/49 s/frame at 16/32/64 spp, so a 3–5 s hero shot takes about 30–125 min. Use it for at most 1–2 hero shots; R3F covers the rest.
