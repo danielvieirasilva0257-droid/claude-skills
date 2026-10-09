@@ -522,12 +522,96 @@ Esta lista consolida as seções "PENDENTE / NÃO PESQUISADO" das seis notas, em
 | Baixa | Comunidade | Tutorial do @ssupernova.studio | Rechecar Instagram (com login), TikTok, YouTube e X nos próximos dias, ou pedir que você encaminhe o link se ele aparecer no seu feed |
 | Baixa | Música | Dados de criativos brasileiros | Varrer a Meta Ad Library (Brasil) em busca de anúncios de apps de fitness, hábitos e finanças e anotar os estilos musicais |
 
-### Atualização de 09/10/2026
+## Rodada 2 (09/10/2026): resultados medidos
 
-- **Kit motion-video instalado no repositório.**
-  - **O que foi instalado:** a skill `motion-video`, que o Claude Code carrega sozinho ao abrir o repositório, e o motor `motion-studio/`.
-  - **O que traz:** nove regras de movimento que combinam com esta pesquisa, um iPhone e cards 3D prontos, sons sincronizados por frame e checagem automática de elementos parados.
-  - **Falta:** rodar `bash motion-studio/tools/setup.sh` neste container e comparar o resultado com o projeto Remotion no mesmo roteiro.
-  - **Detalhes:** `research_notes/Motion design 3D e voz IA/motion_video_kit_e_dicas.md`.
-- **Dica do usuário: Google AI Studio.** Testar a voz Gemini TTS em pt-BR e a música Lyria pelo AI Studio, que é gratuito para testes. A API exige uma chave gratuita criada por você.
-- **Rodada 2 interrompida pelo limite de uso.** Os testes medidos de 3D, as vozes locais (Kokoro, Piper e Chatterbox) com amostras e o alinhamento de palavras, e a análise das legendas restantes do YouTube ficaram parciais. Estão em `3d_round2.md`, `voice_round2.md` e `youtube_round2.md`, e devem ser retomados de onde pararam.
+Os números de tempo foram medidos neste container: 4 CPUs, sem GPU. Os principais foram refeitos com a máquina ociosa. Detalhes, comandos e código estão em `research_notes/Motion design 3D e voz IA/` (`3d_round2.md`, `voice_round2.md`, `youtube_round2.md` e `motion_video_kit_e_dicas.md`).
+
+### 3D: Remotion 4.0.534 com React Three Fiber, sem GPU
+
+- **Velocidade sem pós-processamento:** 0,67–0,76 s por quadro em 1080×1920. Um vídeo de 60 s (1.800 quadros) leva cerca de 20–23 min.
+- **Velocidade com pós-processamento** (bloom, profundidade de campo, vinheta e tone mapping AgX): 2,89 s por quadro, cerca de 3,8 vezes mais. Um vídeo de 60 s levaria uns 87 min, então use só em planos-herói curtos.
+- **`--concurrency=2` não acelera** (fica 2–6% mais lento). Use 1.
+- **Bug do quadro 0 em branco**, em 3 de 9 renders.
+  - Correção: um `delayRender` no componente DOM, mais um último filho dentro do `<ThreeCanvas>` que chama `advance()` e depois `continueRender`. O código está nas notas.
+- **O tone mapping AgX desbota a UI do app**, mesmo com `toneMapped={false}`. Nas cenas que mostram a tela, escolha outro tone mapping.
+- **Tela do app como textura:**
+  - Uma sequência de imagens JPEG funciona com sincronia exata, por cerca de +0,39 s de CPU por quadro. A textura provisória precisa ter o mesmo tamanho da tela (1080×2340).
+  - Os hooks de vídeo (`useOffthreadVideoTexture` e `useVideoTexture`) falharam e já estão marcados como obsoletos.
+  - A rota documentada (`@remotion/media` `<Video headless onVideoFrame>` + `advance()`) funciona com WebM VP9, porque o Chromium do Playwright não decodifica H.264. Ela custa cerca de 2 vezes a sequência JPEG.
+  - O template oficial `template-three` ainda usa `invalidate()` e gera quadros atrasados.
+- **Blender 5.2.2:**
+  - O Eevee só roda com `xvfb-run` (OpenGL por software) e não sai mais barato que o Cycles.
+  - Cycles em CPU com OpenImageDenoise: 45,8 s por quadro com 64 amostras. Com 16 amostras, cerca de 20 s por quadro, com resultado visual quase igual.
+  - Um plano-herói de 3–5 s leva 30–50 min no Blender, contra 4,5–7,5 min no R3F com pós-processamento.
+- **Recomendação:**
+  - Remotion com R3F, `--concurrency=1`, telas em sequência JPEG e a correção do quadro 0.
+  - Pós-processamento só nos planos-herói.
+  - Blender Cycles com 16–32 amostras para no máximo 1–2 planos de produto realistas.
+
+### Voz local e legendas sincronizadas
+
+- **Kokoro-82M** (licença Apache-2.0, permite uso comercial) é a melhor voz gratuita que roda aqui.
+  - Tem 3 vozes pt-BR: `pf_dora`, `pm_alex` e `pm_santa`.
+  - O roteiro de 50 s sai em cerca de 15 s com a máquina livre.
+  - Inteligibilidade de 0,86–0,90; a voz edge-tts atual tem 0,91.
+  - Estrangeirismos precisam de grafia fonética: "Éksel", "ép", "dilôudi".
+  - Use o modelo fp32; o int8 é 4–6 vezes mais lento aqui.
+- **Piper:** o mais rápido, mas menos inteligível (0,49–0,81). As vozes pt-BR derivam de vozes treinadas com dados só para pesquisa ou não comerciais, então evite em anúncio.
+- **Chatterbox pt-BR** (licença MIT): boa pronúncia (0,91), mas cerca de 15 min de CPU por 60 s de fala. A única voz oficial é feminina e o áudio sai com marca d'água inaudível.
+- **Legendas:**
+  - O alinhamento forçado com WhisperX contra o roteiro erra 17 ms na mediana, com 79% das palavras dentro de 1 quadro.
+  - A estimativa atual `wordAt()` erra 174 ms na mediana e chega a 710 ms.
+  - O arquivo já alinhado está pronto no formato `Caption[]`: `samples/rotina_captions_alinhadas_whisperx.json`.
+- **Amostras:** 28 MP3 na pasta `samples/`.
+- **Gemini TTS pelo Google AI Studio** (sua dica):
+  - Falta a chave gratuita, que você cria (`GEMINI_API_KEY`).
+  - Modelo `gemini-3.8-flash-tts`, com camada gratuita.
+  - Vozes masculinas para testar: Puck, Fenrir, Orus e Charon.
+  - Na camada gratuita, o conteúdo é usado para melhorar os produtos do Google.
+
+### YouTube: 39 transcrições restantes e 2 vídeos de Blender
+
+- **Voz:** nenhum criador brasileiro demonstra voz de IA em pt-BR; eles narram com a própria voz. A escolha da voz deve vir dos testes acima.
+- **3D:** nenhum vídeo mostra um celular 3D no Blender nem a composição de Blender com Remotion. O caso mais próximo é um comercial 100% Blender feito por Python, que levou cerca de 5 h de render em GPU.
+- **Padrões que se confirmaram:**
+  - um briefing real vale mais que esforço;
+  - proibir os padrões genéricos e escolher a fonte com intenção;
+  - um vídeo de referência;
+  - trabalho em fases, com storyboard aprovado antes do render;
+  - o áudio vem primeiro;
+  - o Claude critica os próprios quadros;
+  - salvar numa skill o que funcionou;
+  - respeitar as zonas seguras de 9:16;
+  - usar vídeo de IA só para textura e realismo.
+- **Tutorial do @ssupernova.studio:** ainda não tinha sido publicado no YouTube em 09/10.
+
+### Kit motion-video, testado
+
+- Funciona aqui sem mudar o código dele. Só foi preciso apontar para o Chromium instalado com `--no-sandbox`.
+- Cerca de 1,1 s por quadro (1920×1080, 60 fps), com a máquina dividida com outros testes.
+- Travou uma vez, no quadro 767. A retomada renderizando só a faixa que faltava resolveu.
+- O resultado tem acabamento premium: cards 3D, transições circulares e checagem automática de elementos parados.
+- Instalado em `.claude/skills/motion-video/` e `motion-studio/`.
+
+### Feito nesta rodada
+
+- O Remotion do projeto `rotina-video` foi atualizado para **4.0.534**. Os tipos conferem e os quadros de teste saíram iguais aos de antes.
+- O `CLAUDE.md` do repositório registra o combinado:
+  - mudanças em skills só com a sua aprovação;
+  - notas e relatórios são atualizados livremente.
+
+### O que continua pendente (além da tabela acima)
+
+- **3D:**
+  - um render completo de 1.800 quadros, para checar memória e estabilidade;
+  - o custo de cada efeito de pós-processamento separado;
+  - um tone mapping que preserve as cores da UI;
+  - compor a saída do Blender com transparência no Remotion;
+  - cintilação do denoiser em sequências longas.
+- **Voz:**
+  - A/B do roteiro real com Gemini TTS, que precisa da sua chave gratuita;
+  - A/B com ElevenLabs v4, que precisa de plano pago;
+  - a rota com whisper.cpp (`@remotion/install-whisper-cpp`).
+- **YouTube:** cerca de 20 vídeos relevantes ainda não baixados, incluindo os brasileiros e66pc9qvTks, tT5ya2HKazo, woQ180jz92k e SrL4vZvNJDs.
+- **Comunidade:** o tutorial do Supernova Studio.
+- **Skill `remotion-video`:** a proposta de atualização está esperando a sua aprovação.

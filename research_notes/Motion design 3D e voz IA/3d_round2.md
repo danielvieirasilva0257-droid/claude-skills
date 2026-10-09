@@ -1,9 +1,9 @@
 # 3D round 2: measured feasibility of real 3D phone shots (Remotion R3F and Blender) in a 4-CPU, no-GPU Linux container
 
-**Status:** COMPLETE for the four key questions, with caveats on clean timing listed in the PENDENTE section.
+**Status:** COMPLETE for the four key questions. Idle re-runs were added at the end (06:57–07:06). Caveats are listed in PENDENTE.
 
 **How to read:**
-- **MEASURED** = my own experiment in this container, 2026-10-08 22:04 and 2026-10-09 05:58–06:55 UTC, with exact versions and commands.
+- **MEASURED** = my own experiment in this container, 2026-10-08 22:04 and 2026-10-09 05:58–07:06 UTC, with exact versions and commands.
 - **DOCS/SOURCE** = a claim from an official page or a package's source code, with a link.
 - Everything else is marked as an inference.
 
@@ -26,18 +26,20 @@
 **IMPORTANT caveat on timings.** The container restarted at 05:56. From then on, other researchers' jobs shared the 4 CPUs: Chrome renders, TTS/ASR benchmarks such as `piper_bench.py`, `cbx_bench.py` and `asr_check.py`. They used **28–89% of the 4 cores** during my runs, and load average reached 28.
 - Every run therefore went through `r2/runner.py`. It records wall time, the CPU-seconds of my own process tree (as child subreaper, via `RUSAGE_CHILDREN`) and the CPU-seconds of all other processes (from `/proc/stat`).
 - **CPU-seconds are the robust number.** Contended wall times are pessimistic.
-- Clean idle wall times exist only for run A and the first 16 frames of run B (2026-10-08 22:04–22:06, before the restart).
-- The idle → CPU conversion measured from A is **150.7 CPU-s ÷ 45.2 s ≈ 3.3 effective cores** for Remotion + SwiftShader.
+- Clean idle wall times exist for:
+  - run A and the first 16 frames of run B, on 2026-10-08 22:04–22:06 before the restart;
+  - the **idle re-runs B2, D2, A4, C4 and CY64B on 2026-10-09 06:57–07:06**, when other processes used only 3–4% of the CPUs.
+  - The current host was about 15% slower than the pre-restart one (no-post 0.76 against 0.67 s/frame), on an Intel Xeon @ 2.80 GHz vCPU.
+- Effective parallelism of Remotion + SwiftShader on the idle machine was **about 2.9–3.1 cores**: A4 164.2 CPU-s / 52.7 s; B2 539.2 / 187.3. CPU-s measured under contention were somewhat lower for the same work (B 486 against B2 539), so they are only a rough proxy for idle cost.
 - I could not kill an orphaned render because the auto-mode classifier blocked `kill` on PIDs it could not attribute; it finished on its own.
 
 ## 1. Remotion 4.0.534: 60-frame 1080×1920 phone scene WITH vs WITHOUT post-processing (Bloom + DepthOfField + Vignette + ToneMapping), `--concurrency` 1 vs 2, `--gl=swangle`: s/frame and extrapolation to 1,800 frames
 
 ### Takeaway
-Without post, the R3F phone scene renders at about **0.67 s/frame on an idle machine** (measured), so **1,800 frames take about 20 min** (12–23 min depending on how much of the frame the phone fills).
-
-The 4-effect post chain costs **3.2× the CPU** (measured: 486 against 151 CPU-s per 60 frames). That is about **1.8–2.4 s/frame idle**, so **1,800 frames take about 55–75 min**.
-
-**`--concurrency=2` gave no speed-up** with or without post: wall time within ±6%, 1–5% more CPU. Use c1.
+Idle measurements, all in steady state over frames 10→59:
+- **Without post:** the R3F phone scene renders at **0.67–0.76 s/frame**, so **1,800 frames take about 20–23 min**. The range is 14–26 min depending on how much of the frame the phone fills.
+- **With the 4-effect post chain:** **2.89 s/frame** (B2, 60 frames in 187 s), **about 3.8× the no-post per-frame cost**. **1,800 frames take about 87 min** (about 1.5 h). The pre-restart host was faster and gave 1.8–1.95 s/frame for frames 1→16, which would be about 55–60 min.
+- **`--concurrency=2` gave no speed-up**, measured idle and under load, with and without post: 2–6% slower and 1–9% more CPU. Use c1.
 
 **Found and fixed:** an intermittent **blank frame 0**, in 3 of 9 renders, caused by ThreeCanvas 4.0.534 itself.
 
@@ -47,6 +49,10 @@ The 4-effect post chain costs **3.2× the CPU** (measured: 486 against 151 CPU-s
 | Run | Config | Wall | My CPU | Others' share of 4 cores | Notes |
 |---|---|---|---|---|---|
 | A (idle, 10-08 22:04) | no post, static PNG screen, c1 | **45.2 s** | n/a | ≈0 (idle) | 0.40 / 0.53 / 0.77 s/frame for frames 1→10 / 10→30 / 30→60 |
+| **A4 (idle, 10-09 07:04)** | no post, PNG, c1, `build2` | **52.7 s** | 164.2 s | 3% | **0.46 / 0.64 / 0.85 s/frame**; 10→59: **0.76** |
+| **C4 (idle)** | no post, PNG, **c2** | **54.1 s** | 175.8 s | 3% | 10→59: 0.76 s/frame (no gain) |
+| **B2 (idle, 06:57)** | **core post**, MSAA 4, PNG, c1, `build2` with frame-0 fix | **187.3 s** | 539.2 s | 3% | **2.78 / 2.79 / 2.96 s/frame**; 10→59: **2.89**; no blank frames |
+| **D2 (idle)** | **core post**, MSAA 4, PNG, **c2**, `build2` | **193.2 s** | 566.3 s | 3% | 10→59: 2.92 s/frame (no gain); no blank frames |
 | B partial (idle, 22:05) | core post, MSAA 4, c1 | stopped at frame 16 by the restart | n/a | ≈0 | **1.79 s/frame** for frames 1→16 (1.95 for 1→10; about 1.5 for 12→16) |
 | A re-run | no post, PNG, c1 | 101.5 s | **150.7 s** | 63% | |
 | A3 | no post, PNG, c1, **Remotion's Chrome Headless Shell 157** | 71.8 s | **151.2 s** | 46% | same CPU as the Playwright shell |
@@ -67,9 +73,10 @@ The 4-effect post chain costs **3.2× the CPU** (measured: 486 against 151 CPU-s
   - then `npx remotion render build2 Phone out.mp4 --gl=swangle --browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell --concurrency=1 --frames=0-59 --timeout=120000 --props='{"post":"core","shadows":false,"screen":"seq","msaa":4}'`
   - Each render invocation also pays about 8–12 s of fixed start-up (CLI, browser launch, bundle load, first-frame shader compilation). Round 1 measured 20 frames in 11.96 s.
 - **MEASURED, concurrency:**
-  - Under the same contention, c2 against c1 was 107.4 against 101.5 s without post, and 335.7 against 340.3 s with post.
-  - CPU was +5% and +1%.
-  - SwiftShader already uses about 3.3 of the 4 cores at c1, so the theoretical ceiling for c2 is about 1.2×.
+  - **Idle:** c2 against c1 was 54.1 against 52.7 s without post, and 193.2 against 187.3 s with post.
+  - **Under the same contention:** 107.4 against 101.5 s without post, and 335.7 against 340.3 s with post.
+  - CPU was 1–9% higher at c2.
+  - SwiftShader already uses about 2.9–3.1 of the 4 cores at c1, so there is little headroom for a second tab.
 - **MEASURED, per-frame cost depends on the shot.** Without post, cost rose from 0.40 to 0.77 s/frame as the camera dollied in and the phone (MeshPhysicalMaterial, HDRI) covered more pixels.
 - **MEASURED + SOURCE, blank frame 0 (race):**
   - Detector `r2/blank_check.py`: mean luma of frames downscaled to 108×192 is below 8.
@@ -93,21 +100,19 @@ The 4-effect post chain costs **3.2× the CPU** (measured: 486 against 151 CPU-s
 - **DOCS (from round 1):** for no GPU, "`swangle` is recommended. Rendering might be slow." — [Remotion: --gl options](https://www.remotion.dev/docs/gl-options). Round 1 measured that every `--gl` value ends up on SwiftShader here.
 
 ### Inferences
-- **Extrapolation to 1,800 frames (60 s at 30 fps), single render at c1, idle machine:**
-  - **No post:** 0.67 s/frame × 1,800 ≈ **20 min** (range 12–23 min). With the image-sequence screen texture (+0.12 s/frame) it is about **24 min**.
-  - **Core post:**
-    - CPU route: 486 CPU-s ÷ 3.3 cores ÷ 60 ≈ 2.4 s/frame.
-    - Idle partial measurement: 1.8 s/frame on the cheaper early frames.
-    - Result: **1.8–2.4 s/frame ≈ 55–75 min**. With the image-sequence texture: **about 60–80 min**.
-  - **Under contention like today's** (others using about 60% of the CPUs), multiply by about 2.2 (A: 101.5 s against 45.2 s).
-- Practical budget: render the 3D shots **as separate segments** (a 3–5 s hero shot with post takes about 3–6 min). Use post only where it pays off, and keep the rest of the 60 s in 2D/DOM (round 1: about 0.2 s/frame).
+- **Extrapolation to 1,800 frames (60 s at 30 fps), single render at c1, idle machine.** Based on measured steady-state s/frame; add about 10 s start-up per render.
+  - **No post:** 0.67–0.76 s/frame × 1,800 ≈ **20–23 min** (range 14–26 min). With the image-sequence screen texture (+about 0.12 s/frame) it is about **24–27 min**.
+  - **Core post (DOF + Bloom + Vignette + AgX, MSAA 4):** 2.89 s/frame × 1,800 ≈ **87 min**. With the sequence texture, about 90 min. On the faster pre-restart host it would be about 55–60 min.
+  - **`@remotion/media` + `advance()` + post:** about 2× that, ≈ 3 h (M2).
+  - **Under contention like today's** (others using about 60% of the CPUs), multiply by about 2 (A: 101.5 s against 45–53 s).
+- My earlier CPU-based estimate for post (1.8–2.4 s/frame) was too optimistic. With idle cores, SwiftShader burned more CPU per frame (539 against 486 CPU-s for the same render), so CPU-seconds measured under contention are only a rough proxy.
+- Practical budget: render the 3D shots **as separate segments** (a 3–5 s hero shot, 90–150 frames, takes about 4.5–7.5 min with post and about 1–2 min without). Use post only where it pays off, and keep the rest of the 60 s in 2D/DOM (round 1: about 0.2 s/frame).
 - Neither `--gl` nor the browser (A3) changes cost; **concurrency should stay at 1**.
 - For brand-accurate UI under post, use `ToneMappingMode.NEUTRAL`, drop the tone-mapping pass, or reduce exposure (untested).
 
 ### Gaps
-- Clean idle wall times exist only for A and the first 16 frames of B. The other numbers are CPU-based estimates, because the machine was shared. No full 1,800-frame render was attempted (memory growth and leaks over long renders are unknown).
+- Idle 60-frame runs exist (A/A4/C4/B2/D2), but **no full 1,800-frame render** was attempted, so memory growth and leaks over long renders are unknown. The texture-mode runs (E2, K2, I2, I3, M2) have only contended or CPU-based costs.
 - Per-effect cost (DOF vs Bloom vs MSAA 4) and `resolutionScale` / half-resolution effects were not isolated.
-- c2 on an idle machine was not measured; only the ceiling (about 1.2×) is inferred.
 
 ## 2. Screen texture on 4.0.534: (a) pre-rendered image sequence (`staticFile` JPEG per frame) vs (b) `useOffthreadVideoTexture` / `useVideoTexture` with an MP4, plus the documented `@remotion/media` route
 
@@ -149,7 +154,10 @@ The 4-effect post chain costs **3.2× the CPU** (measured: 486 against 151 CPU-s
 - **MEASURED, template-three `invalidate()` pattern with WebM (run H2):**
   - Frame 0's screen was empty, frames 1–2 happened to be correct, and **frames 30 and 59 showed 29 and 58** (`stills/I2_top_H2_bottom_sync.jpg`, I2 on top).
   - 228.3 CPU-s. The I2 − H2 difference of 124 CPU-s, about 2 CPU-s/frame, is the cost of the second render.
-- **MEASURED, `@remotion/media` + `advance()` + core post at c2 (run M2):** RESULT_M2
+- **MEASURED, `@remotion/media` + `advance()` + core post at c2 (run M2), VP9 WebM, almost uncontended (others used 10% of 4 cores):** **385.8 s wall, 1,079.7 CPU-s.**
+  - Exact sync (`stills/M2-mediaadv-corefix-c2_sync.jpg`), no blank frames.
+  - **That is 2.0× the CPU of the sequence route with the same post and concurrency** (K2: 545.4 CPU-s). The second `advance()` per frame re-runs the whole EffectComposer chain.
+  - As wall time on a nearly idle machine, it is about 6.4 s/frame, i.e. about 3.2 h for 1,800 frames.
 - **DOCS:**
   - "We recommend that you mount a <Video> tag in headless mode and use the onVideoFrame prop"; it is available from 4.0.387.
   - "Use `advance()` inside `onVideoFrame` to synchronously re-render the scene before the screenshot is taken. Using `invalidate()` would only schedule an asynchronous re-render, which can lead to stale frames ... especially with concurrency greater than 1."
@@ -160,7 +168,7 @@ The 4-effect post chain costs **3.2× the CPU** (measured: 486 against 151 CPU-s
 
 ### Inferences
 - **Recommended for the promo:** keep every app screen as a Remotion composition, render it to a JPEG sequence (about 6 s per 60 frames), and map it with the `SeqScreen` pattern. It is deterministic, single-render, the cheapest option, and browser-independent.
-- Use `@remotion/media` `<Video headless onVideoFrame>` + `advance()` only when the source is a real screen recording. It needs VP9/WebM, or Remotion's own Chrome Headless Shell for H.264. With post it renders the expensive chain twice per frame.
+- Use `@remotion/media` `<Video headless onVideoFrame>` + `advance()` only when the source is a real screen recording. It needs VP9/WebM, or Remotion's own Chrome Headless Shell for H.264. With post it renders the expensive chain twice per frame: measured 2.0× the CPU of the sequence route (M2 against K2).
 - **Do not use the template-three `invalidate()` code as is.**
 - In the real project, run `npx remotion browser ensure` and drop `--browser-executable` pointing at the Playwright shell, so H.264 assets work. A3 showed the same 3D cost on both browsers.
 
@@ -173,8 +181,11 @@ The 4-effect post chain costs **3.2× the CPU** (measured: 486 against 151 CPU-s
 - **Plain `blender -b` with Eevee fails here** (`Couldn't open libEGL.so.1`, SIGABRT).
 - **Eevee works under `xvfb-run` + Mesa llvmpipe (GLX)**, but on CPU it is **not cheaper than Cycles**: 85 CPU-s/frame at 16 samples, 343 at 64.
 - The Vulkan backend on Chromium's SwiftShader is rejected for missing features.
-- **Cycles CPU + OpenImageDenoise** at 1080×1920 costs about **73 / 100 / 186 CPU-s per frame at 16 / 32 / 64 spp**: about 19 / 26 / 49 s/frame on an idle machine (estimate).
-- A **3–5 s hero shot (90–150 frames)** therefore takes about **30–50 min at 16 spp, 40–65 min at 32 spp, or 75–125 min at 64 spp**. That is 10–25× slower per frame than R3F.
+- **Cycles CPU + OpenImageDenoise** at 1080×1920:
+  - **45.8 s/frame at 64 spp, measured idle** (CY64B);
+  - about **20 / 27 s/frame at 16 / 32 spp** (from 73 / 100 CPU-s at about 3.7 effective cores).
+- A **3–5 s hero shot (90–150 frames)** therefore takes about **30–50 min at 16 spp, 40–68 min at 32 spp, or 69–115 min at 64 spp**.
+- Per frame that is about 7–16× slower than R3F with post (2.9 s/frame) and 26–60× slower than R3F without post.
 - Quality: a clean "product render" look. 16 spp + OIDN is nearly indistinguishable from 64 spp in this scene.
 
 ### Cited Findings
@@ -189,13 +200,14 @@ The 4-effect post chain costs **3.2× the CPU** (measured: 486 against 151 CPU-s
   - Background mode prints no per-sample progress, so the script prints timestamped `bpy.app.handlers.render_stats` stage changes.
 - **MEASURED, Blender runs:**
 
-| Run | Engine / settings (1080×1920) | Render time (contended) | My CPU | Others' share | Notes |
+| Run | Engine / settings (1080×1920) | Render time | My CPU | Others' share (contention) | Notes |
 |---|---|---|---|---|---|
 | EVB | Eevee, plain `blender -b` | abort after 1.7 s | n/a | n/a | `Couldn't open libEGL.so.1: libEGL.so.1: cannot open shared object file` |
 | EVX | Eevee 64 samples, `xvfb-run -a -s "-screen 0 1920x1080x24" blender -b ...` | **296.4 s** | **343.1 s** | 71% | **works** (GLX → Mesa llvmpipe) |
 | EVX3 | Eevee 16 samples, 3 frames, Xvfb | 56.6 / 69.4 / 64.6 s per frame | **256.4 s (≈85/frame)** | 66% | time before first sample: 11.0 s on frame 1 (shaders), 5.6–7.6 s after |
 | EVV | Eevee, `VK_ICD_FILENAMES=.../vk_swiftshader_icd.json blender -b --gpu-backend vulkan` | abort after 1.2 s | n/a | n/a | "SwiftShader Device ... does not meet minimum requirements. Missing features are [geometry shaders, multi viewport, logical operations, dual source blending, shader draw parameters]", then the libEGL abort |
 | CY64 | Cycles CPU 64 spp + OIDN, 1 frame | **184.3 s** | **190.9 s** | 74% | `stills/blender_cycles64.png` |
+| **CY64B (idle, 07:04)** | Cycles CPU 64 spp + OIDN, 1 frame | **45.8 s** (process 47.6 s) | **174.3 s** | 4% | **clean idle number**; 1.1 s before the first sample; about 3.7 effective cores |
 | CYANIM | Cycles CPU 32 spp + OIDN, 4 frames, persistent data | 74.9 / 74.4 / 72.8 / 80.6 s per frame | **402.1 s (≈100/frame)** | 67% | frame 1 setup 2.1 s (light tree), later re-sync about 0.06 s; save 0.4–1 s |
 | CY16 | Cycles CPU 16 spp + OIDN, 1 frame | 60.6 s | **78.1 s** | 68% | nearly identical to 64 spp |
 | smoke | Cycles 1 spp, 10% resolution, cold start | 42.6 s render, about 105 s process | n/a | heavy | cold-cache start-up is expensive |
@@ -206,14 +218,15 @@ The 4-effect post chain costs **3.2× the CPU** (measured: 486 against 151 CPU-s
 - **FORUM (Blender 2.8 era):** Eevee via `xvfb-run` + Mesa llvmpipe works "but is super slow". — [devtalk.blender.org](https://devtalk.blender.org/t/blender-2-8-unable-to-open-a-display-by-the-rendering-on-the-background-eevee/1436)
 
 ### Inferences
-- **Idle-machine estimates.** These assume Cycles uses about 3.8 of 4 cores and llvmpipe about 3.5; neither was measured idle.
-  - Cycles 16 spp + OIDN ≈ 19 s/frame; 32 spp ≈ 26 s/frame; 64 spp ≈ 49 s/frame.
-  - Eevee/llvmpipe at 16 samples ≈ 24 s/frame; at 64 samples ≈ 98 s/frame.
+- **Idle-machine numbers:**
+  - Cycles 64 spp + OIDN is **45.8 s/frame, measured**.
+  - Cycles 16 / 32 spp are about 20 / 27 s/frame, scaled from their CPU-s at the measured 3.7 effective cores.
+  - Eevee/llvmpipe at 16 / 64 samples is about 23–28 / 94–115 s/frame. This assumes llvmpipe uses 3–3.7 cores; not measured idle.
 - **3–5 s hero shot at 30 fps (90–150 frames):**
-  - Cycles 16 spp ≈ 28–48 min; 32 spp ≈ 39–65 min; 64 spp ≈ 74–123 min.
-  - Eevee 16 ≈ 36–60 min.
-  - About 2.2–3× longer under today's kind of shared load.
-  - For comparison, R3F with post takes about 3–6 min for the same shot.
+  - Cycles 16 spp ≈ 30–50 min; 32 spp ≈ 40–68 min; 64 spp ≈ 69–115 min.
+  - Eevee 16 ≈ 35–70 min.
+  - About 2–4× longer under today's kind of shared load (CY64 took 184 s contended against 46 s idle).
+  - For comparison, R3F takes about 4.5–7.5 min for the same shot with post and 1–2 min without.
 - Cost model: about 2.3–3 CPU-s per sample-frame plus about 30–35 CPU-s fixed per frame (OIDN at 1080×1920, sync, save).
 - Practical Blender route, if used at all: Cycles CPU at 16–32 spp + OIDN, `use_persistent_data`, run in the background for at most 1–2 hero shots, and composite into Remotion.
   - For the composite, use `film_transparent` + PNG sequence, or the screen baked in as here. This is untested.
@@ -221,7 +234,7 @@ The 4-effect post chain costs **3.2× the CPU** (measured: 486 against 151 CPU-s
 - blender-mcp is GUI-bound (round 1), so headless `blender -b -P script.py` with Claude-written bpy is the workable automation.
 
 ### Gaps
-- No idle-machine Blender timings.
+- Only Cycles 64 spp was timed on an idle machine (CY64B). Eevee/llvmpipe and Cycles 16/32 spp were timed under 66–74% contention, and their idle numbers are scaled from CPU-s.
 - Not tested:
   - Mesa lavapipe (`mesa-vulkan-drivers`) for the Vulkan backend;
   - the libEGL install;
@@ -257,16 +270,16 @@ At equal framing, **Cycles and Eevee give the most "real product render" look**:
 - No side-by-side at exactly matched camera/animation frames across all engines: the Blender stills use frame 30 of the R3F move, but its coins differ. No motion-blur comparison. No viewer or A/B preference test.
 
 ## PENDENTE / NÃO PESQUISADO
-- [ ] **Clean idle timings.** Every run after the 05:56 restart was contended (28–89% of the CPUs used by other researchers). Wall times for post, c2, Blender and Eevee are estimates from CPU-seconds. Re-run `bench3.sh B D` and `blender_bench2.sh CY64B` on a quiet machine.
+- [x] Clean idle timings for R3F no post / post at c1 and c2, and for Cycles 64 spp (B2, D2, A4, C4, CY64B; 06:57–07:06, others ≤ 4%).
+- [ ] Still contended or estimated: Eevee/llvmpipe, Cycles 16/32 spp, and the texture-mode runs (E2, K2, I2, I3, M2) as wall times. Their CPU-s and correctness are measured.
 - [ ] **Full-length 1,800-frame render** (memory, leaks, stability) of the R3F scene, with and without post; and real per-frame cost for a promo-like shot mix.
 - [ ] Per-effect post cost (DOF / Bloom / MSAA 4 / ToneMapping) and effect `resolutionScale`; a UI-safe post preset (NEUTRAL tone mapping or none).
 - [ ] Root cause of the `useOffthreadVideoTexture` grey screen; `useVideoTexture` with WebM. Both are deprecated, so this is low priority.
 - [ ] Mesa lavapipe (`apt-get install mesa-vulkan-drivers`) for Blender's Vulkan backend, and `libegl1 libegl-mesa0` for plain `-b` Eevee. Both untested; they would not make Eevee faster than llvmpipe.
 - [ ] Blender: alpha round-trip into Remotion (`film_transparent` → PNG sequence or ProRes 4444 → `<OffthreadVideo transparent>`); OIDN temporal flicker over a longer sequence; motion blur cost.
-- [ ] `@remotion/media` + post cost (M2): see section 2 for status.
 - [ ] Still open from round 1: Spline, Rotato/Previewed, AI video B-roll, Sketchfab/Poly Pizza licensing, AI 3D generators, 3D icon packs, Remotion release that introduced `ManualFrameRenderer`.
 
 ## Resumo (3 linhas)
-1. Remotion 4.0.534 + R3F on CPU (SwiftShader): about 0.67 s/frame without post (≈20 min per 1,800 frames) and about 1.8–2.4 s/frame with Bloom + DOF + Vignette + ToneMapping (≈55–75 min). `--concurrency=2` gives no gain. Fix the intermittent blank frame 0 with `FirstContentFrame`.
+1. Remotion 4.0.534 + R3F on CPU (SwiftShader), measured idle: about 0.7–0.76 s/frame without post (≈20–23 min per 1,800 frames) and 2.9 s/frame with Bloom + DOF + Vignette + ToneMapping (≈87 min). `--concurrency=2` gives no gain. Fix the intermittent blank frame 0 with `FirstContentFrame`.
 2. App screen on the 3D phone: the JPEG image sequence (`staticFile` per frame, full-size placeholder, prefetch) gives exact sync at +0.39 CPU-s/frame. `@remotion/media` + `advance()` also works (VP9, or H.264 with Remotion's Chrome Headless Shell) at about 2× the cost. The deprecated hooks and template-three's `invalidate()` failed or gave stale frames.
-3. Blender 5.2.2 headless: Eevee only via `xvfb-run` + llvmpipe and no cheaper than Cycles. Cycles CPU + OIDN costs about 19/26/49 s/frame at 16/32/64 spp, so a 3–5 s hero shot takes about 30–125 min. Use it for at most 1–2 hero shots; R3F covers the rest.
+3. Blender 5.2.2 headless: Eevee only via `xvfb-run` + llvmpipe and no cheaper than Cycles. Cycles CPU + OIDN costs about 20/27/46 s/frame at 16/32/64 spp (64 measured idle), so a 3–5 s hero shot takes about 30–115 min against 4.5–7.5 min in R3F with post. Use it for at most 1–2 hero shots.
