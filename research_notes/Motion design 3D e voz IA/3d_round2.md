@@ -53,6 +53,13 @@ How to read:
 - 06:15, run **J** (`useVideoTexture(ref)` + `<Html5Video ref src=screen.mp4>`), MEASURED. **Failed (timeout):** `A delayRender() "Waiting for texture in useVideoTexture() to be loaded" was called but not cleared after 118000ms`. The `<video>` element never fired `loadeddata`, which fits the missing H.264 decoder. Not re-tested with WebM, since the hook is deprecated.
 - 06:12, Blender **EVB**: Eevee with plain `blender -b --factory-startup -P phone_scene.py` (no display), MEASURED. **Aborted (SIGABRT) after 1.7 s** with `Couldn't open libEGL.so.1: libEGL.so.1: cannot open shared object file`. Blender 5.2.2's headless GPU path needs libEGL, which this container does not have (only libGL/libGLX + Mesa GLX). Next tries: Xvfb + GLX (Mesa llvmpipe), and Vulkan via Chromium's SwiftShader ICD.
 - Blender smoke test (MEASURED): Cycles, 1 sample, 10% resolution (108×192), no denoise. Scene setup took 12.9 s, `render.render()` 42.6 s, and about 105 s from process start to saved PNG, all under heavy shared load. This is a large fixed overhead per Blender invocation (startup, image loading, BVH, kernel loading).
+- 06:16, Blender **CY64** (MEASURED). Cycles CPU, 64 samples + OpenImageDenoise, 1080×1920, 1 frame, `blender -b --factory-startup -P r2/phone_scene.py -- CYCLES 64 <out> 1 1`.
+  - `render.render()` took **184.3 s**; process wall time 186.3 s.
+  - My CPU: 190.9 CPU-s. Other researchers' processes used **74% of the 4 cores** during the run (load average mean 15.5, max 28.9), so Blender effectively got about 1 core.
+  - **Idle-machine estimate (inference, not measured):** about 190 CPU-s ÷ about 3.8 effective cores ≈ **50 s per frame**.
+  - Still `r2/stills/blender_cycles64.png`: clean, noise-free, crisp screen texture, realistic chrome edge highlights. The emissive ring has no bloom (Cycles has none without the compositor). Coins fell out of frame because of my Z-up/Y-up cylinder mapping.
+  - Blender 5.2 in background mode prints no per-sample progress, so I added a `bpy.app.handlers.render_stats` printer for later runs.
+- Citation for the H.264 problem: Remotion's docs say earlier versions downloaded "the free version of Chromium, which would not include codecs for the proprietary H.264 and H.265 codecs", and that it moved to Chrome Headless Shell — [Remotion: Installing Chrome v4.0.247](https://remotion.dev/docs/miscellaneous/thorium-browser). The Playwright `chromium_headless_shell-1194` used here is an open-source Chromium build, which fits the `Cannot decode` result (inference).
 
 ## PENDENTE / NÃO PESQUISADO
 - (filled at the end)
