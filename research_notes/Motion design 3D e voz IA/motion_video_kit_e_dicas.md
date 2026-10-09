@@ -70,13 +70,26 @@ Estas regras valem acima de qualquer estilo e combinam com a pesquisa de motion:
   - Aplicar as 9 regras de movimento do kit no projeto Remotion.
   - Ou testar o kit diretamente para cenas de UI 3D e comparar o resultado com o mesmo roteiro.
 
-## Teste no container (PENDENTE)
+## Teste no container (MEDIDO em 09/10/2026)
 
-- `bash motion-studio/tools/setup.sh` ainda não foi rodado aqui.
-- O Puppeteer baixa o próprio Chrome. Se o download falhar pelo proxy, testar:
-  - `PUPPETEER_SKIP_DOWNLOAD=1` no `npm install`;
-  - `PUPPETEER_EXECUTABLE_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome` no render.
-- O `cutout.swift` e o vigia de RAM do `render-chunks.sh` só funcionam no Mac.
+O kit funciona neste container sem nenhuma alteração no código dele.
+
+- **Instalação:**
+  - `python3 -m venv .venv && .venv/bin/pip install numpy scipy`;
+  - `PUPPETEER_SKIP_DOWNLOAD=1 npm install` (27 pacotes, 3 s).
+- **Chrome:** `PUPPETEER_EXECUTABLE_PATH` aponta para um wrapper que roda `/opt/pw-browsers/chromium-1194/chrome-linux/chrome --no-sandbox "$@"`. O container roda como root, e o `render.mjs` não passa `--no-sandbox`.
+- **Preview** (`bash tools/render.sh exemplo preview`): 10 s de render, cerca de 1 min no total, contando a primeira subida do servidor.
+- **Render completo do exemplo:** 900 quadros, 1920×1080, 60 fps, 15 s.
+  - Cerca de 1,1 s por quadro com os 4 CPUs divididos com outros testes. Os 133 quadros finais levaram 143 s, o que dá uns 16 min estimados para os 15 s inteiros.
+  - Na primeira tentativa o render **travou no quadro 767**, sem erro, enquanto outros renders disputavam a máquina. A causa não foi investigada.
+  - A retomada por faixa funcionou: `FROM=767 TO=899 node tools/render.mjs projects/exemplo full 8777`, depois o ffmpeg e `bash tools/render.sh exemplo audio`.
+- **Resultado:** `final.mp4` com sons sintetizados e loudness de −15,4 LUFS integrado (o alvo era −14; o áudio é só SFX, esparso). O `check.py` apontou 0 dead holds e um trecho de "DRIFT LENTO" nos quadros 21–57, aceitável.
+- **Aparência:** profissional.
+  - Cards de UI em perspectiva 3D, alternância de cenas escuras e claras com fundo de gradiente.
+  - Transições circulares nascendo de um botão.
+  - Texto entrando com blur e checklist com sublinhado à mão.
+- **Atenção:** o exemplo é horizontal (1920×1080). Para Reels, defina `w/h` 1080×1920 no estilo ou no projeto.
+- **Só no Mac:** o `cutout.swift` e o vigia de RAM do `render-chunks.sh`.
 
 ## Dica do usuário: Google AI Studio (PENDENTE)
 

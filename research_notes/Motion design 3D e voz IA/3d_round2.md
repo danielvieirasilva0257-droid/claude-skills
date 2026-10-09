@@ -99,6 +99,15 @@ How to read:
   - Visual (crop `r2/stills/eevee16_vs_cycles32_f3_crop.jpg`): Eevee at 16 samples shows no visible noise and crisp text. Its look is close to Cycles; the dynamic-island pill renders light grey in Eevee and near-black in Cycles. Frames: `r2/stills/evanim_000{1,2,3}.png`, `r2/stills/cyanim_000{1..4}.png`.
 - 06:30, run **D** (core post, MSAA 4, PNG screen, **c2**, 60 frames; MEASURED). **335.7 s wall, my-tree CPU 491.3 s.** Others used 63% of 4 cores. Against B at c1 (340.3 s, 486.0 CPU-s, others 64%): **c2 is about 1% faster in wall time and uses about 1% more CPU, i.e. no meaningful gain.**
 - Frame-0 tally on the unfixed bundle (MEASURED with `r2/blank_check.py`): frame 0 was blank in **3 of 9 renders**. B: 1 of 2; C: 1 of 1; D: 1 of 1; A: 0 of 2; E, F, G: 0 of 1 each. Blank frames never appeared after frame 0. **This is an intermittent race, independent of post and concurrency**, consistent with the `frame === 0` skip in ThreeCanvas.
+- 06:31, Blender **CY16** (MEASURED). Cycles CPU, **16 samples + OIDN**, 1 frame, 1080×1920.
+  - `render.render()` took 60.6 s; process wall 62.2 s; **my CPU 78.1 s**. Others used 68% of 4 cores.
+  - Visual (crop `r2/stills/cycles16_vs_64_crop.jpg`): **nearly identical to 64 spp** in this scene, where the emissive screen dominates. The only visible artefact is a slightly blotchy, brownish dynamic-island area: denoiser smearing in a dark region.
+  - Derived cost model (inference from CY16 / CY64 / CYANIM): about 2.3–3 CPU-s per sample-frame, plus about 30–35 CPU-s fixed per frame (OIDN at 1080×1920, light tree, sync, save).
+  - **Idle estimate: about 19 s/frame at 16 spp + OIDN.**
+- 06:37, run **E2** (MEASURED): fixed **JPEG image-sequence texture** (full-size 1080×2340 placeholder canvas, prefetch of 4 frames ahead with `img.decode()`) plus the `FirstContentFrame` frame-0 fix. No post, c1, 60 frames, bundle `build2`.
+  - **122.3 s wall, my-tree CPU 174.1 s.** Others used 64% of 4 cores.
+  - **Frame sync is exact.** The screen badge reads **00, 01, 02, 30, 59** on output frames 0, 1, 2, 30, 59, and the progress ring reads 20%, 21%, 23%, 59%, 85%, matching the Screen composition (`r2/stills/E2-seqfix-none-c1_sync.jpg`). **No blank frames**; frame 0 luma is 18.6.
+  - **Cost of the per-frame texture:** +23.4 CPU-s over the static PNG (A re-run, 150.7 CPU-s) = **+0.39 CPU-s/frame (+15%)** for JPEG decode and 1080×2340 texture upload. That is about +0.12 s/frame of idle wall time at 3.3 effective cores.
 
 ## PENDENTE / NÃO PESQUISADO
 - (filled at the end)
