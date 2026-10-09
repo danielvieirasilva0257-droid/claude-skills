@@ -1,31 +1,33 @@
-# claude-skills: Daniel's knowledge base for Claude
+# claude-skills: a base de conhecimento do Daniel para o Claude
 
-This repository exists for Claude to use and keep improving. It holds Claude skills, research notes and reports, and the video projects for the "Rotina" app.
+Este repositório existe para o Claude usar e ir melhorando. Ele guarda skills do Claude, anotações e relatórios de pesquisa, e os projetos de vídeo do app "Rotina".
 
-## Working agreement (set by the user)
+## Combinado com o usuário
 
-- **Skills need approval.** When you find a better version of a skill, or want to change one, show the user the updated skill first and ask before committing it. Skills live in `skills/` and `.claude/skills/`.
-  - Write the proposal to the scratchpad, send it with SendUserFile, and summarize what changed.
-- **Knowledge can be updated freely.** Research notes, reports and docs can be added and updated without asking, so the knowledge base keeps getting better. These live in `research_notes/`, `reports/` and README files.
-- Commit and push work as you go, because the cloud container is ephemeral.
-- Talk to the user in Brazilian Portuguese.
+- **Idioma:** fale com o usuário em português do Brasil. **Tudo o que for enviado ou mostrado a ele, inclusive arquivos, propostas de skill e relatórios, deve estar em português.** O usuário não lê inglês. Termos técnicos e código podem ficar como estão.
+- **Skills precisam de aprovação.** Ao encontrar uma versão melhor de uma skill, ou ao querer mudar uma, mostre primeiro a skill atualizada e pergunte antes de salvá-la no repositório. As skills ficam em `skills/` e `.claude/skills/`.
+  - Escreva a proposta no scratchpad, envie com SendUserFile e resuma o que mudou.
+- **Conhecimento pode ser atualizado livremente.** Anotações de pesquisa, relatórios e documentação podem ser criados e atualizados sem perguntar, para a base ficar cada vez melhor. Ficam em `research_notes/`, `reports/` e nos READMEs.
+- **Salve sempre:** faça commit e push do trabalho aos poucos, porque o container da nuvem é temporário.
 
-## Layout
+## Estrutura
 
-| Path | What |
+| Caminho | O que é |
 |---|---|
-| `skills/` | Skills written in this repo: `remotion-video`, `button-animation`, `thumbnail-carousel`, `ui-ux-pro-max` |
-| `.claude/skills/motion-video/` + `motion-studio/` | motion-video kit (canvas motion engine, no Remotion), auto-loaded by Claude Code |
-| `rotina-video/` | Remotion project for the Rotina app videos: `Rotina` (10 s teaser) and `RotinaExplainer` (60 s with voice and music) |
-| `research_notes/<topic>/` | Raw research notes, each with a "PENDENTE / NÃO PESQUISADO" section |
-| `reports/` | Final research reports (pt-BR) |
+| `skills/` | Skills escritas neste repositório: `remotion-video`, `button-animation`, `thumbnail-carousel`, `ui-ux-pro-max` |
+| `.claude/skills/motion-video/` + `motion-studio/` | Kit motion-video: motor de motion em canvas, sem Remotion. O Claude Code carrega sozinho. |
+| `rotina-video/` | Projeto Remotion dos vídeos do app Rotina: `Rotina` (teaser de 10 s) e `RotinaExplainer` (60 s com voz e música) |
+| `research_notes/<tema>/` | Anotações brutas da pesquisa (a maioria em inglês), cada uma com uma seção "PENDENTE / NÃO PESQUISADO" |
+| `reports/` | Relatórios finais de pesquisa, em português |
 
-## Environment notes (cloud container, no GPU)
+## Notas do ambiente (container da nuvem, sem GPU)
 
-- **Remotion:** version 4.0.534. Keep all `@remotion/*` packages on the same exact version.
-  - Render with `--browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell`.
-  - For 3D, add `--gl=swangle`.
+- **Remotion:** versão 4.0.534. Mantenha todos os pacotes `@remotion/*` na mesma versão exata.
+  - Renderize com `--browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell`.
+  - Para 3D, acrescente `--gl=swangle`.
 - **motion-studio:**
-  - Install with `PUPPETEER_SKIP_DOWNLOAD=1 npm install` and a `.venv` with numpy/scipy.
-  - Render with `PUPPETEER_EXECUTABLE_PATH` pointing to a wrapper that runs `/opt/pw-browsers/chromium-1194/chrome-linux/chrome --no-sandbox "$@"`, because the container runs as root.
-- **Proxy:** outbound HTTPS goes through a TLS-intercepting proxy, so Python tools may need the CA at `/root/.ccr/ca-bundle.crt`.
+  - Instale com `PUPPETEER_SKIP_DOWNLOAD=1 npm install` e uma `.venv` com numpy e scipy.
+  - Renderize com `PUPPETEER_EXECUTABLE_PATH` apontando para um script que roda `/opt/pw-browsers/chromium-1194/chrome-linux/chrome --no-sandbox "$@"`, porque o container roda como root.
+  - Se um render travar, refaça só a faixa que falta: `FROM=a TO=b node tools/render.mjs projects/<nome> full 8777`.
+- **Proxy:** o HTTPS de saída passa por um proxy que intercepta TLS, então ferramentas em Python podem precisar do certificado em `/root/.ccr/ca-bundle.crt`.
+- **Desempenho:** a máquina tem só 4 CPUs. Evite rodar vários renders ao mesmo tempo, porque eles disputam a CPU e podem travar.
