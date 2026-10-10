@@ -159,6 +159,9 @@ Os criadores pesquisados (out/2026) atribuem cerca de 10% do resultado ao prompt
 4. Faça um componente por cena e junte com `Series`/`TransitionSeries`.
 5. **Storyboard em imagens.**
    - Renderize os quadros-chave com `npx remotion still … --frame=N --scale=0.5` e junte numa imagem com `ffmpeg … hstack`.
+   - **Mais barato para revisar o vídeo inteiro:** renderize um rascunho com `npx remotion render … --scale=0.5`. 30 s de vídeo levaram 72 s.
+     - Tire quadros com `ffmpeg -vf "select=eq(n\,N)"` e monte folhas de 12 quadros (`hstack` + `vstack`).
+     - No Rotina v2, 48 quadros revisados assim acharam 5 problemas antes do render final.
    - Revise as imagens e corrija os piores problemas, repetindo até ficarem boas. Só então faça o render completo.
 6. Render: `npx remotion render <IdDaComposição> out/video.mp4`.
 7. Salve nesta skill o que funcionou.
@@ -186,6 +189,8 @@ Os números vêm de páginas de terceiros; a página oficial da Meta não foi co
   - Ele renderiza a cena uma vez por amostra, então 10 amostras ≈ 10 vezes o tempo de render.
   - A 4.0.534 também tem o `<HtmlInCanvasMotionBlur>`, mas ele precisa de um recurso experimental do Chrome. Fique com o `CameraMotionBlur` em renders sem tela, a não ser que teste antes.
   - Deixe fundos parados **fora** do blur: as amostras empilhadas sobre gradientes escuros criam faixas.
+  - **Alternativa sem custo de render:** um blur direcional em SVG (`<feGaussianBlur stdDeviation="X 0">` para movimento na horizontal, `"0 Y"` na vertical), aplicado só na camada que se move. A força acompanha a velocidade do quadro.
+    - Foi usado nos giros do celular 3D e nas entradas de cartões do Rotina v2.
   - Coloque a granulação de filme por cima, fora do blur: um SVG `feTurbulence` com `seed={frame % 12}`, opacidade ~0,09 e `mix-blend-mode: overlay`.
   - Não faça números contarem quadro a quadro sob motion blur, porque os dígitos ficam fantasmagóricos. Troque o valor de uma vez e dê um "pop" de mola.
 - **Animação de texto:** letras entrando uma a uma com translateY + `filter: blur()` + opacidade. A saída sobe com blur e fade.
@@ -210,8 +215,26 @@ Medido neste container (4 CPUs, sem GPU, out/2026):
   - Os hooks de vídeo (`useOffthreadVideoTexture`, `useVideoTexture`) falharam e estão obsoletos.
   - A rota documentada (`@remotion/media` `<Video headless onVideoFrame>` + `advance()`) funciona com WebM VP9, porque o Chromium do Playwright não decodifica H.264.
 - **Modelo do celular:** faça um **celular genérico procedural** (caixa arredondada). As regras da Apple desencorajam renderizações de produtos Apple em anúncios de terceiros.
-- **Iluminação:** um HDRI de estúdio do Poly Haven (CC0, uso livre).
-- **Quando usar:** planos-herói curtos (3–5 s), compostos sobre a linha do tempo 2D. O Remotion exporta vídeo com transparência (ProRes 4444 / WebM).
+- **Iluminação:** um HDRI de estúdio do Poly Haven (CC0, uso livre), ou o `RoomEnvironment` do three.js com `PMREMGenerator`, que não precisa baixar nada (usado no Rotina v2), mais luzes de recorte para o corpo escuro aparecer em fundo preto.
+- **Quando usar:**
+  - planos-herói curtos;
+  - ou o celular 3D como fio condutor do vídeo inteiro. No Rotina v2 foram 22 s de celular, renderizados em ~11 min.
+- **Pipeline em camadas** (código de exemplo: branch `rotina-video`, `src/v2`):
+  1. **Telas:** uma composição 1080×2340 com as telas do app, renderizada como sequência JPEG (`--sequence --image-format=jpeg`, ~1,5 min para 669 quadros). Cada toque e cada troca de tela fica preso a uma palavra da voz.
+  2. **Celular:** uma composição só com o celular, fundo transparente, renderizada como sequência PNG (`--sequence --image-format=png --gl=swangle --concurrency=1`, ~1 s por quadro). Os arquivos saem como `element-182.png`.
+  3. **Vídeo final:** uma composição 2D que põe o PNG do quadro com `<Img>` entre as camadas de fundo e de frente.
+     - Mudar o 2D não exige renderizar o 3D de novo.
+     - Uma mudança no movimento do celular exige renderizar de novo só os quadros afetados (`--frames=a-b`).
+  - Deixe as pastas de quadros fora do Git (gere de novo pelo código). O `public/` é copiado em cada bundle, então pastas grandes deixam o bundle lento.
+- **Um "rig" compartilhado:** uma única função dá posição e rotação do celular para cada quadro.
+  - A camada 3D usa essa função.
+  - O 2D projeta pontos da tela do celular com a mesma câmera (`THREE.Vector3.project`).
+  - Assim cartões, sombras e brilhos saem do ponto exato da tela.
+- **Trocar a tela durante um giro:** troque o conteúdo no quadro em que a traseira está de frente para a câmera. Calcule pela normal da tela; num giro rápido de 360°, isso dura só 2–3 quadros.
+- **Entrar na tela:** leve o celular até a câmera (z ~2,75 com câmera em 4,5 e fov 30) até a tela cobrir o quadro inteiro.
+  - Mostre nela a mesma arte do cartão seguinte (por exemplo, o splash vermelho com a marca).
+  - No quadro seguinte, troque pelo cartão 2D: a emenda fica invisível.
+- **O Remotion também exporta vídeo com transparência** (ProRes 4444 / WebM VP9), uma alternativa à sequência PNG.
 - **Blender:**
   - O Claude escreve scripts `bpy` e roda `blender -b -P script.py` sem interface; o Blender MCP precisa da interface gráfica.
   - O Eevee só roda com `xvfb-run` e não sai mais barato.
