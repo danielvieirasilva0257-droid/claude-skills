@@ -44,27 +44,40 @@ const PhoneLayer: React.FC<{f: number}> = ({f}) => {
 	const drx = a.visible ? Math.abs(b.rx - a.rx) : 0;
 	const amount = Math.min(34, (dry + drx) * 20);
 	return (
-		<DirBlur id="v2phoneblur" amount={amount} angle={drx > dry ? 90 : 0} style={{position: 'absolute', left: 0, top: 0, width: 1080, height: 1920}}>
+		<DirBlur id="v2phoneblur" amount={amount} angle={drx > dry ? 90 : 0}>
 			<Img src={staticFile(`v2/celular/element-${String(f).padStart(3, '0')}.png`)} style={{position: 'absolute', left: 0, top: 0, width: 1080, height: 1920}} />
 		</DirBlur>
 	);
 };
 
-export const RotinaV2: React.FC<{audio?: boolean}> = ({audio = true}) => {
+// debug: draw the phone silhouette instead of the 3D layer (layout checks while the 3D renders)
+const Silhueta: React.FC<{f: number}> = ({f}) => {
+	const p = phonePose(f);
+	if (!p.visible) return null;
+	const pts = bodyQuad(p).map((v) => `${v.x.toFixed(1)},${v.y.toFixed(1)}`).join(' ');
+	return (
+		<svg width={1080} height={1920} style={{position: 'absolute', left: 0, top: 0}}>
+			<polygon points={pts} fill="rgba(40,40,48,0.92)" stroke="#9a9aa3" strokeWidth={6} strokeLinejoin="round" />
+		</svg>
+	);
+};
+
+export const RotinaV2: React.FC<{audio?: boolean; silhueta?: boolean}> = ({audio = true, silhueta = false}) => {
 	const f = useCurrentFrame();
 	const ink = isInk(f);
 	return (
 		<AbsoluteFill style={{background: P.paper}}>
+			{/* layer order (editor's rule): background -> texts and cards -> the phone on top */}
 			<Fundo f={f} />
 			{!isRed(f) && f >= 190 && <Grid f={f} color={ink ? 'rgba(255,255,255,0.05)' : P.grid} />}
+			<PhoneGlow f={f} />
 			<Gancho f={f} />
 			<Revelacao f={f} />
 			<Titulos f={f} />
-			<PhoneShadow f={f} />
-			<PhoneGlow f={f} />
-			<PhoneLayer f={f} />
 			<Overlays f={f} />
 			<Fechamento f={f} />
+			<PhoneShadow f={f} />
+			{silhueta ? <Silhueta f={f} /> : <PhoneLayer f={f} />}
 			<CTA f={f} />
 			<Vignette amt={ink || f >= SEC.cta ? 0.28 : 0.14} />
 			<Grain f={f} />

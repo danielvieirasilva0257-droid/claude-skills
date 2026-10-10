@@ -14,54 +14,86 @@
   "step": 2
  },
  {
+  "name": "swish",
+  "frame": 21,
+  "gain": 0.26,
+  "pan": -0.5
+ },
+ {
   "name": "pop",
-  "frame": 22,
+  "frame": 29,
   "gain": 0.3,
   "pan": -0.2,
   "f0": 520,
   "f1": 150
  },
  {
+  "name": "swish",
+  "frame": 30,
+  "gain": 0.26,
+  "pan": -0.5
+ },
+ {
   "name": "pop",
-  "frame": 31,
+  "frame": 38,
   "gain": 0.3,
-  "pan": 0.1,
+  "pan": -0.1,
   "f0": 560,
   "f1": 160
  },
  {
+  "name": "swish",
+  "frame": 45,
+  "gain": 0.26,
+  "pan": -0.5
+ },
+ {
   "name": "pop",
-  "frame": 46,
+  "frame": 53,
   "gain": 0.3,
-  "pan": -0.1,
+  "pan": -0.15,
   "f0": 600,
   "f1": 170
  },
  {
   "name": "whoosh",
-  "frame": 57,
-  "gain": 0.45,
+  "frame": 50,
+  "gain": 0.42,
   "pan": 0,
-  "dur": 0.45,
-  "peak": 0.7
+  "dur": 0.55,
+  "peak": 0.6,
+  "f0": 1800,
+  "f1": 250
  },
  {
   "name": "slam",
-  "frame": 56,
+  "frame": 65,
   "gain": 0.35,
   "pan": 0
  },
  {
   "name": "chime",
-  "frame": 80,
+  "frame": 83,
   "gain": 0.3,
   "pan": -0.25
  },
  {
+  "name": "swish",
+  "frame": 75,
+  "gain": 0.2,
+  "pan": -0.5
+ },
+ {
   "name": "chime",
-  "frame": 114,
+  "frame": 117,
   "gain": 0.3,
   "pan": 0.25
+ },
+ {
+  "name": "swish",
+  "frame": 109,
+  "gain": 0.2,
+  "pan": 0.5
  },
  {
   "name": "glitch",
@@ -79,35 +111,39 @@
  },
  {
   "name": "whoosh",
-  "frame": 128,
+  "frame": 131,
   "gain": 0.32,
-  "pan": 0.5,
+  "pan": 0,
   "dur": 0.25,
-  "peak": 0.85
+  "peak": 0.85,
+  "panFrom": 0.7,
+  "panTo": 0.1
  },
  {
   "name": "slam",
-  "frame": 134,
+  "frame": 141,
   "gain": 0.4,
   "pan": 0
  },
  {
   "name": "whoosh",
-  "frame": 138,
+  "frame": 141,
   "gain": 0.35,
-  "pan": 0.5,
+  "pan": 0,
   "dur": 0.25,
-  "peak": 0.85
+  "peak": 0.85,
+  "panFrom": 0.7,
+  "panTo": 0.1
  },
  {
   "name": "slam",
-  "frame": 144,
+  "frame": 151,
   "gain": 0.45,
   "pan": 0
  },
  {
   "name": "pop",
-  "frame": 148,
+  "frame": 155,
   "gain": 0.4,
   "pan": 0.3,
   "f0": 900,
@@ -146,6 +182,12 @@
   "step": 2
  },
  {
+  "name": "swish",
+  "frame": 179,
+  "gain": 0.2,
+  "pan": -0.5
+ },
+ {
   "name": "scribble",
   "frame": 184,
   "gain": 0.22,
@@ -169,23 +211,55 @@
   "pan": 0
  },
  {
+  "name": "whoosh",
+  "frame": 193,
+  "gain": 0.21,
+  "pan": 0,
+  "dur": 0.3,
+  "peak": 0.8,
+  "panFrom": -0.8,
+  "panTo": -0.1
+ },
+ {
+  "name": "whoosh",
+  "frame": 193,
+  "gain": 0.21,
+  "pan": 0,
+  "dur": 0.3,
+  "peak": 0.8,
+  "panFrom": 0.8,
+  "panTo": 0.1
+ },
+ {
   "name": "slam",
-  "frame": 196,
-  "gain": 0.45,
+  "frame": 205,
+  "gain": 0.42,
   "pan": 0
  },
  {
+  "name": "swish",
+  "frame": 196,
+  "gain": 0.2,
+  "pan": -0.4
+ },
+ {
   "name": "pop",
-  "frame": 197,
-  "gain": 0.32,
+  "frame": 205,
+  "gain": 0.3,
   "pan": -0.4,
   "f0": 700,
   "f1": 200
  },
  {
+  "name": "swish",
+  "frame": 206,
+  "gain": 0.2,
+  "pan": -0.4
+ },
+ {
   "name": "pop",
-  "frame": 207,
-  "gain": 0.32,
+  "frame": 215,
+  "gain": 0.3,
   "pan": -0.35,
   "f0": 640,
   "f1": 180
@@ -234,9 +308,9 @@
  },
  {
   "name": "swish",
-  "frame": 241,
+  "frame": 240,
   "gain": 0.3,
-  "pan": 0.4
+  "pan": -0.4
  },
  {
   "name": "chime",
@@ -248,15 +322,17 @@
  },
  {
   "name": "whoosh",
-  "frame": 262,
+  "frame": 258,
   "gain": 0.28,
-  "pan": -0.3,
+  "pan": 0,
   "dur": 0.35,
-  "peak": 0.8
+  "peak": 0.8,
+  "panFrom": 0.2,
+  "panTo": -0.6
  },
  {
   "name": "swish",
-  "frame": 270,
+  "frame": 269,
   "gain": 0.3,
   "pan": 0.4
  },
@@ -303,20 +379,26 @@
   "pan": 0.3
  },
  {
+  "name": "swish",
+  "frame": 318,
+  "gain": 0.26,
+  "pan": 0.6
+ },
+ {
   "name": "slam",
-  "frame": 319,
-  "gain": 0.5,
+  "frame": 326,
+  "gain": 0.45,
   "pan": 0.2
  },
  {
   "name": "chime",
-  "frame": 321,
+  "frame": 327,
   "gain": 0.22,
   "pan": 0.2
  },
  {
   "name": "whoosh",
-  "frame": 328,
+  "frame": 326,
   "gain": 0.7,
   "pan": 0,
   "dur": 0.5,
@@ -325,20 +407,46 @@
   "panTo": -0.6
  },
  {
+  "name": "whoosh",
+  "frame": 334,
+  "gain": 0.25,
+  "pan": 0,
+  "dur": 0.3,
+  "peak": 0.8,
+  "panFrom": -0.8,
+  "panTo": -0.1
+ },
+ {
+  "name": "whoosh",
+  "frame": 334,
+  "gain": 0.25,
+  "pan": 0,
+  "dur": 0.3,
+  "peak": 0.8,
+  "panFrom": 0.8,
+  "panTo": 0.1
+ },
+ {
   "name": "slam",
-  "frame": 340,
-  "gain": 0.55,
+  "frame": 346,
+  "gain": 0.5,
   "pan": 0
  },
  {
   "name": "swish",
-  "frame": 350,
+  "frame": 355,
   "gain": 0.22,
   "pan": 0
  },
  {
+  "name": "swish",
+  "frame": 361,
+  "gain": 0.26,
+  "pan": -0.5
+ },
+ {
   "name": "pop",
-  "frame": 351,
+  "frame": 367,
   "gain": 0.2,
   "pan": -0.6,
   "f0": 600,
@@ -346,7 +454,7 @@
  },
  {
   "name": "pop",
-  "frame": 354,
+  "frame": 369,
   "gain": 0.2,
   "pan": -0.39999999999999997,
   "f0": 670,
@@ -354,7 +462,7 @@
  },
  {
   "name": "pop",
-  "frame": 357,
+  "frame": 371,
   "gain": 0.2,
   "pan": -0.19999999999999996,
   "f0": 740,
@@ -362,7 +470,7 @@
  },
  {
   "name": "pop",
-  "frame": 360,
+  "frame": 373,
   "gain": 0.2,
   "pan": 1.1102230246251565e-16,
   "f0": 810,
@@ -370,7 +478,7 @@
  },
  {
   "name": "pop",
-  "frame": 363,
+  "frame": 375,
   "gain": 0.2,
   "pan": 0.20000000000000007,
   "f0": 880,
@@ -378,7 +486,7 @@
  },
  {
   "name": "pop",
-  "frame": 366,
+  "frame": 377,
   "gain": 0.2,
   "pan": 0.4,
   "f0": 950,
@@ -386,7 +494,7 @@
  },
  {
   "name": "pop",
-  "frame": 369,
+  "frame": 379,
   "gain": 0.2,
   "pan": 0.6000000000000002,
   "f0": 1020,
@@ -401,102 +509,132 @@
  },
  {
   "name": "whoosh",
-  "frame": 392,
+  "frame": 388,
   "gain": 0.3,
   "pan": 0,
   "dur": 0.35,
-  "peak": 0.8
+  "peak": 0.8,
+  "panFrom": 0,
+  "panTo": -0.6
  },
  {
   "name": "swish",
-  "frame": 395,
-  "gain": 0.2,
-  "pan": 0
+  "frame": 394,
+  "gain": 0.26,
+  "pan": -0.5
  },
  {
   "name": "whoosh",
-  "frame": 420,
+  "frame": 423,
   "gain": 0.2,
-  "pan": 0.5,
+  "pan": 0,
   "dur": 0.22,
-  "peak": 0.85
+  "peak": 0.85,
+  "panFrom": 0.6,
+  "panTo": 0.1
  },
  {
   "name": "slam",
-  "frame": 426,
+  "frame": 433,
   "gain": 0.36,
   "pan": 0.1
  },
  {
   "name": "whoosh",
-  "frame": 429,
+  "frame": 432,
   "gain": 0.2,
-  "pan": 0.5,
+  "pan": 0,
   "dur": 0.22,
-  "peak": 0.85
+  "peak": 0.85,
+  "panFrom": 0.6,
+  "panTo": 0.1
  },
  {
   "name": "slam",
-  "frame": 435,
+  "frame": 442,
   "gain": 0.36,
   "pan": 0.1
  },
  {
   "name": "whoosh",
-  "frame": 445,
+  "frame": 448,
   "gain": 0.2,
-  "pan": 0.5,
+  "pan": 0,
   "dur": 0.22,
-  "peak": 0.85
+  "peak": 0.85,
+  "panFrom": 0.6,
+  "panTo": 0.1
  },
  {
   "name": "slam",
-  "frame": 451,
+  "frame": 458,
   "gain": 0.36,
   "pan": 0.1
  },
  {
   "name": "whoosh",
-  "frame": 462,
+  "frame": 465,
   "gain": 0.2,
-  "pan": 0.5,
+  "pan": 0,
   "dur": 0.22,
-  "peak": 0.85
+  "peak": 0.85,
+  "panFrom": 0.6,
+  "panTo": 0.1
  },
  {
   "name": "slam",
-  "frame": 468,
+  "frame": 475,
   "gain": 0.36,
   "pan": 0.1
  },
  {
   "name": "whoosh",
-  "frame": 476,
+  "frame": 479,
   "gain": 0.35,
   "pan": 0,
   "dur": 0.35,
-  "peak": 0.8
+  "peak": 0.8,
+  "panFrom": 0.2,
+  "panTo": -0.6
+ },
+ {
+  "name": "swish",
+  "frame": 488,
+  "gain": 0.2,
+  "pan": -0.4
  },
  {
   "name": "pop",
-  "frame": 489,
-  "gain": 0.34,
+  "frame": 497,
+  "gain": 0.32,
   "pan": -0.4,
   "f0": 680,
   "f1": 190
  },
  {
+  "name": "swish",
+  "frame": 498,
+  "gain": 0.2,
+  "pan": -0.4
+ },
+ {
   "name": "pop",
-  "frame": 499,
-  "gain": 0.34,
+  "frame": 507,
+  "gain": 0.32,
   "pan": -0.4,
   "f0": 720,
   "f1": 200
  },
  {
+  "name": "swish",
+  "frame": 515,
+  "gain": 0.2,
+  "pan": -0.4
+ },
+ {
   "name": "pop",
-  "frame": 516,
-  "gain": 0.34,
+  "frame": 524,
+  "gain": 0.32,
   "pan": -0.4,
   "f0": 760,
   "f1": 210
@@ -509,7 +647,7 @@
  },
  {
   "name": "whoosh",
-  "frame": 529,
+  "frame": 527,
   "gain": 0.28,
   "pan": -0.5,
   "dur": 0.3,
@@ -523,36 +661,68 @@
   "dur": 0.95
  },
  {
-  "name": "chime",
-  "frame": 567,
-  "gain": 0.42,
-  "pan": 0.3
+  "name": "swish",
+  "frame": 558,
+  "gain": 0.26,
+  "pan": -0.5
  },
  {
   "name": "slam",
-  "frame": 567,
+  "frame": 566,
   "gain": 0.32,
-  "pan": 0.3
+  "pan": -0.3
+ },
+ {
+  "name": "chime",
+  "frame": 569,
+  "gain": 0.42,
+  "pan": -0.2
  },
  {
   "name": "whoosh",
-  "frame": 569,
+  "frame": 567,
   "gain": 0.6,
   "pan": 0,
   "dur": 0.45,
   "peak": 0.8
  },
  {
+  "name": "whoosh",
+  "frame": 581,
+  "gain": 0.24,
+  "pan": 0,
+  "dur": 0.3,
+  "peak": 0.8,
+  "panFrom": -0.8,
+  "panTo": -0.1
+ },
+ {
+  "name": "whoosh",
+  "frame": 581,
+  "gain": 0.24,
+  "pan": 0,
+  "dur": 0.3,
+  "peak": 0.8,
+  "panFrom": 0.8,
+  "panTo": 0.1
+ },
+ {
   "name": "slam",
-  "frame": 580,
-  "gain": 0.52,
+  "frame": 593,
+  "gain": 0.48,
   "pan": 0
  },
  {
   "name": "swish",
-  "frame": 595,
-  "gain": 0.3,
-  "pan": 0.4
+  "frame": 599,
+  "gain": 0.24,
+  "pan": 0
+ },
+ {
+  "name": "swish",
+  "frame": 602,
+  "gain": 0.26,
+  "pan": -0.5
  },
  {
   "name": "typing",
@@ -564,7 +734,7 @@
  },
  {
   "name": "pop",
-  "frame": 614,
+  "frame": 612,
   "gain": 0.3,
   "pan": -0.4,
   "f0": 600,
@@ -572,7 +742,7 @@
  },
  {
   "name": "pop",
-  "frame": 618,
+  "frame": 616,
   "gain": 0.3,
   "pan": -0.4,
   "f0": 680,
@@ -580,42 +750,69 @@
  },
  {
   "name": "pop",
-  "frame": 622,
+  "frame": 620,
   "gain": 0.3,
   "pan": -0.4,
   "f0": 760,
   "f1": 180
  },
  {
-  "name": "scribble",
-  "frame": 612,
+  "name": "swish",
+  "frame": 603,
   "gain": 0.16,
-  "pan": -0.2,
-  "dur": 0.5
+  "pan": -0.4
  },
  {
   "name": "swish",
-  "frame": 630,
-  "gain": 0.2,
-  "pan": 0
+  "frame": 607,
+  "gain": 0.16,
+  "pan": -0.4
+ },
+ {
+  "name": "swish",
+  "frame": 611,
+  "gain": 0.16,
+  "pan": -0.4
+ },
+ {
+  "name": "whoosh",
+  "frame": 625,
+  "gain": 0.24,
+  "pan": 0,
+  "dur": 0.3,
+  "peak": 0.8,
+  "panFrom": 0,
+  "panTo": -0.6
  },
  {
   "name": "whoosh",
   "frame": 634,
-  "gain": 0.25,
+  "gain": 0.22,
   "pan": -0.3,
   "dur": 0.35,
   "peak": 0.8
  },
  {
+  "name": "swish",
+  "frame": 641,
+  "gain": 0.26,
+  "pan": 0.5
+ },
+ {
   "name": "coin",
-  "frame": 642,
+  "frame": 649,
   "gain": 0.42,
   "pan": 0.35
  },
  {
+  "name": "swish",
+  "frame": 658,
+  "gain": 0.26,
+  "pan": 0.5
+ },
+ {
   "name": "pop",
-  "frame": 659,
+  "frame": 666,
   "gain": 0.34,
   "pan": 0.35,
   "f0": 420,
@@ -623,29 +820,31 @@
  },
  {
   "name": "swish",
-  "frame": 686,
-  "gain": 0.4,
+  "frame": 685,
+  "gain": 0.36,
   "pan": 0.3
  },
  {
   "name": "swish",
-  "frame": 693,
-  "gain": 0.4,
+  "frame": 692,
+  "gain": 0.36,
   "pan": 0.4
  },
  {
   "name": "whoosh",
-  "frame": 702,
+  "frame": 700,
   "gain": 0.32,
-  "pan": 0.5,
+  "pan": 0,
   "dur": 0.35,
-  "peak": 0.8
+  "peak": 0.8,
+  "panFrom": 0,
+  "panTo": 0.6
  },
  {
   "name": "swish",
-  "frame": 713,
-  "gain": 0.3,
-  "pan": 0
+  "frame": 712,
+  "gain": 0.26,
+  "pan": -0.4
  },
  {
   "name": "click",
@@ -668,7 +867,7 @@
  },
  {
   "name": "swish",
-  "frame": 753,
+  "frame": 752,
   "gain": 0.28,
   "pan": -0.4
  },
@@ -704,7 +903,7 @@
  },
  {
   "name": "swish",
-  "frame": 774,
+  "frame": 775,
   "gain": 0.28,
   "pan": -0.4
  },
@@ -717,41 +916,59 @@
  },
  {
   "name": "whoosh",
-  "frame": 787,
+  "frame": 783,
   "gain": 0.32,
   "pan": 0,
   "dur": 0.35,
-  "peak": 0.8
+  "peak": 0.8,
+  "panFrom": 0,
+  "panTo": -0.5
+ },
+ {
+  "name": "swish",
+  "frame": 793,
+  "gain": 0.18,
+  "pan": -0.5
  },
  {
   "name": "slam",
-  "frame": 794,
+  "frame": 801,
+  "gain": 0.28,
+  "pan": -0.15
+ },
+ {
+  "name": "swish",
+  "frame": 804,
+  "gain": 0.18,
+  "pan": 0.5
+ },
+ {
+  "name": "slam",
+  "frame": 812,
+  "gain": 0.31000000000000005,
+  "pan": 0.15
+ },
+ {
+  "name": "swish",
+  "frame": 813,
+  "gain": 0.18,
+  "pan": -0.5
+ },
+ {
+  "name": "slam",
+  "frame": 821,
   "gain": 0.34,
-  "pan": 0
+  "pan": -0.15
  },
  {
-  "name": "slam",
-  "frame": 805,
-  "gain": 0.36,
+  "name": "swish",
+  "frame": 825,
+  "gain": 0.18,
   "pan": 0
- },
- {
-  "name": "slam",
-  "frame": 814,
-  "gain": 0.42,
-  "pan": 0
- },
- {
-  "name": "whoosh",
-  "frame": 827,
-  "gain": 0.38,
-  "pan": 0,
-  "dur": 0.3,
-  "peak": 0.8
  },
  {
   "name": "pop",
-  "frame": 828,
+  "frame": 834,
   "gain": 0.3,
   "pan": 0,
   "f0": 500,
@@ -770,7 +987,7 @@
  {
   "name": "boom",
   "frame": 847,
-  "gain": 0.32,
+  "gain": 0.25,
   "pan": 0,
   "dur": 1
  },
@@ -782,9 +999,15 @@
   "dur": 1.2
  },
  {
+  "name": "swish",
+  "frame": 850,
+  "gain": 0.2,
+  "pan": 0
+ },
+ {
   "name": "pop",
-  "frame": 848,
-  "gain": 0.45,
+  "frame": 858,
+  "gain": 0.38,
   "pan": 0,
   "f0": 520,
   "f1": 150,
@@ -792,33 +1015,33 @@
  },
  {
   "name": "click",
-  "frame": 855,
-  "gain": 0.4,
+  "frame": 860,
+  "gain": 0.34,
   "pan": 0,
   "freq": 1800
  },
  {
   "name": "chime",
-  "frame": 856,
+  "frame": 861,
   "gain": 0.2,
   "pan": 0,
   "n1": 1318.5,
   "n2": 1975.5
  },
  {
+  "name": "swish",
+  "frame": 864,
+  "gain": 0.12,
+  "pan": 0,
+  "dur": 0.2
+ },
+ {
   "name": "pop",
-  "frame": 865,
+  "frame": 872,
   "gain": 0.22,
   "pan": 0,
   "f0": 760,
   "f1": 220
- },
- {
-  "name": "swish",
-  "frame": 866,
-  "gain": 0.12,
-  "pan": 0,
-  "dur": 0.2
  },
  {
   "name": "shimmer",

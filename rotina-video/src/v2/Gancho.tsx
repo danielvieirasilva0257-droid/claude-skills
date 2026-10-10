@@ -3,13 +3,31 @@ import {AbsoluteFill, interpolate, random} from 'remotion';
 import {Check} from 'lucide-react';
 import {DISPLAY, P, SANS, SERIF, ease, kf, sp, tw} from './theme';
 import {W} from './tempo';
-import {Pill, Slam} from './parts';
+import {Entra, Pill, textMetrics, textWidth} from './parts';
 
-// S1 (f0-f164): the hook. A frantic spreadsheet; its cells become the headline, it gets crammed into a phone,
-// then everything falls apart on "sob controle?". The red dot of the "?" opens the reveal.
+// S1 (f0-f164): the hook. A frantic spreadsheet whose cells become the headline, crammed into a phone,
+// then it falls apart on "sob controle?". The red dot of the "?" opens the reveal.
+// Rules: nothing overlaps; every word comes from outside the frame; nothing is cut by a mask.
 
-export const Q_DOT = {x: 884, y: 1140, r: 12}; // center of the red dot of "?" (origin of the iris)
 export const IRIS = {start: 155, end: 164};
+
+// question block: "TUDO SOB" / "CONTROLE?" right-aligned, coming from the right edge
+const Q = {size: 176, line1Top: 296, line2Top: 476, right1: 968, right2: 856};
+export const questionDot = () => {
+	const wc = textWidth('CONTROLE', Q.size);
+	const {baseline, cap} = textMetrics(Q.size);
+	const scale = cap / 240; // the "?" glyph is 240 units tall in its viewBox
+	const left = Q.right2 + 10; // the "?" starts right after the word
+	return {
+		x: left + 70 * scale,
+		y: Q.line2Top + baseline - (241 - 222) * scale,
+		r: 19 * scale,
+		scale,
+		wc,
+		baseline,
+		left,
+	};
+};
 
 const COLS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 const HEAD = ['Data', 'Treino', 'Carga', 'Hábito', 'Feito?', 'Gasto', 'Categoria', 'Saldo'];
@@ -50,13 +68,11 @@ const cell = (r: number, c: number, f: number): {t: string; color?: string; bold
 };
 
 const Sheet: React.FC<{f: number}> = ({f}) => {
-	// frantic selection box jumping around
 	const sel = Math.floor(f / 3);
 	const sr = 1 + Math.floor(random('sr' + sel) * 14);
 	const sc = Math.floor(random('sc' + sel) * COLS.length);
 	return (
 		<div style={{position: 'relative', width: SHEET_W, height: SHEET_H, background: '#FCFCFA', fontFamily: SANS, fontSize: 27, color: '#262626'}}>
-			{/* column letters */}
 			<div style={{position: 'absolute', left: 0, top: -54, width: SHEET_W, height: 54, background: '#EFEFEC', borderBottom: '2px solid #C9C9C4', display: 'flex'}}>
 				<div style={{width: 84}} />
 				{COLS.map((l) => (
@@ -96,71 +112,41 @@ const Sheet: React.FC<{f: number}> = ({f}) => {
 	);
 };
 
-// the headline is built from "cells": ink type on paper stickers
-const Sticker: React.FC<{f: number; at: number; exitAt: number; rot: number; children: React.ReactNode; x: number; y: number}> = ({f, at, exitAt, rot, children, x, y}) => {
-	if (f < at - 1) return null;
-	const s = sp(f, at, {stiffness: 320, damping: 22});
-	const e = tw(f, [exitAt, exitAt + 8], [0, 1], ease.in);
-	if (e >= 1) return null;
-	return (
-		<div
-			style={{
-				position: 'absolute',
-				left: x,
-				top: y,
-				transformOrigin: '0% 50%',
-				transform: `translate(${-e * 260}px, ${(1 - s) * 60}px) rotate(${rot * s}deg) scale(${0.6 + 0.4 * s})`,
-				opacity: Math.min(1, s * 2) * (1 - e),
-				filter: e > 0 || s < 0.7 ? `blur(${(e * 16 + (1 - s) * 10).toFixed(1)}px)` : undefined,
-			}}
-		>
-			<div style={{background: P.paperHi, padding: '6px 26px 0', boxShadow: '0 18px 40px rgba(0,0,0,0.18)', border: '3px solid #1E7145'}}>{children}</div>
+// headline "stickers": ink type on opaque paper labels; they come in from the left edge (they live on the phone screen)
+const STICKER = {pad: 24, size: 140};
+const Sticker: React.FC<{f: number; at: number; rot: number; x: number; y: number; id: string; children: React.ReactNode; w: number}> = ({
+	f,
+	at,
+	rot,
+	x,
+	y,
+	id,
+	children,
+	w,
+}) => (
+	<Entra f={f} at={at} from="left" x={x} y={y} w={w} h={STICKER.size + 20} id={id}>
+		<div style={{display: 'inline-block', transform: `rotate(${rot}deg)`, transformOrigin: '0 50%'}}>
+			<div style={{background: P.paperHi, padding: `4px ${STICKER.pad}px 0`, boxShadow: '0 18px 40px rgba(0,0,0,0.18)', border: '3px solid #1E7145'}}>{children}</div>
 		</div>
-	);
-};
+	</Entra>
+);
 
-const CheckChip: React.FC<{f: number; at: number; exitAt: number; x: number; y: number; label: string; rot: number}> = ({f, at, exitAt, x, y, label, rot}) => {
-	if (f < at - 1) return null;
-	const s = sp(f, at, {stiffness: 260, damping: 18});
-	const e = tw(f, [exitAt, exitAt + 10], [0, 1], ease.in);
-	const tick = sp(f, at + 4, {stiffness: 220, damping: 13});
-	return (
-		<div
-			style={{
-				position: 'absolute',
-				left: x,
-				top: y,
-				transform: `translateY(${(1 - s) * 80 + e * 500}px) rotate(${rot + e * 25}deg) scale(${0.7 + 0.3 * s})`,
-				opacity: Math.min(1, s * 1.8) * (1 - e),
-			}}
-		>
-			<Pill size={46} style={{boxShadow: '0 22px 44px rgba(0,0,0,0.25)'}}>
-				<span style={{width: 58, height: 58, borderRadius: 29, background: P.red, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transform: `scale(${tick})`}}>
-					<Check size={38} strokeWidth={4} color="#fff" />
-				</span>
-				{label}
-			</Pill>
-		</div>
-	);
-};
-
-// pieces of the sheet that break loose on "Mas está tudo sob controle?"
+// pieces of the sheet that break loose and FALL out of the frame (never upward, never over the words)
 const Debris: React.FC<{f: number; from: number; box: {x: number; y: number; w: number; h: number}}> = ({f, from, box}) => {
 	if (f < from) return null;
 	return (
 		<>
-			{Array.from({length: 26}).map((_, i) => {
-				const t = (f - from - random('d0' + i) * 6) / 30;
+			{Array.from({length: 22}).map((_, i) => {
+				const t = (f - from - random('d0' + i) * 5) / 30;
 				if (t < 0) return null;
 				const x0 = box.x + random('dx' + i) * box.w;
-				const y0 = box.y + random('dy' + i) * box.h;
-				const vx = (random('vx' + i) - 0.5) * 1400;
-				const vy = -300 - random('vy' + i) * 700;
+				const y0 = box.y + 40 + random('dy' + i) * (box.h - 80);
+				const vx = (random('vx' + i) - 0.5) * 900;
+				const vy = random('vy' + i) * 350;
 				const x = x0 + vx * t;
-				const y = y0 + vy * t + 2200 * t * t;
-				const rot = (random('r' + i) - 0.5) * 720 * t;
-				const w = 90 + random('w' + i) * 110;
-				const label = cell(1 + (i % 12), i % 8, 0).t;
+				const y = y0 + vy * t + 2600 * t * t;
+				const rot = (random('r' + i) - 0.5) * 540 * t;
+				const w = 90 + random('w' + i) * 100;
 				return (
 					<div
 						key={i}
@@ -169,12 +155,12 @@ const Debris: React.FC<{f: number; from: number; box: {x: number; y: number; w: 
 							left: x,
 							top: y,
 							width: w,
-							height: 50,
+							height: 46,
 							background: '#FCFCFA',
 							border: '2px solid #CFCFCA',
 							fontFamily: SANS,
-							fontSize: 22,
-							lineHeight: '46px',
+							fontSize: 20,
+							lineHeight: '42px',
 							padding: '0 8px',
 							overflow: 'hidden',
 							whiteSpace: 'nowrap',
@@ -183,7 +169,7 @@ const Debris: React.FC<{f: number; from: number; box: {x: number; y: number; w: 
 							boxShadow: '0 10px 20px rgba(0,0,0,0.12)',
 						}}
 					>
-						{label}
+						{cell(1 + (i % 12), i % 8, 0).t}
 					</div>
 				);
 			})}
@@ -191,125 +177,145 @@ const Debris: React.FC<{f: number; from: number; box: {x: number; y: number; w: 
 	);
 };
 
+const CheckChip: React.FC<{label: string}> = ({label}) => (
+	<Pill size={40} style={{boxShadow: '0 20px 40px rgba(0,0,0,0.25)'}}>
+		<span style={{width: 52, height: 52, borderRadius: 26, background: P.red, display: 'inline-flex', alignItems: 'center', justifyContent: 'center'}}>
+			<Check size={34} strokeWidth={4} color="#fff" />
+		</span>
+		{label}
+	</Pill>
+);
+const chipW = (label: string) => 52 + 16 + textWidth(label.toUpperCase(), 40, SANS, false, 800) + label.length * 2.4 + 56 + 10;
+
+// the phone of the hook (resting rect; b = bezel thickness) and the camera pull-back that reveals it
+const PHONE = {x: 400, y: 700, w: 280, h: 580, b: 13, r: 52};
+const PULL = {z0: 4.7}; // zoom at which the phone SCREEN covers the whole frame (254*4.7 > 1080)
+
 export const Gancho: React.FC<{f: number}> = ({f}) => {
 	if (f > IRIS.end + 1) return null;
 	const celular = W(1, 'no');
 	const mas = W(2, 'Mas');
-	// sheet: full-frame 3D -> crammed into a phone outline on "no celular?"
+	const tudo = W(2, 'tudo');
+	const controle = W(2, 'controle');
+	// camera pull-back on "no celular?": the hook was a phone screen all along. The screen (sheet + stickers) shrinks
+	// from covering the frame to a small phone; the bezel comes in from outside the frame and always sits exactly on
+	// the screen edge, so no edge of the content is ever a naked cut (editor's rule).
+	const pullStart = celular - 4;
+	const pullEnd = celular + 12;
 	const k = kf(f, [
-		[celular - 4, 0],
-		[celular + 10, 1, ease.inOut],
+		[pullStart, 0],
+		[pullEnd, 1, ease.soft],
 	]);
-	const PHONE = {x: 380, y: 640, w: 320, h: 660};
+	const Z = Math.pow(PULL.z0, 1 - k); // log zoom: constant perceived speed (soft ease: 12-16% per frame at most)
+	const cx = PHONE.x + PHONE.w / 2;
+	const cy = PHONE.y + PHONE.h / 2;
+	const body = {x: cx - (PHONE.w / 2) * Z, y: cy - (PHONE.h / 2) * Z, w: PHONE.w * Z, h: PHONE.h * Z};
+	const lip = (PHONE.b - 2) * Z; // the screen tucks 2 px under the bezel
+	const scr = {x: body.x + lip, y: body.y + lip, w: body.w - 2 * lip, h: body.h - 2 * lip, r: (PHONE.r - PHONE.b + 2) * Z};
 	const camY = interpolate(f, [0, celular], [40, -520], {extrapolateRight: 'clamp'});
 	const camX = interpolate(f, [0, celular], [-40, -170], {extrapolateRight: 'clamp'});
 	const rx = 24 * (1 - k);
 	const rz = -8 * (1 - k);
-	const sheetScale = 1.12 + 0.04 * (f / 60) - (1.12 - 0.3) * k;
+	const sheetScale = 1.12 + 0.04 * (Math.min(f, pullEnd) / 60);
 	const shake = f >= mas ? Math.sin(f * 2.7) * 7 * tw(f, [mas, mas + 6], [0, 1]) : 0;
-	const clip = {
-		top: PHONE.y * k + 14 * k,
-		left: PHONE.x * k + 14 * k,
-		right: (1080 - PHONE.x - PHONE.w) * k + 14 * k,
-		bottom: (1920 - PHONE.y - PHONE.h) * k + 14 * k,
-		r: 46 * k,
-	};
-	const explode = W(2, 'tudo');
-	const sheetGone = tw(f, [explode, explode + 6], [0, 1]);
-	// push-in toward the "?" before the iris
-	const push = tw(f, [W(2, 'controle') + 4, IRIS.start + 2], [1, 1.07], ease.ae);
-	const headExit = celular - 2;
+	const settle = tw(f, [pullEnd - 6, pullEnd + 4], [0, 1], ease.inOut);
+	const float = `translate(${shake}px, ${Math.sin(f / 9) * 6 * settle}px) rotate(${Math.sin(f / 14) * 1.2 * settle}deg)`;
+	const sheetGone = tw(f, [tudo, tudo + 6], [0, 1]);
+	// while the headline is up, the sheet becomes a soft background (blurred, lighter)
+	const bgSoft = tw(f, [W(1, 'sua') - 4, W(1, 'sua') + 4], [0, 1]) * (1 - tw(f, [celular - 6, celular + 2], [0, 1]));
+	const push = tw(f, [controle + 6, IRIS.start + 2], [1, 1.06], ease.ae);
+	const qd = questionDot();
+	const w1 = textWidth('SUA ROTINA', STICKER.size) + 2 * STICKER.pad + 6;
+	const w2 = textWidth('NUMA PLANILHA', STICKER.size) + 2 * STICKER.pad + 6;
+	const w3 = textWidth('DE ', STICKER.size) + textWidth('Excel', 176, SERIF, true) + 2 * STICKER.pad + 26;
+	const wcel = textWidth('NO CELULAR?', 150);
+	const wtudo = textWidth('TUDO SOB', Q.size);
 	return (
-		<AbsoluteFill style={{transformOrigin: `${Q_DOT.x}px ${Q_DOT.y}px`, transform: `scale(${push})`}}>
-			{/* spreadsheet */}
-			<AbsoluteFill style={{clipPath: `inset(${clip.top}px ${clip.right}px ${clip.bottom}px ${clip.left}px round ${clip.r}px)`, opacity: 1 - sheetGone, transform: k > 0.5 ? `translate(${shake}px, ${Math.sin(f / 9) * 6}px) rotate(${Math.sin(f / 14) * 1.2}deg) scale(${1 + 0.012 * Math.sin(f / 11)})` : `translateX(${shake}px)`, transformOrigin: `${PHONE.x + PHONE.w / 2}px ${PHONE.y + PHONE.h / 2}px`}}>
-				<AbsoluteFill style={{background: '#F1F1EE'}} />
-				<div style={{position: 'absolute', left: 0, top: 0, width: 1080, height: 1920, perspective: 1700, perspectiveOrigin: '50% 40%'}}>
-					<div
-						style={{
-							position: 'absolute',
-							left: k > 0.5 ? PHONE.x + 18 : 540 - SHEET_W / 2,
-							top: k > 0.5 ? PHONE.y + 60 : 200,
-							width: SHEET_W,
-							height: SHEET_H,
-							transformOrigin: '0 0',
-							transform:
-								k > 0.5
-									? `scale(${0.3}) translate(${-60 * (1 - k)}px, ${camY * 0.2}px)`
-									: `translate(${camX}px, ${camY}px) rotateX(${rx}deg) rotateZ(${rz}deg) scale(${sheetScale})`,
-						}}
-					>
-						<Sheet f={f} />
+		<AbsoluteFill style={{transformOrigin: `${qd.x}px ${qd.y}px`, transform: `scale(${push})`}}>
+			{/* texts live BELOW the phone (wallpaper -> texts -> phone) */}
+			{/* "no celular?" drops in from the top edge while the camera pulls back */}
+			<Entra f={f} at={celular + 2} from="top" x={540 - wcel / 2} y={300} w={wcel} h={160} exitAt={mas - 2} exitTo="top" id="cel">
+				<div style={{fontFamily: DISPLAY, fontSize: 150, lineHeight: 1, color: P.ink, whiteSpace: 'nowrap'}}>
+					NO CELULAR<span style={{color: P.red}}>?</span>
+				</div>
+			</Entra>
+			{/* what you already have: from the edges, above the phone */}
+			<Entra f={f} at={W(2, 'treinos')} from="left" x={65} y={478} w={chipW('Treinos montados')} h={92} exitAt={mas} exitTo="left" id="ch1">
+				<CheckChip label="Treinos montados" />
+			</Entra>
+			<Entra f={f} at={W(2, 'faturou') - 3} from="right" x={1015 - chipW('Quanto faturou')} y={588} w={chipW('Quanto faturou')} h={92} exitAt={mas + 2} exitTo="right" id="ch2">
+				<CheckChip label="Quanto faturou" />
+			</Entra>
+			{/* the phone: screen (the spreadsheet + its stickers) and bezel move as one object */}
+			<AbsoluteFill style={{opacity: 1 - sheetGone, transform: float, transformOrigin: `${cx}px ${cy}px`}}>
+				<div style={{position: 'absolute', left: scr.x, top: scr.y, width: scr.w, height: scr.h, borderRadius: scr.r, overflow: 'hidden', background: '#F1F1EE'}}>
+					{/* screen content in frame coordinates, scaled about the phone center (identity while it covers the frame) */}
+					<div style={{position: 'absolute', left: -scr.x, top: -scr.y, width: 1080, height: 1920, transformOrigin: `${cx}px ${cy}px`, transform: `scale(${Z / PULL.z0})`}}>
+						<div style={{position: 'absolute', left: -600, top: -900, width: 2280, height: 3720, background: '#F1F1EE'}} />
+						<div style={{position: 'absolute', left: 0, top: 0, width: 1080, height: 1920, perspective: 1700, perspectiveOrigin: '50% 40%', filter: bgSoft > 0.01 ? `blur(${(bgSoft * 5).toFixed(1)}px)` : undefined, opacity: 1 - 0.35 * bgSoft}}>
+							<div style={{position: 'absolute', left: 540 - SHEET_W / 2, top: 200, width: SHEET_W, height: SHEET_H, transformOrigin: '0 0', transform: `translate(${camX}px, ${camY}px) rotateX(${rx}deg) rotateZ(${rz}deg) scale(${sheetScale})`}}>
+								<Sheet f={f} />
+							</div>
+						</div>
+						{/* headline stickers: in from the left edge; they stay on the screen and shrink with it */}
+						<Sticker f={f} at={W(1, 'sua')} rot={-2.5} x={70} y={300} w={w1} id="st1">
+							<div style={{fontFamily: DISPLAY, fontSize: STICKER.size, lineHeight: 1.02, color: P.ink, whiteSpace: 'nowrap'}}>SUA ROTINA</div>
+						</Sticker>
+						<Sticker f={f} at={W(1, 'numa')} rot={1.5} x={100} y={490} w={w2} id="st2">
+							<div style={{fontFamily: DISPLAY, fontSize: STICKER.size, lineHeight: 1.02, color: P.ink, whiteSpace: 'nowrap'}}>NUMA PLANILHA</div>
+						</Sticker>
+						<Sticker f={f} at={W(1, 'de')} rot={-1.5} x={80} y={680} w={w3} id="st3">
+							<div style={{display: 'flex', alignItems: 'baseline', gap: 26, whiteSpace: 'nowrap'}}>
+								<span style={{fontFamily: DISPLAY, fontSize: STICKER.size, lineHeight: 1.02, color: P.ink}}>DE</span>
+								<span style={{fontFamily: SERIF, fontStyle: 'italic', fontSize: 176, lineHeight: 0.9, color: '#1E7145'}}>Excel</span>
+							</div>
+						</Sticker>
 					</div>
 				</div>
-			</AbsoluteFill>
-			{/* phone outline drawn around the crammed sheet */}
-			{k > 0.02 && (
+				{/* bezel: drawn on the screen edge; while zoomed in it lies outside the frame */}
 				<div
 					style={{
 						position: 'absolute',
-						left: PHONE.x,
-						top: PHONE.y,
-						width: PHONE.w,
-						height: PHONE.h,
-						borderRadius: 58,
-						border: `${14 * k}px solid ${P.ink}`,
-						opacity: Math.min(1, k * 1.5) * (1 - sheetGone),
-						transform: `translate(${shake}px, ${Math.sin(f / 9) * 6}px) rotate(${Math.sin(f / 14) * 1.2}deg) scale(${1.25 - 0.25 * k + 0.012 * Math.sin(f / 11)})`,
-						boxShadow: '0 40px 80px rgba(0,0,0,0.25)',
+						left: body.x,
+						top: body.y,
+						width: body.w,
+						height: body.h,
+						borderRadius: PHONE.r * Z,
+						border: `${PHONE.b * Z}px solid ${P.ink}`,
+						boxSizing: 'border-box',
+						boxShadow: k > 0.05 ? `0 ${40 * k}px ${80 * k}px rgba(0,0,0,${0.22 * k})` : undefined,
 					}}
 				>
-					<div style={{position: 'absolute', left: '50%', top: 14, width: 86, height: 24, marginLeft: -43, borderRadius: 12, background: P.ink}} />
+					<div style={{position: 'absolute', left: '50%', top: 12 * Z, width: 80 * Z, height: 22 * Z, marginLeft: -40 * Z, borderRadius: 11 * Z, background: P.ink}} />
 				</div>
-			)}
-			<Debris f={f} from={explode} box={{x: PHONE.x, y: PHONE.y, w: PHONE.w, h: PHONE.h}} />
-			{/* headline built from cells */}
-			<Sticker f={f} at={W(1, 'sua')} exitAt={headExit} rot={-2.5} x={70} y={300}>
-				<div style={{fontFamily: DISPLAY, fontSize: 150, lineHeight: 1.02, color: P.ink}}>SUA ROTINA</div>
-			</Sticker>
-			<Sticker f={f} at={W(1, 'numa')} exitAt={headExit + 2} rot={1.5} x={110} y={490}>
-				<div style={{fontFamily: DISPLAY, fontSize: 150, lineHeight: 1.02, color: P.ink}}>NUMA PLANILHA</div>
-			</Sticker>
-			<Sticker f={f} at={W(1, 'de')} exitAt={headExit + 4} rot={-1.5} x={90} y={680}>
-				<div style={{display: 'flex', alignItems: 'baseline', gap: 26}}>
-					<span style={{fontFamily: DISPLAY, fontSize: 150, lineHeight: 1.02, color: P.ink}}>DE</span>
-					<span style={{fontFamily: SERIF, fontStyle: 'italic', fontSize: 190, lineHeight: 0.9, color: '#1E7145'}}>Excel</span>
+			</AbsoluteFill>
+			<Debris f={f} from={tudo} box={PHONE} />
+			{/* the question: from the right edge; it leaves through the left edge as the red dot opens the reveal */}
+			<Entra f={f} at={tudo} from="right" x={Q.right1 - wtudo} y={Q.line1Top} w={wtudo} h={Q.size} exitAt={IRIS.start + 1} exitTo="left" exitLen={7} id="q1">
+				<div style={{fontFamily: DISPLAY, fontSize: Q.size, lineHeight: 1, color: P.ink, whiteSpace: 'nowrap'}}>TUDO SOB</div>
+			</Entra>
+			<Entra f={f} at={controle} from="right" x={Q.right2 - qd.wc} y={Q.line2Top} w={qd.wc + 120} h={Q.size} exitAt={IRIS.start + 2} exitTo="left" exitLen={7} id="q2">
+				<div style={{position: 'relative', width: qd.wc + 120, height: Q.size}}>
+					<div style={{position: 'absolute', left: 0, top: 0, fontFamily: DISPLAY, fontSize: Q.size, lineHeight: 1, color: P.ink, whiteSpace: 'nowrap'}}>CONTROLE</div>
+					<QuestionMark f={f} left={qd.wc + 10} baseline={qd.baseline} scale={qd.scale} />
 				</div>
-			</Sticker>
-			{/* "no celular?" */}
-			<div style={{position: 'absolute', left: 0, right: 0, top: 300, display: 'flex', justifyContent: 'center'}}>
-				<Slam f={f} at={celular} size={168} exitAt={W(2, 'Seus') - 3}>
-					NO CELULAR<span style={{color: P.red}}>?</span>
-				</Slam>
-			</div>
-			{/* what you already have under control */}
-			<CheckChip f={f} at={W(2, 'treinos')} exitAt={mas + 2} x={70} y={350} label="Treinos montados" rot={-3} />
-			<CheckChip f={f} at={W(2, 'faturou') - 3} exitAt={mas + 5} x={250} y={470} label="Quanto faturou" rot={2.5} />
-			{/* the question */}
-			<div style={{position: 'absolute', right: 120, top: 760, textAlign: 'right'}}>
-				<Slam f={f} at={explode} size={200} from="right">
-					TUDO SOB
-				</Slam>
-			</div>
-			<div style={{position: 'absolute', right: 1080 - 832, top: 975, textAlign: 'right'}}>
-				<Slam f={f} at={W(2, 'controle')} size={200} from="right">
-					CONTROLE
-				</Slam>
-			</div>
-			<QuestionMark f={f} at={W(2, 'controle') + 4} />
+			</Entra>
 		</AbsoluteFill>
 	);
 };
 
-// red "?" drawn as a hook + a dot, so the dot position is known exactly
-const QuestionMark: React.FC<{f: number; at: number}> = ({f, at}) => {
-	if (f < at) return null;
-	const s = sp(f, at, {stiffness: 240, damping: 14});
+// red "?" drawn as a hook + a dot (so the dot position is known exactly); its bottom sits on the text baseline
+const QuestionMark: React.FC<{f: number; left: number; baseline: number; scale: number}> = ({f, left, baseline, scale}) => {
 	const pulse = 1 + 0.25 * tw(f, [IRIS.start - 8, IRIS.start], [0, 1], ease.ae);
+	const w = 140 * scale;
+	const h = 260 * scale;
 	return (
-		<svg width={84} height={156} viewBox="0 0 140 260" style={{position: 'absolute', left: Q_DOT.x - 42, top: Q_DOT.y - 133, overflow: 'visible', transform: `scale(${s})`, transformOrigin: '42px 133px'}}>
+		<svg width={w} height={h} viewBox="0 0 140 260" style={{position: 'absolute', left, top: baseline - 241 * scale, overflow: 'visible'}}>
 			<path d="M 26 66 C 26 18 114 10 114 64 C 114 104 70 108 70 150 L 70 170" fill="none" stroke={P.red} strokeWidth={34} strokeLinecap="round" />
-			<circle cx={70} cy={222} r={(Q_DOT.r / 0.6) * pulse} fill={P.red} />
+			{f < IRIS.start + 2 && <circle cx={70} cy={222} r={19 * pulse} fill={P.red} />}
 		</svg>
 	);
 };
+
+// sp is re-exported for scenes that time things to the hook
+export {sp};

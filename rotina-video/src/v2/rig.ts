@@ -19,15 +19,16 @@ export type Pose = {x: number; y: number; z: number; rx: number; ry: number; rz:
 // Poses in screen pixels (center of the phone at z = 0) for readability
 const POSES = {
 	logo: {x: 540, y: 360}, // projects to (540, 760) at z = -9
-	habitos: {x: 600, y: 1130, rx: 0.08, ry: -0.32, rz: 0.035},
-	metricas: {x: 400, y: 1150, rx: 0.06, ry: 0.3, rz: -0.03},
-	treino: {x: 540, y: 1180, rx: 0.1, ry: -0.22, rz: 0.02},
-	estilos: {x: 540, y: 1440, rx: 0.32, ry: 0.0, rz: 0},
-	series: {x: 650, y: 1150, rx: 0.08, ry: -0.3, rz: 0.03},
-	financeiro: {x: 520, y: 1170, rx: 0.08, ry: 0.25, rz: -0.02},
-	transacoes: {x: 420, y: 1180, rx: 0.07, ry: 0.3, rz: -0.03},
-	despesas: {x: 620, y: 1200, rx: 0.08, ry: -0.26, rz: 0.03},
-	final: {x: 540, y: 1300, rx: 0.05, ry: 0.0, rz: 0},
+	habitos: {x: 690, y: 1130, rx: 0.08, ry: -0.32, rz: 0.035},
+	metricas: {x: 330, y: 1150, rx: 0.06, ry: 0.3, rz: -0.03},
+	treino: {x: 540, y: 1230, rx: 0.1, ry: -0.22, rz: 0.02},
+	estilos: {x: 540, y: 1480, rx: 0.32, ry: 0.0, rz: 0},
+	series: {x: 700, y: 1150, rx: 0.08, ry: -0.3, rz: 0.03},
+	financeiro: {x: 540, y: 1170, rx: 0.08, ry: 0.12, rz: -0.02},
+	financeiro2: {x: 700, y: 1170, rx: 0.08, ry: 0.22, rz: -0.02},
+	transacoes: {x: 380, y: 1180, rx: 0.07, ry: 0.3, rz: -0.03},
+	despesas: {x: 700, y: 1200, rx: 0.08, ry: -0.26, rz: 0.03},
+	final: {x: 540, y: 1420, rx: 0.05, ry: 0.0, rz: 0},
 };
 
 const TAU = Math.PI * 2;
@@ -73,7 +74,7 @@ export const phonePose = (f: number): Pose => {
 	}
 	// Treino -> Estilos -> Séries
 	if (f >= 390) blend(go(390, SPR.soft), {...p.estilos, ry: p.estilos.ry - TAU});
-	if (f >= 474) blend(go(474, SPR.soft), {...p.series, ry: p.series.ry - TAU});
+	if (f >= 482) blend(go(482, SPR.soft), {...p.series, ry: p.series.ry - TAU});
 	// Séries -> Financeiro: forward flip around X, lands on the bar (f580-586)
 	if (f >= 568) {
 		const t = kf(f, [
@@ -86,6 +87,7 @@ export const phonePose = (f: number): Pose => {
 		rz = p.series.rz + (p.financeiro.rz - p.series.rz) * t;
 		rx = p.series.rx + (p.financeiro.rx + TAU - p.series.rx) * t;
 	}
+	if (f >= 598) blend(go(598, SPR.soft), {...p.financeiro2, ry: p.financeiro2.ry - TAU, rx: p.financeiro2.rx + TAU});
 	if (f >= 628) blend(go(628, SPR.soft), {...p.transacoes, ry: p.transacoes.ry - TAU, rx: p.transacoes.rx + TAU});
 	if (f >= 702) blend(go(702, SPR.soft), {...p.despesas, ry: p.despesas.ry - TAU, rx: p.despesas.rx + TAU});
 	if (f >= 786) blend(go(786, SPR.soft), {...p.final, ry: p.final.ry - TAU, rx: p.final.rx + TAU});
@@ -99,8 +101,8 @@ export const phonePose = (f: number): Pose => {
 		[342, 0, ease.in],
 		[390, 0.18],
 		[404, -0.75],
-		[474, -0.62],
-		[490, 0.0],
+		[482, -0.62],
+		[498, 0.0],
 		[568, 0.22],
 		[577, -0.85, ease.out],
 		[586, 0, ease.in],
