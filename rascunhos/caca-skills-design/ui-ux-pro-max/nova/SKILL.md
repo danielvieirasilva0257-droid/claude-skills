@@ -5,7 +5,7 @@ description: "Design de interface premium e minimalista para sites, landing page
 
 # UI/UX Pro Max (versão nossa, 11/10/2026)
 
-Skill nossa, em português, montada em "Frankenstein": a base antiga desta skill mais o melhor de seis skills públicas (Anthropic, Refero, taste-skill, Emil Kowalski, Vercel, impeccable, nextlevelbuilder) e das medições de 47 sites premium e minimalistas. O texto é nosso. Fontes, licenças e o que veio de cada uma: `ORIGEM.md`.
+Skill nossa, em português, montada em "Frankenstein": a base antiga desta skill mais o melhor de sete skills públicas (Anthropic, Refero, taste-skill, Emil Kowalski, Vercel, impeccable, nextlevelbuilder), do padrão aberto DESIGN.md do Google e das análises de marcas premium do awesome-design-md (MIT). O texto é nosso. Fontes, licenças e o que veio de cada uma: `ORIGEM.md`.
 
 **O `DESIGN.md` do projeto sempre vence.** As regras desta skill são o padrão para quando o projeto ainda não tem um.
 
@@ -73,7 +73,7 @@ Decida também:
 
 ### 2. Referência (reference lock) ✋
 
-1. Junte 3 a 5 referências: sites reais, prints do Daniel, links do Refero Styles (só para ver), DESIGN.md do awesome-design-md (MIT) ou o catálogo opcional (fim deste arquivo).
+1. Junte 3 a 5 referências: sites reais, prints do Daniel, DESIGN.md de marcas do awesome-design-md (MIT, fichas em `references/estilos-premium.md`) ou o catálogo opcional (fim deste arquivo).
 2. Escolha **uma principal**. Das outras, no máximo 1 ou 2 detalhes, cada um com um trabalho delimitado (por exemplo: "a janela de código vem da B").
 3. Escreva a trava:
 
@@ -108,8 +108,9 @@ Para tela grande e visível (landing, redesign), proponha **3 direções** trava
    npx -y @google/design.md export --format css-tailwind DESIGN.md > app/theme.css   # @theme do Tailwind v4
    ```
 
+   Pegadinha: no YAML, `fontFamily` leva **um** nome só (ex.: `Inter`); o `export` põe o valor inteiro entre aspas, então complete a pilha (`Inter, system-ui, sans-serif`) à mão no `theme.css`.
 3. Três camadas: primitivo (`--blue-600`) → semântico (`--color-action`) → componente (`--button-bg`). Componente nunca recebe hex direto.
-4. Nomes pelo **propósito** (`--color-canvas`, `--color-surface`, `--color-border`, `--color-text-muted`, `--color-action`), nunca pela cor.
+4. Nomes pelo **propósito** (`--color-canvas`, `--color-surface`, `--color-border`, `--color-text-muted`, `--color-primary` como cor de ação), nunca pela cor.
 5. Inclua os tokens de movimento: `--duration-fast: 150ms`, `--duration-base: 240ms`, `--duration-slow: 400ms`, `--ease-out: cubic-bezier(0.16, 1, 0.3, 1)`, `--ease-standard: cubic-bezier(0.4, 0, 0.2, 1)`.
 
 ### 5. Componentes
@@ -266,8 +267,7 @@ Lista completa, com testes e alternativas: `references/anti-padroes-ia.md`.
 
 ## Fontes de referência e catálogos (opcionais)
 
-- **Refero Styles** (`styles.refero.design`): ótimo para **olhar** sites premium. Os termos proíbem copiar os DESIGN.md para repositório e o robots.txt bloqueia robôs de IA: **abra o link, não baixe em lote**. Para acesso por agente, só o **Refero MCP** (pago, plano Pro/Team, 8 mil chamadas por mês): `claude mcp add --transport http refero https://api.refero.design/mcp` e depois `/mcp`. Token nunca no repositório.
-- **Skill oficial do Refero** (`referodesign/refero_skill`, MIT): método de pesquisa (brief, reference lock, decision ledger, anti-média) que esta skill já incorpora em português. Se quiser a original: `npx skills add https://github.com/referodesign/refero_skill --skill refero-design`. Atenção: a descrição dela se declara "padrão" e tenta mandar nas outras skills; se instalar, ela convive, mas o `DESIGN.md` e esta skill continuam valendo.
+- **Skill oficial do Refero** (`referodesign/refero_skill`, MIT): método de pesquisa (brief, reference lock, decision ledger, anti-média) que esta skill já incorpora em português. Se quiser a original: `npx skills add https://github.com/referodesign/refero_skill --skill refero-design`. Atenção: a descrição dela se declara "padrão" e tenta mandar nas outras skills; se instalar, ela convive, mas o `DESIGN.md` e esta skill continuam valendo. Ela tem um MCP opcional e pago (plano Pro/Team, 8 mil chamadas por mês) para pesquisar estilos, telas e fluxos: `claude mcp add --transport http refero https://api.refero.design/mcp` e depois `/mcp`. Token nunca no repositório.
 - **awesome-design-md** (VoltAgent, MIT, 74 marcas, sem Samsung): análises de terceiros no formato do Google. Baixe **só a marca escolhida, para dentro do projeto**, nunca para o `claude-skills`:
 
   ```bash

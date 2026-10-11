@@ -1,4 +1,4 @@
-// Receitas de movimento para sites premium (skill design-premium).
+// Receitas de movimento para sites premium (skill estilos-premium).
 // Testado em 11/10/2026: TypeScript estrito, motion@14.0.0, React 18. Tailwind v4 nas classes.
 // Todas seguem as 4 regras de composição do editor (veja references/movimento-sites.md).
 "use client";

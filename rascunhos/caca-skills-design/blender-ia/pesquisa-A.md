@@ -13,7 +13,7 @@
 3. **Testado no container:** o Blender **com interface roda sob `xvfb-run`**. Nesse modo, o mecanismo dos MCPs funciona (servidor TCP numa thread mais `bpy.app.timers`). O render OpenGL do viewport (o "olhar" do MCP) leva ~1 s; o `screen.screenshot` sai preto. Os dois MCPs principais usam render OpenGL/offscreen, então provavelmente funcionam aqui. Não rodei o código deles.
 4. **O MCP não traz vantagem neste container.** O Claude já escreve `bpy` e roda `blender -b -P script.py` sem interface, que é mais simples, reprodutível e versionável. O MCP vale para o computador do Daniel, com GPU e Blender aberto.
 5. **Renderização medida** (1080×1920, Cycles na CPU com OIDN, cena de celular + logo): **~13–17 s por quadro com 4–8 amostras** quando os dados ficam carregados entre quadros (`persistent_data`), mais ~20 s no primeiro quadro.
-   - Os 60 quadros (2 s a 30 fps) a 8 amostras **levaram ver §8**.
+   - Os 60 quadros (2 s a 30 fps) a 8 amostras **levaram 16 min 41 s** (média de 16,7 s por quadro; 14,4 s por quadro com a máquina livre).
    - A prévia a 25% leva **1,4 s por quadro**.
 6. **Licenças:**
    - MIT: mcp-for-blender, blenderwright, cc-blender-skill, claudedesignskills, ECC, Flue, scenario-labs e BlenderGPT.
@@ -222,7 +222,7 @@ Máquina: 4 CPUs, 15 GB de RAM, sem GPU, Blender **5.2.2 LTS** (build de 15/09/2
 | 2 quadros, 4 amostras | 20,8 s (1º) → **13,5 s** (2º, dados persistentes) |
 | 2 quadros, 8 amostras | 21,6 s (1º) → **17,3 s** (2º) |
 | Prévia a 25% (270×480), 8 amostras | **1,4 s por quadro** (serve para animatic e aprovação de movimento) |
-| **Animação 60 quadros (2 s), 8 amostras, 1080×1920** | **ver §8** |
+| **Animação 60 quadros (2 s), 8 amostras, 1080×1920** | **1.001 s = 16 min 41 s** (16,7 s/quadro; detalhes no §8) |
 
 ### 7.2 MCP no container: prova da arquitetura sob Xvfb (`xvfb_socket_server.py` + `xvfb_socket_client.py`, código meu)
 
@@ -242,7 +242,23 @@ Máquina: 4 CPUs, 15 GB de RAM, sem GPU, Blender **5.2.2 LTS** (build de 15/09/2
 
 ## 8. Resultado da animação completa
 
-(preenchido abaixo depois do fim do render)
+- **Comando:** `blender -b --factory-startup -P promo_min.py -- CYCLES 8 anim_cycles8 1 60`. Depois, `ffmpeg -framerate 30 … -c:v libx264 -crf 18` gera `promo_min_cycles8.mp4` (452 KB).
+- **Total:** **1.001 s de render (16 min 41 s)**; o processo inteiro levou 1.002 s. A média foi **16,7 s por quadro**.
+  - **Quadros 12–60** (máquina livre): **mediana de 14,4 s**, média de 14,6 s, mínimo de 13,7 s.
+  - **Quadros 1–11:** de 15 a 44 s, porque outro agente rodava um Blender ao mesmo tempo.
+- **Estimativa com a máquina livre:** ~14,5 s por quadro, ou seja, **~15 min para 2 s e ~22 min para 3 s** a 30 fps.
+  - A 24 fps, o custo cai 20%.
+  - Com 4 amostras, ~13,5 s por quadro (pouco ganho; o OIDN e a sincronização da cena pesam).
+- **Qualidade** (folha de contato em `teste/anim_contato.jpg`, quadros 1, 30 e 60):
+  - sem ruído visível a 8 amostras + OIDN;
+  - giro e overshoot do logo corretos;
+  - reflexo de recorte nas bordas.
+  - O visual é **funcional, ainda não premium**: o brilho de fundo encheu o quadro, o corpo é fino e a tela é um degradê liso.
+  - O premium depende da direção de arte (HDRI de estúdio, tela com a UI real do app, motion blur e DOF, que ainda não foram medidos aqui), e não da ferramenta.
+- **Comparação:**
+  - R3F no Remotion: ~0,7 s por quadro.
+  - Cycles na rodada anterior, cena mais pesada a 64 amostras: 45,8 s por quadro.
+  - O Blender a 8 amostras fica **~20 vezes mais lento que o R3F**, mas viável para 1–2 planos-herói em segundo plano.
 
 ---
 

@@ -1,12 +1,12 @@
 # Estilos premium: arquétipos, receitas e fichas de marcas
 
-Texto nosso. Os números de marcas são **fatos medidos em sites públicos**, citados pontualmente com a fonte ("observado em <marca> via Refero" = medição publicada em styles.refero.design, aberta em 11/10/2026). Nada aqui é cópia de DESIGN.md do Refero. Para ver o original, abra o link da ficha no fim.
+Texto nosso. Os números de marcas são fatos citados pontualmente, com a fonte: "awesome-design-md" = coleção [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md) (MIT, © 2026 VoltAgent, commit `13be5c0` de 05/10/2026), análises de terceiros no formato DESIGN.md do Google; "HIG" = Apple Human Interface Guidelines (só números, texto © Apple). Marcas, nomes e fontes pertencem aos donos.
 
-## O que faz um site parecer caro (padrão medido em 27 sites premium)
+## O que faz um site parecer caro
 
-- **UI quase sem cor.** Em 22 de 27 sites, a interface é praticamente neutra. A foto do produto carrega a cor.
-- **No máximo 1 acento, com 1 trabalho.** Vários não têm nenhum (a foto faz esse papel).
-- **Sem sombra em card e botão** (23 de 27). Profundidade = troca de superfície + linha de 1px.
+- **UI quase sem cor.** A interface fica neutra e a foto do produto carrega a cor.
+- **No máximo 1 acento, com 1 trabalho.** Muitas marcas premium não têm nenhum (a foto faz esse papel).
+- **Sem sombra em card e botão.** Profundidade = troca de superfície + linha de 1px.
 - **Display grande e leve:** 56 a 120px, peso 300 a 600, tracking negativo que cresce com o tamanho.
 - **Respiro:** 80 a 160px entre seções.
 - **Botões em dois extremos:** pílula ou quina viva (0 a 4px). O "meio-termo genérico de 8px" é o que mais parece template.
@@ -86,15 +86,21 @@ Regra geral: **raio interno = raio externo − padding**.
 
 ## Receita "tipo Apple" (web)
 
-Fatos observados em apple.com via Refero (9 páginas) e na Apple HIG (números conferidos, texto © Apple):
+Fatos do `design-md/apple` do awesome-design-md e da HIG:
 
-- Canvas `#f5f5f7` alternado com `#fff`; texto `#1d1d1f`; o azul `#0071e3` aparece **só como fundo do botão**; links `#0066cc` com sublinhado só no hover.
-- Corpo 17px, entrelinha 1,47; hero de 80 a 96px com peso 600, entrelinha ~1,05 e tracking ~−0,015em. Peso 600 é o teto dos títulos.
-- Botões em pílula (`border-radius: 980px`); par de CTAs = pílula preenchida + pílula contornada ou link "Saiba mais ›". **Nunca dois preenchidos.**
-- Cards e mídia com 28px de raio nas páginas de produto atuais, sem sombra.
-- Nav de 44px que vira vidro ao rolar: `backdrop-filter: saturate(180%) blur(20px)`.
-- Seções separadas por 80 a 120px (até ~160px em página de produto).
-- HIG: "1 ou 2 botões proeminentes por vista"; alvo de 44×44pt; evitar pesos Ultralight, Thin e Light em texto pequeno; evitar movimento em interação frequente.
+- Canvas `#fff` alternado com `#f5f5f7` e com faixas escuras (`#272729`); texto `#1d1d1f`; **uma única cor interativa**, o azul `#0066cc` (`#0071e3` no foco, `#2997ff` sobre escuro).
+- Hero de 56px peso 600, entrelinha 1,07, tracking levemente negativo; corpo em torno de 17px. Fonte do sistema (`system-ui`, que vira SF no Apple).
+- Botão primário em pílula (9999px) com padding 11 × 22px; raios do sistema 8/11/18px + pílula.
+- **Nenhuma sombra no chrome.** A única sombra é a que fica embaixo da foto do produto apoiada numa superfície.
+- Escala de espaço 4/8/12/17/24/32/48 e 80px entre seções; cada bloco ocupa mais ou menos uma tela.
+- Par de CTAs = pílula preenchida + pílula contornada ou link "Saiba mais ›". **Nunca dois preenchidos.** Nav fina que vira vidro ao rolar (`backdrop-filter: saturate(180%) blur(20px)`).
+- HIG: "1 ou 2 botões proeminentes por vista"; alvo de 44×44pt; texto padrão de 17pt no iOS (mínimo 11pt); evitar pesos Ultralight, Thin e Light em texto pequeno; evitar movimento em interação frequente.
+
+Para usar a análise completa num projeto (MIT, com atribuição), baixe para dentro do projeto:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/VoltAgent/awesome-design-md/main/design-md/apple/DESIGN.md -o referencias/apple-DESIGN.md
+```
 
 ### Movimento "fluido" da Apple na web
 
@@ -123,7 +129,7 @@ Ideias e fórmulas da skill `apple-design` de Emil Kowalski (MIT), resumidas por
 
 ## Receita "tipo Samsung" (web)
 
-**Não existe DESIGN.md da Samsung no Refero nem no awesome-design-md.** Fatos medidos em samsung.com (fonte de terceiros: oh-my-design.kr, sem licença declarada; usamos só números) + princípios públicos do One UI (developer.samsung.com/one-ui):
+**Não existe DESIGN.md da Samsung no awesome-design-md.** Fatos medidos em samsung.com (fonte de terceiros: oh-my-design.kr, sem licença declarada; usamos só números) + princípios públicos do One UI (developer.samsung.com/one-ui):
 
 - Canvas `#fff`, superfície `#f7f7f7`, texto secundário `#707070`, borda `#ddd`.
 - **CTA preto** (`#000`, texto branco), raio de 20px, altura de 40px, padding ~10 × 24px. O contornado é preto e **inverte no hover** (fundo preto, texto branco).
@@ -135,31 +141,30 @@ Ideias e fórmulas da skill `apple-design` de Emil Kowalski (MIT), resumidas por
 
 Resumo: a receita "tipo Apple" com CTA preto de 20px de raio e 40px de altura no lugar da pílula azul, mais display bold geométrico.
 
-## Fichas de marcas (para abrir e olhar)
+## Fichas de marcas (awesome-design-md, MIT)
 
-Uma linha por marca, com 2 ou 3 fatos observados via Refero. Para estudar, **abra o link**; não baixe em lote nem copie o conteúdo para repositório.
+Uma linha por marca, com 2 ou 3 fatos do arquivo da coleção. O caminho de cada uma é `https://github.com/VoltAgent/awesome-design-md/tree/main/design-md/<pasta>`. Para usar num projeto, baixe **só a marca escolhida, para dentro do projeto** (comando no `SKILL.md`), nunca para o `claude-skills`. Não há Samsung, Bang & Olufsen, Dyson nem Sonos na coleção.
 
-| Marca | Arquétipo | Fatos observados | Link |
-|---|---|---|---|
-| Apple (home) | Galeria clara | canvas `#f5f5f7`, um azul `#0071e3` só no CTA, pílula 980px | https://styles.refero.design/style/aecac5da-f397-4ddf-b71f-de1efc434cb8 |
-| Apple (MacBook) | Galeria clara | display de 80 a 96px, cards de 28px, 100 a 120px entre seções | https://styles.refero.design/style/c9cabb96-32fa-4896-837a-f2497ce1c856 |
-| Apple iPhone Pro | Palco escuro | palco `#000`, display de 96px peso 600 | https://styles.refero.design/style/40be36d7-7fe6-4451-9f2d-7ceccfd43be8 |
-| Bang & Olufsen | Galeria clara | uma família só, botões contornados que invertem no hover | https://styles.refero.design/style/27a4a4fa-4b1a-4e7e-b2c3-3e5bf57f00e5 |
-| Dyson | Galeria clara | papel creme `#fff8e6`, display peso 300, raio de 2px | https://styles.refero.design/style/96845df2-7ddb-420a-814e-c339f95a6554 |
-| Sonos | Galeria clara | UI sem cor, display de 96px peso 400 | https://styles.refero.design/style/8d315332-6267-4dc0-a14c-e8b49c26b0e1 |
-| teenage engineering | Galeria clara | raio 0, nenhuma sombra, display peso 100 | https://styles.refero.design/style/aecf9dda-5cba-4dc7-9e73-59b65d895cdf |
-| Tesla | Galeria clara | azul só no "Order", raios de 4 a 8px, blocos de tela cheia | https://styles.refero.design/style/7266b546-2fb0-465c-acd6-79001c39829a |
-| BMW | Galeria clara | display de 60px peso 300, raio 0, sem cor de UI | https://styles.refero.design/style/b8899cbd-e2ca-4069-83cf-d8f8b0d71100 |
-| Ferrari | Palco escuro | caixa alta a ~+0,08em, vermelho só no hover e foco, raio 0 | https://styles.refero.design/style/80164adf-a898-4f7c-bce7-12f3f62e1649 |
-| Lamborghini | Palco escuro | amarelo em 1 elemento por tela, raio 0 | https://styles.refero.design/style/c9c5be5a-aaa1-4338-9681-8378d2e24fbd |
-| SpaceX | Palco escuro | `#000`, caixa alta a +0,10em, botões fantasma de 1px | https://styles.refero.design/style/13b74e34-b824-4d1d-bd2c-bb9bfbc2d6e1 |
-| Nike | Galeria clara | foto até a borda, pílulas de 30px, sem cor de UI | https://styles.refero.design/style/d7ace114-0548-41f5-a2ff-2afbf32be94d |
-| Stripe | Instrumento (claro) | display peso 300, raio de 4px, sem sombras | https://styles.refero.design/style/48e5de76-05d5-4c4e-a269-c7c245b291ec |
-| Linear | Instrumento (escuro) | `#08090a`, raios 6/12/9999, um lima num CTA | https://styles.refero.design/style/90ce5883-bb24-4466-93f7-801cd617b0d1 |
-| Vercel | Instrumento | tracking de −0,06em a 64px, anel duplo no lugar de sombra, raio de 6px | https://styles.refero.design/style/f24daf3a-d43f-4dec-85a9-8ac1d5148a03 |
-| Raycast | Instrumento (escuro) | coral só na marca, nav com blur de 48px | https://styles.refero.design/style/3b6a17f0-3bdf-418c-a95e-0b89e5a8b2f8 |
-| Framer | Instrumento (escuro) | revelações de 0,75s sem quique, azul só em bordas e brilhos | https://styles.refero.design/style/d417b42f-824d-45ba-a02e-cbef3b8ea0d8 |
-| Dia (Browser Company) | Palco escuro editorial | serifa de 112px peso 300, transição de 0,2s só em cor | https://styles.refero.design/style/b458ca1a-70f0-4f85-b745-f879a4d08457 |
+| Marca (pasta) | Arquétipo | Fatos do arquivo |
+|---|---|---|
+| Apple (`apple`) | Galeria clara | um azul `#0066cc` como única cor interativa; pílula; sombra só sob a foto do produto |
+| BMW (`bmw`) | Galeria clara | azul `#1c69d4`; texto `#262626`; botão primário com raio **0** e padding 14 × 32px |
+| Nike (`nike`) | Galeria clara | primário quase preto `#111`; vermelho `#d30005` só para promoção; display de 96px peso 500 |
+| Tesla (`tesla`) | Galeria clara | um azul `#3e6ae1` só nos CTAs; hero de tela cheia com foto; título de 40px peso 500 |
+| Ferrari (`ferrari`) | Palco escuro | canvas `#181818`; vermelho `#da291c`; display de 80px peso 500 com tracking de −0,02em |
+| SpaceX (`spacex`) | Palco escuro | `#000` e branco; display condensado em caixa alta com tracking **positivo** (+0,02em) |
+| PlayStation (`playstation`) | Palco escuro | azul `#0070d1`; laranja `#d53b00` só no comércio; display peso 300 |
+| Stripe (`stripe`) | Instrumento (claro) | display de 56px peso **300** a −0,025em; índigo `#533afd` da marca; raios de 4 a 8px |
+| Vercel (`vercel`) | Instrumento (claro) | primário `#171717`; Geist 600 a −0,05em; azul `#0070f3` só em link |
+| Linear (`linear.app`) | Instrumento (escuro) | canvas `#010102` com 4 degraus de superfície; display de 80px peso 600 a −0,0375em |
+| Raycast (`raycast`) | Instrumento (escuro) | canvas `#07080a`; botão primário **branco** com texto preto; raio de 8px |
+| Framer (`framer`) | Instrumento (escuro) | canvas `#090909`; display de 110px peso 500 a −0,05em; azul `#0099ff` como acento |
+| Superhuman (`superhuman`) | Minimalista | primário `#1b1938`; texto `#292827`; display de 48 a 64px com peso intermediário (460 a 540) |
+| Notion (`notion`) | Minimalista | canvas `#fff` com superfície quente `#f6f5f4`; texto `#1a1a1a` |
+| Cursor (`cursor`) | Minimalista | canvas tingido `#f7f7f4`; texto `#26251e`; laranja `#f54e00` como acento |
+| Airbnb (`airbnb`) | Galeria clara (consumo) | canvas `#fff`; texto `#222`; um coral `#ff385c` da marca |
+
+Outras marcas da coleção que podem servir: `bugatti`, `lamborghini`, `bmw-m`, `nvidia`, `spotify`, `uber`, `wise`, `revolut`, `figma`, `webflow`, `shopify`, `claude`, `elevenlabs`.
 
 Fontes de marca (SF Pro, SamsungOne, Söhne, FerrariSans etc.) têm licença própria: use substitutas livres (Inter, Inter Tight, Geist, Manrope, Barlow para DIN e condensadas, Jost para Futura).
 

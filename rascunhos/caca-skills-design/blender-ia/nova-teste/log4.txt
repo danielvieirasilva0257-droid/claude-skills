@@ -1,0 +1,62 @@
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova/scripts/logo_e_celular.py:44: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m.use_nodes = True
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova/scripts/logo_e_celular.py:74: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  sm.use_nodes = True
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova/scripts/logo_e_celular.py:158: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  gm.use_nodes = True
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova/scripts/logo_e_celular.py:181: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world.use_nodes = True
+00:00.466  cycles           | WARNING CUEW initialization failed: Error opening the library
+[promo_min +   0.06s] motor=CYCLES amostras=2 quadros=10-33 res=25% alpha=True threads=4
+00:01.262  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0010.png'
+[promo_min +   0.85s] quadro 10 pronto em 0.79s
+00:01.807  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0011.png'
+[promo_min +   1.40s] quadro 11 pronto em 0.54s
+00:02.317  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0012.png'
+[promo_min +   1.91s] quadro 12 pronto em 0.51s
+00:02.797  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0013.png'
+[promo_min +   2.39s] quadro 13 pronto em 0.48s
+00:03.294  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0014.png'
+[promo_min +   2.89s] quadro 14 pronto em 0.50s
+00:03.801  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0015.png'
+[promo_min +   3.39s] quadro 15 pronto em 0.51s
+00:04.363  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0016.png'
+[promo_min +   3.96s] quadro 16 pronto em 0.56s
+00:04.931  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0017.png'
+[promo_min +   4.52s] quadro 17 pronto em 0.57s
+00:05.474  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0018.png'
+[promo_min +   5.07s] quadro 18 pronto em 0.54s
+00:06.117  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0019.png'
+[promo_min +   5.71s] quadro 19 pronto em 0.64s
+00:06.732  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0020.png'
+[promo_min +   6.32s] quadro 20 pronto em 0.61s
+00:07.281  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0021.png'
+[promo_min +   6.87s] quadro 21 pronto em 0.55s
+00:07.820  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0022.png'
+[promo_min +   7.41s] quadro 22 pronto em 0.54s
+00:08.302  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0023.png'
+[promo_min +   7.89s] quadro 23 pronto em 0.48s
+00:08.788  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0024.png'
+[promo_min +   8.38s] quadro 24 pronto em 0.49s
+00:09.299  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0025.png'
+[promo_min +   8.89s] quadro 25 pronto em 0.51s
+00:09.795  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0026.png'
+[promo_min +   9.39s] quadro 26 pronto em 0.50s
+00:10.243  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0027.png'
+[promo_min +   9.84s] quadro 27 pronto em 0.45s
+00:10.703  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0028.png'
+[promo_min +  10.30s] quadro 28 pronto em 0.46s
+00:11.164  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0029.png'
+[promo_min +  10.76s] quadro 29 pronto em 0.46s
+00:11.602  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0030.png'
+[promo_min +  11.19s] quadro 30 pronto em 0.44s
+00:12.189  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0031.png'
+[promo_min +  11.78s] quadro 31 pronto em 0.59s
+00:12.641  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0032.png'
+[promo_min +  12.23s] quadro 32 pronto em 0.45s
+00:13.093  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/nova-teste/logo_anim/q_0033.png'
+[promo_min +  12.69s] quadro 33 pronto em 0.45s
+[promo_min +  12.69s] TOTAL render 24 quadros: 12.6s (0.53s/quadro)
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit

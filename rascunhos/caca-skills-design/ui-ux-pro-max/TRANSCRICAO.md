@@ -28,6 +28,7 @@ Material de apoio também lido (não transcrito aqui, porque já está salvo no 
 | Escuro | Cena física decide | Escuro só se o briefing pedir | Frase de cena decide; sem informação, claro. |
 | Travessão | Evitar só como enfeite | (sem posição) | Evitar como enfeite na interface; uso gramatical normal em pt-BR. |
 | Samsung | Lacuna | Princípios One UI + medidas de samsung.com (terceiros) | Receita "tipo Samsung" escrita por nós em `estilos-premium.md`. |
+| Refero | Relatórios internos como base de números | Só a skill oficial MIT pode entrar | **Instrução do coordenador (11/10):** nada do Refero além da skill oficial MIT. Fatos de marca passaram a vir do awesome-design-md (MIT); `DESIGN.md` → tokens pelo padrão aberto do Google (`npx @google/design.md lint/export`, testado: 0 erros, 0 avisos). |
 
 ---
 

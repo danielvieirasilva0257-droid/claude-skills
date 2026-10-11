@@ -13,6 +13,7 @@ a.add_argument('--mb', action='store_true'); a.add_argument('--dof', action='sto
 a.add_argument('--hdri'); a.add_argument('--screen'); a.add_argument('--sombra', action='store_true')
 a.add_argument('--turntable', action='store_true'); a.add_argument('--view', default='Standard')
 a.add_argument('--so', help='so estes quadros, ex. 1,30,60 (rascunho)')
+a.add_argument('--so_sombra', action='store_true', help='camada so com a sombra (vai abaixo dos textos)')
 args = a.parse_args(sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else [])
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
@@ -111,6 +112,8 @@ area('Topo', (0, 0, 0.7), 1.0, 1.0, 3)
 if args.sombra:                                    # sombra de contato sobre o fundo do Remotion
     bpy.ops.mesh.primitive_plane_add(size=2, location=(0, 0, -H / 2 - 0.002))
     bpy.context.object.is_shadow_catcher = True
+if args.so_sombra:                                 # celular invisivel a camera, mas faz sombra
+    for o in (corpo, tela): o.visible_camera = False
 
 # ---------- camera 85 mm, DOF fisico, alvo comum ----------
 cd = bpy.data.cameras.new('Cam'); cd.lens = 85; cd.sensor_width = 36
