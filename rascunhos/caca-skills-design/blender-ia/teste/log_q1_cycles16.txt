@@ -1,0 +1,15 @@
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/promo_min.py:40: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m.use_nodes = True
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/promo_min.py:70: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  sm.use_nodes = True
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/promo_min.py:146: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world.use_nodes = True
+00:10.522  cycles           | WARNING CUEW initialization failed: Error opening the library
+[promo_min +   0.36s] motor=CYCLES amostras=16 quadros=30-30 res=100% alpha=False threads=4
+00:41.147  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/q1_cycles16/q_0030.png'
+[promo_min +  30.98s] quadro 30 pronto em 30.62s
+[promo_min +  30.98s] TOTAL render 1 quadros: 30.6s (30.63s/quadro)
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+processo: 41.689489060s

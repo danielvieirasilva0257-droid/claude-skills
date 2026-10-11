@@ -1,0 +1,20 @@
+GHOST/Wayland: error: XDG_RUNTIME_DIR is invalid or not set in the environment.
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/blender-dl/blender-5.2.2-linux-x64/blender() [0x10e512d]
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/blender-dl/blender-5.2.2-linux-x64/blender() [0x10e5293]
+/lib/x86_64-linux-gnu/libwayland-client.so.0(+0x598e) [0x7f00c085898e]
+/lib/x86_64-linux-gnu/libwayland-client.so.0(wl_display_connect+0x36f) [0x7f00c085daef]
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/blender-dl/blender-5.2.2-linux-x64/blender() [0x1a782e7]
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/blender-dl/blender-5.2.2-linux-x64/blender() [0x1a577bd]
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/blender-dl/blender-5.2.2-linux-x64/blender() [0x16cb341]
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/blender-dl/blender-5.2.2-linux-x64/blender() [0x16a27e5]
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/blender-dl/blender-5.2.2-linux-x64/blender() [0x75f8eb]
+/lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x7f00e302a1ca]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x7f00e302a28b]
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/blender-dl/blender-5.2.2-linux-x64/blender() [0x78994e]
+[srv +0.0s] ouvindo em 9877 (background=False)
+[srv +0.0s] timer registrado
+00:08.499  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/xvfb_out/viewport_opengl.png'
+00:08.499  render           | OpenGL Render written to '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/xvfb_out/viewport_opengl.png'
+00:10.467  blend            | Saved session recovery to "/tmp/quit.blend"
+
+Blender quit

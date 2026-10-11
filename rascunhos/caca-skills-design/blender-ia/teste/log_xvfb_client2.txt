@@ -1,0 +1,3 @@
+{"ok": true, "stdout": "ok\n", "s": 0.0, "ida_e_volta_s": 3.7}
+{"ok": true, "stdout": "Warning: 3 × Draw window and swap: 2040.4558 ms, average: 680.15193567 ms\nscreenshot apos redraw: 2.76 s\n", "s": 2.76, "ida_e_volta_s": 3.52}
+{"ok": true, "stdout": "render OpenGL do viewport 540x960: 1.07 s\n", "s": 1.07, "ida_e_volta_s": 1.62}

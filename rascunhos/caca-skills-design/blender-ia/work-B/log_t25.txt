@@ -1,0 +1,8 @@
+00:01.691  cycles           | WARNING CUEW initialization failed: Error opening the library
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/work-B/receita_produto.py:64: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(nome); m.use_nodes = True
+00:12.830  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/work-B/out/t25_0001.png'
+00:17.595  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/work-B/out/t25_0055.png'
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit

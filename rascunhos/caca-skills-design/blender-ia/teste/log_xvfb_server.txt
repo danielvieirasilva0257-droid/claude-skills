@@ -1,0 +1,19 @@
+GHOST/Wayland: error: XDG_RUNTIME_DIR is invalid or not set in the environment.
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/blender-dl/blender-5.2.2-linux-x64/blender() [0x10e512d]
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/blender-dl/blender-5.2.2-linux-x64/blender() [0x10e5293]
+/lib/x86_64-linux-gnu/libwayland-client.so.0(+0x598e) [0x7fa8096e798e]
+/lib/x86_64-linux-gnu/libwayland-client.so.0(wl_display_connect+0x36f) [0x7fa8096ecaef]
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/blender-dl/blender-5.2.2-linux-x64/blender() [0x1a782e7]
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/blender-dl/blender-5.2.2-linux-x64/blender() [0x1a577bd]
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/blender-dl/blender-5.2.2-linux-x64/blender() [0x16cb341]
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/blender-dl/blender-5.2.2-linux-x64/blender() [0x16a27e5]
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/blender-dl/blender-5.2.2-linux-x64/blender() [0x75f8eb]
+/lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x7fa80982a1ca]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x7fa80982a28b]
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/3d/blender-dl/blender-5.2.2-linux-x64/blender() [0x78994e]
+[srv +0.0s] ouvindo em 9877 (background=False)
+[srv +0.0s] timer registrado
+01:01.939  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/xvfb_out/eevee_gui_50pct.png'
+01:06.185  blend            | Saved session recovery to "/tmp/quit.blend"
+
+Blender quit

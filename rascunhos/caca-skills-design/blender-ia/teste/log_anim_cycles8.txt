@@ -1,0 +1,135 @@
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/promo_min.py:40: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m.use_nodes = True
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/promo_min.py:70: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  sm.use_nodes = True
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/promo_min.py:151: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  gm.use_nodes = True
+/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/promo_min.py:174: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world.use_nodes = True
+00:00.906  cycles           | WARNING CUEW initialization failed: Error opening the library
+[promo_min +   0.10s] motor=CYCLES amostras=8 quadros=1-60 res=100% alpha=False threads=4
+00:28.679  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0001.png'
+[promo_min +  27.87s] quadro 1 pronto em 27.77s
+00:46.012  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0002.png'
+[promo_min +  45.20s] quadro 2 pronto em 17.33s
+01:08.720  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0003.png'
+[promo_min +  67.91s] quadro 3 pronto em 22.71s
+01:25.277  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0004.png'
+[promo_min +  84.47s] quadro 4 pronto em 16.56s
+01:56.070  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0005.png'
+[promo_min + 115.26s] quadro 5 pronto em 30.79s
+02:26.767  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0006.png'
+[promo_min + 145.96s] quadro 6 pronto em 30.70s
+02:58.620  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0007.png'
+[promo_min + 177.81s] quadro 7 pronto em 31.85s
+03:42.483  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0008.png'
+[promo_min + 221.67s] quadro 8 pronto em 43.86s
+04:13.339  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0009.png'
+[promo_min + 252.53s] quadro 9 pronto em 30.86s
+04:32.727  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0010.png'
+[promo_min + 271.92s] quadro 10 pronto em 19.39s
+04:47.960  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0011.png'
+[promo_min + 287.15s] quadro 11 pronto em 15.23s
+05:08.408  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0012.png'
+[promo_min + 307.60s] quadro 12 pronto em 20.45s
+05:24.416  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0013.png'
+[promo_min + 323.61s] quadro 13 pronto em 16.01s
+05:39.287  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0014.png'
+[promo_min + 338.48s] quadro 14 pronto em 14.87s
+05:53.838  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0015.png'
+[promo_min + 353.03s] quadro 15 pronto em 14.55s
+06:08.956  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0016.png'
+[promo_min + 368.15s] quadro 16 pronto em 15.12s
+06:24.965  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0017.png'
+[promo_min + 384.15s] quadro 17 pronto em 16.01s
+06:38.810  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0018.png'
+[promo_min + 398.00s] quadro 18 pronto em 13.85s
+06:52.459  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0019.png'
+[promo_min + 411.65s] quadro 19 pronto em 13.65s
+07:06.302  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0020.png'
+[promo_min + 425.49s] quadro 20 pronto em 13.84s
+07:20.807  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0021.png'
+[promo_min + 440.00s] quadro 21 pronto em 14.50s
+07:35.316  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0022.png'
+[promo_min + 454.51s] quadro 22 pronto em 14.51s
+07:50.576  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0023.png'
+[promo_min + 469.77s] quadro 23 pronto em 15.26s
+08:04.835  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0024.png'
+[promo_min + 484.02s] quadro 24 pronto em 14.26s
+08:19.342  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0025.png'
+[promo_min + 498.53s] quadro 25 pronto em 14.51s
+08:33.995  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0026.png'
+[promo_min + 513.19s] quadro 26 pronto em 14.65s
+08:48.144  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0027.png'
+[promo_min + 527.33s] quadro 27 pronto em 14.15s
+09:02.146  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0028.png'
+[promo_min + 541.34s] quadro 28 pronto em 14.00s
+09:16.986  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0029.png'
+[promo_min + 556.18s] quadro 29 pronto em 14.84s
+09:30.759  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0030.png'
+[promo_min + 569.95s] quadro 30 pronto em 13.77s
+09:44.569  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0031.png'
+[promo_min + 583.76s] quadro 31 pronto em 13.81s
+09:59.035  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0032.png'
+[promo_min + 598.23s] quadro 32 pronto em 14.47s
+10:12.855  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0033.png'
+[promo_min + 612.05s] quadro 33 pronto em 13.82s
+10:27.552  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0034.png'
+[promo_min + 626.74s] quadro 34 pronto em 14.70s
+10:43.504  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0035.png'
+[promo_min + 642.69s] quadro 35 pronto em 15.95s
+10:57.965  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0036.png'
+[promo_min + 657.16s] quadro 36 pronto em 14.46s
+11:12.082  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0037.png'
+[promo_min + 671.27s] quadro 37 pronto em 14.12s
+11:26.317  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0038.png'
+[promo_min + 685.51s] quadro 38 pronto em 14.24s
+11:40.238  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0039.png'
+[promo_min + 699.43s] quadro 39 pronto em 13.92s
+11:54.913  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0040.png'
+[promo_min + 714.10s] quadro 40 pronto em 14.67s
+12:09.272  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0041.png'
+[promo_min + 728.46s] quadro 41 pronto em 14.36s
+12:23.560  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0042.png'
+[promo_min + 742.75s] quadro 42 pronto em 14.29s
+12:38.029  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0043.png'
+[promo_min + 757.22s] quadro 43 pronto em 14.47s
+12:53.387  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0044.png'
+[promo_min + 772.58s] quadro 44 pronto em 15.36s
+13:07.764  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0045.png'
+[promo_min + 786.95s] quadro 45 pronto em 14.38s
+13:22.606  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0046.png'
+[promo_min + 801.80s] quadro 46 pronto em 14.84s
+13:36.856  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0047.png'
+[promo_min + 816.05s] quadro 47 pronto em 14.25s
+13:51.669  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0048.png'
+[promo_min + 830.86s] quadro 48 pronto em 14.81s
+14:05.949  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0049.png'
+[promo_min + 845.14s] quadro 49 pronto em 14.28s
+14:20.280  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0050.png'
+[promo_min + 859.47s] quadro 50 pronto em 14.33s
+14:34.555  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0051.png'
+[promo_min + 873.75s] quadro 51 pronto em 14.28s
+14:49.297  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0052.png'
+[promo_min + 888.49s] quadro 52 pronto em 14.74s
+15:03.005  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0053.png'
+[promo_min + 902.20s] quadro 53 pronto em 13.71s
+15:16.750  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0054.png'
+[promo_min + 915.94s] quadro 54 pronto em 13.74s
+15:31.376  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0055.png'
+[promo_min + 930.57s] quadro 55 pronto em 14.63s
+15:45.968  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0056.png'
+[promo_min + 945.16s] quadro 56 pronto em 14.59s
+15:59.933  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0057.png'
+[promo_min + 959.12s] quadro 57 pronto em 13.97s
+16:14.024  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0058.png'
+[promo_min + 973.22s] quadro 58 pronto em 14.09s
+16:27.938  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0059.png'
+[promo_min + 987.13s] quadro 59 pronto em 13.91s
+16:41.840  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-ia/teste/anim_cycles8/q_0060.png'
+[promo_min +1001.03s] quadro 60 pronto em 13.90s
+[promo_min +1001.03s] TOTAL render 60 quadros: 1000.9s (16.68s/quadro)
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
+PROCESSO_TOTAL 1002s

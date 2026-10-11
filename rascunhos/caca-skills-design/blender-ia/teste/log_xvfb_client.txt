@@ -1,0 +1,6 @@
+{"ok": true, "stdout": "5.2.2 LTS background= False objetos= 3\n", "s": 0.0, "ida_e_volta_s": 18.78}
+[cli] Blender respondeu 18.8s depois do inicio do cliente
+{"ok": true, "stdout": "objetos= ['Camera', 'Cube', 'Light', 'Suzanne']\n", "s": 0.01, "ida_e_volta_s": 1.41}
+{"ok": true, "stdout": "eevee 540x960 16 amostras: 40.65 s\n", "s": 40.65, "ida_e_volta_s": 41.97}
+{"ok": true, "stdout": "screenshot: 0.96 s\n", "s": 0.96, "ida_e_volta_s": 1.79}
+[cli] total 64.0s
