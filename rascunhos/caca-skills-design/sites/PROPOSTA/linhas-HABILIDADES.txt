@@ -1,0 +1,27 @@
+LINHAS NOVAS PARA guia/HABILIDADES.txt (proposta de 11/10/2026; entram só depois da aprovação da categoria nova "sites")
+=====================================================================================================================
+
+>>> Na seção 1, depois do bloco [DESIGN ...], acrescentar o bloco abaixo:
+
+[SITES: fazer sites com IA, do planejamento à publicação (skills/sites/)]
+referencia-sites | base de referência de sites e templates com código: landing, portfólio, SaaS, loja, blog, componentes animados; link, licença, stack e estilo de cada um; o que pode copiar e o que é só para olhar; baixar um template no commit certo para o projeto (nunca para a main); Refero só pelo caminho oficial | skills/sites/referencia-sites/SKILL.md (lista fixada em fontes.txt; script em scripts/baixar-referencia.sh)
+site-architecture | planejar o site antes do código: que páginas fazer, menu, URLs, links internos e mapa do site em Mermaid (skill de terceiros, MIT, intacta) | skills/sites/site-architecture/SKILL.md (origem em ORIGEM.md)
+shadcn | componentes do site em React/Tailwind com shadcn/ui: instalar pela CLI, formulários, tema a partir do nosso DESIGN.md, blocos de registries (skill oficial, MIT, intacta; roda npx shadcn sozinha: carregar só na pasta do projeto) | skills/sites/shadcn/SKILL.md (leia antes o APRENDIZADOS.md; origem em ORIGEM.md)
+vercel-react-best-practices | código React/Next.js rápido: 70 regras de desempenho (cascatas de await, bundle, servidor, re-render); ler só a regra necessária (skill da Vercel, MIT, intacta) | skills/sites/vercel-react-best-practices/SKILL.md (regras em rules/; origem em ORIGEM.md)
+cro | landing page que converte: título, CTA, prova social, objeções e formulários; "minha página não vende" (skill de terceiros, MIT, intacta; usar depois do combo-copy-humanizada) | skills/sites/cro/SKILL.md (origem em ORIGEM.md)
+webapp-testing | ver e testar o site no navegador: prints no celular e no computador, cliques, formulário, erros do console (Playwright; skill da Anthropic, Apache-2.0, intacta) | skills/sites/webapp-testing/SKILL.md (instalar o Playwright antes: ver APRENDIZADOS.md)
+web-quality | auditoria antes de publicar: velocidade, Core Web Vitals, acessibilidade WCAG 2.2, SEO técnico (meta tags, sitemap, JSON-LD), segurança; "o site está lento", "audita meu site" (pacote de 6 skills do Addy Osmani, MIT, intacto) | skills/sites/web-quality/web-quality-audit/SKILL.md (irmãs na mesma pasta: performance, core-web-vitals, accessibility, seo, best-practices)
+deploy-to-vercel | publicar o site na Vercel: preview primeiro, produção só com aprovação; push e envio "sem login" só com o sim do Daniel (skill da Vercel, MIT, intacta) | skills/sites/deploy-to-vercel/SKILL.md (leia antes o APRENDIZADOS.md; origem em ORIGEM.md)
+seo-audit | SEO depois que o site está no ar: não aparece no Google, tráfego caiu, SEO local, títulos (skill de terceiros, MIT, intacta) | skills/sites/seo-audit/SKILL.md (origem em ORIGEM.md)
+
+>>> Na seção 1b (COMBOS), acrescentar:
+
+combo-site-premium | fazer um site do zero com visual premium: mapa → texto → DESIGN.md e referência → shadcn → código → animação → conversão → prints → qualidade → publicar, com 5 aprovações do Daniel (usa skills/sites/ + ui-ux-pro-max, estilos-premium, motion-oficial, button-animation, combo-copy-humanizada) | skills/combos/combo-site-premium/SKILL.md
+
+>>> Na seção 2 (CONHECIMENTO), acrescentar (quando as pesquisas forem salvas em research_notes/):
+
+pesquisa "fazer sites com IA" (11/10/2026): catálogo skills.sh, web, base de referência de sites com licença | research_notes/Sites com IA 2026-10/ (pesquisa-A.md, pesquisa-B.md, TRANSCRICAO.md)
+
+>>> No manual guia/LEIA-ANTES-DE-USAR.md, tabela 3.3, acrescentar a linha (precisa da mesma aprovação):
+
+| `skills/sites/` | fazer sites: planejar, construir, testar, auditar e publicar | `referencia-sites`, `site-architecture`, `shadcn`, `vercel-react-best-practices`, `cro`, `webapp-testing`, `web-quality` (6), `deploy-to-vercel`, `seo-audit` |

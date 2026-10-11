@@ -1,0 +1,12 @@
+# Referências de sites com código, fixadas num commit (conferido em 11/10/2026).
+# Formato: nome | owner/repo | commit | licença | stack | tipo
+# Só entram aqui repositórios com licença que permite copiar e modificar (MIT, Apache-2.0, CC0, CC BY).
+# Para baixar um deles: scripts/baixar-referencia.sh <nome> [pasta-destino]
+launch-ui | launch-ui/launch-ui | b0d4d5bce91d13523450416ce1797109076b2787 | MIT | Next 16, React 19, Tailwind 4, shadcn | landing page
+portfolio-magicui | dillionverma/portfolio | 5ef12e4c8bd0de3e22e89c2181ee77a35925ec8b | MIT | Next 16, Tailwind 4, Motion (Magic UI) | portfólio animado
+astrowind | onwidget/astrowind | 14e1a691f80548dcc36370847b1a02c0d0b12821 | MIT | Astro 7, Tailwind 4 | site com várias páginas e blog
+saas-starter | nextjs/saas-starter | 6e33e58b1e553a41fe22e6b941a7229a002de361 | MIT | Next 15, Postgres, Drizzle, Stripe, shadcn | SaaS com login e pagamento
+commerce | vercel/commerce | 3761e52e60df9c6a316e067dbfd7032e494d3634 | MIT | Next 15, Shopify, Tailwind 4 | loja
+once-ui-starter | once-ui-system/nextjs-starter | 78dcb8d7c5036a1f0c0fcc69220556ca47914019 | MIT | Next 16, Once UI | starter minimalista
+shadcn-landing | leoMirandaa/shadcn-landing-page | ae3716dbce5c8a26815222bb743994b5717938f1 | MIT | React, Tailwind 3, shadcn | landing simples (genérica)
+page-ui | danmindru/page-ui | bb4951f98c1d2960bc3093f377aa836b508fa9c0 | MIT | React, Tailwind, shadcn | componentes de landing (42 MB)

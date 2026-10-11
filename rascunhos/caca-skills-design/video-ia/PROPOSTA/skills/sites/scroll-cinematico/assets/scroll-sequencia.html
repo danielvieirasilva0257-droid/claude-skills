@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scroll cinematográfico</title>
+<!--
+  Modelo testado (skill scroll-cinematico, 11/10/2026). Sem dependências.
+  Para usar:
+  1. Ponha os quadros em frames/f_0001.webp ... (ou mude data-pattern; {i} vira 0001, 0002...).
+  2. Ajuste data-frames (total de quadros), o src do pôster (melhor quadro) e o preload abaixo.
+  3. Troque os textos #tA/#tB e as faixas de progresso em T (nunca sobrepostas: regra 1 do editor).
+  4. window.__scroll é o gancho do teste (scripts/testar-scroll.js). Pode ficar em produção.
+-->
+<!-- Primeiro quadro com prioridade alta: é o que aparece antes do JS (LCP). -->
+<link rel="preload" as="image" href="frames/f_0001.webp" fetchpriority="high">
+<style>
+  :root { --bg: #07070c; --fg: #f4f4f8; --muted: #9a9ab0; --accent: #ff7a18; }
+  * { box-sizing: border-box; margin: 0; }
+  html { background: var(--bg); color: var(--fg); font: 400 18px/1.4 system-ui, sans-serif; }
+  body { background: var(--bg); overflow-x: clip; }
+  .intro, .outro { min-height: 100vh; display: grid; place-items: center; text-align: center; padding: 0 16px; }
+  .intro p, .outro p { color: var(--muted); }
+
+  /* Seção do scrub: altura = "comprimento" da animação. Palco grudado (pin) com sticky, sem JS. */
+  .cine { position: relative; height: 400vh; }
+  .palco { position: sticky; top: 0; height: 100vh; overflow: clip; /* borda real da cena = borda da tela */
+           background: radial-gradient(60% 60% at 50% 50%, #1b1640 0%, var(--bg) 70%); }
+  /* Camadas (regra 3): fundo -> textos -> elemento principal (canvas com alpha) por cima. */
+  .txt { position: absolute; z-index: 1; will-change: transform, opacity; }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
+  .poster { display: none; }
+
+  #tA { left: 6vw; top: 50%; translate: 0 -50%; max-width: 30vw; }
+  #tA h2 { font: 800 clamp(40px, 7vw, 96px)/0.95 system-ui, sans-serif; letter-spacing: -0.03em; }
+  #tA p { color: var(--muted); margin-top: 12px; }
+  /* Texto B nasce ATRÁS do aparelho (centro) e desliza para a direita: cabe no círculo inscrito do aparelho. */
+  #tB { left: 50%; top: 50%; width: 180px; margin: -32px 0 0 -90px; padding: 10px 14px; border-radius: 12px;
+        background: #15152a; border: 1px solid #2c2c4a; }
+  #tB strong { color: var(--accent); display: block; font-size: 22px; }
+  #tB span { color: var(--muted); font-size: 14px; }
+
+  /* Sem JS: mostra o pôster parado. */
+  html:not(.js) canvas { display: none; }
+  html:not(.js) .poster, .rm .poster { display: block; }
+
+  /* Reduzir movimento: sem pin, sem scrub; quadro final parado + textos lado a lado. */
+  .rm.cine { height: auto; }
+  .rm .palco { position: relative; height: auto; min-height: 100vh; display: grid; grid-template-columns: 1fr auto 1fr;
+               align-items: center; gap: 24px; padding: 48px 16px; }
+  .rm canvas { display: none; }
+  .rm #tA { order: 1; } .rm .poster { order: 2; } .rm #tB { order: 3; }
+  .rm .poster { max-height: 80vh; max-width: 40vw; object-fit: contain; }
+  .rm .txt { position: static; transform: none !important; opacity: 1 !important; margin: 0; translate: none; max-width: none; }
+  @media (max-width: 700px) { .rm .palco { grid-template-columns: 1fr; } .rm .poster { max-width: 100%; } }
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js')</script>
+
+<section class="intro"><div><h1>Role para baixo</h1><p>Teste de sequência de quadros num canvas, controlada pela rolagem.</p></div></section>
+
+<section class="cine" id="cine" data-frames="60" data-pattern="frames/f_{i}.webp">
+  <div class="palco">
+    <div class="txt" id="tA"><h2>Gira.</h2><p>Entra pela borda esquerda e sai por ela antes do próximo texto.</p></div>
+    <div class="txt" id="tB"><strong>60 quadros</strong><span>Sai de trás do aparelho.</span></div>
+    <canvas id="cv" role="img" aria-label="Aparelho girando até ficar de pé"></canvas>
+    <img class="poster" src="frames/f_0060.webp" alt="Aparelho de pé, de frente" width="1280" height="720">
+  </div>
+</section>
+
+<section class="outro"><div><h1>Fim</h1><p>O palco solta aqui.</p></div></section>
+
+<script>
+(() => {
+  const sec = document.getElementById('cine');
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const tA = document.getElementById('tA');
+  const tB = document.getElementById('tB');
+  const N = +sec.dataset.frames;
+  const url = i => sec.dataset.pattern.replace('{i}', String(i + 1).padStart(4, '0'));
+  const rm = matchMedia('(prefers-reduced-motion: reduce)');
+
+  // ---- Carregamento: grosso -> fino (passos 8, 4, 2, 1), 6 de cada vez, decode() antes de usar.
+  const imgs = new Array(N); let loaded = 0;
+  const order = [0]; for (const s of [8, 4, 2, 1]) for (let i = 0; i < N; i += s) if (!order.includes(i)) order.push(i);
+  if (!order.includes(N - 1)) order.splice(1, 0, N - 1);
+  let q = 0;
+  const next = () => { if (q >= order.length) return; const i = order[q++]; const im = new Image();
+    im.src = url(i); im.decode().then(() => { imgs[i] = im; loaded++; if (i === want) dirty = true; kick(); })
+      .catch(() => {}).finally(next); };
+  for (let k = 0; k < 6; k++) next();
+  const nearest = i => { for (let d = 0; d < N; d++) { if (imgs[i - d]) return i - d; if (imgs[i + d]) return i + d; } return -1; };
+
+  // ---- Geometria lida só no resize (nunca no scroll).
+  let top = 0, len = 1, W = 0, H = 0, dpr = 1;
+  const measure = () => {
+    const r = sec.getBoundingClientRect();
+    top = r.top + scrollY; len = Math.max(1, sec.offsetHeight - innerHeight);
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    W = cv.clientWidth; H = cv.clientHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    drawn = -1; dirty = true; kick();
+  };
+  new ResizeObserver(measure).observe(document.documentElement);
+
+  // ---- Desenho "contain" do quadro i.
+  let drawn = -1, want = 0, dirty = true;
+  const draw = i => { const k = nearest(i); if (k < 0 || (k === drawn && !dirty)) return; const im = imgs[k];
+    const s = Math.min(cv.width / im.naturalWidth, cv.height / im.naturalHeight);
+    const w = im.naturalWidth * s, h = im.naturalHeight * s;
+    ctx.clearRect(0, 0, cv.width, cv.height); ctx.drawImage(im, (cv.width - w) / 2, (cv.height - h) / 2, w, h);
+    drawn = k; dirty = false; };
+
+  // ---- Coreografia dos textos (faixas de progresso SEM sobreposição: regra 1).
+  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const seg = (p, a, b) => clamp((p - a) / (b - a));
+  const ease = t => 1 - Math.pow(1 - t, 3);      // sai rápido, pousa sem passar do ponto
+  const easeIn = t => t * t * t;
+  const T = { A: { in: [0.06, 0.22], out: [0.40, 0.50] }, B: { in: [0.78, 0.92], out: [1.1, 1.2] } };
+  const layout = p => {
+    // A: da borda esquerda (fora do quadro) para dentro; sai pelo mesmo lado.
+    const aIn = ease(seg(p, ...T.A.in)), aOut = easeIn(seg(p, ...T.A.out));
+    const ax = (1 - aIn) * -1 - aOut;                    // em "larguras de tela"
+    tA.style.transform = `translate3d(${ax * 100}vw,0,0)`;
+    tA.style.opacity = aIn > 0 && aOut < 1 ? 1 : 0;
+    // B: começa escondido no centro, atrás do aparelho (z-index menor), e desliza para a direita.
+    const bIn = ease(seg(p, ...T.B.in));
+    tB.style.transform = `translate3d(${bIn * Math.min(330, W * 0.3)}px,0,0)`;
+    tB.style.opacity = bIn > 0 ? 1 : 0;
+  };
+
+  // ---- Laço: lê só scrollY; suaviza (scrub com inércia) e só redesenha quando o quadro muda.
+  let cur = 0, raf = 0, last = 0;
+  const target = () => clamp((scrollY - top) / len);
+  const tick = now => { raf = 0; const dt = last ? Math.min(64, now - last) : 16.7; last = now;
+    // Inércia por tempo (igual em 60 e 120 Hz): 18% do caminho a cada 16,7 ms.
+    const t = target(); const smooth = rm.matches ? 1 : 1 - Math.pow(1 - 0.18, dt / 16.7);
+    cur += (t - cur) * smooth; if (Math.abs(t - cur) < 0.0005) cur = t;
+    want = Math.round(cur * (N - 1)); draw(want); layout(cur);
+    window.__scroll = { p: +cur.toFixed(4), frame: drawn + 1, want: want + 1, loaded, settled: cur === t };
+    if (cur !== t || dirty) kick(); else last = 0; };
+  function kick() { if (!raf) raf = requestAnimationFrame(tick); }
+  addEventListener('scroll', kick, { passive: true });
+
+  // ---- Reduzir movimento: troca para a versão parada (e volta, se o usuário mudar a preferência).
+  const applyRM = () => { sec.classList.toggle('rm', rm.matches); measure(); };
+  rm.addEventListener('change', applyRM); applyRM();
+})();
+</script>
+</body>
+</html>

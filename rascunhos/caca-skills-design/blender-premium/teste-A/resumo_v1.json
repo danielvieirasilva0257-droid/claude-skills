@@ -1,0 +1,95 @@
+{
+ "orbita_pivo_rotZ": {
+  "erro_max_quadros_pct": 2e-05,
+  "erro_max_subquadros_pct": 3e-05
+ },
+ "dolly_cam_locY": {
+  "erro_max_quadros_pct": 4e-05,
+  "erro_max_subquadros_pct": 5e-05
+ },
+ "produto_rotZ_mola": {
+  "erro_max_quadros_pct": 0.0,
+  "erro_max_subquadros_pct": 0.00662
+ },
+ "skill_keyframe_insert_exp": {
+  "erro_max_quadros_pct": 2e-05,
+  "erro_max_subquadros_pct": 3e-05
+ },
+ "skill_keyframe_insert_dolly": {
+  "erro_max_quadros_pct": 3e-05,
+  "erro_max_subquadros_pct": 3e-05
+ },
+ "entrada_22_1_36_1_em_20q": {
+  "erro_max_quadros_pct": 2e-05,
+  "erro_max_subquadros_pct": 2e-05
+ },
+ "overshoot_handle_0.16_1.05_0.3_1": {
+  "erro_max_quadros_pct": 2e-05,
+  "erro_max_subquadros_pct": 3e-05
+ },
+ "overshoot_handle_0.16_1.1_0.3_1": {
+  "erro_max_quadros_pct": 2e-05,
+  "erro_max_subquadros_pct": 4e-05
+ },
+ "overshoot_handle_0.2_1.2_0.3_1": {
+  "erro_max_quadros_pct": 2e-05,
+  "erro_max_subquadros_pct": 4e-05
+ },
+ "overshoot_handle_0.34_1.56_0.64_1": {
+  "erro_max_quadros_pct": 2e-05,
+  "erro_max_subquadros_pct": 5e-05
+ },
+ "_depsgraph_vs_evaluate_rad": 0.0,
+ "_handle_free_preservado": [
+  "FREE",
+  [
+   15.24,
+   0.0
+  ]
+ ],
+ "_overshoot_handle_pct": {
+  "(0.16, 1.05, 0.3, 1)": 0.04,
+  "(0.16, 1.1, 0.3, 1)": 0.24,
+  "(0.2, 1.2, 0.3, 1)": 1.25,
+  "(0.34, 1.56, 0.64, 1)": 9.78
+ },
+ "_overshoot_BACK_pct": {
+  "0.5": 0.82,
+  "1.0": 3.7,
+  "1.70158": 10.0
+ },
+ "_overshoot_mola_teorico_pct": {
+  "0.6": 9.48,
+  "0.7": 4.6,
+  "0.8": 1.52,
+  "0.9": 0.15
+ },
+ "_mola_produto_pico_graus": 15.981,
+ "_tres_chaves_no_quadro_40": {
+  "cubic_bezier_por_trecho": {
+   "vel_meio": 0.0001,
+   "salto_acel": 0.000956
+  },
+  "AUTO_CLAMPED+NONE": {
+   "vel_meio": 0.0121,
+   "salto_acel": 0.001078,
+   "passa_do_fim": 0
+  },
+  "AUTO_CLAMPED+CONT_ACCEL": {
+   "vel_meio": 0.018,
+   "salto_acel": 0.000168,
+   "passa_do_fim": 0.0
+  },
+  "AUTO+CONT_ACCEL": {
+   "vel_meio": 0.0191,
+   "salto_acel": 2.6e-05,
+   "passa_do_fim": 0.018
+  }
+ },
+ "_varredura_rel_graus": 30.0,
+ "_varredura_10_90_quadros": [
+  5,
+  13,
+  8
+ ]
+}

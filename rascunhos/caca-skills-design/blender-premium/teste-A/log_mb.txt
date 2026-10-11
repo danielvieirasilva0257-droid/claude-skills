@@ -1,0 +1,124 @@
+00:00.728  cycles           | WARNING CUEW initialization failed: Error opening the library
+00:05.335  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0001.png'
+00:06.078  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0004.png'
+00:06.727  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0007.png'
+00:07.384  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0010.png'
+00:08.026  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0013.png'
+00:08.837  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0016.png'
+00:09.570  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0019.png'
+00:10.243  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0022.png'
+00:11.048  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0025.png'
+00:11.744  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0028.png'
+00:12.437  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0031.png'
+00:13.095  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0034.png'
+00:13.770  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0037.png'
+00:14.452  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0040.png'
+00:15.116  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0043.png'
+00:15.792  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0046.png'
+00:16.484  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0049.png'
+00:17.192  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0052.png'
+00:17.877  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0055.png'
+00:18.563  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0058.png'
+00:19.252  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0061.png'
+00:20.009  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0064.png'
+00:20.870  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0067.png'
+00:21.590  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0070.png'
+00:22.335  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0073.png'
+00:23.033  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0076.png'
+00:23.765  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0079.png'
+00:24.509  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0082.png'
+00:25.203  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0085.png'
+00:25.949  render           | Saved: '/tmp/claude-0/-home-user-claude-skills/a0fff76b-036f-52aa-aae0-78ee08fe2860/scratchpad/hunter/blender-premium/teste-A/quadros_mb/q_0088.png'
+{
+ "orbita_pivo_rotZ": {
+  "erro_max_quadros_pct": 2e-05,
+  "erro_max_subquadros_pct": 3e-05
+ },
+ "dolly_cam_locY": {
+  "erro_max_quadros_pct": 4e-05,
+  "erro_max_subquadros_pct": 5e-05
+ },
+ "produto_rotZ_mola": {
+  "erro_max_quadros_pct": 0.0,
+  "erro_max_subquadros_pct": 0.00662
+ },
+ "skill_keyframe_insert_exp": {
+  "erro_max_quadros_pct": 2e-05,
+  "erro_max_subquadros_pct": 3e-05
+ },
+ "skill_keyframe_insert_dolly": {
+  "erro_max_quadros_pct": 3e-05,
+  "erro_max_subquadros_pct": 3e-05
+ },
+ "entrada_22_1_36_1_em_20q": {
+  "erro_max_quadros_pct": 2e-05,
+  "erro_max_subquadros_pct": 2e-05
+ },
+ "overshoot_handle_0.16_1.05_0.3_1": {
+  "erro_max_quadros_pct": 2e-05,
+  "erro_max_subquadros_pct": 3e-05
+ },
+ "overshoot_handle_0.16_1.1_0.3_1": {
+  "erro_max_quadros_pct": 2e-05,
+  "erro_max_subquadros_pct": 4e-05
+ },
+ "overshoot_handle_0.2_1.2_0.3_1": {
+  "erro_max_quadros_pct": 2e-05,
+  "erro_max_subquadros_pct": 4e-05
+ },
+ "overshoot_handle_0.34_1.56_0.64_1": {
+  "erro_max_quadros_pct": 2e-05,
+  "erro_max_subquadros_pct": 5e-05
+ },
+ "_depsgraph_vs_evaluate_rad": 0.0,
+ "_handle_free_preservado": [
+  "FREE",
+  [
+   15.24,
+   0.0
+  ]
+ ],
+ "_overshoot_handle_pct": {
+  "(0.16, 1.05, 0.3, 1)": 0.04,
+  "(0.16, 1.1, 0.3, 1)": 0.24,
+  "(0.2, 1.2, 0.3, 1)": 1.25,
+  "(0.34, 1.56, 0.64, 1)": 9.78
+ },
+ "_overshoot_BACK_pct": {
+  "0.5": 0.82,
+  "1.0": 3.7,
+  "1.70158": 10.0
+ },
+ "_overshoot_mola_teorico_pct": {
+  "0.6": 9.48,
+  "0.7": 4.6,
+  "0.8": 1.52,
+  "0.9": 0.15
+ },
+ "_mola_produto_pico_graus": 15.981,
+ "_tres_chaves_no_quadro_40": {
+  "cubic_bezier_por_trecho": {
+   "vel_meio": 0.0001,
+   "salto_acel": 0.000956
+  },
+  "AUTO_CLAMPED+NONE": {
+   "vel_meio": 0.0121,
+   "salto_acel": 0.001078,
+   "passa_do_fim": 0
+  },
+  "AUTO_CLAMPED+CONT_ACCEL": {
+   "vel_meio": 0.018,
+   "salto_acel": 0.000168,
+   "passa_do_fim": 0.0
+  },
+  "AUTO+CONT_ACCEL": {
+   "vel_meio": 0.0191,
+   "salto_acel": 2.6e-05,
+   "passa_do_fim": 0.018
+  }
+ }
+}
+RENDER mb: 30 quadros, total 25.2 s, mediana 0.70 s/quadro, 1o 4.60 s
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:34:58)
+
+Blender quit
