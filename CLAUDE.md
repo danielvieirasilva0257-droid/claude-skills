@@ -3,7 +3,7 @@
 Esta branch guarda **apenas o código** dos vídeos do app Rotina, na pasta `rotina-video/`.
 
 - **Habilidades, regras e conhecimento:** ficam na branch `main`.
-  - Comece pelo índice `HABILIDADES.txt` da main: `git fetch origin main && git show origin/main:HABILIDADES.txt`.
+  - Comece pelo índice `guia/HABILIDADES.txt` da main: `git fetch origin main && git show origin/main:guia/HABILIDADES.txt`. O manual está em `guia/LEIA-ANTES-DE-USAR.md`.
   - As regras de trabalho estão em `CLAUDE.md` da main, por exemplo: português com o usuário, aprovação para mudar skills, nunca salvar chaves.
 - **Passo a passo do projeto:** está na main, em `projetos/rotina/PASSO-A-PASSO.md`.
 - **Para ter as habilidades e o código juntos:** `git worktree add ../claude-skills-main origin/main`.
