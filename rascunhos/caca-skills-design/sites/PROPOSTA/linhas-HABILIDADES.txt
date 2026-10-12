@@ -25,3 +25,34 @@ pesquisa "fazer sites com IA" (11/10/2026): catálogo skills.sh, web, base de re
 >>> No manual guia/LEIA-ANTES-DE-USAR.md, tabela 3.3, acrescentar a linha (precisa da mesma aprovação):
 
 | `skills/sites/` | fazer sites: planejar, construir, testar, auditar e publicar | `referencia-sites`, `site-architecture`, `shadcn`, `vercel-react-best-practices`, `cro`, `webapp-testing`, `web-quality` (6), `deploy-to-vercel`, `seo-audit` |
+
+
+ACRESCENTADO EM 12/10/2026 (lista de download do Daniel: skills e ferramentas do vídeo). Entram só depois da aprovação do Daniel.
+=====================================================================================================================
+
+>>> Na seção 1, no bloco [DESIGN: animação e interface de sites e apps (skills/design/)], acrescentar depois de estilos-premium:
+
+taste-skill | revisar e gerar interface "anti-genérica": lê o briefing, 3 botões (variância, movimento, densidade), lista de padrões proibidos de IA e checagem final; skill GRANDE (uns 22 mil tokens, leia por seção) e v2 EXPERIMENTAL; opcional, o DESIGN.md aprovado manda; evitar os padrões com recorte/máscara (skill de terceiros, MIT, intacta) | skills/design/taste-skill/SKILL.md (leia antes o APRENDIZADOS.md; origem em ORIGEM.md)
+image-to-code | site "imagem primeiro": gerar uma imagem por seção, analisar e só então codar igual à imagem; precisa de gerador de imagem aprovado (gasta créditos) e vem depois do DESIGN.md; opcional (skill de terceiros, MIT, intacta) | skills/design/image-to-code/SKILL.md (leia antes o APRENDIZADOS.md; origem em ORIGEM.md)
+web-design-guidelines | revisar código de interface contra 100+ regras da Vercel (acessibilidade, foco, formulários, animação, tipografia, desempenho), relatório arquivo:linha; usar as regras da cópia fixada na pasta, não a busca na internet (skill da Vercel, MIT, intacta) | skills/design/web-design-guidelines/SKILL.md (regras em regras-fixadas/command.md; origem em ORIGEM.md)
+frontend-design | plano curto de design (cores, fontes, layout) revisado contra o briefing, fugir dos 5 visuais típicos de IA, uma ousadia só, guia de textos de interface; curta (uns 2,5 mil tokens) (skill da Anthropic, Apache-2.0, intacta) | skills/design/frontend-design/SKILL.md (origem em ORIGEM.md)
+
+>>> Na seção 1, no bloco [SITES: fazer sites com IA, do planejamento à publicação (skills/sites/)], acrescentar depois de webapp-testing:
+
+playwright-cli | usar um navegador por comandos curtos: prints em celular e computador, tema claro/escuro, movimento reduzido, cliques, formulário, console, vídeo; gasta menos créditos que MCP de navegador; instalar só na pasta do projeto ou no computador do Daniel; libera comandos sem perguntar e tem run-code: nunca conectar ao Chrome pessoal (skill da Microsoft, Apache-2.0, intacta) | skills/sites/playwright-cli/SKILL.md (leia antes o APRENDIZADOS.md; origem em ORIGEM.md)
+mcps-para-sites | manual dos MCPs para sites: shadcn MCP (achar e instalar componentes), 21st MCP (antigo Magic MCP, pago, envia pedidos à 21st.dev) e Chrome DevTools MCP (trace de desempenho e Lighthouse no Chrome; desligar estatísticas do Google); comandos de instalação só para o computador do Daniel, flags de privacidade, chaves e custos (skill nossa) | skills/sites/mcps-para-sites/SKILL.md
+
+>>> Na seção 1b (COMBOS): a linha do combo-site-premium (já proposta acima) passa a citar também: playwright-cli, web-design-guidelines, frontend-design, taste-skill, image-to-code (opcionais) e mcps-para-sites. Texto sugerido para substituir o trecho entre parênteses:
+
+(usa skills/sites/ + ui-ux-pro-max, estilos-premium, frontend-design, motion-oficial, button-animation, combo-copy-humanizada; opcionais: taste-skill, image-to-code, web-design-guidelines, MCPs de mcps-para-sites)
+
+>>> No manual guia/LEIA-ANTES-DE-USAR.md, tabela 3.3:
+
+- Na linha `skills/sites/` (proposta acima), acrescentar `playwright-cli` e `mcps-para-sites` à lista de skills.
+- Na linha `skills/design/`, acrescentar `taste-skill`, `image-to-code`, `web-design-guidelines` e `frontend-design`.
+
+>>> Na seção 2 (CONHECIMENTO), acrescentar (quando as pesquisas forem salvas em research_notes/):
+
+lista de download do Daniel (12/10/2026): 9 itens do vídeo (Taste Skill, Web Design Guidelines, Awesome Design, Image to Code, Playwright CLI, shadcn MCP, Magic/21st MCP, Frontend Design, Chrome DevTools MCP): licença, commit, risco e veredito de cada um | research_notes/Sites com IA 2026-10/RELATORIO-lista-download.md
+
+>>> Sobre o Awesome Design (VoltAgent/awesome-design-md): não vira skill nova. As 15 fichas já estão em skills/design/estilos-premium/references/marcas/. As outras 59 das 74 entram na "lista de download" como uma linha em skills/sites/referencia-sites/fontes.txt (nome awesome-design-md, commit 13be5c0) e como seção F do SKILL.md da referencia-sites (comandos para baixar UMA ficha para a pasta do projeto).

@@ -78,6 +78,30 @@ Ao instalar de um registry: `npx shadcn@latest add @launchui/<bloco>` (ou `@magi
 
 Godly, Lapa Ninja, Land-book, One Page Love, Awwwards e Codrops (as demos do Codrops têm termos próprios). Nunca copiar nem raspar. Use para escolher o "clima" e depois escreva o `DESIGN.md` com as nossas palavras.
 
+## F. Fichas de marca (awesome-design-md): baixar UMA sob demanda
+
+Coleção **VoltAgent/awesome-design-md** (MIT, "Copyright (c) 2026 VoltAgent"), fixada no commit `13be5c05c63be24b57581162364167028020f043` (05/10/2026), conferida em 12/10/2026: **74 fichas** `design-md/<marca>/DESIGN.md` (o README ainda diz 73), uns 2,9 MB no total. Cada ficha é uma **análise "inspirada"** do site público, no formato DESIGN.md do Google (cores, fontes, raios, componentes). **Não é guia oficial da marca**; logos, fotos e fontes continuam sendo dos donos (regras de uso em `estilos-premium`). O README também faz propaganda de kits pagos do `getdesign.md`: só link, nada de comprar sem o "sim" do Daniel.
+
+- **15 já estão guardadas** em `skills/design/estilos-premium/references/marcas/`: apple, bmw, bugatti, ferrari, framer, lamborghini, linear.app, notion, nike, raycast, spacex, stripe, superhuman, tesla, vercel. Use essas primeiro.
+- **As outras 59** ficam só na internet, no commit fixado: airbnb, airtable, binance, bmw-m, cal, claude, clay, clickhouse, cohere, coinbase, composio, cursor, dell-1996, elevenlabs, expo, figma, hashicorp, hp, ibm, intercom, kraken, lovable, mastercard, meta, minimax, mintlify, miro, mistral.ai, mongodb, nintendo-2001, nvidia, ollama, opencode.ai, pinterest, playstation, posthog, renault, replicate, resend, revolut, runwayml, sanity, sentry, shopify, slack, spotify, starbucks, supabase, theverge, together.ai, uber, vodafone, voltagent, warp, webflow, wired, wise, x.ai, zapier. Atenção: a pasta pode ter ponto no nome (`linear.app`, `mistral.ai`, `x.ai`).
+
+**O `scripts/baixar-referencia.sh awesome-design-md` baixa a coleção inteira (74 fichas, 2,9 MB)**: funciona e é pequeno, mas para **uma ficha só** use um destes comandos (testados em 12/10/2026), sempre **dentro da pasta do projeto do site**, nunca no `claude-skills`:
+
+```bash
+# A) um arquivo, direto (o mais simples; commit fixado)
+mkdir -p referencias
+curl -fsSL "https://raw.githubusercontent.com/VoltAgent/awesome-design-md/13be5c05c63be24b57581162364167028020f043/design-md/<marca>/DESIGN.md" -o "referencias/<marca>-DESIGN.md"
+
+# B) só a pasta da marca + a licença, com o histórico do git (para registrar o commit)
+git init -q referencias/_clones/awesome-design-md && cd referencias/_clones/awesome-design-md
+git remote add origin https://github.com/VoltAgent/awesome-design-md.git
+git sparse-checkout set --no-cone /design-md/<marca>/DESIGN.md /LICENSE
+git fetch -q --depth 1 --filter=blob:none origin 13be5c05c63be24b57581162364167028020f043
+git -c advice.detachedHead=false checkout -q FETCH_HEAD
+```
+
+Depois: (1) acrescente a marca em `CREDITOS.md` do projeto (repositório, commit, licença MIT) e guarde o texto da licença; (2) **confira as cores e fontes no site real**, porque a ficha pode estar desatualizada; (3) as fichas não têm as seções de movimento e composição do nosso modelo (`skills/design/ui-ux-pro-max/references/modelo-DESIGN.md`): acrescente-as; (4) pegue a **linguagem**, nunca a identidade da marca; (5) se a ficha ficar muito usada, proponha ao Daniel guardá-la em `estilos-premium` (precisa de aprovação). Para atualizar o commit fixado, repita a rotina "Para acrescentar uma referência nova".
+
 ## Qual escolher (atalho)
 
 | O Daniel pediu | Comece por |
@@ -89,6 +113,7 @@ Godly, Lapa Ninja, Land-book, One Page Love, Awwwards e Codrops (as demos do Cod
 | "loja" | `commerce` |
 | "algo bem minimalista e elegante" | `once-ui-starter` ou `launch-ui` com o `DESIGN.md` de `estilos-premium` |
 | "só quero ideias de layout" | HTML5 UP e a seção E |
+| "quero o visual de uma marca (Airbnb, Spotify, Revolut...)" | Ficha da marca no `awesome-design-md` (seção F) + `estilos-premium` |
 
 ## Como trazer um template para um projeto
 

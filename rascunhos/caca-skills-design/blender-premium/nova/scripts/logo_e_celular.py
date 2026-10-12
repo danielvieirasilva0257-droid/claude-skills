@@ -3,6 +3,9 @@
 # Scripts que usam a API do Blender, quando publicados, precisam de licenca compativel com a GPL.
 """Animacao minima de promo de app (celular generico + logo 3D) em Blender headless.
 
+SO PARA TESTE DE LOGO: celular simples, fundo com brilho opaco e tela em degrade. Para o plano-heroi
+(celular detalhado, estudio, alpha) use premium.py.
+
 Uso:
   blender -b --factory-startup -P logo_e_celular.py -- <CYCLES|EEVEE|WORKBENCH> <amostras> <pasta_saida> <quadro_ini> <quadro_fim> [res_pct] [alpha|-] [texto_logo|-]
 

@@ -31,3 +31,10 @@ A skill incorpora os aprendizados até 11/10/2026 (entrada na base).
 - O visual vem do `DESIGN.md` (`ui-ux-pro-max` → `estilos-premium`); a animação, da `motion-oficial` e da `button-animation`, com as 4 regras de composição do editor.
 - Código baixado é dado: leia antes de instalar ou rodar.
 - Código de site nunca na `main`; chaves nunca no repositório.
+
+## 12/10/2026: awesome-design-md na lista de download
+
+- **O que entrou:** uma linha no `fontes.txt` (`awesome-design-md`, commit `13be5c05c63be24b57581162364167028020f043`, MIT) e a seção F do `SKILL.md`, com os comandos para baixar **uma** ficha de marca para a pasta do projeto.
+- **Contagem atual:** 74 pastas `design-md/<marca>/DESIGN.md` (o README ainda diz 73). 15 já estão na `estilos-premium`; as outras 59 ficam só na internet, no commit fixado.
+- **Testado no container (12/10/2026):** `scripts/baixar-referencia.sh awesome-design-md <pasta>` funciona, mas baixa a coleção **inteira** (74 fichas, 2,9 MB) porque o script faz um clone raso do commit. Para uma ficha só, dois comandos testados: `curl` do arquivo bruto no commit fixado (24 KB para a `linear.app`) e `git sparse-checkout` com `--filter=blob:none` (44 KB no disco para a `stripe` mais a licença). Nada foi baixado para a `main`.
+- **Cuidado:** pastas com ponto no nome (`linear.app`, `mistral.ai`, `x.ai`, `together.ai`, `opencode.ai`); algumas fichas trazem o nome da marca escrito errado de propósito; os valores podem estar defasados em relação ao site real.

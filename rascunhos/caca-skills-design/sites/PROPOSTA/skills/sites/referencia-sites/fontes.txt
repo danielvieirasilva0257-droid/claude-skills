@@ -10,3 +10,4 @@ commerce | vercel/commerce | 3761e52e60df9c6a316e067dbfd7032e494d3634 | MIT | Ne
 once-ui-starter | once-ui-system/nextjs-starter | 78dcb8d7c5036a1f0c0fcc69220556ca47914019 | MIT | Next 16, Once UI | starter minimalista
 shadcn-landing | leoMirandaa/shadcn-landing-page | ae3716dbce5c8a26815222bb743994b5717938f1 | MIT | React, Tailwind 3, shadcn | landing simples (genérica)
 page-ui | danmindru/page-ui | bb4951f98c1d2960bc3093f377aa836b508fa9c0 | MIT | React, Tailwind, shadcn | componentes de landing (42 MB)
+awesome-design-md | VoltAgent/awesome-design-md | 13be5c05c63be24b57581162364167028020f043 | MIT | Markdown: 74 fichas DESIGN.md de marcas (design-md/<marca>/DESIGN.md), 2,9 MB | fichas de design de marcas (só inspiração; marcas e logos são dos donos)
