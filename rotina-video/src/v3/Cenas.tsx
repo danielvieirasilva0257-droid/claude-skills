@@ -193,16 +193,18 @@ const RotinaTitulo: React.FC<{f: number}> = ({f}) => {
 	const c = centro(at);
 	const y0 = c.y - 120;
 	const y1 = TOPO - 6;
+	// nasce centrado no celular e 20% menor (a caixa inteira cabe atras dele, que esta girando), cresce subindo
 	const pos = (g: number) => {
 		const k = sp(g, at, M.atras);
 		let y = y0 + (y1 - y0) * k;
 		y -= tw(g, [out, out + 10], [0, 1], E.exit) * (y1 + 260);
-		return y;
+		return {y, x: c.x + (540 - c.x) * Math.min(1, k), s: 0.8 + 0.2 * Math.min(1, k)};
 	};
-	const y = pos(f);
+	const p = pos(f);
+	const q = pos(f - 1);
 	return (
-		<Borrao id="v3rotina" dx={0} dy={y - pos(f - 1)}>
-			<div style={{position: 'absolute', left: 540 - w / 2, top: y, fontFamily: display, fontWeight: 600, fontSize: size, lineHeight: 0.95, letterSpacing: '0.02em', color: K.text}}>ROTINA</div>
+		<Borrao id="v3rotina" dx={p.x - q.x} dy={p.y - q.y}>
+			<div style={{position: 'absolute', left: p.x - w / 2, top: p.y, width: w, textAlign: 'center', transform: `scale(${p.s})`, transformOrigin: '50% 0', fontFamily: display, fontWeight: 600, fontSize: size, lineHeight: 0.95, letterSpacing: '0.02em', color: K.text, whiteSpace: 'nowrap'}}>ROTINA</div>
 		</Borrao>
 	);
 };
