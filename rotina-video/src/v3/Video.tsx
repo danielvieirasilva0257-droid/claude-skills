@@ -42,7 +42,8 @@ export const RotinaV3: React.FC<{audio?: boolean; silhueta?: boolean}> = ({audio
 		<AbsoluteFill style={{background: '#080808'}}>
 			<Fundo f={f} />
 			<Cenas f={f} />
-			{silhueta ? <Silhueta f={f} /> : bbox(phonePose(f)).y0 > 1930 ? null : <Img src={staticFile(`v3/celular/c_${pad4(f)}.png`)} style={{position: 'absolute', left: 0, top: 0, width: 1080, height: 1920}} />}
+			{/* o Blender (--borda) nao grava os quadros sem celular (0 a 4, y0 > 2000) */}
+			{silhueta ? <Silhueta f={f} /> : bbox(phonePose(f)).y0 > 2000 ? null : <Img src={staticFile(`v3/celular/c_${pad4(f)}.png`)} style={{position: 'absolute', left: 0, top: 0, width: 1080, height: 1920}} />}
 			<Grao f={f} />
 			<AbsoluteFill style={{pointerEvents: 'none', background: 'radial-gradient(ellipse at 50% 46%, rgba(0,0,0,0) 58%, rgba(0,0,0,0.22) 100%)'}} />
 			{audio ? <Audio src={staticFile(MIX_V3)} /> : null}

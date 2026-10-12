@@ -1,6 +1,6 @@
 import React from 'react';
 import {AbsoluteFill, useCurrentFrame} from 'remotion';
-import {ArrowDownRight, ArrowUpRight, Award, Banknote, CalendarDays, Dumbbell, Flame, Home, ListChecks, Percent, Plus, Repeat, Settings, TrendingUp, Wallet} from 'lucide-react';
+import {ArrowDownRight, ArrowUpRight, Award, Banknote, CalendarDays, Dumbbell, Flame, Home, ListChecks, Percent, PiggyBank, Plus, Repeat, Settings, TrendingUp, Utensils, Wallet} from 'lucide-react';
 import {brl, c, display, body} from '../theme';
 import {Card, Label} from '../screens/ui';
 import {AppMark} from '../v2/Marca';
@@ -576,7 +576,59 @@ const Abertura: React.FC<{f: number; desde: number}> = ({f, desde}) => (
 	</div>
 );
 
-const Apagada: React.FC = () => <div style={{width: UI_W, height: UI_H, background: '#000'}} />;
+// ---------------------------------------------------------------- tela de bloqueio do gancho (antes do app ligar)
+// "Segunda eu comeco" -> relogio cedo; em "quarta" a data e a hora rolam; as notificacoes dos 3 apps se empilham
+// em "voce ja perdeu a conta". A troca de data/hora e um cruzamento sem recorte (regra: nada de mascara cortando).
+const NOTIFS = [
+	{app: 'Dieta', msg: 'Você não registrou o almoço', Icon: Utensils, at: W(4, 'você')},
+	{app: 'Academia', msg: 'Treino de ontem: não feito', Icon: Dumbbell, at: W(4, 'perdeu')},
+	{app: 'Dinheiro', msg: '3 gastos sem anotar', Icon: PiggyBank, at: W(4, 'conta')},
+];
+const VIRA_DIA = W(4, 'quarta');
+
+const Rola: React.FC<{f: number; at: number; a: string; b: string; style: React.CSSProperties}> = ({f, at, a, b, style}) => {
+	const k = tw(f, [at, at + 12], [0, 1], E.uiMove);
+	const lh = Number(style.lineHeight ?? 1) * Number(style.fontSize ?? 16);
+	return (
+		<div style={{position: 'relative', height: lh}}>
+			<div style={{...style, transform: `translateY(${-0.4 * lh * k}px)`, opacity: 1 - tw(k, [0, 0.6], [0, 1], E.lin), filter: `blur(${3 * k}px)`}}>{a}</div>
+			<div style={{...style, position: 'absolute', left: 0, right: 0, top: 0, transform: `translateY(${0.4 * lh * (1 - k)}px)`, opacity: tw(k, [0.3, 1], [0, 1], E.lin), filter: `blur(${3 * (1 - k)}px)`}}>{b}</div>
+		</div>
+	);
+};
+
+const Bloqueio: React.FC<{f: number}> = ({f}) => {
+	const txt: React.CSSProperties = {textAlign: 'center', color: '#F5F5F7', whiteSpace: 'nowrap'};
+	return (
+		<div style={{position: 'relative', width: UI_W, height: UI_H, overflow: 'hidden', background: 'radial-gradient(120% 70% at 50% 108%, #3A0606 0%, #160505 38%, #070707 70%), #070707'}}>
+			<div style={{position: 'absolute', left: 0, right: 0, top: 96}}>
+				<Rola f={f} at={VIRA_DIA} a="segunda-feira, 6 de outubro" b="quarta-feira, 8 de outubro" style={{...txt, fontFamily: body, fontWeight: 500, fontSize: 18, lineHeight: 1.3, color: 'rgba(245,245,247,0.78)'}} />
+				<Rola f={f} at={VIRA_DIA + 3} a="06:30" b="09:47" style={{...txt, fontFamily: display, fontWeight: 600, fontSize: 104, lineHeight: 1.0, letterSpacing: '0.01em'}} />
+			</div>
+			<div style={{position: 'absolute', left: 12, right: 12, top: 300, display: 'flex', flexDirection: 'column', gap: 8}}>
+				{NOTIFS.map((n) => {
+					if (f < n.at) return null;
+					const k = sp(f, n.at, M.ui);
+					return (
+						<div key={n.app} style={{height: 70, borderRadius: 22, background: 'rgba(44,44,46,0.82)', display: 'flex', alignItems: 'center', gap: 12, padding: '0 14px', opacity: Math.min(1, k * 1.6), transform: `translateY(${-26 * (1 - k)}px) scale(${0.94 + 0.06 * k})`}}>
+							<div style={{width: 38, height: 38, borderRadius: 10, background: '#3A3A3C', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
+								<n.Icon size={22} color="#F5F5F7" strokeWidth={2} />
+							</div>
+							<div style={{flex: 1, minWidth: 0, fontFamily: body, color: '#F5F5F7'}}>
+								<div style={{display: 'flex', justifyContent: 'space-between', fontSize: 15, fontWeight: 600}}>
+									<span>{n.app}</span>
+									<span style={{fontWeight: 500, fontSize: 13, color: 'rgba(245,245,247,0.55)'}}>agora</span>
+								</div>
+								<div style={{fontSize: 14.5, fontWeight: 500, color: 'rgba(245,245,247,0.82)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{n.msg}</div>
+							</div>
+						</div>
+					);
+				})}
+			</div>
+			<div style={{position: 'absolute', left: (UI_W - 134) / 2, bottom: 9, width: 134, height: 5, borderRadius: 3, background: 'rgba(245,245,247,0.6)'}} />
+		</div>
+	);
+};
 
 // ---------------------------------------------------------------- linha do tempo das telas
 type Item = {at: number; el: (f: number) => React.ReactNode; slide?: number; dir?: 1 | -1};
@@ -591,7 +643,7 @@ const VOLTA = W(12, 'Nem') - 2;
 const FIM = W(13, 'Rotina') - 8;
 
 export const TELAS: Item[] = [
-	{at: 0, el: () => <Apagada />},
+	{at: 0, el: (f) => <Bloqueio f={f} />},
 	{at: LIGA, el: (f) => <Abertura f={f} desde={LIGA} />},
 	{at: HAB, el: (f) => <Habitos f={f} desde={HAB} />, slide: 9},
 	{at: MET, el: (f) => <Metricas f={f} desde={MET} />, slide: 9},

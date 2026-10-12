@@ -57,6 +57,11 @@ export const SFX: Cue[] = [
 	saida(W(4, 'quarta') - 2, -1, 0.24),
 	...titulo(W(4, 'quarta') - 2, DIR, true),
 	...titulo(W(4, 'perdeu') - 4, DIR, false, 0.16),
+	// tela de bloqueio: data/hora rolam em "quarta" e 3 notificacoes caem (Tela.tsx, Bloqueio)
+	['tick', W(4, 'quarta') + 4, 0.14, 0.2],
+	['chime', W(4, 'você') + 1, 0.1, 0.15, {n1: 1760, n2: 2349.3, gap: 0.05, dur: 0.35}],
+	['chime', W(4, 'perdeu') + 1, 0.1, 0.15, {n1: 1760, n2: 2349.3, gap: 0.05, dur: 0.35}],
+	['chime', W(4, 'conta') + 1, 0.11, 0.15, {n1: 1760, n2: 2349.3, gap: 0.05, dur: 0.35}],
 	// ---- revelacao (virada da trilha em "junta"): os icones voltam para tras do celular, a tela liga e ele gira
 	['pop', W(5, 'junta') + 2, 0.24, -0.3, {f0: 380, f1: 100, dur: 0.14}],
 	['pop', W(5, 'as') + 2, 0.24, 0.3, {f0: 420, f1: 110, dur: 0.14}],
