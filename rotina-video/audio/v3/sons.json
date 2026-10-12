@@ -252,6 +252,12 @@
   "pan": 0
  },
  {
+  "name": "swish",
+  "frame": 314,
+  "gain": 0.18,
+  "pan": 0.5
+ },
+ {
   "name": "click",
   "frame": 316,
   "gain": 0.26,

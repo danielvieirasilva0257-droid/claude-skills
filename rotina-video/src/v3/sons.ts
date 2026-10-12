@@ -71,6 +71,7 @@ export const SFX: Cue[] = [
 	['swish', W(5, 'mesmo') - 7, 0.22, 0],
 	['slam', W(5, 'mesmo') - 6 + POUSO_ATRAS, 0.36, 0],
 	// ---- habitos: 4 toques, o foguinho soma um
+	...titulo(W(6, 'cumprido') - 2, DIR, false, 0.18),
 	toque(W(6, 'cumprido') - 1),
 	toque(W(6, 'soma'), 0.24),
 	toque(W(6, 'um'), 0.24),

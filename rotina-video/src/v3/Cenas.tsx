@@ -284,6 +284,7 @@ export const Cenas: React.FC<{f: number}> = ({f}) => {
 			{/* revelacao */}
 			<RotinaTitulo f={f} />
 			{/* habitos */}
+			<Titulo f={f} id="t5b" txt="Cumprido" at={C(6, 'cumprido') - 2} out={C(7, 'E') - 4} lado="dir" size={150} />
 			<MaisUm f={f} />
 			<Titulo f={f} id="t6" txt="Furou" at={C(7, 'furou') - 2} out={C(8, 'semana') - 12} lado="dir" cor={K.redHi} />
 			{/* treino */}
