@@ -1,0 +1,566 @@
+{
+ "fps": 30,
+ "lead_s": 0.2,
+ "voice_end_s": 28.329,
+ "lines": [
+  {
+   "n": 1,
+   "text": "Segunda eu começo.",
+   "start": 0.275,
+   "end": 1.165,
+   "words": [
+    {
+     "word": "Segunda",
+     "start": 0.275,
+     "end": 0.575
+    },
+    {
+     "word": "eu",
+     "start": 0.595,
+     "end": 0.635
+    },
+    {
+     "word": "começo.",
+     "start": 0.675,
+     "end": 1.165
+    }
+   ]
+  },
+  {
+   "n": 2,
+   "text": "Dieta, academia, guardar dinheiro.",
+   "start": 1.345,
+   "end": 3.646,
+   "words": [
+    {
+     "word": "Dieta,",
+     "start": 1.345,
+     "end": 1.925
+    },
+    {
+     "word": "academia,",
+     "start": 1.965,
+     "end": 2.726
+    },
+    {
+     "word": "guardar",
+     "start": 2.826,
+     "end": 3.106
+    },
+    {
+     "word": "dinheiro.",
+     "start": 3.126,
+     "end": 3.646
+    }
+   ]
+  },
+  {
+   "n": 3,
+   "text": "Aí cada coisa fica num app diferente.",
+   "start": 3.826,
+   "end": 5.647,
+   "words": [
+    {
+     "word": "Aí",
+     "start": 3.826,
+     "end": 3.966
+    },
+    {
+     "word": "cada",
+     "start": 4.046,
+     "end": 4.247
+    },
+    {
+     "word": "coisa",
+     "start": 4.307,
+     "end": 4.547
+    },
+    {
+     "word": "fica",
+     "start": 4.607,
+     "end": 4.767
+    },
+    {
+     "word": "num",
+     "start": 4.787,
+     "end": 4.887
+    },
+    {
+     "word": "app",
+     "start": 4.947,
+     "end": 5.087
+    },
+    {
+     "word": "diferente.",
+     "start": 5.127,
+     "end": 5.647
+    }
+   ]
+  },
+  {
+   "n": 4,
+   "text": "Na quarta, você já perdeu a conta.",
+   "start": 5.827,
+   "end": 7.408,
+   "words": [
+    {
+     "word": "Na",
+     "start": 5.827,
+     "end": 5.908
+    },
+    {
+     "word": "quarta,",
+     "start": 5.968,
+     "end": 6.428
+    },
+    {
+     "word": "você",
+     "start": 6.528,
+     "end": 6.648
+    },
+    {
+     "word": "já",
+     "start": 6.688,
+     "end": 6.768
+    },
+    {
+     "word": "perdeu",
+     "start": 6.808,
+     "end": 7.008
+    },
+    {
+     "word": "a",
+     "start": 7.048,
+     "end": 7.068
+    },
+    {
+     "word": "conta.",
+     "start": 7.108,
+     "end": 7.408
+    }
+   ]
+  },
+  {
+   "n": 5,
+   "text": "O Rotina junta as três no mesmo lugar.",
+   "start": 7.748,
+   "end": 9.919,
+   "words": [
+    {
+     "word": "O",
+     "start": 7.748,
+     "end": 7.788
+    },
+    {
+     "word": "Rotina",
+     "start": 7.828,
+     "end": 8.228
+    },
+    {
+     "word": "junta",
+     "start": 8.338,
+     "end": 8.598
+    },
+    {
+     "word": "as",
+     "start": 8.678,
+     "end": 8.758
+    },
+    {
+     "word": "três",
+     "start": 8.838,
+     "end": 9.198
+    },
+    {
+     "word": "no",
+     "start": 9.278,
+     "end": 9.338
+    },
+    {
+     "word": "mesmo",
+     "start": 9.378,
+     "end": 9.599
+    },
+    {
+     "word": "lugar.",
+     "start": 9.639,
+     "end": 9.919
+    }
+   ]
+  },
+  {
+   "n": 6,
+   "text": "Cada dia cumprido soma um no foguinho.",
+   "start": 10.179,
+   "end": 12.104,
+   "words": [
+    {
+     "word": "Cada",
+     "start": 10.179,
+     "end": 10.359
+    },
+    {
+     "word": "dia",
+     "start": 10.399,
+     "end": 10.499
+    },
+    {
+     "word": "cumprido",
+     "start": 10.559,
+     "end": 10.979
+    },
+    {
+     "word": "soma",
+     "start": 11.104,
+     "end": 11.304
+    },
+    {
+     "word": "um",
+     "start": 11.404,
+     "end": 11.524
+    },
+    {
+     "word": "no",
+     "start": 11.624,
+     "end": 11.704
+    },
+    {
+     "word": "foguinho.",
+     "start": 11.744,
+     "end": 12.104
+    }
+   ]
+  },
+  {
+   "n": 7,
+   "text": "E dá pra ver em qual dia você furou.",
+   "start": 12.284,
+   "end": 13.885,
+   "words": [
+    {
+     "word": "E",
+     "start": 12.284,
+     "end": 12.324
+    },
+    {
+     "word": "dá",
+     "start": 12.364,
+     "end": 12.424
+    },
+    {
+     "word": "pra",
+     "start": 12.465,
+     "end": 12.565
+    },
+    {
+     "word": "ver",
+     "start": 12.625,
+     "end": 12.745
+    },
+    {
+     "word": "em",
+     "start": 12.765,
+     "end": 12.825
+    },
+    {
+     "word": "qual",
+     "start": 12.905,
+     "end": 13.145
+    },
+    {
+     "word": "dia",
+     "start": 13.205,
+     "end": 13.385
+    },
+    {
+     "word": "você",
+     "start": 13.425,
+     "end": 13.585
+    },
+    {
+     "word": "furou.",
+     "start": 13.645,
+     "end": 13.885
+    }
+   ]
+  },
+  {
+   "n": 8,
+   "text": "Você planeja a semana: segunda peito, terça costas.",
+   "start": 14.165,
+   "end": 16.815,
+   "words": [
+    {
+     "word": "Você",
+     "start": 14.165,
+     "end": 14.305
+    },
+    {
+     "word": "planeja",
+     "start": 14.345,
+     "end": 14.665
+    },
+    {
+     "word": "a",
+     "start": 14.685,
+     "end": 14.705
+    },
+    {
+     "word": "semana:",
+     "start": 14.765,
+     "end": 15.245
+    },
+    {
+     "word": "segunda",
+     "start": 15.375,
+     "end": 15.675
+    },
+    {
+     "word": "peito,",
+     "start": 15.715,
+     "end": 16.075
+    },
+    {
+     "word": "terça",
+     "start": 16.175,
+     "end": 16.375
+    },
+    {
+     "word": "costas.",
+     "start": 16.415,
+     "end": 16.815
+    }
+   ]
+  },
+  {
+   "n": 9,
+   "text": "Anotou peso e repetição, cai direto no gráfico.",
+   "start": 16.995,
+   "end": 19.176,
+   "words": [
+    {
+     "word": "Anotou",
+     "start": 16.995,
+     "end": 17.235
+    },
+    {
+     "word": "peso",
+     "start": 17.315,
+     "end": 17.555
+    },
+    {
+     "word": "e",
+     "start": 17.575,
+     "end": 17.616
+    },
+    {
+     "word": "repetição,",
+     "start": 17.636,
+     "end": 18.136
+    },
+    {
+     "word": "cai",
+     "start": 18.236,
+     "end": 18.376
+    },
+    {
+     "word": "direto",
+     "start": 18.396,
+     "end": 18.656
+    },
+    {
+     "word": "no",
+     "start": 18.696,
+     "end": 18.736
+    },
+    {
+     "word": "gráfico.",
+     "start": 18.776,
+     "end": 19.176
+    }
+   ]
+  },
+  {
+   "n": 10,
+   "text": "Entrou salário, saiu PIX, o saldo do mês acompanha.",
+   "start": 19.456,
+   "end": 22.316,
+   "words": [
+    {
+     "word": "Entrou",
+     "start": 19.456,
+     "end": 19.696
+    },
+    {
+     "word": "salário,",
+     "start": 19.736,
+     "end": 20.156
+    },
+    {
+     "word": "saiu",
+     "start": 20.256,
+     "end": 20.416
+    },
+    {
+     "word": "PIX,",
+     "start": 20.476,
+     "end": 20.816
+    },
+    {
+     "word": "o",
+     "start": 20.916,
+     "end": 20.956
+    },
+    {
+     "word": "saldo",
+     "start": 21.056,
+     "end": 21.296
+    },
+    {
+     "word": "do",
+     "start": 21.336,
+     "end": 21.416
+    },
+    {
+     "word": "mês",
+     "start": 21.456,
+     "end": 21.776
+    },
+    {
+     "word": "acompanha.",
+     "start": 21.876,
+     "end": 22.316
+    }
+   ]
+  },
+  {
+   "n": 11,
+   "text": "Conta fixa de um lado, gasto pontual do outro.",
+   "start": 22.496,
+   "end": 24.837,
+   "words": [
+    {
+     "word": "Conta",
+     "start": 22.496,
+     "end": 22.696
+    },
+    {
+     "word": "fixa",
+     "start": 22.836,
+     "end": 23.136
+    },
+    {
+     "word": "de",
+     "start": 23.176,
+     "end": 23.236
+    },
+    {
+     "word": "um",
+     "start": 23.276,
+     "end": 23.336
+    },
+    {
+     "word": "lado,",
+     "start": 23.376,
+     "end": 23.656
+    },
+    {
+     "word": "gasto",
+     "start": 23.756,
+     "end": 23.996
+    },
+    {
+     "word": "pontual",
+     "start": 24.056,
+     "end": 24.417
+    },
+    {
+     "word": "do",
+     "start": 24.457,
+     "end": 24.537
+    },
+    {
+     "word": "outro.",
+     "start": 24.597,
+     "end": 24.837
+    }
+   ]
+  },
+  {
+   "n": 12,
+   "text": "Nem precisa esperar a segunda.",
+   "start": 25.137,
+   "end": 26.418,
+   "words": [
+    {
+     "word": "Nem",
+     "start": 25.137,
+     "end": 25.257
+    },
+    {
+     "word": "precisa",
+     "start": 25.297,
+     "end": 25.657
+    },
+    {
+     "word": "esperar",
+     "start": 25.697,
+     "end": 25.978
+    },
+    {
+     "word": "a",
+     "start": 25.998,
+     "end": 26.018
+    },
+    {
+     "word": "segunda.",
+     "start": 26.058,
+     "end": 26.418
+    }
+   ]
+  },
+  {
+   "n": 13,
+   "text": "Baixe o Rotina agora. Link na bio.",
+   "start": 26.658,
+   "end": 28.299,
+   "words": [
+    {
+     "word": "Baixe",
+     "start": 26.658,
+     "end": 26.878
+    },
+    {
+     "word": "o",
+     "start": 26.898,
+     "end": 26.918
+    },
+    {
+     "word": "Rotina",
+     "start": 26.978,
+     "end": 27.298
+    },
+    {
+     "word": "agora.",
+     "start": 27.358,
+     "end": 27.679
+    },
+    {
+     "word": "Link",
+     "start": 27.809,
+     "end": 27.969
+    },
+    {
+     "word": "na",
+     "start": 28.009,
+     "end": 28.069
+    },
+    {
+     "word": "bio.",
+     "start": 28.129,
+     "end": 28.299
+    }
+   ]
+  }
+ ]
+}

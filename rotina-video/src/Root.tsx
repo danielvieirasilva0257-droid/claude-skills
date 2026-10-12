@@ -7,9 +7,16 @@ import {Tela} from './v2/Tela';
 import {Celular} from './v2/Celular';
 import {END} from './v2/tempo';
 import {RotinaV2} from './v2/Video';
+import {V3Tela} from './v3/Tela';
+import {END as END3} from './v3/tempo';
+import {RotinaV3} from './v3/Video';
 
 export const Root: React.FC = () => (
 	<>
+		{/* v3 (30 s): telas do app para a tela do celular do Blender (1080 x 2309 = area ativa do premium.py) */}
+		<Composition id="V3Tela" component={V3Tela} durationInFrames={END3} fps={30} width={1080} height={2309} defaultProps={{}} />
+		{/* v3 final: palco escuro + celular do Blender (public/v3/celular) + voz Leda 1,1x + trilha e efeitos */}
+		<Composition id="RotinaV3" component={RotinaV3} durationInFrames={END3} fps={30} width={1080} height={1920} defaultProps={{audio: true, silhueta: false}} />
 		{/* v2 (30 s): app screens for the 3D phone texture, the 3D phone layer (transparent) */}
 		<Composition id="V2Tela" component={Tela} durationInFrames={END} fps={30} width={1080} height={2340} defaultProps={{}} />
 		<Composition id="V2Celular" component={Celular} durationInFrames={END} fps={30} width={1080} height={1920} defaultProps={{}} />

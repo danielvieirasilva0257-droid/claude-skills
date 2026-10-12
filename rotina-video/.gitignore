@@ -5,3 +5,7 @@ audio/music.wav
 # v2: frames generated from code (see PASSO-A-PASSO on main): re-render instead of committing
 public/v2/tela/
 public/v2/celular/
+
+# v3: quadros gerados por código (telas e camada 3D do Blender): renderize de novo em vez de versionar
+public/v3/tela/
+public/v3/celular/

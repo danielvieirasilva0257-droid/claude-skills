@@ -16,6 +16,7 @@ a.add_argument('--pct', type=int, default=100); a.add_argument('--spp', type=int
 a.add_argument('--mb', action='store_true'); a.add_argument('--fstop', type=float, default=0.0)
 a.add_argument('--tela', help='primeiro arquivo da sequencia da UI (numerada pelo quadro do Remotion)')
 a.add_argument('--checar', action='store_true', help='grava <out>checar.json com os cantos da tela projetados')
+a.add_argument('--borda', action='store_true', help='renderiza so a regiao do celular em cada quadro (mesmo PNG cheio, fundo transparente)')
 args = a.parse_args(sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else [])
 os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
 T0 = time.time()
@@ -93,7 +94,29 @@ for i, f in enumerate(lista):
     if ini is None: ini = f
     if i == len(lista) - 1 or lista[i + 1] != f + 1: trechos.append((ini, f)); ini = None
 log(f'render {len(lista)} quadros em {len(trechos)} trechos, {args.pct}%, {args.spp} amostras, mb={args.mb}')
-for f0, f1 in trechos:
-    sc.frame_start, sc.frame_end = f0, f1; r.filepath = args.out
-    bpy.ops.render.render(animation=True)
+pecas = [o for o in bpy.data.objects if o.type == 'MESH' and o.visible_camera and (o.parent == prod or (o.parent and o.parent.parent == prod))]
+def borda(f):
+    # caixa do celular projetada em f - 0,5, f e f + 0,5 (motion blur), com folga para reflexo e antisserrilhado
+    xs, ys = [], []
+    for sub in (-0.5, 0.0, 0.5):
+        sc.frame_set(f, subframe=0.5 + sub) if sub < 0 else sc.frame_set(f, subframe=sub) if sub > 0 else sc.frame_set(f)
+        if sub < 0: sc.frame_set(f - 1, subframe=0.5)
+        for o in pecas:
+            for c in o.bound_box:
+                v = world_to_camera_view(sc, cam, o.matrix_world @ Vector(c)); xs.append(v.x); ys.append(v.y)
+    sc.frame_set(f)
+    pad = 0.03
+    return max(0.0, min(xs) - pad), min(1.0, max(xs) + pad), max(0.0, min(ys) - pad * 0.56), min(1.0, max(ys) + pad * 0.56)
+if args.borda:
+    r.use_border = True; r.use_crop_to_border = False
+    for f in lista:
+        x0, x1, y0, y1 = borda(f)
+        if x1 <= x0 or y1 <= y0: continue
+        r.border_min_x, r.border_max_x, r.border_min_y, r.border_max_y = x0, x1, y0, y1
+        sc.frame_set(f); r.filepath = f'{args.out}{f:04d}'
+        bpy.ops.render.render(write_still=True)
+else:
+    for f0, f1 in trechos:
+        sc.frame_start, sc.frame_end = f0, f1; r.filepath = args.out
+        bpy.ops.render.render(animation=True)
 log('fim')
