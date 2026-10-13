@@ -1,12 +1,13 @@
 import React from 'react';
-import {C, E, F, Grande, brl, sp, tw} from './theme';
+import type {LucideIcon} from 'lucide-react';
+import {C, E, F, FD, Grande, brl, sp, tw} from './theme';
 import {Cartao, Item} from './pecas';
 
 // Blocos maiores do v5, genericos (o conteudo vem de Cenas5).
 
 // ---------------------------------------------------------------- lista que rola por secoes (como "Combustivel / Manutencao / ...")
 export type ItemDados = {selo: React.ReactNode; titulo: string; sub: string; valor: React.ReactNode; corValor?: string};
-export type SecaoDados = {titulo: string; total?: string; itens: ItemDados[]; at: number};
+export type SecaoDados = {titulo: string; total?: string; itens: ItemDados[]; at: number; icone?: LucideIcon; cor?: string};
 
 // cada secao entra no quadro da palavra; a coluna rola rapido ate ela (chicote com borrao vertical)
 export const LARG_LISTA = 860;
@@ -41,8 +42,11 @@ export const Lista: React.FC<{f: number; secoes: SecaoDados[]; x: number; topo: 
 				return (
 					<div key={s.titulo} style={{position: 'absolute', left: 0, top, width: LARG_LISTA}}>
 						<div style={{height: ALT_TIT, display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-							<span style={{fontWeight: 700, fontSize: 52, letterSpacing: '-0.025em', color: C.text}}>{s.titulo}</span>
-							{s.total ? <span style={{fontWeight: 600, fontSize: 30, color: C.gray}}>{s.total}</span> : null}
+							<span style={{display: 'flex', alignItems: 'center', gap: 16}}>
+								{s.icone ? <s.icone size={46} color={s.cor ?? C.red} strokeWidth={2.4} /> : null}
+								<span style={{fontFamily: FD, fontWeight: 800, fontSize: 62, letterSpacing: '0.01em', color: s.cor ?? C.text, textTransform: 'uppercase'}}>{s.titulo}</span>
+							</span>
+							{s.total ? <span style={{fontFamily: FD, fontWeight: 700, fontSize: 36, color: C.gray}}>{s.total}</span> : null}
 						</div>
 						{s.itens.map((it, j) => {
 							const at = s.at + j * 4;
@@ -66,9 +70,9 @@ export const velLista = (f: number, secoes: SecaoDados[], topo: number) => posic
 // ---------------------------------------------------------------- linha do topo com um numero que muda a cada secao (o "sobra R$ ..." do modelo)
 export const Topo: React.FC<{esquerda: string; rotulo: string; valor: string; w: number}> = ({esquerda, rotulo, valor, w}) => (
 	<div style={{width: w, display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', fontFamily: F}}>
-		<span style={{fontWeight: 500, fontSize: 30, color: C.gray}}>{esquerda}</span>
-		<span style={{fontWeight: 500, fontSize: 30, color: C.gray}}>
-			{rotulo} <span style={{fontWeight: 700, fontSize: 46, color: C.text, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums'}}>{valor}</span>
+		<span style={{fontFamily: FD, fontWeight: 600, fontSize: 30, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.gray}}>{esquerda}</span>
+		<span style={{fontFamily: FD, fontWeight: 600, fontSize: 30, letterSpacing: '0.1em', textTransform: 'uppercase', color: C.gray}}>
+			{rotulo} <span style={{fontWeight: 800, fontSize: 58, letterSpacing: 0, color: C.text, fontVariantNumeric: 'tabular-nums'}}>{valor}</span>
 		</span>
 	</div>
 );
@@ -85,7 +89,7 @@ export const Resumo: React.FC<{f: number; at: number; linhas: Linha[]; segmentos
 				{linhas.map((l) => (
 					<div key={l.rotulo} style={{display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 18}}>
 						<span style={{fontWeight: 500, fontSize: 32, color: C.gray}}>{l.rotulo}</span>
-						<span style={{fontWeight: 700, fontSize: 36, color: C.text, fontVariantNumeric: 'tabular-nums'}}>{l.valor}</span>
+						<span style={{fontFamily: FD, fontWeight: 800, fontSize: 42, color: C.text, fontVariantNumeric: 'tabular-nums'}}>{l.valor}</span>
 					</div>
 				))}
 				<div style={{display: 'flex', gap: 6, height: 14, marginTop: 10}}>
@@ -94,7 +98,7 @@ export const Resumo: React.FC<{f: number; at: number; linhas: Linha[]; segmentos
 					))}
 				</div>
 				<div style={{height: 1.5, background: C.line, margin: '34px 0 26px'}} />
-				<div style={{fontWeight: 600, fontSize: 34, color: luz > 0.5 ? C.red : C.gray}}>{titulo}</div>
+				<div style={{fontFamily: FD, fontWeight: 700, fontSize: 34, letterSpacing: '0.12em', textTransform: 'uppercase', color: luz > 0.5 ? C.red : C.gray}}>{titulo}</div>
 				<div style={{marginTop: 6, textShadow: luz > 0 ? `0 0 ${40 * luz}px rgba(255,77,77,${0.45 * luz})` : undefined}}>
 					<Grande valor={grande} size={150} />
 				</div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import {Pointer} from 'lucide-react';
 import {AppMark} from '../v2/Marca';
-import {C, E, F, larg, sp, tw} from './theme';
+import {C, E, F, FD, larg, sp, tw} from './theme';
 
 // Pecas de interface do v5, no desenho do video-modelo: cartoes escuros com borda fina, titulos fortes,
 // valores alinhados a direita, numeros tabulares.
@@ -42,14 +42,14 @@ export const Item: React.FC<{
 			<div style={{fontWeight: 600, fontSize: 32, color: C.text, letterSpacing: '-0.01em', whiteSpace: 'nowrap'}}>{titulo}</div>
 			<div style={{fontWeight: 500, fontSize: 23, color: C.gray, marginTop: 2, whiteSpace: 'nowrap'}}>{sub}</div>
 		</div>
-		<div style={{fontWeight: 700, fontSize: 32, color: corValor, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums'}}>{valor}</div>
+		<div style={{fontFamily: FD, fontWeight: 800, fontSize: 40, color: corValor, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums'}}>{valor}</div>
 	</div>
 );
 
 export const SeloDia: React.FC<{dia: string; mes: string}> = ({dia, mes}) => (
 	<>
-		<div style={{fontWeight: 700, fontSize: 32, lineHeight: 1, color: C.text}}>{dia}</div>
-		<div style={{fontWeight: 600, fontSize: 15, letterSpacing: '0.08em', color: C.gray, marginTop: 4}}>{mes}</div>
+		<div style={{fontFamily: FD, fontWeight: 800, fontSize: 36, lineHeight: 1, color: C.text}}>{dia}</div>
+		<div style={{fontFamily: FD, fontWeight: 600, fontSize: 16, letterSpacing: '0.12em', color: C.gray, marginTop: 3}}>{mes}</div>
 	</>
 );
 
@@ -71,11 +71,12 @@ export const Pilula: React.FC<{w: number; h: number; texto: string; size: number
 			display: 'flex',
 			alignItems: 'center',
 			justifyContent: 'center',
-			fontFamily: F,
-			fontWeight: 600,
+			fontFamily: FD,
+			fontWeight: 800,
 			fontSize: size,
-			letterSpacing: '-0.015em',
-			color: '#140405',
+			letterSpacing: '0.02em',
+			textTransform: 'uppercase',
+			color: '#FFFFFF',
 			transform: `scale(${1 - 0.05 * afunda})`,
 			boxShadow: `0 ${24 - 12 * afunda}px ${60 - 20 * afunda}px rgba(224,30,38,${0.35 + 0.25 * brilho}), inset 0 1px 0 rgba(255,255,255,0.25)`,
 		}}
@@ -100,9 +101,9 @@ export const Cursor: React.FC<{f: number; de: {x: number; y: number}; para: {x: 
 
 // logo do Rotina no desenho do modelo: icone + nome + subtitulo pequeno na cor do acento
 export const Logo: React.FC<{f: number; at: number; size?: number; sub?: string; desenha?: boolean}> = ({f, at, size = 132, sub = 'hábitos · treino · dinheiro', desenha = true}) => {
-	const nome = 'Rotina';
-	const sNome = size * 0.72;
-	const wNome = larg(nome, sNome, 700);
+	const nome = 'ROTINA';
+	const sNome = size * 0.82;
+	const wNome = larg(nome, sNome, 700, FD, 0.02);
 	const sSub = size * 0.24;
 	const wSub = larg(sub, sSub, 600);
 	const icon = sp(f, at, {stiffness: 260, damping: 18});
@@ -117,10 +118,10 @@ export const Logo: React.FC<{f: number; at: number; size?: number; sub?: string;
 				<AppMark size={size} bg={C.redFill} fg="#FFFFFF" draw={draw} />
 			</div>
 			<div style={{position: 'relative', zIndex: 1, marginLeft: 24, display: 'flex', alignItems: 'baseline', gap: 14, transform: `translateX(${(1 - rev) * -(wNome * 0.5)}px)`, opacity: rev, filter: rev < 1 ? `blur(${(1 - rev) * 10}px)` : undefined}}>
-				<span style={{fontFamily: F, fontWeight: 700, fontSize: sNome, letterSpacing: '-0.03em', color: C.text}}>{nome}</span>
-				<span style={{fontFamily: F, fontWeight: 600, fontSize: sSub, color: C.red, opacity: revSub, transform: `translateX(${(1 - revSub) * -20}px)`}}>{sub}</span>
+				<span style={{fontFamily: FD, fontWeight: 700, fontSize: sNome, letterSpacing: '0.02em', color: C.text, whiteSpace: 'nowrap'}}>{nome}</span>
+				<span style={{fontFamily: F, fontWeight: 600, fontSize: sSub, color: C.red, whiteSpace: 'nowrap', opacity: revSub, transform: `translateX(${(1 - revSub) * -20}px)`}}>{sub}</span>
 			</div>
 		</div>
 	);
 };
-export const larguraLogo = (size = 132, sub = 'hábitos · treino · dinheiro') => size + 24 + larg('Rotina', size * 0.72, 700) + 14 + larg(sub, size * 0.24, 600);
+export const larguraLogo = (size = 132, sub = 'hábitos · treino · dinheiro') => size + 24 + larg('ROTINA', size * 0.82, 700, FD, 0.02) + 14 + larg(sub, size * 0.24, 600);

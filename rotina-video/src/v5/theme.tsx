@@ -1,12 +1,14 @@
 import React from 'react';
+import type {LucideIcon} from 'lucide-react';
 import {AbsoluteFill, Easing, interpolate, spring} from 'remotion';
-import {SANS} from '../v2/theme';
+import {body, c, display} from '../theme';
 import {textWidth} from '../v2/parts';
 
 // Rotina v5 (16:9, 1920 x 1080): no estilo do video-modelo do Daniel (promo de app "UI premium").
-// Fundo quase preto com manchas de luz desfocadas, Inter Tight em tudo, cartoes escuros de interface,
-// frases que se montam palavra por palavra no centro, camera passeando pela interface com borrao de movimento.
-// No modelo as manchas sao verde e laranja; aqui viram vermelho (a marca) e ambar.
+// Fundo quase preto com manchas de luz desfocadas, cartoes escuros de interface, frases que se montam palavra
+// por palavra no centro, camera passeando pela interface com borrao de movimento.
+// Pedido do Daniel: a TIPOGRAFIA, os ICONES e as CORES sao os do proprio app (Barlow, Barlow Condensed em caixa alta,
+// icones lucide do app, cor de cada categoria), como no v2. No modelo as manchas sao verde e laranja; aqui, vermelho e ambar.
 
 export const W5 = 1920;
 export const H5 = 1080;
@@ -19,14 +21,19 @@ export const C = {
 	card: '#17171C',
 	card2: '#1E1E24',
 	line: 'rgba(255,255,255,0.07)',
-	red: '#FF4D4D', // acento em texto (o verde do modelo)
-	redFill: '#E01E26', // botoes e preenchimentos
+	red: c.redHi, // acento em texto (o verde do modelo) = vermelho claro do app
+	redFill: c.red, // botoes e preenchimentos = vermelho do app
 	redDeep: '#7A0A0E',
 	redGlow: 'rgba(255,60,60,0.35)',
-	amber: '#F59E0B',
-	green: '#34D399',
+	amber: c.amber,
+	green: c.green,
+	blue: c.blue,
+	purple: c.purple,
+	orange: c.orange,
+	pink: c.pink,
 };
-export const F = SANS; // Inter Tight (variavel, 100-900), carregada pelo tema do v2
+export const F = body; // Barlow (texto do app)
+export const FD = display; // Barlow Condensed (titulos e numeros do app, em caixa alta)
 
 export const E = {
 	out: Easing.bezier(0.16, 1, 0.3, 1),
@@ -46,8 +53,8 @@ export const SPR = {
 	ui: {stiffness: 380, damping: 32},
 };
 
-// largura de texto em Inter Tight
-export const larg = (t: string, size: number, peso = 600) => textWidth(t, size, F, false, peso) + t.length * size * -0.01;
+// largura de texto (Barlow ou Barlow Condensed), com o mesmo espacamento usado no desenho
+export const larg = (t: string, size: number, peso = 600, fonte = F, track = -0.01) => textWidth(t, size, fonte, false, peso) + t.length * size * track;
 
 // numero em reais no formato brasileiro
 export const brl = (v: number, casas = 2) => v.toLocaleString('pt-BR', {minimumFractionDigits: casas, maximumFractionDigits: casas});
@@ -61,8 +68,8 @@ export const Fundo5: React.FC<{f: number; forca?: number}> = ({f, forca = 1}) =>
 	const by = 1240 + 60 * Math.cos(t * 0.23 + 0.4);
 	return (
 		<AbsoluteFill style={{background: C.bg}}>
-			<AbsoluteFill style={{opacity: forca, background: `radial-gradient(circle 980px at ${ax}px ${ay}px, rgba(214,24,30,0.62) 0%, rgba(150,12,18,0.30) 38%, rgba(10,10,14,0) 72%)`}} />
-			<AbsoluteFill style={{opacity: forca, background: `radial-gradient(circle 900px at ${bx}px ${by}px, rgba(245,140,20,0.55) 0%, rgba(200,90,10,0.22) 40%, rgba(10,10,14,0) 74%)`}} />
+			<AbsoluteFill style={{opacity: forca, background: `radial-gradient(circle 1150px at ${ax}px ${ay}px, rgba(214,24,30,0.78) 0%, rgba(160,14,20,0.40) 36%, rgba(10,10,14,0) 74%)`}} />
+			<AbsoluteFill style={{opacity: forca, background: `radial-gradient(circle 1050px at ${bx}px ${by}px, rgba(245,140,20,0.70) 0%, rgba(205,95,12,0.30) 38%, rgba(10,10,14,0) 76%)`}} />
 			<AbsoluteFill style={{background: 'radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.45) 100%)'}} />
 		</AbsoluteFill>
 	);
@@ -101,13 +108,19 @@ export const Borrao5: React.FC<{id: string; dx: number; dy: number; children: Re
 // ---------------------------------------------------------------- frase palavra por palavra (como no modelo)
 // Cada palavra entra no quadro da fala com desfoque saindo e uma subida curta; a linha se recentraliza sozinha
 // porque a largura de cada palavra entra aos poucos. Uma "palavra" pode ser um chip de interface.
-export type Palavra = {t: string; at: number; cor?: string; peso?: number; chip?: React.ReactNode; chipW?: number};
+// titulo: true = palavra no estilo dos titulos do app (Barlow Condensed, caixa alta, cor e icone da categoria)
+export type Palavra = {t: string; at: number; cor?: string; peso?: number; chip?: React.ReactNode; chipW?: number; titulo?: boolean; icone?: LucideIcon};
+const larguraPalavra = (p: Palavra, size: number) => {
+	if (p.chip) return p.chipW ?? 0;
+	if (p.titulo) return larg(p.t.toUpperCase(), size * 1.12, 800, FD, 0) + (p.icone ? size * 0.95 : 0);
+	return larg(p.t, size, p.peso ?? 600);
+};
 export const Frase: React.FC<{f: number; palavras: Palavra[]; size: number; y: number; sai?: number; id: string; gap?: number}> = ({f, palavras, size, y, sai = 1e9, id, gap}) => {
 	if (f < palavras[0].at - 1) return null;
 	const out = tw(f, [sai, sai + 8], [0, 1], E.in);
 	if (out >= 1) return null;
 	const g = gap ?? size * 0.28;
-	const ws = palavras.map((p) => (p.chip ? p.chipW ?? 0 : larg(p.t, size, p.peso ?? 600)));
+	const ws = palavras.map((p) => larguraPalavra(p, size));
 	const as = palavras.map((p) => tw(f, [p.at - 1, p.at + 8], [0, 1], E.out));
 	const total = ws.reduce((acc, w, i) => acc + (w + (i ? g : 0)) * as[i], 0);
 	let x = W5 / 2 - total / 2;
@@ -132,6 +145,15 @@ export const Frase: React.FC<{f: number; palavras: Palavra[]; size: number; y: n
 							{p.chip}
 						</div>
 					);
+				if (p.titulo) {
+					const cor = p.cor ?? C.red;
+					return (
+						<div key={id + i} style={{...style, top: y - size * 0.68 + (1 - a) * size * 0.32, display: 'flex', alignItems: 'center', gap: size * 0.2}}>
+							{p.icone ? <p.icone size={size * 0.75} color={cor} strokeWidth={2.4} /> : null}
+							<span style={{fontFamily: FD, fontWeight: 800, fontSize: size * 1.12, lineHeight: 1.24, color: cor, textTransform: 'uppercase'}}>{p.t}</span>
+						</div>
+					);
+				}
 				return (
 					<div key={id + i} style={{...style, fontFamily: F, fontWeight: p.peso ?? 600, fontSize: size, lineHeight: 1.24, letterSpacing: '-0.01em', color: p.cor ?? C.text}}>
 						{p.t}
@@ -148,9 +170,9 @@ export const Grande: React.FC<{valor: string; size: number; cor?: string; corCen
 	const ini = i >= 0 ? valor.slice(0, i) : valor;
 	const fim = i >= 0 ? valor.slice(i) : '';
 	return (
-		<span style={{fontFamily: F, fontWeight: 700, fontSize: size, letterSpacing: '-0.035em', color: cor, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums'}}>
+		<span style={{fontFamily: FD, fontWeight: 800, fontSize: size, letterSpacing: '-0.01em', color: cor, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums'}}>
 			{ini}
-			<span style={{fontSize: size * 0.48, color: corCent, letterSpacing: '-0.01em'}}>{fim}</span>
+			<span style={{fontSize: size * 0.48, color: corCent, letterSpacing: 0}}>{fim}</span>
 		</span>
 	);
 };
