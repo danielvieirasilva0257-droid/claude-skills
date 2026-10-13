@@ -11,9 +11,20 @@ import {V3Tela, V4Tela} from './v3/Tela';
 import {END as END3} from './v3/tempo';
 import {RotinaV3} from './v3/Video';
 import {RotinaV4} from './v4/Video';
+import {TelaV5} from './v5/Tela5';
 
 export const Root: React.FC = () => (
 	<>
+		{/* v5 (16:9, estilo do video-modelo): textura da tela de bloqueio do celular da abertura (conteudo provisorio) */}
+		<Composition
+			id="V5Tela"
+			component={TelaV5}
+			durationInFrames={120}
+			fps={30}
+			width={1080}
+			height={2309}
+			defaultProps={{data: 'segunda-feira, 13 de outubro', hora: '07:30', widget: {rotulo: 'Rotina', meta: 'semana', valor: '4 de 7', progresso: 0.57}}}
+		/>
 		{/* v4 final: celular do Blender do v3 + visual papel e tinta do v2 (fundos por secao, Anton, Instrument Serif) */}
 		<Composition id="RotinaV4" component={RotinaV4} durationInFrames={END3} fps={30} width={1080} height={1920} defaultProps={{audio: true, silhueta: false}} />
 		{/* v4 (30 s): telas do app com a abertura clara (o resto igual ao v3) */}

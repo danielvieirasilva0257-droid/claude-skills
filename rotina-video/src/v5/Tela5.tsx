@@ -1,10 +1,10 @@
 import React from 'react';
-import {AbsoluteFill, random, useCurrentFrame} from 'remotion';
+import {AbsoluteFill, useCurrentFrame} from 'remotion';
 import {AppMark} from '../v2/Marca';
 import {C, F} from './theme';
 
 // Tela de bloqueio do celular da abertura do v5 (textura do Blender, 1080 x 2309 = area ativa do premium.py).
-// Papel de parede com bokeh quente (como o do modelo, em vermelho e ambar), relogio e o widget do Rotina,
+// Papel de parede em gradiente (pedido do Daniel), relogio e o widget do Rotina,
 // que depois salta para fora do celular em 2D (o mesmo componente, maior).
 
 export const UI5 = {w: 390, h: 834};
@@ -31,32 +31,36 @@ export const Widget5: React.FC<{d: WidgetDados; escala?: number; prog?: number}>
 	);
 };
 
-const Bokeh: React.FC = () => (
+// papel de parede em gradiente (o Daniel gosta): escuro no topo (relogio e widget legiveis),
+// vermelho da marca no meio e ambar embaixo, com uma luz suave e granulacao fina
+const Gradiente: React.FC = () => (
 	<>
-		{Array.from({length: 26}).map((_, i) => {
-			const r = 8 + random('br' + i) * 38;
-			const x = random('bx' + i) * UI5.w;
-			const y = UI5.h * 0.45 + random('by' + i) * UI5.h * 0.55;
-			const quente = random('bc' + i);
-			const cor = quente < 0.45 ? '255,90,40' : quente < 0.8 ? '255,170,60' : '255,60,70';
-			const a = 0.18 + random('ba' + i) * 0.4;
-			return <div key={i} style={{position: 'absolute', left: x - r, top: y - r, width: 2 * r, height: 2 * r, borderRadius: '50%', background: `radial-gradient(circle, rgba(${cor},${a}) 0%, rgba(${cor},${a * 0.55}) 55%, rgba(${cor},0) 72%)`}} />;
-		})}
+		<div style={{position: 'absolute', inset: 0, background: 'linear-gradient(180deg, #0B0709 0%, #1A0608 26%, #5A0A10 52%, #B3121B 72%, #E8461E 88%, #F59E0B 100%)'}} />
+		<div style={{position: 'absolute', inset: 0, background: 'radial-gradient(90% 45% at 18% 78%, rgba(255,120,60,0.55) 0%, rgba(255,120,60,0) 70%)'}} />
+		<div style={{position: 'absolute', inset: 0, background: 'radial-gradient(80% 40% at 88% 62%, rgba(255,40,60,0.45) 0%, rgba(255,40,60,0) 70%)'}} />
+		<div style={{position: 'absolute', inset: 0, background: 'radial-gradient(120% 50% at 50% 0%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 70%)'}} />
+		<svg width={UI5.w} height={UI5.h} style={{position: 'absolute', inset: 0, mixBlendMode: 'overlay', opacity: 0.18}}>
+			<filter id="t5grao">
+				<feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves={2} seed={3} stitchTiles="stitch" />
+				<feColorMatrix type="saturate" values="0" />
+			</filter>
+			<rect width="100%" height="100%" filter="url(#t5grao)" />
+		</svg>
 	</>
 );
 
 export const Bloqueio5: React.FC<{data: string; hora: string; widget: WidgetDados; notifs?: {app: string; msg: string; quando: string}[]}> = ({data, hora, widget, notifs = []}) => (
-	<div style={{position: 'relative', width: UI5.w, height: UI5.h, overflow: 'hidden', background: 'radial-gradient(130% 80% at 50% 100%, #3B1206 0%, #1A0A08 45%, #0B0A0C 75%)', fontFamily: F}}>
-		<Bokeh />
-		<div style={{position: 'absolute', left: 0, right: 0, top: 70, textAlign: 'center', color: C.text}}>
+	<div style={{position: 'relative', width: UI5.w, height: UI5.h, overflow: 'hidden', background: '#0B0709', fontFamily: F}}>
+		<Gradiente />
+		<div style={{position: 'absolute', left: 0, right: 0, top: 60, textAlign: 'center', color: C.text}}>
 			<div style={{fontWeight: 600, fontSize: 17, color: 'rgba(245,245,247,0.82)'}}>{data}</div>
 			<div style={{fontWeight: 700, fontSize: 92, lineHeight: 1.0, letterSpacing: '-0.04em', marginTop: 2}}>{hora}</div>
 		</div>
 		{/* widget no centro do terco de cima (v ~ 0,27: e o ponto que a camera do Blender centraliza no avanco) */}
-		<div style={{position: 'absolute', left: 20, top: 186}}>
+		<div style={{position: 'absolute', left: 20, top: 196}}>
 			<Widget5 d={widget} />
 		</div>
-		<div style={{position: 'absolute', left: 14, right: 14, top: 318, display: 'flex', flexDirection: 'column', gap: 8}}>
+		<div style={{position: 'absolute', left: 14, right: 14, top: 330, display: 'flex', flexDirection: 'column', gap: 8}}>
 			{notifs.map((n) => (
 				<div key={n.msg} style={{height: 64, borderRadius: 20, background: 'rgba(30,28,32,0.72)', border: '0.8px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 11, padding: '0 13px'}}>
 					<AppMark size={34} bg={C.redFill} fg="#fff" />
