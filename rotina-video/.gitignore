@@ -9,3 +9,7 @@ public/v2/celular/
 # v3: quadros gerados por código (telas e camada 3D do Blender): renderize de novo em vez de versionar
 public/v3/tela/
 public/v3/celular/
+
+# v4: telas com a abertura clara e os quadros do celular refeitos (o resto vem de public/v3/celular)
+public/v4/tela/
+public/v4/celular/

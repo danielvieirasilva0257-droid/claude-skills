@@ -7,12 +7,17 @@ import {Tela} from './v2/Tela';
 import {Celular} from './v2/Celular';
 import {END} from './v2/tempo';
 import {RotinaV2} from './v2/Video';
-import {V3Tela} from './v3/Tela';
+import {V3Tela, V4Tela} from './v3/Tela';
 import {END as END3} from './v3/tempo';
 import {RotinaV3} from './v3/Video';
+import {RotinaV4} from './v4/Video';
 
 export const Root: React.FC = () => (
 	<>
+		{/* v4 final: celular do Blender do v3 + visual papel e tinta do v2 (fundos por secao, Anton, Instrument Serif) */}
+		<Composition id="RotinaV4" component={RotinaV4} durationInFrames={END3} fps={30} width={1080} height={1920} defaultProps={{audio: false, silhueta: false}} />
+		{/* v4 (30 s): telas do app com a abertura clara (o resto igual ao v3) */}
+		<Composition id="V4Tela" component={V4Tela} durationInFrames={END3} fps={30} width={1080} height={2309} defaultProps={{}} />
 		{/* v3 (30 s): telas do app para a tela do celular do Blender (1080 x 2309 = area ativa do premium.py) */}
 		<Composition id="V3Tela" component={V3Tela} durationInFrames={END3} fps={30} width={1080} height={2309} defaultProps={{}} />
 		{/* v3 final: palco escuro + celular do Blender (public/v3/celular) + voz Leda 1,1x + trilha e efeitos */}

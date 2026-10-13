@@ -576,6 +576,14 @@ const Abertura: React.FC<{f: number; desde: number}> = ({f, desde}) => (
 	</div>
 );
 
+// v4: abertura clara (papel com a marca vermelha), para contrastar com o fundo vermelho do video
+const AberturaClara: React.FC<{f: number; desde: number}> = ({f, desde}) => (
+	<div style={{width: UI_W, height: UI_H, background: '#F7F3EC', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20}}>
+		<AppMark size={128} bg={c.red} fg="#FFFFFF" draw={tw(f, [desde + 2, desde + 22], [0, 1], E.out)} />
+		<div style={{fontFamily: display, fontSize: 60, fontWeight: 600, letterSpacing: '0.02em', color: '#111111', opacity: tw(f, [desde + 10, desde + 18], [0, 1], E.ui), transform: `translateY(${tw(f, [desde + 10, desde + 20], [16, 0], E.ui)}px)`}}>ROTINA</div>
+	</div>
+);
+
 // ---------------------------------------------------------------- tela de bloqueio do gancho (antes do app ligar)
 // "Segunda eu comeco" -> relogio cedo; em "quarta" a data e a hora rolam; as notificacoes dos 3 apps se empilham
 // em "voce ja perdeu a conta". A troca de data/hora e um cruzamento sem recorte (regra: nada de mascara cortando).
@@ -642,9 +650,12 @@ const DESP = W(11, 'Conta') - 6;
 const VOLTA = W(12, 'Nem') - 2;
 const FIM = W(13, 'Rotina') - 8;
 
-export const TELAS: Item[] = [
+// clara = true no v4 (a abertura fica clara para nao sumir no fundo vermelho)
+const telasCom = (clara: boolean): Item[] => {
+	const Ab = clara ? AberturaClara : Abertura;
+	return [
 	{at: 0, el: (f) => <Bloqueio f={f} />},
-	{at: LIGA, el: (f) => <Abertura f={f} desde={LIGA} />},
+	{at: LIGA, el: (f) => <Ab f={f} desde={LIGA} />},
 	{at: HAB, el: (f) => <Habitos f={f} desde={HAB} />, slide: 9},
 	{at: MET, el: (f) => <Metricas f={f} desde={MET} />, slide: 9},
 	{at: TREINO, el: (f) => <Planejar f={f} desde={TREINO} tapTab={TREINO - 2} />, slide: 9},
@@ -652,12 +663,15 @@ export const TELAS: Item[] = [
 	{at: FIN, el: (f) => <Visao f={f} desde={FIN} tapTab={FIN - 2} />, slide: 9},
 	{at: DESP, el: (f) => <Despesas f={f} desde={DESP} />, slide: 9},
 	{at: VOLTA, el: (f) => <Habitos f={f} desde={VOLTA} tapTab={VOLTA - 2} final />, slide: 9, dir: -1},
-	{at: FIM, el: (f) => <Abertura f={f} desde={FIM} />, slide: 8},
-];
+	{at: FIM, el: (f) => <Ab f={f} desde={FIM} />, slide: 8},
+	];
+};
+export const TELAS = telasCom(false);
+export const TELAS_V4 = telasCom(true);
 
-export const telaEm = (f: number) => {
+export const telaEm = (f: number, lista: Item[] = TELAS) => {
 	let i = 0;
-	for (let k = 0; k < TELAS.length; k++) if (f >= TELAS[k].at) i = k;
+	for (let k = 0; k < lista.length; k++) if (f >= lista[k].at) i = k;
 	return i;
 };
 
@@ -668,10 +682,10 @@ const TAPS_ABA: [number, number][] = [
 	[VOLTA - 2, 0],
 ];
 
-export const TelaApp: React.FC<{f: number}> = ({f}) => {
-	const i = telaEm(f);
-	const cur = TELAS[i];
-	const prev = i > 0 ? TELAS[i - 1] : null;
+export const TelaApp: React.FC<{f: number; lista?: Item[]}> = ({f, lista = TELAS}) => {
+	const i = telaEm(f, lista);
+	const cur = lista[i];
+	const prev = i > 0 ? lista[i - 1] : null;
 	const t = cur.slide ? tw(f, [cur.at, cur.at + cur.slide], [0, 1], E.uiMove) : 1;
 	const dir = cur.dir ?? 1;
 	const aba = TAPS_ABA.find(([at]) => f >= at - 5 && f < at + 18);
@@ -691,6 +705,18 @@ export const V3Tela: React.FC = () => {
 		<AbsoluteFill style={{background: '#000'}}>
 			<div style={{position: 'absolute', left: 0, top: 0, width: UI_W, height: UI_H, transform: `scale(${S})`, transformOrigin: '0 0'}}>
 				<TelaApp f={f} />
+			</div>
+		</AbsoluteFill>
+	);
+};
+
+// Composicao V4Tela: igual a V3Tela, com a abertura clara
+export const V4Tela: React.FC = () => {
+	const f = useCurrentFrame();
+	return (
+		<AbsoluteFill style={{background: '#000'}}>
+			<div style={{position: 'absolute', left: 0, top: 0, width: UI_W, height: UI_H, transform: `scale(${S})`, transformOrigin: '0 0'}}>
+				<TelaApp f={f} lista={TELAS_V4} />
 			</div>
 		</AbsoluteFill>
 	);
