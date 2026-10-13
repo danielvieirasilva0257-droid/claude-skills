@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Rotina v3: aplica a coreografia do video (poses.json, gerado pelo src/v3/rig.ts) ao celular da cena base
+# Rotina v3/v4/v5: aplica a coreografia do video (poses.json, gerado pelo src/v3/rig.ts) ao celular da cena base
 # do premium.py (skill blender-ia) e renderiza a camada 3D com fundo transparente para o Remotion.
 # A camera e fixa e igual a projecao do rig.ts: os textos e cartoes do Remotion caem no lugar certo da tela.
 #
@@ -25,6 +25,9 @@ def log(m): print(f'[v3_pose +{time.time() - T0:6.1f}s] {m}', flush=True)
 P = json.load(open(args.poses))
 sc = bpy.context.scene; r = sc.render; cy = sc.cycles
 cy.samples = args.spp; cy.adaptive_min_samples = min(8, args.spp)
+# resolucao: a do poses.json (v5: 1920 x 1080); sem ela, a da cena base (1080 x 1920, v3/v4)
+W = int(P['cam'].get('w', r.resolution_x)); H = int(P['cam'].get('h', r.resolution_y))
+r.resolution_x, r.resolution_y = W, H
 r.resolution_percentage = args.pct
 r.use_motion_blur = args.mb; r.motion_blur_shutter = 0.5
 
@@ -74,7 +77,7 @@ def cantos(f):
     sc.frame_set(f); mw = corpo.matrix_world; out = []
     for u, v in ((0, 0), (1, 0), (1, 1), (0, 1), (0.5, 0.5)):
         w = mw @ Vector(((u - 0.5) * 2 * AX, (0.5 - v) * 2 * AY, D / 2))
-        c = world_to_camera_view(sc, cam, w); out.append([round(c.x * 1080, 1), round((1 - c.y) * 1920, 1)])
+        c = world_to_camera_view(sc, cam, w); out.append([round(c.x * W, 1), round((1 - c.y) * H, 1)])
     return out
 
 fr = sorted(vis)
@@ -106,7 +109,7 @@ def borda(f):
                 v = world_to_camera_view(sc, cam, o.matrix_world @ Vector(c)); xs.append(v.x); ys.append(v.y)
     sc.frame_set(f)
     pad = 0.03
-    return max(0.0, min(xs) - pad), min(1.0, max(xs) + pad), max(0.0, min(ys) - pad * 0.56), min(1.0, max(ys) + pad * 0.56)
+    return max(0.0, min(xs) - pad), min(1.0, max(xs) + pad), max(0.0, min(ys) - pad * W / H), min(1.0, max(ys) + pad * W / H)
 if args.borda:
     r.use_border = True; r.use_crop_to_border = False
     for f in lista:
