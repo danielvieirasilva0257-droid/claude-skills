@@ -492,8 +492,8 @@ export const Fechamento: React.FC<{f: number}> = ({f}) => {
 	const sT = Math.min(110, (940 * 100) / serifW(t, 100));
 	const wSeg = textWidth('SEGUNDA', 240);
 	const segAt = W(12, 'segunda') - 4;
-	const risco = tw(f, [segAt + 8, segAt + 18], [0, 1], ease.out);
-	const sai = T.redEnd + 4;
+	const risco = tw(f, [segAt + 6, segAt + 14], [0, 1], ease.out);
+	const sai = T.redEnd + 1; // saem antes do botao descer do topo (nada de texto cruzando texto)
 	return (
 		<>
 			<Entra f={f} at={nem} from="left" x={70} y={300} w={serifW(t, sT)} h={sT * 1.2} exitAt={sai} exitTo="left" id="c_nem">
@@ -515,7 +515,7 @@ export const Fechamento: React.FC<{f: number}> = ({f}) => {
 
 // ============================================================ CTA (vermelho; celular no centro com a abertura clara)
 export const CTA: React.FC<{f: number}> = ({f}) => {
-	const baixe = W(13, 'Baixe');
+	const baixe = W(13, 'Baixe') + 2;
 	if (f < baixe - 2) return null;
 	const agora = W(13, 'agora');
 	const link = W(13, 'Link') - 1;

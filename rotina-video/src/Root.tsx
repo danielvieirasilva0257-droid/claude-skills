@@ -15,7 +15,7 @@ import {RotinaV4} from './v4/Video';
 export const Root: React.FC = () => (
 	<>
 		{/* v4 final: celular do Blender do v3 + visual papel e tinta do v2 (fundos por secao, Anton, Instrument Serif) */}
-		<Composition id="RotinaV4" component={RotinaV4} durationInFrames={END3} fps={30} width={1080} height={1920} defaultProps={{audio: false, silhueta: false}} />
+		<Composition id="RotinaV4" component={RotinaV4} durationInFrames={END3} fps={30} width={1080} height={1920} defaultProps={{audio: true, silhueta: false}} />
 		{/* v4 (30 s): telas do app com a abertura clara (o resto igual ao v3) */}
 		<Composition id="V4Tela" component={V4Tela} durationInFrames={END3} fps={30} width={1080} height={2309} defaultProps={{}} />
 		{/* v3 (30 s): telas do app para a tela do celular do Blender (1080 x 2309 = area ativa do premium.py) */}

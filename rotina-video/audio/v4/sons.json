@@ -917,10 +917,10 @@
  },
  {
   "name": "scribble",
-  "frame": 786,
+  "frame": 784,
   "gain": 0.26,
   "pan": 0.2,
-  "dur": 0.4
+  "dur": 0.3
  },
  {
   "name": "whoosh",
@@ -941,7 +941,7 @@
  },
  {
   "name": "whoosh",
-  "frame": 797,
+  "frame": 799,
   "gain": 0.26,
   "pan": 0,
   "dur": 0.4,
@@ -951,7 +951,7 @@
  },
  {
   "name": "thump",
-  "frame": 808,
+  "frame": 810,
   "gain": 0.26,
   "pan": 0
  },
