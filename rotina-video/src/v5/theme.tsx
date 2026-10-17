@@ -88,15 +88,16 @@ export const Grao5: React.FC<{f: number}> = ({f}) => (
 );
 
 // borrao direcional (filtro SVG em regiao grande: nunca corta)
-export const Borrao5: React.FC<{id: string; dx: number; dy: number; children: React.ReactNode; k?: number; max?: number}> = ({id, dx, dy, children, k = 0.35, max = 40}) => {
+// w, h: tamanho do quadro (padrao 1920 x 1080; o v6 vertical passa 1080 x 1920)
+export const Borrao5: React.FC<{id: string; dx: number; dy: number; children: React.ReactNode; k?: number; max?: number; w?: number; h?: number}> = ({id, dx, dy, children, k = 0.35, max = 40, w = W5, h = H5}) => {
 	const sx = Math.min(max, Math.abs(dx) * k);
 	const sy = Math.min(max, Math.abs(dy) * k);
-	const frame: React.CSSProperties = {position: 'absolute', left: 0, top: 0, width: W5, height: H5};
+	const frame: React.CSSProperties = {position: 'absolute', left: 0, top: 0, width: w, height: h};
 	if (sx < 0.5 && sy < 0.5) return <div style={frame}>{children}</div>;
 	return (
 		<div style={{...frame, filter: `url(#${id})`}}>
 			<svg width={0} height={0} style={{position: 'absolute'}}>
-				<filter id={id} filterUnits="userSpaceOnUse" x={-3000} y={-3000} width={W5 + 6000} height={H5 + 6000}>
+				<filter id={id} filterUnits="userSpaceOnUse" x={-3000} y={-3000} width={w + 6000} height={h + 6000}>
 					<feGaussianBlur stdDeviation={`${sx.toFixed(2)} ${sy.toFixed(2)}`} />
 				</filter>
 			</svg>
@@ -110,12 +111,24 @@ export const Borrao5: React.FC<{id: string; dx: number; dy: number; children: Re
 // porque a largura de cada palavra entra aos poucos. Uma "palavra" pode ser um chip de interface.
 // titulo: true = palavra no estilo dos titulos do app (Barlow Condensed, caixa alta, cor e icone da categoria)
 export type Palavra = {t: string; at: number; cor?: string; peso?: number; chip?: React.ReactNode; chipW?: number; titulo?: boolean; icone?: LucideIcon};
-const larguraPalavra = (p: Palavra, size: number) => {
+export const larguraPalavra = (p: Palavra, size: number) => {
 	if (p.chip) return p.chipW ?? 0;
 	if (p.titulo) return larg(p.t.toUpperCase(), size * 1.12, 800, FD, 0) + (p.icone ? size * 0.95 : 0);
 	return larg(p.t, size, p.peso ?? 600);
 };
-export const Frase: React.FC<{f: number; palavras: Palavra[]; size: number; y: number; sai?: number; id: string; gap?: number}> = ({f, palavras, size, y, sai = 1e9, id, gap}) => {
+// cx, fw, fh: centro da linha e tamanho do quadro (padrao: quadro 16:9 do v5)
+export const Frase: React.FC<{f: number; palavras: Palavra[]; size: number; y: number; sai?: number; id: string; gap?: number; cx?: number; fw?: number; fh?: number}> = ({
+	f,
+	palavras,
+	size,
+	y,
+	sai = 1e9,
+	id,
+	gap,
+	cx = W5 / 2,
+	fw = W5,
+	fh = H5,
+}) => {
 	if (f < palavras[0].at - 1) return null;
 	const out = tw(f, [sai, sai + 8], [0, 1], E.in);
 	if (out >= 1) return null;
@@ -123,9 +136,9 @@ export const Frase: React.FC<{f: number; palavras: Palavra[]; size: number; y: n
 	const ws = palavras.map((p) => larguraPalavra(p, size));
 	const as = palavras.map((p) => tw(f, [p.at - 1, p.at + 8], [0, 1], E.out));
 	const total = ws.reduce((acc, w, i) => acc + (w + (i ? g : 0)) * as[i], 0);
-	let x = W5 / 2 - total / 2;
+	let x = cx - total / 2;
 	return (
-		<div style={{position: 'absolute', left: 0, top: 0, width: W5, height: H5, opacity: 1 - out, filter: out > 0 ? `blur(${(out * 10).toFixed(1)}px)` : undefined}}>
+		<div style={{position: 'absolute', left: 0, top: 0, width: fw, height: fh, opacity: 1 - out, filter: out > 0 ? `blur(${(out * 10).toFixed(1)}px)` : undefined}}>
 			{palavras.map((p, i) => {
 				const a = as[i];
 				const left = x + (i ? g * a : 0);
