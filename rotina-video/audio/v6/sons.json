@@ -177,7 +177,7 @@
  },
  {
   "name": "whoosh",
-  "frame": 92,
+  "frame": 88,
   "gain": 0.1,
   "pan": 0,
   "dur": 0.3,
@@ -219,7 +219,7 @@
  },
  {
   "name": "whoosh",
-  "frame": 256,
+  "frame": 250,
   "gain": 0.12,
   "pan": 0,
   "dur": 0.3,
@@ -344,7 +344,7 @@
  },
  {
   "name": "whoosh",
-  "frame": 386,
+  "frame": 381,
   "gain": 0.1,
   "pan": 0,
   "dur": 0.3,
@@ -515,7 +515,7 @@
  },
  {
   "name": "whoosh",
-  "frame": 587,
+  "frame": 583,
   "gain": 0.12,
   "pan": 0,
   "dur": 0.3,
@@ -644,7 +644,7 @@
  },
  {
   "name": "whoosh",
-  "frame": 770,
+  "frame": 766,
   "gain": 0.1,
   "pan": 0,
   "dur": 0.3,
@@ -735,7 +735,7 @@
  },
  {
   "name": "whoosh",
-  "frame": 868,
+  "frame": 864,
   "gain": 0.1,
   "pan": 0,
   "dur": 0.3,
@@ -779,39 +779,32 @@
   "frame": 973,
   "gain": 0.045,
   "pan": 0,
-  "freq": 2120
+  "freq": 2200
+ },
+ {
+  "name": "click",
+  "frame": 975,
+  "gain": 0.045,
+  "pan": 0,
+  "freq": 2600
  },
  {
   "name": "click",
   "frame": 976,
   "gain": 0.045,
   "pan": 0,
-  "freq": 2440
+  "freq": 3000
  },
  {
   "name": "click",
   "frame": 978,
   "gain": 0.045,
   "pan": 0,
-  "freq": 2760
- },
- {
-  "name": "click",
-  "frame": 981,
-  "gain": 0.045,
-  "pan": 0,
-  "freq": 3080
- },
- {
-  "name": "click",
-  "frame": 983,
-  "gain": 0.045,
-  "pan": 0,
   "freq": 3400
  },
  {
   "name": "whoosh",
-  "frame": 976,
+  "frame": 974,
   "gain": 0.12,
   "pan": 0,
   "dur": 0.3,

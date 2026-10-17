@@ -33,10 +33,10 @@ export const SFX: Cue[] = [
 	...camera,
 	['chime', T6.pop1, 0.07, 0, {n1: 1760, n2: 2349.3, gap: 0.05, dur: 0.35}],
 	pop(T6.pop1 + 2, 820, 0.16),
-	sobe(T6.p1 - 6),
+	sobe(T6.p1 - 10),
 	// ================= estilos por semana: 4 cartoes, tom subindo
 	...T6.semanas.map((a, i) => pop(a + 1, 560 + 90 * i, 0.15, -0.2 + 0.13 * i)),
-	sobe(T6.p2 - 8, 0.12),
+	sobe(T6.p2 - 14, 0.12),
 	// ================= checklist do treino (toques na tela) e o toque no estilo
 	...T6.checks.flatMap((a, i): Cue[] => [toque(a, 0.1, 0.15), pop(a + 3, 1100 + 80 * i, 0.07, 0.15)]),
 	toque(T6.tocaEstilo, 0.12),
@@ -48,7 +48,7 @@ export const SFX: Cue[] = [
 	pop(T6.popReps + 1, 640, 0.14),
 	toque(T6.maisReps - 1, 0.16),
 	['tick', T6.maisReps + 1, 0.1, -0.1],
-	sobe(T6.p3 - 6),
+	sobe(T6.p3 - 11),
 	// ================= fechou doze: digita as repeticoes; o app manda subir a carga
 	...digita([T6.doze - 9, T6.doze - 8, T6.doze - 4, T6.doze - 3, T6.doze + 1, T6.doze + 2]),
 	['chime', T6.popAviso, 0.07, 0.2, {n1: 1318.5, n2: 1975.5, gap: 0.06, dur: 0.5}],
@@ -60,7 +60,7 @@ export const SFX: Cue[] = [
 	sobe(T6.popRM - 8, 0.08),
 	pop(T6.popRM + 1, 600, 0.14),
 	...conta(T6.popRM + 3, T6.popRM + 26, 9),
-	sobe(T6.p4 - 7, 0.12),
+	sobe(T6.p4 - 11, 0.12),
 	// ================= grafico semana a semana, mes a mes
 	pop(T6.popGrafico + 1, 680, 0.14),
 	['scribble', T6.popGrafico + 3, 0.08, 0, {dur: 0.6}],
@@ -72,19 +72,19 @@ export const SFX: Cue[] = [
 	pop(T6.popCardio + 1, 720, 0.14),
 	...conta(T6.popCardio + 3, T6.falta - 4, 8, 0.04),
 	pop(T6.falta + 1, 520, 0.16),
-	sobe(T6.p5 - 6),
+	sobe(T6.p5 - 10),
 	// ================= habitos: o outro checklist, a sequencia sobe
 	...T6.habTaps.flatMap((a, i): Cue[] => [toque(a, 0.1, -0.15), pop(a + 3, 1100 + 80 * i, 0.07, -0.15)]),
 	pop(T6.popSeq + 1, 700, 0.14),
 	['tick', T6.sobe + 1, 0.12, 0],
 	['shimmer', T6.sobe + 2, 0.09, 0, {dur: 0.9}],
-	sobe(T6.p6 - 6),
+	sobe(T6.p6 - 10),
 	// ================= financeiro: entra, sai, sobra
 	pop(T6.popEntra + 1, 820, 0.15, -0.2),
 	pop(T6.popSai + 1, 600, 0.15, 0.2),
 	pop(T6.popSobra + 1, 700, 0.15),
-	...conta(T6.popSobra + 3, T6.popSobra + 15, 6),
-	sobe(T6.p7 - 6, 0.12),
+	...conta(T6.popSobra + 3, T6.popSobra + 10, 5),
+	sobe(T6.p7 - 8, 0.12),
 	// ================= tudo num app so: toques nas abas e o celular sai por baixo
 	...T6.abas.slice(0, 2).map((a) => toque(a, 0.12, 0)),
 	whooshTo(T6.fora + 12, 0.2, 0.4, 0.75, 0, {f0: 1600, f1: 300}),

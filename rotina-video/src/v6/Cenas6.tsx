@@ -3,7 +3,7 @@ import {Img, staticFile} from 'remotion';
 import {ArrowDownRight, ArrowUpRight, Dumbbell, Flame, ListChecks, Minus, Plus, TrendingUp, Trophy, Wallet} from 'lucide-react';
 import {C, E, F, FD, Grande, brl, sp, tw} from '../v5/theme';
 import {Cursor, Logo, Pilula, larguraLogo} from '../v5/pecas';
-import {bodyQuad, screenPoint} from '../v3/camera';
+import {bbox, bodyQuad, screenPoint} from '../v3/camera';
 import {ALT6, Borrao6, Frase6, LARG6} from './base6';
 import {FIM_CELULAR, RE, Rect, T6} from './plano6';
 import {desfoque, poseV6} from './rig6';
@@ -19,7 +19,8 @@ const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 // ============================================================ celular (Blender), desfocado no 2D durante os mergulhos
 const usaB = (f: number) => Number(desfoque(f).toFixed(3)) >= 0.6;
 export const Celular6: React.FC<{f: number; silhueta?: boolean}> = ({f, silhueta}) => {
-	if (f > FIM_CELULAR) return null;
+	// fora do quadro (saindo por baixo) o Blender nao gera o PNG
+	if (f > FIM_CELULAR || bbox(poseV6(f)).y0 > ALT6) return null;
 	const d = desfoque(f);
 	const filtro = d > 0.01 ? `blur(${(18 * d).toFixed(1)}px) brightness(${(1 - 0.38 * d).toFixed(3)})` : undefined;
 	if (silhueta) {
@@ -199,8 +200,8 @@ const Salto: React.FC<{f: number; at: number; de: Rect; cx: number; cy: number; 
 	const y = lerp(o.cy, cy, k) + dy - 1500 * s;
 	const vy = y - (lerp(o.cy, cy, sp(f - 1, at, {stiffness: 190, damping: 19})) + dy0 - 1500 * s0);
 	return (
-		<Borrao6 id={id} dx={0} dy={vy} k={0.25} max={34}>
-			<div style={{position: 'absolute', left: x - w / 2, top: y - h / 2, width: w, height: h, transform: `scale(${esc})`, transformOrigin: '50% 50%', opacity: Math.min(1, (f - at + 2) / 3) * (1 - 0.6 * s)}}>
+		<Borrao6 id={id} dx={0} dy={vy} k={0.2} max={s > 0 ? 14 : 30}>
+			<div style={{position: 'absolute', left: x - w / 2, top: y - h / 2, width: w, height: h, transform: `scale(${esc})`, transformOrigin: '50% 50%', opacity: Math.min(1, (f - at + 2) / 3) * (1 - s)}}>
 				{children}
 			</div>
 		</Borrao6>
@@ -490,7 +491,7 @@ const CartaoCardio: React.FC<{f: number}> = ({f}) => {
 						<span style={{fontFamily: FD, fontWeight: 700, fontSize: 30, color: C.gray, textTransform: 'uppercase'}}>de 150 min</span>
 					</div>
 				</div>
-				<div style={{flex: 1}}>
+				<div style={{flex: 1, opacity: Math.min(1, falta * 2)}}>
 					<Rot size={30}>Faltam</Rot>
 					<div style={{fontFamily: FD, fontWeight: 800, fontSize: 130, lineHeight: 1, color: C.blue, transform: `scale(${0.7 + 0.3 * Math.min(1.05, falta)})`, transformOrigin: '0 50%', opacity: Math.min(1, falta * 2)}}>30 min</div>
 					<div style={{fontWeight: 500, fontSize: 30, color: C.gray, marginTop: 8}}>4 sessões nesta semana</div>
@@ -540,8 +541,8 @@ const CartaoMov: React.FC<{entrada: boolean}> = ({entrada}) => {
 	);
 };
 const CartaoSobra: React.FC<{f: number}> = ({f}) => {
-	const v = 990 * tw(f, [T6.popSobra + 2, T6.popSobra + 16], [0, 1], E.out);
-	const luz = tw(f, [T6.popSobra + 12, T6.popSobra + 20], [0, 1]);
+	const v = 990 * tw(f, [T6.popSobra + 2, T6.popSobra + 10], [0, 1], E.out);
+	const luz = tw(f, [T6.popSobra + 6, T6.popSobra + 12], [0, 1]);
 	return (
 		<Card6 w={900} h={300}>
 			<Rot cor={C.red} size={36}>
@@ -557,45 +558,45 @@ const CartaoSobra: React.FC<{f: number}> = ({f}) => {
 const sub = (r: Rect, x: number, y: number, w: number, h: number): Rect => ({x: r.x + x, y: r.y + y, w, h});
 export const CenasAcima: React.FC<{f: number}> = ({f}) => (
 	<>
-		<Salto f={f} id="s1" at={T6.pop1} de={RE.historico3m} cx={540} cy={900} w={900} h={360} sai={T6.p1 - 6}>
+		<Salto f={f} id="s1" at={T6.pop1} de={RE.historico3m} cx={540} cy={900} w={900} h={360} sai={T6.p1 - 10}>
 			<CartaoGancho />
 		</Salto>
 		{SEMANAS.map((_, i) => (
-			<Salto key={i} f={f} id={`s2${i}`} at={T6.semanas[i]} de={RE.semanas[i]} cx={540} cy={560 + i * 220} w={940} h={190} sai={T6.p2 - 8 + i * 2}>
+			<Salto key={i} f={f} id={`s2${i}`} at={T6.semanas[i]} de={RE.semanas[i]} cx={540} cy={560 + i * 220} w={940} h={190} sai={T6.p2 - 16 + i * 2}>
 				<CartaoSemana i={i} />
 			</Salto>
 		))}
-		<Salto f={f} id="s3a" at={T6.popSeries} de={RE.series} cx={540} cy={760} w={900} h={250} sai={T6.p3 - 6}>
+		<Salto f={f} id="s3a" at={T6.popSeries} de={RE.series} cx={540} cy={760} w={900} h={250} sai={T6.p3 - 12}>
 			<CartaoSeries f={f} />
 		</Salto>
-		<Salto f={f} id="s3b" at={T6.popReps} de={RE.reps} cx={540} cy={1090} w={900} h={330} sai={T6.p3 - 4}>
+		<Salto f={f} id="s3b" at={T6.popReps} de={RE.reps} cx={540} cy={1090} w={900} h={330} sai={T6.p3 - 10}>
 			<CartaoReps f={f} />
 		</Salto>
 		<Salto f={f} id="s4a" at={T6.popAviso} de={RE.aviso} cx={540} cy={720} w={940} h={330} sai={T6.popRM - 8}>
 			<CartaoAviso />
 		</Salto>
-		<Salto f={f} id="s4b" at={T6.popRecorde} de={RE.recorde} cx={540} cy={1080} w={940} h={180} sai={T6.p4 - 8} mov={[[T6.popRM - 5, -500]]}>
+		<Salto f={f} id="s4b" at={T6.popRecorde} de={RE.recorde} cx={540} cy={1080} w={940} h={180} sai={T6.p4 - 12} mov={[[T6.popRM - 5, -500]]}>
 			<CartaoRecorde />
 		</Salto>
-		<Salto f={f} id="s4c" at={T6.popRM} de={RE.rm} cx={540} cy={1060} w={940} h={470} sai={T6.p4 - 6}>
+		<Salto f={f} id="s4c" at={T6.popRM} de={RE.rm} cx={540} cy={1060} w={940} h={470} sai={T6.p4 - 10}>
 			<CartaoRM f={f} />
 		</Salto>
 		<Salto f={f} id="s5" at={T6.popGrafico} de={RE.grafico} cx={540} cy={940} w={960} h={780} sai={T6.tela6 - 4}>
 			<CartaoGrafico f={f} />
 		</Salto>
-		<Salto f={f} id="s6" at={T6.popCardio} de={RE.cardio} cx={540} cy={960} w={920} h={560} sai={T6.p5 - 6}>
+		<Salto f={f} id="s6" at={T6.popCardio} de={RE.cardio} cx={540} cy={960} w={920} h={560} sai={T6.p5 - 10}>
 			<CartaoCardio f={f} />
 		</Salto>
-		<Salto f={f} id="s7" at={T6.popSeq} de={RE.sequencia} cx={540} cy={960} w={920} h={320} sai={T6.p6 - 6}>
+		<Salto f={f} id="s7" at={T6.popSeq} de={RE.sequencia} cx={540} cy={960} w={920} h={320} sai={T6.p6 - 10}>
 			<CartaoSequencia f={f} />
 		</Salto>
-		<Salto f={f} id="s8a" at={T6.popEntra} de={sub(RE.resumo, 16, 14, 160, 70)} cx={540} cy={620} w={900} h={200} sai={T6.p7 - 6}>
+		<Salto f={f} id="s8a" at={T6.popEntra} de={sub(RE.resumo, 16, 14, 160, 70)} cx={540} cy={620} w={900} h={200} sai={T6.p7 - 9}>
 			<CartaoMov entrada />
 		</Salto>
-		<Salto f={f} id="s8b" at={T6.popSai} de={sub(RE.resumo, 178, 14, 160, 70)} cx={540} cy={860} w={900} h={200} sai={T6.p7 - 5}>
+		<Salto f={f} id="s8b" at={T6.popSai} de={sub(RE.resumo, 178, 14, 160, 70)} cx={540} cy={860} w={900} h={200} sai={T6.p7 - 7}>
 			<CartaoMov entrada={false} />
 		</Salto>
-		<Salto f={f} id="s8c" at={T6.popSobra} de={sub(RE.resumo, 16, 124, 320, 64)} cx={540} cy={1160} w={900} h={300} sai={T6.p7 - 4}>
+		<Salto f={f} id="s8c" at={T6.popSobra} de={sub(RE.resumo, 16, 124, 320, 64)} cx={540} cy={1160} w={900} h={300} sai={T6.p7 - 5}>
 			<CartaoSobra f={f} />
 		</Salto>
 	</>
