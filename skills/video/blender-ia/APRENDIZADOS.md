@@ -98,3 +98,8 @@ O `SKILL.md` incorpora os aprendizados até 12/10/2026.
 
 - Os 895 PNG do celular (2 h 40 min) foram reusados num visual totalmente novo. Só a tela de abertura mudou, porque a tela vermelha sumia no fundo vermelho: 136 quadros refeitos com `--frames` (~29 min). Guardar as poses e os PNG por quadro, separados do 2D, paga.
 - Um celular escuro sobre papel claro funciona bem como foto de produto, desde que tenha sombra (feita em 2D no Remotion). Detalhes: `projetos/rotina/PASSO-A-PASSO.md` (item 7).
+
+## 17/10/2026: Rotina v5, abertura curta em 16:9
+
+- `v3_pose.py` passou a ler a resolução do `poses.json` (`cam.w` e `cam.h`). A mesma lente (fov vertical de 24°, a 0,62 m) serve no 16:9; o v3 e o v4 não mudam.
+- Só 73 quadros no Blender (~13 min): o celular abre o vídeo e some atrás de um elemento 2D (a notificação salta da tela). O resto do vídeo é 2D. Para retomar depois de um reinício, `--frames a-b` só nos quadros que faltam. Detalhes: `projetos/rotina/PASSO-A-PASSO.md` (item 8).

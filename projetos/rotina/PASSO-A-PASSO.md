@@ -151,6 +151,48 @@ Este arquivo guarda só o que foi feito, como foi feito e onde estão as habilid
      - a vinheta mudando de uma vez na troca de fundo;
      - os textos do fechamento cruzando o botão do CTA.
 
+8. **Promo v5 de 22 s no estilo de um vídeo-modelo** (composição `RotinaV5`, 1920×1080, 672 quadros, 17/10/2026). Saída: `rotina-video/rotina-v5.mp4`.
+   - **Pedido do usuário:** "faz igual, nesse estilo", com um vídeo-modelo (promo de app para motorista, 16:9, 26,7 s, voz feminina). Depois pediu:
+     - papel de parede do celular em gradiente;
+     - a tipografia, os ícones e as cores do próprio app, como no v2.1.
+   - **O que o modelo faz:**
+     - fundo quase preto com duas manchas de luz desfocadas;
+     - frases montadas palavra por palavra no centro, com um chip de interface no meio e a palavra de acento colorida;
+     - lista que rola por seções, com um número no topo que muda a cada seção;
+     - cartão-resumo de vidro; cartão que vira o ícone e depois a marca;
+     - formulário do app com a câmera passeando e borrão de movimento; resultado contando;
+     - frase curta, botão em pílula com cursor clicando, marca no fim.
+   - **Adaptado ao Rotina:**
+     - manchas vermelha e âmbar (no modelo, verde e laranja);
+     - Barlow e Barlow Condensed em caixa alta; ícones lucide do app;
+     - a cor de cada categoria: fixas em roxo, cartão em rosa, pontuais em azul, investimentos em verde.
+   - **Roteiro (45 palavras):** "Você sabe quanto ganha por mês, mas sabe quanto sobra? / Conta fixa, cartão, gasto pontual, investimento. / Tudo isso sai do mesmo salário. / No Rotina, você anota o que entra e o que sai, e vê quanto sobra no mês. / Treino e hábitos também. / Baixe agora."
+     - Voz Leda a 1,0x (o ritmo do modelo), pausas de 0,5 s entre as falas. A voz termina em 17,8 s.
+   - **Abertura no Blender** (`src/v5/intro.ts`, quadros 0–72):
+     - o celular chega girando e pousa com a tela para cima; a câmera avança até a notificação do salário;
+     - a notificação salta para fora em 2D. É o mesmo componente da tela, preso à projeção da tela no quadro em que salta, e cresce cobrindo a original;
+     - `blender/v3_pose.py` agora lê `w` e `h` do `poses.json` (renderiza em 16:9). O v3 e o v4 não mudam.
+   - **Arquivos** (`rotina-video/src/v5/`):
+     - `theme`, `pecas` e `blocos` (peças reaproveitáveis);
+     - `Tela5`, `camera`, `intro` e `exportar_poses` (abertura no Blender);
+     - `tempo5`, `Cenas5`, `Video5` e `sons` (o vídeo);
+     - em `audio/v5/`: o roteiro, a voz, `trilha_v5.py` e `sons.json`.
+   - **Áudio:**
+     - trilha em código a 100 BPM na grade da voz: intro mais baixa, virada em "No Rotina", silêncio sob "Baixe" e um clique em "agora";
+     - 85 efeitos, poucos e baixos, como no modelo.
+     - Final: −14,0 LUFS, pico −2,5 dBFS; a voz fica no mínimo 13,3 dB acima do fundo (mediana 20,0 dB). Transcrição do áudio final: 100%.
+   - **Revisão:** 4 folhas do rascunho e 1 do final. Corrigido:
+     - a notificação subia por cima do relógio. Agora cresce no lugar, cobrindo a original, com fundo sólido;
+     - o cartão-resumo aparecia atrás do retângulo que encolhia até virar o ícone;
+     - a câmera do formulário entrava fora do ponto em foco;
+     - quadros vazios antes de "Treino".
+   - **Avisado ao usuário:**
+     - o modelo revela as palavras no lugar, no meio do quadro, e a regra 4 pede borda ou trás do celular. Ficou igual ao modelo; listas, cartões e o botão entram pelas bordas;
+     - 16:9 como o modelo. Uma versão 9:16 para Reels pode reaproveitar as peças;
+     - a notificação é de um banco genérico, para não afirmar que o Rotina tem widget;
+     - sem "é grátis", porque o preço não foi confirmado.
+   - **Tempo de render:** Blender ~13 min (73 quadros, 10 a 12 s cada, com uma retomada depois de um reinício). Rascunho em meia resolução: 58 s. Final: 1 min 46 s.
+
 ## Comandos (dentro de `rotina-video/`)
 
 ```bash
@@ -218,6 +260,25 @@ python -I <main>/skills/audio/trilha-e-mixagem/scripts/mixar_com_efeitos.py --vo
 npx remotion render src/index.ts RotinaV4 out/rotina-v4.mp4 --crf=17 --audio-codec=aac --audio-bitrate=256k --browser-executable=$BR
 ```
 
+**Promo v5 (22 s, 16:9).** Rode dentro de `rotina-video/`. As pastas `public/v5/tela` e `public/v5/celular` não vão para o Git: gere de novo.
+
+```bash
+# 1) textura da tela de bloqueio (74 JPEG, element-00 a element-73) e poses da abertura
+npx remotion render src/index.ts V5Tela public/v5/tela --sequence --image-format=jpeg --jpeg-quality=95 --frames=0-73 --browser-executable=$BR
+npx esbuild src/v5/exportar_poses.ts --bundle --platform=node --outfile=out/exportar_poses_v5.js && node out/exportar_poses_v5.js > blender/poses-v5.json
+# 2) Blender (só os quadros com o celular)
+$BLENDER -b base_cena.blend -P blender/v3_pose.py -- --poses $PWD/blender/poses-v5.json --out $PWD/public/v5/celular/c_ \
+  --frames 0-72 --pct 100 --spp 8 --mb --borda --tela $PWD/public/v5/tela/element-00.jpeg
+# 3) trilha, efeitos e mixagem
+python -I audio/v5/trilha_v5.py trilha_v5.wav audio/v5/trilha-v5_eventos.json
+npx esbuild audio/v5/exportar_sons.ts --bundle --platform=node --outfile=out/exportar_sons_v5.js && node out/exportar_sons_v5.js > audio/v5/sons.json
+python -I <main>/skills/audio/trilha-e-mixagem/scripts/mixar_com_efeitos.py --voz public/v5/voz.wav --musica trilha_v5.wav \
+  --efeitos audio/v5/sons.json --saida public/v5/rotina-v5-mix.wav --duracao 22.4 --linha-do-tempo src/v5/voz.json
+# 4) rascunho e final
+npx remotion render src/index.ts RotinaV5 out/v5-rascunho.mp4 --scale=0.5 --browser-executable=$BR
+npx remotion render src/index.ts RotinaV5 out/rotina-v5.mp4 --props='{"audio":true}' --crf=17 --audio-codec=aac --audio-bitrate=256k --browser-executable=$BR
+```
+
 ## Aprendizados deste projeto
 
 - **O vídeo ficou "simples" por quatro motivos:**
@@ -257,6 +318,18 @@ npx remotion render src/index.ts RotinaV4 out/rotina-v4.mp4 --crf=17 --audio-cod
 - **Celular escuro no papel precisa de sombra.** Uma sombra 2D feita do corpo projetado, desfocada e deslocada para baixo, resolve sem renderizar de novo.
 - **Tela vermelha em fundo vermelho some.** Quando o fundo do vídeo é da cor da tela do app, use uma versão clara da tela.
 
+### Aprendizados da v5 (17/10/2026)
+
+- **Copiar um modelo = copiar a gramática, não a marca.** Do modelo vieram a ordem das cenas, o tipo de movimento e o ritmo da voz. Do app vieram a fonte, os ícones e as cores. O Daniel pediu as duas coisas explicitamente ("faz igual, nesse estilo" + "gostei que você usou a tipografia e os ícones do app").
+- **Preferências do Daniel registradas:**
+  - papel de parede do celular em gradiente;
+  - a tipografia (Barlow e Barlow Condensed em caixa alta), os ícones e as cores de categoria do próprio app nos vídeos.
+- **Quando o modelo quebra uma regra do editor, avise.** O modelo revela as palavras no meio do quadro (contra a regra 4). Copiar e avisar na entrega deixa a decisão com o Daniel.
+- **Elemento que "sai da tela" do celular:** desenhe a cópia 2D colada na projeção da tela do Blender no quadro do salto e só depois solte na mola. Se ela crescer no próprio lugar, cobre a original e não passa por cima de outro texto da tela (o relógio).
+- **Morph cartão → ícone sem máscara:** um retângulo da cor do cartão cobre o conteúdo, encolhe até o quadrado do ícone e muda de cor; no último quadro, entra o ícone de verdade com o mesmo canto.
+- **Câmera passeando numa interface 2D:** guarde só uma lista de focos (quadro, ponto, escala) e aplique `translate(centro) scale(e) translate(-foco)`; o borrão vem da diferença entre um quadro e o anterior.
+- **Módulos lidos pelo exportador de efeitos (node) não podem medir texto ao carregar:** medidas com canvas vão dentro do componente, senão o `exportar_sons` quebra.
+
 ## Próximo vídeo: plano
 
 1. **Ouvir e avaliar a v2** (o Claude não ouve). Pontos para o usuário decidir:
@@ -274,3 +347,7 @@ npx remotion render src/index.ts RotinaV4 out/rotina-v4.mp4 --crf=17 --audio-cod
    - transformar o "papel e tinta" do v2/v4 numa skill de sistema visual (proposta `design-de-video`), para não perder o padrão;
    - decidir as skills e combos novos propostos no relatório `reports/Vídeo Rotina v3, skills e combos usados (2026-10-12).md`;
    - capa do Reels a partir de um quadro do Blender (proposta `capa-e-cortes-reels`).
+6. **Depois da v5 (17/10/2026):**
+   - o Daniel assiste ao v5 e decide se a revelação das palavras no meio do quadro (do modelo) pode ficar;
+   - versão 9:16 do v5 para Reels, reaproveitando as peças de `src/v5/`;
+   - continuam abertas as decisões do item 5 (skill de sistema visual, skills e combos propostos, capa do Reels).

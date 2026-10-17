@@ -91,3 +91,11 @@ O Daniel é editor de vídeo profissional (motion). Ele revisou o v2 do Rotina e
 - **Gráfico que se desenha sem máscara:** a área sob a linha é um polígono calculado até a ponta da linha a cada quadro, no lugar do `clipPath`.
 - **`Atras` com elemento largo:** se o elemento for mais largo que o celular, ele começa vazando pela lateral. Use `Entra` pela borda do quadro (ex.: o botão do CTA desce do topo).
 - **Textos saindo e entrando no mesmo lugar:** confira se o que sai e o que entra não se cruzam no meio do movimento (no v4, o botão do CTA cruzava o texto que saía; resolvido saindo antes). Detalhes: `projetos/rotina/PASSO-A-PASSO.md` (item 7).
+
+## 17/10/2026: Rotina v5 (promo 16:9 no estilo de um modelo de "UI premium")
+
+- **Câmera passeando numa interface 2D:** lista de focos (quadro, ponto, escala) interpolada com `inOut`; transform `translate(centro) scale(e) translate(-foco)` com `transformOrigin: 0 0`. O borrão de movimento vem da diferença de posição para o quadro anterior (filtro SVG com região grande, que não corta).
+- **Frase palavra por palavra que se recentraliza sozinha:** cada palavra entra com desfoque e uma subida curta, e a largura dela entra aos poucos na soma. Um chip de interface pode ser uma "palavra".
+- **Morph cartão → ícone sem máscara:** retângulo da cor do cartão cobre o conteúdo, encolhe até o quadrado do ícone (mesmo raio do canto) e muda de cor; o ícone real entra no quadro seguinte.
+- **Lista inteira montada que rola por seção:** a seção em foco acesa, a próxima apagada (0,32) e a que sai some por tempo enquanto a coluna rola, para nada passar por cima do topo.
+- **Cuidado:** módulos lidos pelo exportador de efeitos (node, sem `document`) não podem medir texto no carregamento. Detalhes: `projetos/rotina/PASSO-A-PASSO.md` (item 8).
