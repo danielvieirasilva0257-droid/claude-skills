@@ -42,3 +42,8 @@ Adendos datados. O mais novo fica embaixo. A skill incorpora os aprendizados at�
 
 - O v3 aplicou a personalidade "premium com peso" de forma contida (palco escuro, um acento, títulos pequenos, pouco texto) e o Daniel achou simples demais. O v2.1, com o sistema "papel e tinta" (fundos por seção, Anton gigante, serifa itálica, peças do app saindo do celular), foi o preferido.
 - Para **vídeo promocional curto**, o premium do Daniel é **editorial e cheio de energia**, não minimalista. O "contido" continua valendo para sites e telas. Detalhes: `projetos/rotina/PASSO-A-PASSO.md` (item 7).
+
+## 17/10/2026: o "UI premium" do modelo do Daniel (Rotina v5)
+
+- O Daniel trouxe como referência um promo escuro de "UI premium": fundo quase preto com duas manchas de luz, cartões escuros de interface, frases montadas palavra por palavra, câmera passeando pela interface. Diferente do "contido" do v3, aqui tudo se mexe o tempo todo e a interface aparece grande.
+- Ele quer esse estilo com a fonte, os ícones e as cores do próprio app, e papel de parede do celular em gradiente. Detalhes: `projetos/rotina/PASSO-A-PASSO.md` (item 8).
