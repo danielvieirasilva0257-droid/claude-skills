@@ -100,13 +100,14 @@ export const Cursor: React.FC<{f: number; de: {x: number; y: number}; para: {x: 
 };
 
 // logo do Rotina no desenho do modelo: icone + nome + subtitulo pequeno na cor do acento
-export const Logo: React.FC<{f: number; at: number; size?: number; sub?: string; desenha?: boolean}> = ({f, at, size = 132, sub = 'hábitos · treino · dinheiro', desenha = true}) => {
+// pop = false: o icone ja esta no lugar (veio do cartao que virou icone) e so o nome e o subtitulo aparecem
+export const Logo: React.FC<{f: number; at: number; size?: number; sub?: string; desenha?: boolean; pop?: boolean}> = ({f, at, size = 132, sub = 'hábitos · treino · dinheiro', desenha = true, pop = true}) => {
 	const nome = 'ROTINA';
 	const sNome = size * 0.82;
 	const wNome = larg(nome, sNome, 700, FD, 0.02);
 	const sSub = size * 0.24;
 	const wSub = larg(sub, sSub, 600);
-	const icon = sp(f, at, {stiffness: 260, damping: 18});
+	const icon = pop ? sp(f, at, {stiffness: 260, damping: 18}) : 1;
 	const draw = desenha ? tw(f, [at + 2, at + 18], [0, 1], E.soft) : 1;
 	// o nome e o subtitulo aparecem da esquerda para a direita, saindo de tras do icone
 	const rev = tw(f, [at + 6, at + 22], [0, 1], E.out);

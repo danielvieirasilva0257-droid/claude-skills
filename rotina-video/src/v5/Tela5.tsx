@@ -15,10 +15,11 @@ const S = 1080 / UI5.w;
 export type AvisoDados = {app: string; titulo: string; valor: string; quando: string};
 export const AVISO_UI = {x: 20, y: 196, w: 350, h: 118}; // posicao e tamanho na tela (pontos da UI 390 x 834)
 
-export const Aviso5: React.FC<{d: AvisoDados; escala?: number}> = ({d, escala = 1}) => {
+// opaco (0..1): fundo fica solido quando ela salta do celular (nao deixa ver o que esta atras)
+export const Aviso5: React.FC<{d: AvisoDados; escala?: number; opaco?: number}> = ({d, escala = 1, opaco = 0}) => {
 	const k = escala;
 	return (
-		<div style={{width: AVISO_UI.w * k, height: AVISO_UI.h * k, boxSizing: 'border-box', borderRadius: 24 * k, padding: `${13 * k}px ${16 * k}px`, background: 'rgba(26,22,24,0.80)', border: `${Math.max(1, 0.8 * k)}px solid rgba(255,255,255,0.09)`, fontFamily: F, color: C.text, boxShadow: k > 1.5 ? '0 40px 90px rgba(0,0,0,0.6), 0 10px 30px rgba(0,0,0,0.4)' : undefined}}>
+		<div style={{width: AVISO_UI.w * k, height: AVISO_UI.h * k, boxSizing: 'border-box', borderRadius: 24 * k, padding: `${13 * k}px ${16 * k}px`, background: `rgba(26,22,24,${(0.8 + 0.2 * opaco).toFixed(3)})`, border: `${Math.max(1, 0.8 * k)}px solid rgba(255,255,255,0.09)`, fontFamily: F, color: C.text, boxShadow: k > 1.5 ? '0 40px 90px rgba(0,0,0,0.6), 0 10px 30px rgba(0,0,0,0.4)' : undefined}}>
 			<div style={{display: 'flex', alignItems: 'center', gap: 9 * k}}>
 				<div style={{width: 24 * k, height: 24 * k, borderRadius: 7 * k, background: '#3A3A3F', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
 					<Landmark size={15 * k} color="#F5F5F7" strokeWidth={2.2} />

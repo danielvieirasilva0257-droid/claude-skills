@@ -30,17 +30,29 @@ export const posicaoLista = (f: number, secoes: SecaoDados[], topo: number) => {
 	return y + topo;
 };
 
-export const Lista: React.FC<{f: number; secoes: SecaoDados[]; x: number; topo: number}> = ({f, secoes, x, topo}) => {
-	const y0 = posicaoLista(f, secoes, topo);
+// entrada da coluna inteira pela borda de baixo (quando "entra" e dado): deslocamento extra em px
+export const entradaLista = (f: number, entra?: number) => (entra === undefined ? 0 : (1 - tw(f, [entra, entra + 14], [0, 1], E.out)) * 900);
+
+// opac(i): opacidade de cada secao (a que sai some enquanto a coluna rola: nada passa por cima do topo)
+// entra: a coluna inteira ja vem montada e sobe da borda de baixo (itens escalonados);
+// sem ele, cada secao so aparece no quadro dela
+export const Lista: React.FC<{f: number; secoes: SecaoDados[]; x: number; topo: number; opac?: (i: number) => number; entra?: number}> = ({f, secoes, x, topo, opac, entra}) => {
+	if (entra !== undefined && f < entra - 1) return null;
+	const y0 = posicaoLista(f, secoes, topo) + entradaLista(f, entra);
 	let acum = 0;
+	let g = 0;
 	return (
 		<div style={{position: 'absolute', left: x, top: y0, width: LARG_LISTA, fontFamily: F}}>
 			{secoes.map((s, i) => {
 				const top = acum;
 				acum += alturaSecao(s);
-				if (f < s.at - 4) return null;
+				const g0 = g;
+				g += s.itens.length + 1;
+				if (entra === undefined && f < s.at - 4) return null;
+				const o = opac ? opac(i) : 1;
+				if (o <= 0.001) return null;
 				return (
-					<div key={s.titulo} style={{position: 'absolute', left: 0, top, width: LARG_LISTA}}>
+					<div key={s.titulo} style={{position: 'absolute', left: 0, top, width: LARG_LISTA, opacity: o}}>
 						<div style={{height: ALT_TIT, display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
 							<span style={{display: 'flex', alignItems: 'center', gap: 16}}>
 								{s.icone ? <s.icone size={46} color={s.cor ?? C.red} strokeWidth={2.4} /> : null}
@@ -49,7 +61,7 @@ export const Lista: React.FC<{f: number; secoes: SecaoDados[]; x: number; topo: 
 							{s.total ? <span style={{fontFamily: FD, fontWeight: 700, fontSize: 36, color: C.gray}}>{s.total}</span> : null}
 						</div>
 						{s.itens.map((it, j) => {
-							const at = s.at + j * 4;
+							const at = entra === undefined ? s.at + j * 4 : entra + (g0 + j + 1) * 2;
 							const k = sp(f, at, {stiffness: 300, damping: 26});
 							return (
 								<div key={it.titulo} style={{marginTop: GAP_ITEM, opacity: Math.min(1, k * 1.4), transform: `translateY(${(1 - Math.min(1, k)) * 40}px)`}}>
@@ -79,13 +91,30 @@ export const Topo: React.FC<{esquerda: string; rotulo: string; valor: string; w:
 
 // ---------------------------------------------------------------- cartao-resumo (linhas, barra segmentada, numero grande)
 export type Linha = {rotulo: string; valor: string};
-export const Resumo: React.FC<{f: number; at: number; linhas: Linha[]; segmentos: number[]; cores?: string[]; titulo: string; grande: string; acende: number; w?: number}> = ({f, at, linhas, segmentos, cores, titulo, grande, acende, w = 860}) => {
+// cresce: quadro em que os segmentos da barra comecam a crescer, um depois do outro (sem ele, a barra ja vem cheia)
+// aceso: indice do segmento que acende em vermelho (os outros usam cores[i]); h: altura fixa do cartao (para o morph)
+export const Resumo: React.FC<{
+	f: number;
+	at: number;
+	linhas: Linha[];
+	segmentos: number[];
+	cores?: string[];
+	titulo: string;
+	grande: string;
+	acende: number;
+	w?: number;
+	h?: number;
+	cresce?: number;
+	aceso?: number;
+}> = ({f, at, linhas, segmentos, cores, titulo, grande, acende, w = 860, h, cresce, aceso = 0}) => {
 	const k = sp(f, at, {stiffness: 220, damping: 22});
 	const luz = tw(f, [acende, acende + 10], [0, 1], E.out);
 	const soma = segmentos.reduce((a, b) => a + b, 0);
+	const cresc = segmentos.map((_, i) => (cresce === undefined ? 1 : tw(f, [cresce + i * 3, cresce + i * 3 + 9], [0, 1], E.out)));
+	const vazio = segmentos.reduce((a, s, i) => a + (s / soma) * (1 - cresc[i]), 0);
 	return (
 		<div style={{transform: `scale(${0.86 + 0.14 * Math.min(1.02, k)})`, opacity: Math.min(1, k * 1.5), transformOrigin: '50% 50%'}}>
-			<Cartao w={w} vidro style={{padding: '40px 48px 44px'}}>
+			<Cartao w={w} h={h} vidro style={{padding: '40px 48px 44px'}}>
 				{linhas.map((l) => (
 					<div key={l.rotulo} style={{display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 18}}>
 						<span style={{fontWeight: 500, fontSize: 32, color: C.gray}}>{l.rotulo}</span>
@@ -93,9 +122,20 @@ export const Resumo: React.FC<{f: number; at: number; linhas: Linha[]; segmentos
 					</div>
 				))}
 				<div style={{display: 'flex', gap: 6, height: 14, marginTop: 10}}>
-					{segmentos.map((s, i) => (
-						<div key={i} style={{flex: s / soma, borderRadius: 7, background: i === 0 ? (luz > 0 ? `rgba(255,90,90,${0.35 + 0.65 * luz})` : 'rgba(255,255,255,0.35)') : cores?.[i] ?? 'rgba(255,255,255,0.18)', opacity: i === 0 ? 1 : 0.9}} />
-					))}
+					{segmentos.map((s, i) =>
+						cresc[i] <= 0.001 ? null : (
+							<div
+								key={i}
+								style={{
+									flex: (s / soma) * cresc[i],
+									borderRadius: 7,
+									background: i === aceso ? (luz > 0 ? `rgba(255,90,90,${0.35 + 0.65 * luz})` : 'rgba(255,255,255,0.35)') : cores?.[i] ?? 'rgba(255,255,255,0.18)',
+									opacity: i === aceso ? 1 : 0.9,
+								}}
+							/>
+						),
+					)}
+					{vazio > 0.001 ? <div style={{flex: vazio}} /> : null}
 				</div>
 				<div style={{height: 1.5, background: C.line, margin: '34px 0 26px'}} />
 				<div style={{fontFamily: FD, fontWeight: 700, fontSize: 34, letterSpacing: '0.12em', textTransform: 'uppercase', color: luz > 0.5 ? C.red : C.gray}}>{titulo}</div>

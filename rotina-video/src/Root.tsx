@@ -13,9 +13,13 @@ import {RotinaV3} from './v3/Video';
 import {RotinaV4} from './v4/Video';
 import {TelaV5} from './v5/Tela5';
 import {EstiloV5} from './v5/Estilo';
+import {RotinaV5} from './v5/Video5';
+import {END5} from './v5/tempo5';
 
 export const Root: React.FC = () => (
 	<>
+		{/* v5 final (16:9, 22,4 s): no estilo do video-modelo, com a tipografia, os icones e as cores do app */}
+		<Composition id="RotinaV5" component={RotinaV5} durationInFrames={END5} fps={30} width={1920} height={1080} defaultProps={{audio: false}} />
 		{/* v5: quadro de estilo (conferir fontes, cores e pecas) */}
 		<Composition id="V5Estilo" component={EstiloV5} durationInFrames={60} fps={30} width={1920} height={1080} defaultProps={{}} />
 		{/* v5 (16:9, estilo do video-modelo): textura da tela de bloqueio do celular da abertura */}
