@@ -18,7 +18,7 @@ export const Root: React.FC = () => (
 	<>
 		{/* v5: quadro de estilo (conferir fontes, cores e pecas) */}
 		<Composition id="V5Estilo" component={EstiloV5} durationInFrames={60} fps={30} width={1920} height={1080} defaultProps={{}} />
-		{/* v5 (16:9, estilo do video-modelo): textura da tela de bloqueio do celular da abertura (conteudo provisorio) */}
+		{/* v5 (16:9, estilo do video-modelo): textura da tela de bloqueio do celular da abertura */}
 		<Composition
 			id="V5Tela"
 			component={TelaV5}
@@ -26,7 +26,7 @@ export const Root: React.FC = () => (
 			fps={30}
 			width={1080}
 			height={2309}
-			defaultProps={{data: 'segunda-feira, 13 de outubro', hora: '07:30', widget: {rotulo: 'Rotina', meta: 'semana', valor: '4 de 7', progresso: 0.57}}}
+			defaultProps={{data: 'segunda-feira, 6 de outubro', hora: '08:12', aviso: {app: 'Banco', titulo: 'Salário recebido', valor: 'R$ 4.800,00', quando: 'agora'}}}
 		/>
 		{/* v4 final: celular do Blender do v3 + visual papel e tinta do v2 (fundos por secao, Anton, Instrument Serif) */}
 		<Composition id="RotinaV4" component={RotinaV4} durationInFrames={END3} fps={30} width={1080} height={1920} defaultProps={{audio: true, silhueta: false}} />

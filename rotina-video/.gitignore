@@ -13,3 +13,7 @@ public/v3/celular/
 # v4: telas com a abertura clara e os quadros do celular refeitos (o resto vem de public/v3/celular)
 public/v4/tela/
 public/v4/celular/
+
+# v5: textura da tela e camada 3D da abertura (geradas por codigo)
+public/v5/tela/
+public/v5/celular/

@@ -1,0 +1,280 @@
+{
+ "fps": 30,
+ "lead_s": 0.15,
+ "voice_end_s": 17.81,
+ "lines": [
+  {
+   "n": 1,
+   "text": "Você sabe quanto ganha por mês, mas sabe quanto sobra?",
+   "start": 0.185,
+   "end": 3.469,
+   "words": [
+    {
+     "word": "Você",
+     "start": 0.185,
+     "end": 0.406
+    },
+    {
+     "word": "sabe",
+     "start": 0.506,
+     "end": 0.746
+    },
+    {
+     "word": "quanto",
+     "start": 0.786,
+     "end": 1.006
+    },
+    {
+     "word": "ganha",
+     "start": 1.046,
+     "end": 1.246
+    },
+    {
+     "word": "por",
+     "start": 1.286,
+     "end": 1.407
+    },
+    {
+     "word": "mês,",
+     "start": 1.467,
+     "end": 1.847
+    },
+    {
+     "word": "mas",
+     "start": 2.388,
+     "end": 2.608
+    },
+    {
+     "word": "sabe",
+     "start": 2.648,
+     "end": 2.848
+    },
+    {
+     "word": "quanto",
+     "start": 2.888,
+     "end": 3.088
+    },
+    {
+     "word": "sobra?",
+     "start": 3.148,
+     "end": 3.469
+    }
+   ]
+  },
+  {
+   "n": 2,
+   "text": "Conta fixa, cartão, gasto pontual, investimento.",
+   "start": 3.969,
+   "end": 7.512,
+   "words": [
+    {
+     "word": "Conta",
+     "start": 3.969,
+     "end": 4.23
+    },
+    {
+     "word": "fixa,",
+     "start": 4.35,
+     "end": 4.81
+    },
+    {
+     "word": "cartão,",
+     "start": 4.93,
+     "end": 5.511
+    },
+    {
+     "word": "gasto",
+     "start": 5.771,
+     "end": 6.052
+    },
+    {
+     "word": "pontual,",
+     "start": 6.132,
+     "end": 6.692
+    },
+    {
+     "word": "investimento.",
+     "start": 6.772,
+     "end": 7.512
+    }
+   ]
+  },
+  {
+   "n": 3,
+   "text": "Tudo isso sai do mesmo salário.",
+   "start": 8.012,
+   "end": 9.874,
+   "words": [
+    {
+     "word": "Tudo",
+     "start": 8.012,
+     "end": 8.292
+    },
+    {
+     "word": "isso",
+     "start": 8.412,
+     "end": 8.632
+    },
+    {
+     "word": "sai",
+     "start": 8.692,
+     "end": 8.833
+    },
+    {
+     "word": "do",
+     "start": 8.853,
+     "end": 8.933
+    },
+    {
+     "word": "mesmo",
+     "start": 9.033,
+     "end": 9.353
+    },
+    {
+     "word": "salário.",
+     "start": 9.413,
+     "end": 9.874
+    }
+   ]
+  },
+  {
+   "n": 4,
+   "text": "No Rotina, você anota o que entra e o que sai, e vê quanto sobra no mês.",
+   "start": 10.374,
+   "end": 14.958,
+   "words": [
+    {
+     "word": "No",
+     "start": 10.374,
+     "end": 10.474
+    },
+    {
+     "word": "Rotina,",
+     "start": 10.594,
+     "end": 11.174
+    },
+    {
+     "word": "você",
+     "start": 11.355,
+     "end": 11.575
+    },
+    {
+     "word": "anota",
+     "start": 11.635,
+     "end": 11.995
+    },
+    {
+     "word": "o",
+     "start": 12.015,
+     "end": 12.055
+    },
+    {
+     "word": "que",
+     "start": 12.075,
+     "end": 12.195
+    },
+    {
+     "word": "entra",
+     "start": 12.296,
+     "end": 12.536
+    },
+    {
+     "word": "e",
+     "start": 12.676,
+     "end": 12.736
+    },
+    {
+     "word": "o",
+     "start": 12.756,
+     "end": 12.796
+    },
+    {
+     "word": "que",
+     "start": 12.816,
+     "end": 12.916
+    },
+    {
+     "word": "sai,",
+     "start": 12.976,
+     "end": 13.197
+    },
+    {
+     "word": "e",
+     "start": 13.657,
+     "end": 13.737
+    },
+    {
+     "word": "vê",
+     "start": 13.837,
+     "end": 13.957
+    },
+    {
+     "word": "quanto",
+     "start": 13.997,
+     "end": 14.198
+    },
+    {
+     "word": "sobra",
+     "start": 14.278,
+     "end": 14.518
+    },
+    {
+     "word": "no",
+     "start": 14.558,
+     "end": 14.618
+    },
+    {
+     "word": "mês.",
+     "start": 14.658,
+     "end": 14.958
+    }
+   ]
+  },
+  {
+   "n": 5,
+   "text": "Treino e hábitos também.",
+   "start": 15.458,
+   "end": 16.72,
+   "words": [
+    {
+     "word": "Treino",
+     "start": 15.458,
+     "end": 15.819
+    },
+    {
+     "word": "e",
+     "start": 15.879,
+     "end": 15.939
+    },
+    {
+     "word": "hábitos",
+     "start": 16.019,
+     "end": 16.359
+    },
+    {
+     "word": "também.",
+     "start": 16.399,
+     "end": 16.72
+    }
+   ]
+  },
+  {
+   "n": 6,
+   "text": "Baixe agora.",
+   "start": 17.22,
+   "end": 17.78,
+   "words": [
+    {
+     "word": "Baixe",
+     "start": 17.22,
+     "end": 17.46
+    },
+    {
+     "word": "agora.",
+     "start": 17.48,
+     "end": 17.78
+    }
+   ]
+  }
+ ]
+}

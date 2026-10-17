@@ -1,0 +1,323 @@
+{
+ "duration": 18.88,
+ "lines": [
+  {
+   "n": 1,
+   "text": "Você sabe quanto ganha por mês, mas sabe quanto sobra?",
+   "start": 0.3,
+   "end": 3.584,
+   "words": [
+    {
+     "word": "Você",
+     "start": 0.3,
+     "end": 0.521,
+     "score": 0.953
+    },
+    {
+     "word": "sabe",
+     "start": 0.621,
+     "end": 0.861,
+     "score": 0.758
+    },
+    {
+     "word": "quanto",
+     "start": 0.901,
+     "end": 1.121,
+     "score": 0.785
+    },
+    {
+     "word": "ganha",
+     "start": 1.161,
+     "end": 1.361,
+     "score": 0.849
+    },
+    {
+     "word": "por",
+     "start": 1.401,
+     "end": 1.522,
+     "score": 0.724
+    },
+    {
+     "word": "mês,",
+     "start": 1.582,
+     "end": 1.962,
+     "score": 0.877
+    },
+    {
+     "word": "mas",
+     "start": 2.503,
+     "end": 2.723,
+     "score": 0.824
+    },
+    {
+     "word": "sabe",
+     "start": 2.763,
+     "end": 2.963,
+     "score": 0.876
+    },
+    {
+     "word": "quanto",
+     "start": 3.003,
+     "end": 3.203,
+     "score": 0.837
+    },
+    {
+     "word": "sobra?",
+     "start": 3.263,
+     "end": 3.584,
+     "score": 0.985
+    }
+   ]
+  },
+  {
+   "n": 2,
+   "text": "Conta fixa, cartão, gasto pontual, investimento.",
+   "start": 4.184,
+   "end": 7.727,
+   "words": [
+    {
+     "word": "Conta",
+     "start": 4.184,
+     "end": 4.445,
+     "score": 1.0
+    },
+    {
+     "word": "fixa,",
+     "start": 4.565,
+     "end": 5.025,
+     "score": 0.933
+    },
+    {
+     "word": "cartão,",
+     "start": 5.145,
+     "end": 5.726,
+     "score": 0.827
+    },
+    {
+     "word": "gasto",
+     "start": 5.986,
+     "end": 6.267,
+     "score": 0.987
+    },
+    {
+     "word": "pontual,",
+     "start": 6.347,
+     "end": 6.907,
+     "score": 0.999
+    },
+    {
+     "word": "investimento.",
+     "start": 6.987,
+     "end": 7.727,
+     "score": 0.97
+    }
+   ]
+  },
+  {
+   "n": 3,
+   "text": "Tudo isso sai do mesmo salário.",
+   "start": 8.229,
+   "end": 10.091,
+   "words": [
+    {
+     "word": "Tudo",
+     "start": 8.229,
+     "end": 8.509,
+     "score": 0.783
+    },
+    {
+     "word": "isso",
+     "start": 8.629,
+     "end": 8.849,
+     "score": 0.875
+    },
+    {
+     "word": "sai",
+     "start": 8.909,
+     "end": 9.05,
+     "score": 0.778
+    },
+    {
+     "word": "do",
+     "start": 9.07,
+     "end": 9.15,
+     "score": 0.813
+    },
+    {
+     "word": "mesmo",
+     "start": 9.25,
+     "end": 9.57,
+     "score": 0.85
+    },
+    {
+     "word": "salário.",
+     "start": 9.63,
+     "end": 10.091,
+     "score": 0.995
+    }
+   ]
+  },
+  {
+   "n": 4,
+   "text": "No Rotina, você anota o que entra e o que sai, e vê quanto sobra no mês.",
+   "start": 10.872,
+   "end": 15.456,
+   "words": [
+    {
+     "word": "No",
+     "start": 10.872,
+     "end": 10.972,
+     "score": 0.867
+    },
+    {
+     "word": "Rotina,",
+     "start": 11.092,
+     "end": 11.672,
+     "score": 0.962
+    },
+    {
+     "word": "você",
+     "start": 11.853,
+     "end": 12.073,
+     "score": 1.0
+    },
+    {
+     "word": "anota",
+     "start": 12.133,
+     "end": 12.493,
+     "score": 0.852
+    },
+    {
+     "word": "o",
+     "start": 12.513,
+     "end": 12.553,
+     "score": 0.5
+    },
+    {
+     "word": "que",
+     "start": 12.573,
+     "end": 12.693,
+     "score": 0.571
+    },
+    {
+     "word": "entra",
+     "start": 12.794,
+     "end": 13.034,
+     "score": 0.953
+    },
+    {
+     "word": "e",
+     "start": 13.174,
+     "end": 13.234,
+     "score": 0.666
+    },
+    {
+     "word": "o",
+     "start": 13.254,
+     "end": 13.294,
+     "score": 0.505
+    },
+    {
+     "word": "que",
+     "start": 13.314,
+     "end": 13.414,
+     "score": 0.83
+    },
+    {
+     "word": "sai,",
+     "start": 13.474,
+     "end": 13.695,
+     "score": 0.884
+    },
+    {
+     "word": "e",
+     "start": 14.155,
+     "end": 14.235,
+     "score": 0.749
+    },
+    {
+     "word": "vê",
+     "start": 14.335,
+     "end": 14.455,
+     "score": 1.0
+    },
+    {
+     "word": "quanto",
+     "start": 14.495,
+     "end": 14.696,
+     "score": 0.879
+    },
+    {
+     "word": "sobra",
+     "start": 14.776,
+     "end": 15.016,
+     "score": 0.897
+    },
+    {
+     "word": "no",
+     "start": 15.056,
+     "end": 15.116,
+     "score": 0.858
+    },
+    {
+     "word": "mês.",
+     "start": 15.156,
+     "end": 15.456,
+     "score": 0.991
+    }
+   ]
+  },
+  {
+   "n": 5,
+   "text": "Treino e hábitos também.",
+   "start": 16.217,
+   "end": 17.479,
+   "words": [
+    {
+     "word": "Treino",
+     "start": 16.217,
+     "end": 16.578,
+     "score": 0.915
+    },
+    {
+     "word": "e",
+     "start": 16.638,
+     "end": 16.698,
+     "score": 0.668
+    },
+    {
+     "word": "hábitos",
+     "start": 16.778,
+     "end": 17.118,
+     "score": 0.809
+    },
+    {
+     "word": "também.",
+     "start": 17.158,
+     "end": 17.479,
+     "score": 0.924
+    }
+   ]
+  },
+  {
+   "n": 6,
+   "text": "Baixe agora.",
+   "start": 18.059,
+   "end": 18.619,
+   "words": [
+    {
+     "word": "Baixe",
+     "start": 18.059,
+     "end": 18.299,
+     "score": 0.819
+    },
+    {
+     "word": "agora.",
+     "start": 18.319,
+     "end": 18.619,
+     "score": 0.965
+    }
+   ]
+  }
+ ]
+}

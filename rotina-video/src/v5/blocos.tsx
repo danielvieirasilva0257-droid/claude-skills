@@ -79,7 +79,7 @@ export const Topo: React.FC<{esquerda: string; rotulo: string; valor: string; w:
 
 // ---------------------------------------------------------------- cartao-resumo (linhas, barra segmentada, numero grande)
 export type Linha = {rotulo: string; valor: string};
-export const Resumo: React.FC<{f: number; at: number; linhas: Linha[]; segmentos: number[]; titulo: string; grande: string; acende: number; w?: number}> = ({f, at, linhas, segmentos, titulo, grande, acende, w = 860}) => {
+export const Resumo: React.FC<{f: number; at: number; linhas: Linha[]; segmentos: number[]; cores?: string[]; titulo: string; grande: string; acende: number; w?: number}> = ({f, at, linhas, segmentos, cores, titulo, grande, acende, w = 860}) => {
 	const k = sp(f, at, {stiffness: 220, damping: 22});
 	const luz = tw(f, [acende, acende + 10], [0, 1], E.out);
 	const soma = segmentos.reduce((a, b) => a + b, 0);
@@ -94,7 +94,7 @@ export const Resumo: React.FC<{f: number; at: number; linhas: Linha[]; segmentos
 				))}
 				<div style={{display: 'flex', gap: 6, height: 14, marginTop: 10}}>
 					{segmentos.map((s, i) => (
-						<div key={i} style={{flex: s / soma, borderRadius: 7, background: i === 0 ? (luz > 0 ? `rgba(255,77,77,${0.35 + 0.65 * luz})` : 'rgba(255,255,255,0.35)') : 'rgba(255,255,255,0.18)'}} />
+						<div key={i} style={{flex: s / soma, borderRadius: 7, background: i === 0 ? (luz > 0 ? `rgba(255,90,90,${0.35 + 0.65 * luz})` : 'rgba(255,255,255,0.35)') : cores?.[i] ?? 'rgba(255,255,255,0.18)', opacity: i === 0 ? 1 : 0.9}} />
 					))}
 				</div>
 				<div style={{height: 1.5, background: C.line, margin: '34px 0 26px'}} />

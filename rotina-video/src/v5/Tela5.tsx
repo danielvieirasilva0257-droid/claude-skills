@@ -1,32 +1,33 @@
 import React from 'react';
 import {AbsoluteFill, useCurrentFrame} from 'remotion';
-import {AppMark} from '../v2/Marca';
+import {Landmark} from 'lucide-react';
 import {C, F, FD} from './theme';
 
 // Tela de bloqueio do celular da abertura do v5 (textura do Blender, 1080 x 2309 = area ativa do premium.py).
-// Papel de parede em gradiente (pedido do Daniel), relogio e o widget do Rotina,
+// Papel de parede em gradiente (pedido do Daniel), relogio e a notificacao do salario,
 // que depois salta para fora do celular em 2D (o mesmo componente, maior).
 
 export const UI5 = {w: 390, h: 834};
 const S = 1080 / UI5.w;
 
-export type WidgetDados = {rotulo: string; meta: string; valor: string; progresso: number};
+// notificacao do banco na tela de bloqueio (generica, sem marca: nao afirma nenhuma funcao do Rotina).
+// O mesmo desenho e usado no 2D quando ela salta para fora do celular (escala maior).
+export type AvisoDados = {app: string; titulo: string; valor: string; quando: string};
+export const AVISO_UI = {x: 20, y: 196, w: 350, h: 118}; // posicao e tamanho na tela (pontos da UI 390 x 834)
 
-// widget do Rotina (mesmo desenho na tela de bloqueio e no 2D)
-export const Widget5: React.FC<{d: WidgetDados; escala?: number; prog?: number}> = ({d, escala = 1, prog}) => {
+export const Aviso5: React.FC<{d: AvisoDados; escala?: number}> = ({d, escala = 1}) => {
 	const k = escala;
-	const p = prog ?? d.progresso;
 	return (
-		<div style={{width: 350 * k, boxSizing: 'border-box', borderRadius: 22 * k, padding: `${14 * k}px ${16 * k}px ${16 * k}px`, background: 'rgba(24,22,26,0.78)', border: `${Math.max(1, 0.8 * k)}px solid rgba(255,255,255,0.08)`, fontFamily: F, color: C.text, boxShadow: k > 1.5 ? '0 40px 90px rgba(0,0,0,0.6), 0 10px 30px rgba(0,0,0,0.4)' : undefined}}>
-			<div style={{display: 'flex', alignItems: 'center', gap: 8 * k}}>
-				<AppMark size={20 * k} bg={C.redFill} fg="#fff" />
-				<span style={{fontWeight: 600, fontSize: 13.5 * k}}>{d.rotulo}</span>
-				<span style={{marginLeft: 'auto', fontWeight: 500, fontSize: 11 * k, color: 'rgba(245,245,247,0.55)'}}>{d.meta}</span>
+		<div style={{width: AVISO_UI.w * k, height: AVISO_UI.h * k, boxSizing: 'border-box', borderRadius: 24 * k, padding: `${13 * k}px ${16 * k}px`, background: 'rgba(26,22,24,0.80)', border: `${Math.max(1, 0.8 * k)}px solid rgba(255,255,255,0.09)`, fontFamily: F, color: C.text, boxShadow: k > 1.5 ? '0 40px 90px rgba(0,0,0,0.6), 0 10px 30px rgba(0,0,0,0.4)' : undefined}}>
+			<div style={{display: 'flex', alignItems: 'center', gap: 9 * k}}>
+				<div style={{width: 24 * k, height: 24 * k, borderRadius: 7 * k, background: '#3A3A3F', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+					<Landmark size={15 * k} color="#F5F5F7" strokeWidth={2.2} />
+				</div>
+				<span style={{fontWeight: 600, fontSize: 14 * k, color: 'rgba(245,245,247,0.85)'}}>{d.app}</span>
+				<span style={{marginLeft: 'auto', fontWeight: 500, fontSize: 12 * k, color: 'rgba(245,245,247,0.5)'}}>{d.quando}</span>
 			</div>
-			<div style={{fontFamily: FD, fontWeight: 800, fontSize: 40 * k, lineHeight: 1.05, marginTop: 6 * k, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap'}}>{d.valor}</div>
-			<div style={{height: 5 * k, borderRadius: 3 * k, background: 'rgba(255,255,255,0.12)', marginTop: 10 * k, overflow: 'hidden'}}>
-				<div style={{width: `${p * 100}%`, height: '100%', borderRadius: 3 * k, background: C.red}} />
-			</div>
+			<div style={{fontWeight: 600, fontSize: 15 * k, marginTop: 8 * k, color: 'rgba(245,245,247,0.9)'}}>{d.titulo}</div>
+			<div style={{fontFamily: FD, fontWeight: 800, fontSize: 40 * k, lineHeight: 1.05, marginTop: 1 * k, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap'}}>{d.valor}</div>
 		</div>
 	);
 };
@@ -49,37 +50,23 @@ const Gradiente: React.FC = () => (
 	</>
 );
 
-export const Bloqueio5: React.FC<{data: string; hora: string; widget: WidgetDados; notifs?: {app: string; msg: string; quando: string}[]}> = ({data, hora, widget, notifs = []}) => (
+export const Bloqueio5: React.FC<{data: string; hora: string; aviso: AvisoDados}> = ({data, hora, aviso}) => (
 	<div style={{position: 'relative', width: UI5.w, height: UI5.h, overflow: 'hidden', background: '#0B0709', fontFamily: F}}>
 		<Gradiente />
 		<div style={{position: 'absolute', left: 0, right: 0, top: 60, textAlign: 'center', color: C.text}}>
 			<div style={{fontWeight: 600, fontSize: 17, color: 'rgba(245,245,247,0.82)'}}>{data}</div>
 			<div style={{fontFamily: FD, fontWeight: 600, fontSize: 104, lineHeight: 1.0, letterSpacing: '0.01em', marginTop: 2}}>{hora}</div>
 		</div>
-		{/* widget no centro do terco de cima (v ~ 0,27: e o ponto que a camera do Blender centraliza no avanco) */}
-		<div style={{position: 'absolute', left: 20, top: 196}}>
-			<Widget5 d={widget} />
-		</div>
-		<div style={{position: 'absolute', left: 14, right: 14, top: 330, display: 'flex', flexDirection: 'column', gap: 8}}>
-			{notifs.map((n) => (
-				<div key={n.msg} style={{height: 64, borderRadius: 20, background: 'rgba(30,28,32,0.72)', border: '0.8px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 11, padding: '0 13px'}}>
-					<AppMark size={34} bg={C.redFill} fg="#fff" />
-					<div style={{flex: 1, minWidth: 0, color: C.text}}>
-						<div style={{display: 'flex', justifyContent: 'space-between', fontSize: 13.5, fontWeight: 600}}>
-							<span>{n.app}</span>
-							<span style={{fontWeight: 500, fontSize: 11.5, color: 'rgba(245,245,247,0.5)'}}>{n.quando}</span>
-						</div>
-						<div style={{fontSize: 13, fontWeight: 500, color: 'rgba(245,245,247,0.78)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{n.msg}</div>
-					</div>
-				</div>
-			))}
+		{/* notificacao no terco de cima (a camera do Blender centraliza esse ponto no avanco) */}
+		<div style={{position: 'absolute', left: AVISO_UI.x, top: AVISO_UI.y}}>
+			<Aviso5 d={aviso} />
 		</div>
 		<div style={{position: 'absolute', left: (UI5.w - 134) / 2, bottom: 9, width: 134, height: 5, borderRadius: 3, background: 'rgba(245,245,247,0.6)'}} />
 	</div>
 );
 
 // composicao da textura (1080 x 2309); o conteudo e definido em Cenas5 (DADOS_TELA)
-export const TelaV5: React.FC<{data: string; hora: string; widget: WidgetDados; notifs?: {app: string; msg: string; quando: string}[]}> = (props) => {
+export const TelaV5: React.FC<{data: string; hora: string; aviso: AvisoDados}> = (props) => {
 	useCurrentFrame();
 	return (
 		<AbsoluteFill style={{background: '#000'}}>
