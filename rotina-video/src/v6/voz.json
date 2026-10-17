@@ -1,0 +1,573 @@
+{
+ "fps": 30,
+ "lead_s": 0.3,
+ "voice_end_s": 35.645,
+ "lines": [
+  {
+   "n": 1,
+   "text": "Quanto você pegava no supino três meses atrás?",
+   "start": 0.31,
+   "end": 2.971,
+   "words": [
+    {
+     "word": "Quanto",
+     "start": 0.31,
+     "end": 0.57
+    },
+    {
+     "word": "você",
+     "start": 0.61,
+     "end": 0.81
+    },
+    {
+     "word": "pegava",
+     "start": 0.85,
+     "end": 1.211
+    },
+    {
+     "word": "no",
+     "start": 1.251,
+     "end": 1.331
+    },
+    {
+     "word": "supino",
+     "start": 1.371,
+     "end": 1.731
+    },
+    {
+     "word": "três",
+     "start": 1.851,
+     "end": 2.131
+    },
+    {
+     "word": "meses",
+     "start": 2.191,
+     "end": 2.491
+    },
+    {
+     "word": "atrás?",
+     "start": 2.531,
+     "end": 2.971
+    }
+   ]
+  },
+  {
+   "n": 2,
+   "text": "No Rotina, cada semana tem um estilo: hipertrofia, força, potência, deload.",
+   "start": 3.471,
+   "end": 8.713,
+   "words": [
+    {
+     "word": "No",
+     "start": 3.471,
+     "end": 3.571
+    },
+    {
+     "word": "Rotina,",
+     "start": 3.631,
+     "end": 4.131
+    },
+    {
+     "word": "cada",
+     "start": 4.251,
+     "end": 4.491
+    },
+    {
+     "word": "semana",
+     "start": 4.551,
+     "end": 4.872
+    },
+    {
+     "word": "tem",
+     "start": 4.932,
+     "end": 5.052
+    },
+    {
+     "word": "um",
+     "start": 5.092,
+     "end": 5.152
+    },
+    {
+     "word": "estilo:",
+     "start": 5.192,
+     "end": 5.532
+    },
+    {
+     "word": "hipertrofia,",
+     "start": 5.832,
+     "end": 6.572
+    },
+    {
+     "word": "força,",
+     "start": 6.792,
+     "end": 7.212
+    },
+    {
+     "word": "potência,",
+     "start": 7.432,
+     "end": 7.992
+    },
+    {
+     "word": "deload.",
+     "start": 8.212,
+     "end": 8.713
+    }
+   ]
+  },
+  {
+   "n": 3,
+   "text": "Cada treino vira um checklist.",
+   "start": 9.213,
+   "end": 10.814,
+   "words": [
+    {
+     "word": "Cada",
+     "start": 9.213,
+     "end": 9.453
+    },
+    {
+     "word": "treino",
+     "start": 9.553,
+     "end": 9.873
+    },
+    {
+     "word": "vira",
+     "start": 9.933,
+     "end": 10.094
+    },
+    {
+     "word": "um",
+     "start": 10.134,
+     "end": 10.194
+    },
+    {
+     "word": "checklist.",
+     "start": 10.234,
+     "end": 10.814
+    }
+   ]
+  },
+  {
+   "n": 4,
+   "text": "Você muda séries e repetições.",
+   "start": 11.314,
+   "end": 12.975,
+   "words": [
+    {
+     "word": "Você",
+     "start": 11.314,
+     "end": 11.494
+    },
+    {
+     "word": "muda",
+     "start": 11.554,
+     "end": 11.754
+    },
+    {
+     "word": "séries",
+     "start": 11.854,
+     "end": 12.235
+    },
+    {
+     "word": "e",
+     "start": 12.275,
+     "end": 12.315
+    },
+    {
+     "word": "repetições.",
+     "start": 12.355,
+     "end": 12.975
+    }
+   ]
+  },
+  {
+   "n": 5,
+   "text": "Fechou doze em todas, o app manda subir a carga.",
+   "start": 13.475,
+   "end": 15.857,
+   "words": [
+    {
+     "word": "Fechou",
+     "start": 13.475,
+     "end": 13.695
+    },
+    {
+     "word": "doze",
+     "start": 13.755,
+     "end": 13.936
+    },
+    {
+     "word": "em",
+     "start": 13.956,
+     "end": 14.036
+    },
+    {
+     "word": "todas,",
+     "start": 14.096,
+     "end": 14.496
+    },
+    {
+     "word": "o",
+     "start": 14.716,
+     "end": 14.756
+    },
+    {
+     "word": "app",
+     "start": 14.816,
+     "end": 14.976
+    },
+    {
+     "word": "manda",
+     "start": 15.036,
+     "end": 15.236
+    },
+    {
+     "word": "subir",
+     "start": 15.276,
+     "end": 15.456
+    },
+    {
+     "word": "a",
+     "start": 15.476,
+     "end": 15.496
+    },
+    {
+     "word": "carga.",
+     "start": 15.556,
+     "end": 15.857
+    }
+   ]
+  },
+  {
+   "n": 6,
+   "text": "Bateu recorde, ele calcula quanto você pegaria numa repetição.",
+   "start": 16.357,
+   "end": 19.658,
+   "words": [
+    {
+     "word": "Bateu",
+     "start": 16.357,
+     "end": 16.597
+    },
+    {
+     "word": "recorde,",
+     "start": 16.657,
+     "end": 17.097
+    },
+    {
+     "word": "ele",
+     "start": 17.317,
+     "end": 17.437
+    },
+    {
+     "word": "calcula",
+     "start": 17.477,
+     "end": 17.897
+    },
+    {
+     "word": "quanto",
+     "start": 18.037,
+     "end": 18.297
+    },
+    {
+     "word": "você",
+     "start": 18.337,
+     "end": 18.517
+    },
+    {
+     "word": "pegaria",
+     "start": 18.577,
+     "end": 18.957
+    },
+    {
+     "word": "numa",
+     "start": 18.977,
+     "end": 19.177
+    },
+    {
+     "word": "repetição.",
+     "start": 19.217,
+     "end": 19.658
+    }
+   ]
+  },
+  {
+   "n": 7,
+   "text": "O gráfico mostra o supino semana a semana, mês a mês.",
+   "start": 20.158,
+   "end": 23.36,
+   "words": [
+    {
+     "word": "O",
+     "start": 20.158,
+     "end": 20.198
+    },
+    {
+     "word": "gráfico",
+     "start": 20.238,
+     "end": 20.598
+    },
+    {
+     "word": "mostra",
+     "start": 20.618,
+     "end": 20.878
+    },
+    {
+     "word": "o",
+     "start": 20.898,
+     "end": 20.938
+    },
+    {
+     "word": "supino",
+     "start": 20.979,
+     "end": 21.299
+    },
+    {
+     "word": "semana",
+     "start": 21.399,
+     "end": 21.819
+    },
+    {
+     "word": "a",
+     "start": 21.859,
+     "end": 21.919
+    },
+    {
+     "word": "semana,",
+     "start": 21.979,
+     "end": 22.419
+    },
+    {
+     "word": "mês",
+     "start": 22.639,
+     "end": 22.92
+    },
+    {
+     "word": "a",
+     "start": 22.96,
+     "end": 22.98
+    },
+    {
+     "word": "mês.",
+     "start": 23.02,
+     "end": 23.36
+    }
+   ]
+  },
+  {
+   "n": 8,
+   "text": "E a meta de cardio mostra quanto falta.",
+   "start": 23.86,
+   "end": 25.761,
+   "words": [
+    {
+     "word": "E",
+     "start": 23.86,
+     "end": 23.94
+    },
+    {
+     "word": "a",
+     "start": 23.96,
+     "end": 24.0
+    },
+    {
+     "word": "meta",
+     "start": 24.04,
+     "end": 24.26
+    },
+    {
+     "word": "de",
+     "start": 24.28,
+     "end": 24.36
+    },
+    {
+     "word": "cardio",
+     "start": 24.42,
+     "end": 24.721
+    },
+    {
+     "word": "mostra",
+     "start": 24.781,
+     "end": 25.081
+    },
+    {
+     "word": "quanto",
+     "start": 25.201,
+     "end": 25.421
+    },
+    {
+     "word": "falta.",
+     "start": 25.481,
+     "end": 25.761
+    }
+   ]
+  },
+  {
+   "n": 9,
+   "text": "Nos hábitos, outro checklist, e a sequência sobe.",
+   "start": 26.261,
+   "end": 29.022,
+   "words": [
+    {
+     "word": "Nos",
+     "start": 26.261,
+     "end": 26.421
+    },
+    {
+     "word": "hábitos,",
+     "start": 26.461,
+     "end": 26.961
+    },
+    {
+     "word": "outro",
+     "start": 27.121,
+     "end": 27.321
+    },
+    {
+     "word": "checklist,",
+     "start": 27.361,
+     "end": 27.901
+    },
+    {
+     "word": "e",
+     "start": 28.121,
+     "end": 28.182
+    },
+    {
+     "word": "a",
+     "start": 28.202,
+     "end": 28.242
+    },
+    {
+     "word": "sequência",
+     "start": 28.282,
+     "end": 28.682
+    },
+    {
+     "word": "sobe.",
+     "start": 28.762,
+     "end": 29.022
+    }
+   ]
+  },
+  {
+   "n": 10,
+   "text": "No financeiro, o que entra, o que sai e quanto sobra.",
+   "start": 29.522,
+   "end": 32.583,
+   "words": [
+    {
+     "word": "No",
+     "start": 29.522,
+     "end": 29.602
+    },
+    {
+     "word": "financeiro,",
+     "start": 29.642,
+     "end": 30.203
+    },
+    {
+     "word": "o",
+     "start": 30.423,
+     "end": 30.463
+    },
+    {
+     "word": "que",
+     "start": 30.503,
+     "end": 30.623
+    },
+    {
+     "word": "entra,",
+     "start": 30.683,
+     "end": 30.963
+    },
+    {
+     "word": "o",
+     "start": 31.183,
+     "end": 31.223
+    },
+    {
+     "word": "que",
+     "start": 31.263,
+     "end": 31.343
+    },
+    {
+     "word": "sai",
+     "start": 31.423,
+     "end": 31.643
+    },
+    {
+     "word": "e",
+     "start": 31.863,
+     "end": 31.903
+    },
+    {
+     "word": "quanto",
+     "start": 31.983,
+     "end": 32.223
+    },
+    {
+     "word": "sobra.",
+     "start": 32.283,
+     "end": 32.583
+    }
+   ]
+  },
+  {
+   "n": 11,
+   "text": "Tudo num app só.",
+   "start": 33.083,
+   "end": 33.924,
+   "words": [
+    {
+     "word": "Tudo",
+     "start": 33.083,
+     "end": 33.324
+    },
+    {
+     "word": "num",
+     "start": 33.364,
+     "end": 33.484
+    },
+    {
+     "word": "app",
+     "start": 33.544,
+     "end": 33.704
+    },
+    {
+     "word": "só.",
+     "start": 33.784,
+     "end": 33.924
+    }
+   ]
+  },
+  {
+   "n": 12,
+   "text": "Baixe o Rotina agora.",
+   "start": 34.424,
+   "end": 35.615,
+   "words": [
+    {
+     "word": "Baixe",
+     "start": 34.424,
+     "end": 34.684
+    },
+    {
+     "word": "o",
+     "start": 34.704,
+     "end": 34.724
+    },
+    {
+     "word": "Rotina",
+     "start": 34.764,
+     "end": 35.125
+    },
+    {
+     "word": "agora.",
+     "start": 35.265,
+     "end": 35.615
+    }
+   ]
+  }
+ ]
+}

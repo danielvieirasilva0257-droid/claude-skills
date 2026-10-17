@@ -5,8 +5,8 @@ import {Borrao5, C, Frase, Palavra} from '../v5/theme';
 // Rotina v6 (vertical 1080 x 1920): o mesmo visual do v5 (fundo escuro com luzes, interface do app grande,
 // frases palavra por palavra), com o celular do Blender varias vezes: tela em foco <-> elemento que sobe com o celular desfocado.
 
-export const W6 = 1080;
-export const H6 = 1920;
+export const LARG6 = 1080;
+export const ALT6 = 1920;
 
 // fundo: quase preto + mancha vermelha (alto, esquerda) e ambar (baixo, direita) que derivam devagar
 export const Fundo6: React.FC<{f: number}> = ({f}) => {
@@ -24,14 +24,14 @@ export const Fundo6: React.FC<{f: number}> = ({f}) => {
 	);
 };
 
-export const Borrao6: React.FC<{id: string; dx: number; dy: number; children: React.ReactNode; k?: number; max?: number}> = (p) => <Borrao5 {...p} w={W6} h={H6} />;
+export const Borrao6: React.FC<{id: string; dx: number; dy: number; children: React.ReactNode; k?: number; max?: number}> = (p) => <Borrao5 {...p} w={LARG6} h={ALT6} />;
 
 // frase em varias linhas (cada linha se monta palavra por palavra e se recentraliza sozinha)
 // y = centro da primeira linha; passo = distancia entre linhas
 export const Frase6: React.FC<{f: number; linhas: Palavra[][]; size: number; y: number; passo?: number; sai?: number; id: string}> = ({f, linhas, size, y, passo, sai, id}) => (
 	<>
 		{linhas.map((l, i) => (
-			<Frase key={i} f={f} id={`${id}-${i}`} palavras={l} size={size} y={y + i * (passo ?? size * 1.22)} sai={sai} cx={W6 / 2} fw={W6} fh={H6} />
+			<Frase key={i} f={f} id={`${id}-${i}`} palavras={l} size={size} y={y + i * (passo ?? size * 1.22)} sai={sai} cx={LARG6 / 2} fw={LARG6} fh={ALT6} />
 		))}
 	</>
 );

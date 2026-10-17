@@ -15,9 +15,17 @@ import {TelaV5} from './v5/Tela5';
 import {EstiloV5} from './v5/Estilo';
 import {RotinaV5} from './v5/Video5';
 import {END5} from './v5/tempo5';
+import {V6Tela} from './v6/Tela6';
+import {RotinaV6} from './v6/Video6';
+import {END6} from './v6/tempo6';
+import {FIM_CELULAR} from './v6/plano6';
 
 export const Root: React.FC = () => (
 	<>
+		{/* v6 final (vertical, 38,3 s): treino + checklists + financeiro no estilo do v5 */}
+		<Composition id="RotinaV6" component={RotinaV6} durationInFrames={END6} fps={30} width={1080} height={1920} defaultProps={{audio: false, silhueta: false}} />
+		{/* v6 (vertical): textura da tela do celular do Blender (1080 x 2309), um quadro por quadro do video */}
+		<Composition id="V6Tela" component={V6Tela} durationInFrames={FIM_CELULAR + 1} fps={30} width={1080} height={2309} defaultProps={{}} />
 		{/* v5 final (16:9, 22,4 s): no estilo do video-modelo, com a tipografia, os icones e as cores do app */}
 		<Composition id="RotinaV5" component={RotinaV5} durationInFrames={END5} fps={30} width={1920} height={1080} defaultProps={{audio: false}} />
 		{/* v5: quadro de estilo (conferir fontes, cores e pecas) */}

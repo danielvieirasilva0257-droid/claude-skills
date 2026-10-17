@@ -17,3 +17,6 @@ public/v4/celular/
 # v5: textura da tela e camada 3D da abertura (geradas por codigo)
 public/v5/tela/
 public/v5/celular/
+public/v6/tela/
+public/v6/celular/
+public/v6/celular_b/

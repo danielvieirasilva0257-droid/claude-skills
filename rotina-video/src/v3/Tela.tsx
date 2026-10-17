@@ -14,13 +14,13 @@ import {W} from './tempo';
 
 export const UI_W = 390;
 export const UI_H = 834; // 390 x 834 pt -> 1080 x 2309 px
-const S = 1080 / UI_W;
-const TAB_H = 84;
+export const S = 1080 / UI_W;
+export const TAB_H = 84;
 
 // ---------------------------------------------------------------- pecas
-const press = (f: number, at: number) => (f < at - 4 || f > at + 8 ? 1 : f < at ? tw(f, [at - 4, at], [1, 0.96], E.press) : tw(f, [at, at + 6], [0.96, 1], E.ui));
+export const press = (f: number, at: number) => (f < at - 4 || f > at + 8 ? 1 : f < at ? tw(f, [at - 4, at], [1, 0.96], E.press) : tw(f, [at, at + 6], [0.96, 1], E.ui));
 
-const Toque: React.FC<{f: number; at: number; x: number | string; y: number | string}> = ({f, at, x, y}) => {
+export const Toque: React.FC<{f: number; at: number; x: number | string; y: number | string}> = ({f, at, x, y}) => {
 	const l = f - at;
 	if (l < -5 || l > 18) return null;
 	const dot = tw(l, [-5, 0], [0, 1], E.press) * (1 - tw(l, [3, 10], [0, 1], E.ui));
@@ -33,7 +33,7 @@ const Toque: React.FC<{f: number; at: number; x: number | string; y: number | st
 	);
 };
 
-const CheckDesenhado: React.FC<{k: number; size?: number}> = ({k, size = 18}) => (
+export const CheckDesenhado: React.FC<{k: number; size?: number}> = ({k, size = 18}) => (
 	<svg width={size} height={size} viewBox="0 0 24 24" style={{display: 'block'}}>
 		<path d="M5 12.5 L10 17.5 L19 7" fill="none" stroke="#fff" strokeWidth={3.4} strokeLinecap="round" strokeLinejoin="round" pathLength={1} strokeDasharray={1} strokeDashoffset={1 - k} />
 	</svg>
@@ -45,10 +45,10 @@ const TABS = [
 	{label: 'Financeiro', Icon: Wallet},
 	{label: 'Ajustes', Icon: Settings},
 ];
-const tabX = (i: number) => (UI_W * (i + 0.5)) / 4;
-const TAB_Y = UI_H - TAB_H + 30;
+export const tabX = (i: number) => (UI_W * (i + 0.5)) / 4;
+export const TAB_Y = UI_H - TAB_H + 30;
 
-const Tela: React.FC<{tab: number; f: number; tapTab?: number; children: React.ReactNode}> = ({tab, f, tapTab, children}) => (
+export const Tela: React.FC<{tab: number; f: number; tapTab?: number; children: React.ReactNode}> = ({tab, f, tapTab, children}) => (
 	<div style={{width: UI_W, height: UI_H, background: c.bg, color: c.text, fontFamily: body, position: 'relative', overflow: 'hidden'}}>
 		<div style={{padding: '54px 18px 0'}}>{children}</div>
 		<div style={{position: 'absolute', left: 0, right: 0, bottom: 0, height: TAB_H, paddingBottom: 22, background: 'rgba(8,8,8,0.96)', borderTop: `1px solid ${c.border}`, display: 'flex'}}>
@@ -67,14 +67,14 @@ const Tela: React.FC<{tab: number; f: number; tapTab?: number; children: React.R
 	</div>
 );
 
-const Cabeca: React.FC<{kicker: string; title: string}> = ({kicker, title}) => (
+export const Cabeca: React.FC<{kicker: string; title: string}> = ({kicker, title}) => (
 	<div style={{marginBottom: 14}}>
 		<div style={{fontFamily: display, fontSize: 13, fontWeight: 600, color: c.muted, textTransform: 'uppercase', letterSpacing: '0.12em'}}>{kicker}</div>
 		<div style={{fontFamily: display, fontSize: 34, fontWeight: 700, textTransform: 'uppercase', lineHeight: 1.05}}>{title}</div>
 	</div>
 );
 
-const Pilulas: React.FC<{items: string[]; active: number; f?: number; tapAt?: number; slideAt?: number; from?: number}> = ({items, active, f = 0, tapAt, slideAt, from}) => (
+export const Pilulas: React.FC<{items: string[]; active: number; f?: number; tapAt?: number; slideAt?: number; from?: number}> = ({items, active, f = 0, tapAt, slideAt, from}) => (
 	<div style={{position: 'relative', display: 'flex', gap: 7, marginBottom: 14}}>
 		{items.map((it, i) => {
 			const was = from !== undefined && slideAt !== undefined && f < slideAt ? from : active;
@@ -91,7 +91,7 @@ const Pilulas: React.FC<{items: string[]; active: number; f?: number; tapAt?: nu
 );
 
 // entrada dos blocos dentro da tela (UI: ease-out forte, 6 a 9 q, deslocamento curto)
-const sobe = (f: number, at: number): React.CSSProperties => ({opacity: tw(f, [at, at + 6], [0, 1], E.ui), transform: `translateY(${tw(f, [at, at + 9], [14, 0], E.ui)}px)`});
+export const sobe = (f: number, at: number): React.CSSProperties => ({opacity: tw(f, [at, at + 6], [0, 1], E.ui), transform: `translateY(${tw(f, [at, at + 9], [14, 0], E.ui)}px)`});
 
 // ---------------------------------------------------------------- Hábitos de hoje
 const HABITOS = ['Dieta', 'Beber 3L de água', 'Ler 10 páginas', 'Treinar', 'Meditar 10 min'];
