@@ -99,3 +99,9 @@ O Daniel é editor de vídeo profissional (motion). Ele revisou o v2 do Rotina e
 - **Morph cartão → ícone sem máscara:** retângulo da cor do cartão cobre o conteúdo, encolhe até o quadrado do ícone (mesmo raio do canto) e muda de cor; o ícone real entra no quadro seguinte.
 - **Lista inteira montada que rola por seção:** a seção em foco acesa, a próxima apagada (0,32) e a que sai some por tempo enquanto a coluna rola, para nada passar por cima do topo.
 - **Cuidado:** módulos lidos pelo exportador de efeitos (node, sem `document`) não podem medir texto no carregamento. Detalhes: `projetos/rotina/PASSO-A-PASSO.md` (item 8).
+
+## 17/10/2026: Rotina v6 (vertical, celular do Blender alternando foco e mergulho)
+
+- **Lista de trechos da câmera** (P em foco, N mergulho num retângulo da UI): gera a pose do Blender, o desfoque do celular no 2D e o ponto de partida de cada cartão. O cartão nasce na projeção do retângulo da tela no quadro do salto e vai com mola para o lugar dele.
+- **A saída do cartão termina antes de o celular voltar ao foco,** com borrão de no máximo ~14 px. Senão o rastro cruza a tela nítida.
+- **Celular saindo do quadro:** o `--borda` do Blender não grava PNG quando o celular está todo fora. Teste a caixa projetada antes de pedir a imagem. Detalhes: `projetos/rotina/PASSO-A-PASSO.md` (item 9).

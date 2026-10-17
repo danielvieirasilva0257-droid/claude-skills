@@ -16,3 +16,7 @@ Adendos datados. O mais novo fica embaixo. Os arquivos oficiais ficam intactos.
 
 - Ângulo "Segunda eu começo": a semana é o fio (segunda → quarta → o dia a dia no app → "nem precisa esperar a segunda" → "agora"). 13 falas, 91 palavras, gancho de 2 s, uma CTA só.
 - Para a voz caber em 30 s com a Leda a ~1,1x, a meta de 80 a 95 palavras funcionou. Arquivos: `research_notes/Rotina v3 2026-10/roteiro/`.
+
+## 17/10/2026: roteiro que passeia por muitas telas (Rotina v6)
+
+- O primeiro rascunho leu a tela em voz alta. Escrever a partir da fala do público ("quanto você pegaria numa repetição" no lugar de "1RM estimado") deixou o texto natural, e o termo técnico ficou só na tela. Detalhes: `projetos/rotina/PASSO-A-PASSO.md` (item 9).

@@ -56,3 +56,8 @@ Ordem que funcionou, do zero ao vídeo final, numa sessão (passo a passo comple
 - Quando o Daniel manda um modelo ("faz igual, nesse estilo"), separe o que copiar do que manter. Do modelo: ordem das cenas, tipo de movimento, ritmo da voz e formato (16:9). Do app: fonte, ícones e cores de categoria (ele pediu isso de novo no v5).
 - Ordem que funcionou: analisar o modelo (folhas de quadros + transcrição com tempos) → roteiro no mesmo número de falas e no mesmo ritmo → voz → trilha na grade da voz → abertura no Blender → cenas 2D → efeitos → revisão.
 - Avise na entrega o que o modelo faz contra as regras do editor (no v5, as palavras reveladas no meio do quadro). Detalhes: `projetos/rotina/PASSO-A-PASSO.md` (item 8).
+
+## 17/10/2026: Rotina v6 (vertical, mais longo, foco em treino)
+
+- O Daniel gostou do celular chegando, desfocando atrás e focando no elemento que sobe (abertura do v5) e pediu isso o vídeo todo. O padrão dele agora: alternar tela em foco (frase em cima) com mergulho (cartão grande sobre o celular desfocado), uma troca por fala.
+- Ordem que funcionou: roteiro (agente com copy + humanizer) → voz → trilha → telas do app → poses → rascunho com o celular em silhueta → Blender em segundo plano → efeitos e mix → rascunho real → final. Detalhes: `projetos/rotina/PASSO-A-PASSO.md` (item 9).
