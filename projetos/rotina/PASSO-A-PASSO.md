@@ -274,3 +274,16 @@ npx remotion render src/index.ts RotinaV4 out/rotina-v4.mp4 --crf=17 --audio-cod
    - transformar o "papel e tinta" do v2/v4 numa skill de sistema visual (proposta `design-de-video`), para não perder o padrão;
    - decidir as skills e combos novos propostos no relatório `reports/Vídeo Rotina v3, skills e combos usados (2026-10-12).md`;
    - capa do Reels a partir de um quadro do Blender (proposta `capa-e-cortes-reels`).
+
+## App na web: GitHub Pages (18/10/2026)
+
+- **O que foi feito:** o app (artefato https://claude.ai/artifact/FsKaH7SRjcPc4wRLXSJcFE) virou um site estático na branch `rotina-app` do claude-skills, só com o app:
+  - `index.html` (o HTML do artefato + `<title>`, `theme-color`, metas do iPhone e link do manifest);
+  - `manifest.webmanifest`, `icon-192.png`, `icon-512.png`, `apple-touch-icon.png` (ícones feitos com Pillow: anel vermelho + "R"), `.nojekyll`.
+- **Endereço:** https://danielvieirasilva0257-droid.github.io/claude-skills/ (só funciona depois de ligar o Pages: Settings → Pages → "Deploy from a branch" → `rotina-app` / `(root)` → Save).
+- **Como funciona fora do Claude:** sem `window.claude`, o app guarda os dados no `localStorage` do aparelho (chave `daniel-app-v2`) e o backup vira download normal. Os dados não sincronizam entre aparelhos; para passar dados, use o backup do app (exportar num lugar e importar no outro).
+- **Aprendizados:**
+  - a integração do GitHub nesta sessão não consegue criar repositório (erro 403), mas consegue enviar branches para o claude-skills, que é público;
+  - ligar o GitHub Pages precisa ser feito pelo usuário nas configurações do repositório;
+  - para atualizar o site: ler o artefato de novo (`Artifact read`), refazer o `index.html` com as mesmas metas e enviar para a branch `rotina-app`.
+- **Próximo passo:** ligar o Pages, abrir o link no Safari do iPhone e tocar em Compartilhar → "Adicionar à Tela de Início".
