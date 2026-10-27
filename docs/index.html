@@ -1,0 +1,1552 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Placas NFC</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Estoque e vendas das suas placas NFC.">
+<meta name="theme-color" content="#eef0f4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1116" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Placas NFC">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: coluna única de app de celular (máx. 560px), barra de abas embaixo, folhas que sobem de baixo */
+:root {
+  --bg: #eef0f4;
+  --surface: #ffffff;
+  --surface-2: #f5f6f9;
+  --ink: #14161b;
+  --muted: #646b78;
+  --line: #e1e4ea;
+  --accent: #2b4cff;
+  --accent-ink: #ffffff;
+  --accent-soft: #e6eaff;
+  --good: #11845b;
+  --good-soft: #def3ea;
+  --warn: #a35f00;
+  --warn-soft: #fcefd9;
+  --bad: #c0362c;
+  --bad-soft: #fbe5e2;
+  --shadow: 0 1px 2px rgba(20,22,27,.06), 0 8px 24px -12px rgba(20,22,27,.18);
+  --font-display: "Unbounded", "Arial Rounded MT Bold", system-ui, sans-serif;
+  --font-body: "Instrument Sans", -apple-system, "Segoe UI", Roboto, system-ui, sans-serif;
+  --r-lg: 22px; --r-md: 14px; --r-sm: 10px;
+  --tabbar-h: 64px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1116; --surface: #181b22; --surface-2: #1f232b; --ink: #eceef3; --muted: #9aa1ae; --line: #2a2f39;
+    --accent: #7d92ff; --accent-ink: #0d1020; --accent-soft: #232a4a;
+    --good: #4cc995; --good-soft: #15302a; --warn: #f2b65a; --warn-soft: #33270f; --bad: #f2877d; --bad-soft: #3a1d1a;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -14px rgba(0,0,0,.7);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1116; --surface: #181b22; --surface-2: #1f232b; --ink: #eceef3; --muted: #9aa1ae; --line: #2a2f39;
+  --accent: #7d92ff; --accent-ink: #0d1020; --accent-soft: #232a4a;
+  --good: #4cc995; --good-soft: #15302a; --warn: #f2b65a; --warn-soft: #33270f; --bad: #f2877d; --bad-soft: #3a1d1a;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px -14px rgba(0,0,0,.7);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+}
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; }
+.n { font-variant-numeric: tabular-nums; }
+
+.app {
+  max-width: 560px; margin: 0 auto;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 14px);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + 28px);
+}
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 2px 16px; }
+.top h1 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 22px; letter-spacing: -0.02em; }
+.top .sub { color: var(--muted); font-size: 14px; }
+.view { display: flex; flex-direction: column; gap: 22px; }
+h2 { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+.sec { display: flex; flex-direction: column; gap: 12px; }
+.sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 0 2px; }
+.sec-head .link { background: none; border: 0; color: var(--accent); font-weight: 600; font-size: 14px; padding: 4px 0; }
+
+/* hero */
+.hero { background: var(--surface); border-radius: var(--r-lg); padding: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 16px; }
+.hero-main { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.hero-num { font-family: var(--font-display); font-weight: 700; font-size: clamp(52px, 17vw, 72px); line-height: .9; letter-spacing: -0.04em; }
+.hero-label { color: var(--muted); font-size: 15px; margin-top: 6px; }
+.hero-split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mini { background: var(--surface-2); border-radius: var(--r-md); padding: 12px 14px; min-width: 0; }
+.mini span { display: block; font-size: 13px; color: var(--muted); }
+.mini b { display: block; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.mini small { display: block; font-size: 12px; color: var(--muted); }
+.alerts { display: flex; flex-wrap: wrap; gap: 8px; }
+.alert { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 600; background: var(--warn-soft); color: var(--warn); border: 0; }
+.alert.out { background: var(--bad-soft); color: var(--bad); }
+
+/* placas */
+.plates { display: grid; grid-auto-flow: column; grid-auto-columns: min(76%, 260px); gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 2px 14px; margin: -4px -2px -10px; scrollbar-width: none; }
+.plates::-webkit-scrollbar { display: none; }
+.plate {
+  position: relative; scroll-snap-align: start; aspect-ratio: 1.42; border-radius: 20px; padding: 16px; border: 0; text-align: left;
+  color: var(--p-ink); background: var(--p-bg); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.45), inset 0 -1px 0 rgba(0,0,0,.08), 0 14px 26px -16px var(--p-glow, rgba(0,0,0,.5));
+  transition: transform .18s ease;
+}
+.plate::after { content: ""; position: absolute; inset: 0; background: linear-gradient(118deg, rgba(255,255,255,.38) 0%, rgba(255,255,255,0) 34%, rgba(255,255,255,0) 70%, rgba(255,255,255,.12) 100%); pointer-events: none; }
+.plate:active { transform: scale(.97); }
+.plate-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; position: relative; z-index: 1; }
+.plate-name { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.plate-nfc { width: 26px; height: 26px; flex: none; opacity: .9; }
+.plate-bottom { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; position: relative; z-index: 1; }
+.plate-stock { font-family: var(--font-display); font-weight: 700; font-size: 40px; line-height: .9; letter-spacing: -0.04em; }
+.plate-stock small { display: block; font-family: var(--font-body); font-size: 12px; font-weight: 600; letter-spacing: 0; margin-top: 6px; opacity: .85; }
+.plate-side { text-align: right; font-size: 12px; font-weight: 600; opacity: .9; line-height: 1.35; }
+.plate-strip { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; z-index: 1; }
+.plate-tag { position: absolute; top: 46px; left: 16px; z-index: 1; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: rgba(255,255,255,.92); color: #a33a00; }
+.plate-tag.out { color: #b3261e; }
+.plate.add { background: transparent; border: 2px dashed var(--line); color: var(--muted); box-shadow: none; align-items: center; justify-content: center; gap: 6px; font-weight: 600; }
+.plate.add::after { display: none; }
+
+/* cartões e listas */
+.card { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); padding: 16px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: var(--surface-2); border-radius: 12px; padding: 4px; gap: 4px; }
+.seg button { border: 0; background: transparent; color: var(--muted); font-weight: 600; font-size: 14px; padding: 8px 10px; border-radius: 9px; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.chart svg { display: block; width: 100%; height: auto; }
+.chart .bar { fill: var(--accent); opacity: .35; }
+.chart .bar.now { opacity: 1; }
+.chart .lbl { font: 600 11px var(--font-body); fill: var(--muted); }
+.chart .val { font: 700 11px var(--font-body); fill: var(--ink); }
+.chart .base { stroke: var(--line); }
+.rank { display: flex; flex-direction: column; gap: 10px; }
+.rank-row { display: grid; grid-template-columns: 92px 1fr auto; gap: 10px; align-items: center; font-size: 14px; }
+.rank-row .nm { display: flex; align-items: center; gap: 7px; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.track { height: 10px; border-radius: 6px; background: var(--surface-2); overflow: hidden; }
+.track i { display: block; height: 100%; border-radius: 6px; }
+.sw { width: 12px; height: 12px; border-radius: 4px; flex: none; }
+.empty { text-align: center; color: var(--muted); padding: 22px 10px; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 15px; }
+.empty b { color: var(--ink); font-size: 16px; }
+
+/* instalar */
+.install { background: var(--accent); color: var(--accent-ink); border-radius: var(--r-lg); padding: 16px; display: flex; gap: 14px; align-items: center; }
+.install p { margin: 0; font-size: 14px; flex: 1; }
+.install b { display: block; font-size: 16px; }
+.install button { border: 0; border-radius: 10px; background: var(--accent-ink); color: var(--accent); font-weight: 700; padding: 9px 12px; white-space: nowrap; }
+.install .x { background: transparent; color: var(--accent-ink); padding: 6px; font-size: 20px; line-height: 1; opacity: .8; }
+
+/* histórico */
+.filters { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px; margin: -2px; }
+.filters::-webkit-scrollbar { display: none; }
+.fchip { flex: none; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 7px 13px; font-size: 14px; font-weight: 600; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+.fchip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.month { display: flex; flex-direction: column; gap: 8px; }
+.month-head { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 4px 0; gap: 8px; }
+.month-head h3 { margin: 0; font-size: 15px; font-weight: 700; text-transform: capitalize; }
+.month-head span { font-size: 13px; color: var(--muted); text-align: right; }
+.list { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); overflow: hidden; }
+.item { display: grid; grid-template-columns: 42px 1fr auto; gap: 12px; align-items: center; padding: 12px 14px; width: 100%; background: none; border: 0; text-align: left; border-top: 1px solid var(--line); }
+.item:first-child { border-top: 0; }
+.item:active { background: var(--surface-2); }
+.ico { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font-weight: 700; font-size: 14px; color: var(--p-ink); background: var(--p-bg); position: relative; overflow: hidden; }
+.item .t { font-weight: 600; font-size: 15px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item .d { font-size: 13px; color: var(--muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item .v { text-align: right; font-weight: 700; font-size: 15px; white-space: nowrap; }
+.item .v small { display: block; font-weight: 500; font-size: 12px; color: var(--muted); }
+.item .v.in { color: var(--good); }
+
+/* ajustes */
+.rows { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); overflow: hidden; }
+.row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-top: 1px solid var(--line); width: 100%; background: none; border-left: 0; border-right: 0; border-bottom: 0; text-align: left; min-height: 54px; }
+.row:first-child { border-top: 0; }
+.row .grow { flex: 1; min-width: 0; }
+.row .grow small { display: block; color: var(--muted); font-size: 13px; }
+.row .chev { color: var(--muted); font-size: 18px; }
+.row.danger { color: var(--bad); font-weight: 600; }
+.switch { width: 50px; height: 30px; border-radius: 999px; background: var(--line); position: relative; flex: none; transition: background .2s; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s; }
+.switch[aria-checked="true"] { background: var(--good); }
+.switch[aria-checked="true"]::after { transform: translateX(20px); }
+.note { font-size: 13px; color: var(--muted); padding: 0 4px; margin: 0; }
+.steps { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
+
+/* barra de abas */
+.tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: saturate(1.6) blur(18px); -webkit-backdrop-filter: saturate(1.6) blur(18px);
+  border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px);
+}
+.tabbar-in { max-width: 560px; margin: 0 auto; height: var(--tabbar-h); display: grid; grid-template-columns: 1fr 1fr 76px 1fr 1fr; align-items: center; }
+.tab { border: 0; background: none; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; padding: 6px 0; }
+.tab svg { width: 24px; height: 24px; }
+.tab[aria-current="page"] { color: var(--accent); }
+.fab { justify-self: center; width: 58px; height: 58px; border-radius: 20px; border: 0; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; box-shadow: 0 10px 22px -10px var(--accent); transform: translateY(-10px); transition: transform .15s; }
+.fab:active { transform: translateY(-10px) scale(.94); }
+.fab svg { width: 28px; height: 28px; }
+
+/* folhas */
+.scrim { position: fixed; inset: 0; background: rgba(8,10,14,.45); z-index: 40; opacity: 0; pointer-events: none; transition: opacity .25s; }
+.scrim.on { opacity: 1; pointer-events: auto; }
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; margin: 0 auto; max-width: 560px;
+  background: var(--surface); border-radius: 26px 26px 0 0; max-height: 94dvh; overflow-y: auto; overscroll-behavior: contain;
+  padding: 10px max(18px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 20px) max(18px, env(safe-area-inset-left, 0px));
+  transform: translateY(105%); transition: transform .32s cubic-bezier(.2,.8,.2,1); visibility: hidden;
+}
+.sheet.on { transform: none; visibility: visible; }
+.grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line); margin: 0 auto 12px; }
+.sheet-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; }
+.sheet-head h2 { font-size: 20px; }
+.close { border: 0; background: var(--surface-2); width: 34px; height: 34px; border-radius: 50%; font-size: 18px; color: var(--muted); display: grid; place-items: center; }
+.form { display: flex; flex-direction: column; gap: 16px; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field > span, .flabel { font-size: 13px; font-weight: 600; color: var(--muted); }
+.field input, .field select { width: 100%; min-width: 0; background: var(--surface-2); border: 1.5px solid transparent; border-radius: 12px; padding: 12px 13px; font-size: 16px; }
+.field input:focus { border-color: var(--accent); outline: none; }
+.money { position: relative; }
+.money::before { content: "R$"; position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); font-weight: 600; pointer-events: none; }
+.money input { padding-left: 42px; font-size: 22px; font-weight: 700; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.picker { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 3px; margin: -3px; }
+.picker::-webkit-scrollbar { display: none; }
+.pick { flex: none; border: 0; border-radius: 14px; padding: 10px 14px; min-width: 96px; text-align: left; color: var(--p-ink); background: var(--p-bg); font-weight: 700; font-size: 14px; position: relative; overflow: hidden; box-shadow: inset 0 1px 0 rgba(255,255,255,.4); opacity: .55; transition: opacity .15s, transform .15s; }
+.pick small { display: block; font-weight: 600; font-size: 11px; opacity: .85; }
+.pick[aria-pressed="true"] { opacity: 1; box-shadow: 0 0 0 2.5px var(--surface), 0 0 0 4.5px var(--ink); }
+.stepper { display: grid; grid-template-columns: 56px 1fr 56px; align-items: center; background: var(--surface-2); border-radius: 16px; padding: 6px; }
+.stepper button { height: 48px; border: 0; border-radius: 12px; background: var(--surface); font-size: 26px; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.stepper input { text-align: center; border: 0; background: transparent; font-family: var(--font-display); font-weight: 700; font-size: 30px; width: 100%; min-width: 0; padding: 4px; }
+.stepper input:focus { outline: none; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; padding: 7px 13px; font-size: 14px; font-weight: 600; }
+.chip[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.opt { font-style: normal; font-weight: 500; }
+.totalbox { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; background: var(--accent-soft); color: var(--accent); border-radius: 12px; padding: 10px 14px; font-weight: 600; font-size: 15px; }
+.totalbox b { font-family: var(--font-display); font-size: 20px; font-variant-numeric: tabular-nums; }
+.split { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.split-row { display: grid; grid-template-columns: 96px 1fr; gap: 10px; align-items: center; }
+.split-row > span { font-weight: 600; font-size: 15px; color: var(--ink); }
+.split-row .money input { font-size: 17px; padding-top: 10px; padding-bottom: 10px; }
+.helper.ok { color: var(--good); font-weight: 600; }
+.helper.bad { color: var(--bad); font-weight: 600; }
+.pays { display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+.pays div { display: flex; justify-content: space-between; gap: 10px; }
+.pays span { color: var(--muted); }
+.pays b { font-variant-numeric: tabular-nums; }
+.pays .pend b, .pays .pend span { color: var(--warn); }
+.item .v .lucro { color: var(--good); font-weight: 600; }
+.item .v .falta { color: var(--warn); font-weight: 700; }
+.pays .go { border: 0; background: none; padding: 2px 0; width: 100%; text-align: left; font-size: 14px; color: inherit; cursor: pointer; }
+.pays .go span::after { content: " ›"; color: var(--muted); }
+.pays .fee b { color: var(--bad); }
+.due-card { display: flex; align-items: center; gap: 12px; width: 100%; border: 0; text-align: left; background: var(--warn-soft); color: var(--warn); border-radius: var(--r-md); padding: 12px 14px; }
+.due-card .grow { flex: 1; min-width: 0; }
+.due-card b { display: block; font-size: 20px; font-variant-numeric: tabular-nums; }
+.due-card small { display: block; font-size: 13px; font-weight: 600; opacity: .85; }
+.due-card .chev { font-size: 22px; }
+.dues { display: flex; flex-direction: column; gap: 10px; }
+.due-card.loja { background: var(--accent-soft); color: var(--accent); }
+.due .amt.loja { color: var(--accent); }
+.steplbl { display: flex; justify-content: space-between; gap: 8px; }
+.steplbl small { font-weight: 500; color: var(--muted); }
+.due { background: var(--surface-2); border-radius: var(--r-md); padding: 12px 14px; display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; }
+.due .who { font-weight: 700; font-size: 16px; min-width: 0; overflow-wrap: anywhere; }
+.due .amt { font-weight: 700; font-size: 17px; color: var(--warn); text-align: right; font-variant-numeric: tabular-nums; }
+.due .info { font-size: 13px; color: var(--muted); }
+.due .late { color: var(--bad); font-weight: 600; }
+.due button { border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 14px; padding: 8px 14px; justify-self: end; }
+.rowinput { width: 96px; text-align: right; background: var(--surface-2); border: 1.5px solid transparent; border-radius: 10px; padding: 8px 10px; font-size: 16px; font-weight: 600; }
+.rowinput:focus { border-color: var(--accent); outline: none; }
+.quick { border: 0; background: var(--accent-soft); color: var(--accent); border-radius: 10px; padding: 8px 12px; font-size: 14px; font-weight: 600; align-self: flex-start; }
+.helper { margin: 0; font-size: 14px; color: var(--muted); }
+.warnbox { background: var(--warn-soft); color: var(--warn); border-radius: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500; }
+.btn { border: 0; border-radius: 14px; background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 17px; padding: 15px; width: 100%; }
+.btn.ghost { background: var(--surface-2); color: var(--ink); }
+.btn.danger { background: var(--bad); color: #fff; }
+.btn.textdanger { background: transparent; color: var(--bad); }
+.btn:disabled { opacity: .5; }
+.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dl { display: grid; grid-template-columns: 1fr auto; gap: 10px 14px; margin: 0; font-size: 15px; }
+.dl dt { color: var(--muted); }
+.dl dd { margin: 0; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.color-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.color-dot { width: 36px; height: 36px; border-radius: 50%; border: 0; box-shadow: inset 0 0 0 1px rgba(0,0,0,.1); }
+.color-dot[aria-pressed="true"] { box-shadow: 0 0 0 2.5px var(--surface), 0 0 0 4.5px var(--ink); }
+
+/* toast */
+.toast { position: fixed; left: 50%; bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + 18px); z-index: 60; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; background: var(--ink); color: var(--bg); padding: 11px 16px; border-radius: 14px; font-weight: 600; font-size: 15px; transition: opacity .2s, transform .25s; max-width: calc(100% - 32px); width: max-content; text-align: center; }
+.toast.on { opacity: 1; transform: translate(-50%, 0); }
+.toast.err { background: var(--bad); color: #fff; }
+
+/* bloqueio */
+.lock { position: fixed; inset: 0; z-index: 100; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px; padding: calc(env(safe-area-inset-top, 0px) + 20px) 20px calc(env(safe-area-inset-bottom, 0px) + 20px); }
+.lock h2 { font-size: 19px; text-align: center; }
+.lock p { margin: -14px 0 0; color: var(--muted); font-size: 14px; text-align: center; min-height: 1.4em; }
+.lock p.err { color: var(--bad); font-weight: 600; }
+.dots { display: flex; gap: 16px; }
+.dots i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--muted); }
+.dots i.on { background: var(--ink); border-color: var(--ink); }
+.dots.shake { animation: shake .35s; }
+@keyframes shake { 25% { transform: translateX(-8px); } 50% { transform: translateX(8px); } 75% { transform: translateX(-4px); } }
+.keypad { display: grid; grid-template-columns: repeat(3, 76px); gap: 14px; }
+.keypad button { height: 76px; border-radius: 50%; border: 0; background: var(--surface); font-size: 28px; font-weight: 600; box-shadow: var(--shadow); }
+.keypad button.blank { visibility: hidden; }
+.keypad button.txt { background: transparent; box-shadow: none; font-size: 15px; color: var(--muted); }
+.lock-logo { width: 64px; height: 64px; border-radius: 18px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+@media (min-width: 700px) {
+  .plates { grid-auto-flow: row; grid-template-columns: 1fr 1fr; grid-auto-columns: auto; overflow: visible; }
+  .sheet { bottom: 50%; transform: translateY(60%); opacity: 0; border-radius: 26px; transition: transform .3s cubic-bezier(.2,.8,.2,1), opacity .2s; max-height: 88dvh; }
+  .sheet.on { transform: translateY(50%); opacity: 1; }
+  .grab { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="lock" id="lock" hidden>
+  <img class="lock-logo" src="icons/icon-192.png" alt="">
+  <h2 id="lock-title">Digite seu PIN</h2>
+  <p id="lock-msg"></p>
+  <div class="dots" id="lock-dots"><i></i><i></i><i></i><i></i></div>
+  <div class="keypad" id="keypad"></div>
+</div>
+
+<div class="app" id="app">
+  <header class="top">
+    <div>
+      <h1 id="top-title">Placas NFC</h1>
+      <div class="sub" id="top-sub"></div>
+    </div>
+  </header>
+
+  <!-- INÍCIO -->
+  <section class="view" id="v-inicio">
+    <div class="install" id="install" hidden>
+      <p><b>Coloque na tela inicial</b>Assim ele abre como um app, em tela cheia e sem internet.</p>
+      <button type="button" id="install-btn">Como fazer</button>
+      <button type="button" class="x" id="install-x" aria-label="Fechar aviso">×</button>
+    </div>
+
+    <div class="hero">
+      <div class="hero-main">
+        <div>
+          <div class="hero-num n" id="h-estoque">0</div>
+          <div class="hero-label" id="h-est-l">placas em estoque</div>
+        </div>
+      </div>
+      <div class="hero-split">
+        <div class="mini"><span id="h-fat-l">Faturado este mês</span><b class="n" id="h-fat">R$ 0,00</b><small id="h-fat-s">nenhuma venda ainda</small></div>
+        <div class="mini"><span>Vendidas este mês</span><b class="n" id="h-ven">0</b><small id="h-ven-s">placas</small></div>
+      </div>
+      <button type="button" class="due-card" id="due-card" hidden><span class="grow"><small>A receber dos clientes</small><b id="due-total">R$ 0,00</b><small id="due-sub"></small></span><span class="chev">›</span></button>
+      <button type="button" class="due-card loja" id="loja-card" hidden><span class="grow"><small>Placas deixadas nas lojas</small><b id="loja-total">0</b><small id="loja-sub"></small></span><span class="chev">›</span></button>
+      <div class="alerts" id="alerts" hidden></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><h2>Suas placas</h2><button type="button" class="link" id="go-tipos">Editar tipos</button></div>
+      <div class="plates" id="plates"></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><h2>Resultados</h2></div>
+      <div class="card">
+        <div class="seg" role="group" aria-label="Período">
+          <button type="button" data-per="mes" aria-pressed="true">Este mês</button>
+          <button type="button" data-per="ano" aria-pressed="false">Este ano</button>
+          <button type="button" data-per="tudo" aria-pressed="false">Tudo</button>
+        </div>
+        <div class="stats" id="stats"></div>
+        <div id="pays-wrap" class="sec" style="gap:10px" hidden>
+          <div class="flabel">Como entrou o dinheiro</div>
+          <div class="pays" id="pays"></div>
+        </div>
+        <div id="rank-wrap" class="sec" style="gap:10px">
+          <div class="flabel">Mais vendidas no período</div>
+          <div class="rank" id="rank"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec" id="chart-sec">
+      <div class="sec-head"><h2>Faturamento por mês</h2></div>
+      <div class="card chart" id="chart"></div>
+    </div>
+  </section>
+
+  <!-- HISTÓRICO -->
+  <section class="view" id="v-historico" hidden>
+    <div class="filters" id="f-mov">
+      <button type="button" class="fchip" data-f="" aria-pressed="true">Tudo</button>
+      <button type="button" class="fchip" data-f="venda" aria-pressed="false">Vendas</button>
+      <button type="button" class="fchip" data-f="entrada" aria-pressed="false">Entradas</button>
+      <button type="button" class="fchip" data-f="loja" aria-pressed="false">Nas lojas</button>
+    </div>
+    <div class="filters" id="f-tipo"></div>
+    <div class="filters" id="f-pag"></div>
+    <div id="hist"></div>
+  </section>
+
+  <!-- AJUSTES -->
+  <section class="view" id="v-ajustes" hidden>
+    <div class="sec">
+      <div class="sec-head"><h2>Tipos de placa</h2></div>
+      <div class="rows" id="tipos-list"></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><h2>Pagamentos</h2></div>
+      <div class="rows">
+        <label class="row" for="cfg-taxa"><span class="grow">Taxa da maquininha (%)<small>Descontada do lucro nas vendas no cartão</small></span><input class="rowinput" id="cfg-taxa" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off"></label>
+      </div>
+      <p class="note" id="taxa-note">Exemplo: se a maquininha cobra 3,99% no crédito, coloque 3,99. Deixe vazio se não usa cartão.</p>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><h2>Privacidade</h2></div>
+      <div class="rows">
+        <button type="button" class="row" id="pin-toggle"><span class="grow">Pedir PIN ao abrir<small>Um código de 4 números para abrir o app</small></span><span class="switch" id="pin-switch" role="switch" aria-checked="false"></span></button>
+        <button type="button" class="row" id="pin-change" hidden><span class="grow">Trocar PIN</span><span class="chev">›</span></button>
+      </div>
+      <p class="note">Seus registros ficam guardados só neste aparelho. Não vão para nenhum servidor e ninguém mais tem acesso.</p>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><h2>Cópia de segurança</h2></div>
+      <div class="rows">
+        <button type="button" class="row" id="bk-save"><span class="grow">Salvar cópia de segurança<small id="bk-last">Nenhuma cópia ainda</small></span><span class="chev">›</span></button>
+        <button type="button" class="row" id="bk-csv"><span class="grow">Exportar planilha<small>Arquivo CSV que abre no Excel ou no Google Planilhas</small></span><span class="chev">›</span></button>
+        <label class="row" for="bk-file"><span class="grow">Restaurar uma cópia<small>Escolha um arquivo .json salvo antes</small></span><span class="chev">›</span></label>
+      </div>
+      <input type="file" id="bk-file" accept=".json,application/json" hidden>
+      <p class="note">Se você apagar o app ou limpar os dados do navegador, os registros somem. Salve uma cópia de vez em quando (no Drive, no WhatsApp para você mesmo ou no e-mail).</p>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><h2>Aparência</h2></div>
+      <div class="card">
+        <div class="seg" role="group" aria-label="Tema" id="tema">
+          <button type="button" data-tema="auto" aria-pressed="true">Automático</button>
+          <button type="button" data-tema="light" aria-pressed="false">Claro</button>
+          <button type="button" data-tema="dark" aria-pressed="false">Escuro</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head"><h2>Instalar no celular</h2></div>
+      <div class="rows"><button type="button" class="row" id="how-install"><span class="grow">Como colocar na tela inicial</span><span class="chev">›</span></button></div>
+    </div>
+
+    <div class="rows"><button type="button" class="row danger" id="wipe">Apagar todos os dados</button></div>
+    <p class="note" id="versao" style="text-align:center"></p>
+  </section>
+</div>
+
+<nav class="tabbar" aria-label="Navegação">
+  <div class="tabbar-in">
+    <button type="button" class="tab" data-tab="inicio" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg>Início</button>
+    <button type="button" class="tab" data-tab="historico">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></svg>Histórico</button>
+    <button type="button" class="fab" id="fab" aria-label="Nova venda">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button type="button" class="tab" data-tab="entrada-rapido">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>Entrada</button>
+    <button type="button" class="tab" data-tab="ajustes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Ajustes</button>
+  </div>
+</nav>
+
+<div class="scrim" id="scrim"></div>
+
+<!-- Folha: lançar / editar -->
+<div class="sheet" id="sh-lancar" role="dialog" aria-modal="true" aria-labelledby="l-title">
+  <div class="grab"></div>
+  <div class="sheet-head"><h2 id="l-title">Nova venda</h2><button type="button" class="close" data-close aria-label="Fechar">✕</button></div>
+  <form class="form" id="l-form" novalidate>
+    <div class="seg" role="group" aria-label="Tipo de lançamento" id="l-mov">
+      <button type="button" data-mov="venda" aria-pressed="true">Venda</button>
+      <button type="button" data-mov="entrada" aria-pressed="false">Entrada</button>
+      <button type="button" data-mov="loja" aria-pressed="false">Na loja</button>
+    </div>
+    <div class="field"><span>Placa</span><div class="picker" id="l-picker"></div></div>
+    <div class="field"><span>Quantidade</span>
+      <div class="stepper"><button type="button" id="q-menos" aria-label="Diminuir">−</button><input id="l-qtd" type="number" inputmode="numeric" min="1" step="1" value="1" aria-label="Quantidade"><button type="button" id="q-mais" aria-label="Aumentar">+</button></div>
+    </div>
+    <div class="warnbox" id="l-warn" hidden></div>
+    <div class="field"><span id="l-valor-l">Preço de cada placa</span><div class="money"><input id="l-valor" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off"></div></div>
+    <div class="totalbox" id="l-total" hidden></div>
+    <p class="helper" id="l-unit" hidden></p>
+    <button type="button" class="quick" id="l-quick" hidden></button>
+    <div class="field" id="l-pag-f"><span>Como pagou <em class="opt">(pode marcar mais de um)</em></span>
+      <div class="chips" id="l-pag">
+        <button type="button" class="chip" data-pag="Pix" aria-pressed="false">Pix</button>
+        <button type="button" class="chip" data-pag="Dinheiro" aria-pressed="false">Dinheiro</button>
+        <button type="button" class="chip" data-pag="Cartão" aria-pressed="false">Cartão</button>
+        <button type="button" class="chip" data-pag="A receber" aria-pressed="false">A receber</button>
+      </div>
+      <div class="split" id="l-split" hidden></div>
+      <p class="helper" id="l-split-msg" hidden></p>
+    </div>
+    <div class="two">
+      <label class="field"><span>Data</span><input id="l-data" type="date"></label>
+      <label class="field"><span id="l-quem-l">Cliente</span><input id="l-quem" type="text" maxlength="80" placeholder="Opcional"></label>
+    </div>
+    <label class="field"><span>Observação</span><input id="l-obs" type="text" maxlength="160" placeholder="Opcional"></label>
+    <button type="submit" class="btn" id="l-save">Salvar venda</button>
+    <button type="button" class="btn ghost" id="l-acertar" hidden>Fazer acerto com a loja</button>
+    <div id="l-del-wrap" hidden>
+      <button type="button" class="btn textdanger" id="l-del">Apagar este registro</button>
+      <div class="btn-row" id="l-del-confirm" hidden>
+        <button type="button" class="btn ghost" id="l-del-no">Manter</button>
+        <button type="button" class="btn danger" id="l-del-yes">Apagar</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Folha: detalhe da placa -->
+<div class="sheet" id="sh-tipo" role="dialog" aria-modal="true" aria-labelledby="t-title">
+  <div class="grab"></div>
+  <div class="sheet-head"><h2 id="t-title">Placa</h2><button type="button" class="close" data-close aria-label="Fechar">✕</button></div>
+  <div class="form">
+    <div id="t-plate"></div>
+    <dl class="dl" id="t-dl"></dl>
+    <div class="btn-row">
+      <button type="button" class="btn ghost" id="t-repor">Entrada</button>
+      <button type="button" class="btn" id="t-vender">Vender</button>
+    </div>
+    <button type="button" class="btn ghost" id="t-hist">Ver histórico desta placa</button>
+  </div>
+</div>
+
+<!-- Folha: editar tipo -->
+<div class="sheet" id="sh-edtipo" role="dialog" aria-modal="true" aria-labelledby="e-title">
+  <div class="grab"></div>
+  <div class="sheet-head"><h2 id="e-title">Novo tipo</h2><button type="button" class="close" data-close aria-label="Fechar">✕</button></div>
+  <form class="form" id="e-form" novalidate>
+    <div id="e-preview"></div>
+    <label class="field"><span>Nome</span><input id="e-nome" type="text" maxlength="28" placeholder="Ex.: TikTok, iFood, Cardápio"></label>
+    <div class="field"><span>Cor</span><div class="color-row" id="e-cores"></div></div>
+    <button type="submit" class="btn" id="e-save">Adicionar tipo</button>
+    <p class="helper" id="e-help" hidden></p>
+    <button type="button" class="btn textdanger" id="e-del" hidden>Apagar este tipo</button>
+  </form>
+</div>
+
+<!-- Folha: instalar -->
+<div class="sheet" id="sh-install" role="dialog" aria-modal="true" aria-labelledby="i-title">
+  <div class="grab"></div>
+  <div class="sheet-head"><h2 id="i-title">Colocar na tela inicial</h2><button type="button" class="close" data-close aria-label="Fechar">✕</button></div>
+  <div class="form">
+    <button type="button" class="btn" id="i-native" hidden>Instalar agora</button>
+    <div class="card" style="box-shadow:none;background:var(--surface-2)">
+      <h2>No iPhone (Safari)</h2>
+      <ol class="steps">
+        <li>Abra este endereço no <b>Safari</b>.</li>
+        <li>Toque no botão <b>Compartilhar</b> (o quadrado com a seta para cima).</li>
+        <li>Role e toque em <b>Adicionar à Tela de Início</b>.</li>
+        <li>Toque em <b>Adicionar</b>. O ícone aparece junto dos seus apps.</li>
+      </ol>
+    </div>
+    <div class="card" style="box-shadow:none;background:var(--surface-2)">
+      <h2>No Android (Chrome)</h2>
+      <ol class="steps">
+        <li>Abra este endereço no <b>Chrome</b>.</li>
+        <li>Toque nos <b>três pontinhos</b> no canto de cima.</li>
+        <li>Toque em <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</li>
+        <li>Confirme. O ícone aparece junto dos seus apps.</li>
+      </ol>
+    </div>
+    <p class="note">Abra sempre pelo ícone: os registros ficam guardados nele. Se abrir pelo navegador, ele mostra outra cópia, vazia.</p>
+  </div>
+</div>
+
+<!-- Folha: a receber -->
+<div class="sheet" id="sh-receber" role="dialog" aria-modal="true" aria-labelledby="r-title">
+  <div class="grab"></div>
+  <div class="sheet-head"><h2 id="r-title">A receber</h2><button type="button" class="close" data-close aria-label="Fechar">✕</button></div>
+  <div class="form">
+    <p class="helper" id="r-resumo"></p>
+    <div class="dues" id="r-lista"></div>
+  </div>
+</div>
+
+<!-- Folha: registrar recebimento -->
+<div class="sheet" id="sh-recebi" role="dialog" aria-modal="true" aria-labelledby="rr-title">
+  <div class="grab"></div>
+  <div class="sheet-head"><h2 id="rr-title">Recebi</h2><button type="button" class="close" data-close aria-label="Fechar">✕</button></div>
+  <form class="form" id="rr-form" novalidate>
+    <div class="totalbox" id="rr-falta"></div>
+    <div class="field"><span>Como pagou</span>
+      <div class="chips" id="rr-forma">
+        <button type="button" class="chip" data-f="Pix" aria-pressed="true">Pix</button>
+        <button type="button" class="chip" data-f="Dinheiro" aria-pressed="false">Dinheiro</button>
+        <button type="button" class="chip" data-f="Cartão" aria-pressed="false">Cartão</button>
+      </div>
+    </div>
+    <div class="field"><span>Quanto recebeu</span><div class="money"><input id="rr-valor" type="text" inputmode="decimal" autocomplete="off"></div></div>
+    <p class="helper" id="rr-msg"></p>
+    <button type="submit" class="btn" id="rr-save">Confirmar recebimento</button>
+  </form>
+</div>
+
+<!-- Folha: placas nas lojas -->
+<div class="sheet" id="sh-lojas" role="dialog" aria-modal="true" aria-labelledby="lj-title">
+  <div class="grab"></div>
+  <div class="sheet-head"><h2 id="lj-title">Nas lojas</h2><button type="button" class="close" data-close aria-label="Fechar">✕</button></div>
+  <div class="form">
+    <p class="helper" id="lj-resumo"></p>
+    <div class="dues" id="lj-lista"></div>
+    <button type="button" class="btn ghost" id="lj-nova">Deixar mais placas numa loja</button>
+  </div>
+</div>
+
+<!-- Folha: acerto com a loja -->
+<div class="sheet" id="sh-acerto" role="dialog" aria-modal="true" aria-labelledby="a-title">
+  <div class="grab"></div>
+  <div class="sheet-head"><h2 id="a-title">Acerto</h2><button type="button" class="close" data-close aria-label="Fechar">✕</button></div>
+  <form class="form" id="a-form" novalidate>
+    <div class="totalbox" id="a-na-loja"></div>
+    <div class="field"><span class="steplbl">Quantas a loja vendeu</span>
+      <div class="stepper"><button type="button" data-step="a-ven:-1" aria-label="Diminuir">−</button><input id="a-ven" type="number" inputmode="numeric" min="0" step="1" value="0" aria-label="Placas vendidas pela loja"><button type="button" data-step="a-ven:1" aria-label="Aumentar">+</button></div>
+    </div>
+    <div class="field"><span class="steplbl">Quantas voltaram para você <small>(opcional)</small></span>
+      <div class="stepper"><button type="button" data-step="a-dev:-1" aria-label="Diminuir">−</button><input id="a-dev" type="number" inputmode="numeric" min="0" step="1" value="0" aria-label="Placas devolvidas"><button type="button" data-step="a-dev:1" aria-label="Aumentar">+</button></div>
+    </div>
+    <p class="helper" id="a-fica"></p>
+    <div id="a-venda-f" class="form">
+      <div class="field"><span>Preço de cada placa</span><div class="money"><input id="a-preco" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off"></div></div>
+      <div class="totalbox" id="a-total" hidden></div>
+      <div class="field"><span>Como a loja pagou</span>
+        <div class="chips" id="a-forma">
+          <button type="button" class="chip" data-f="Pix" aria-pressed="true">Pix</button>
+          <button type="button" class="chip" data-f="Dinheiro" aria-pressed="false">Dinheiro</button>
+          <button type="button" class="chip" data-f="Cartão" aria-pressed="false">Cartão</button>
+          <button type="button" class="chip" data-f="A receber" aria-pressed="false">Ainda não pagou</button>
+        </div>
+      </div>
+    </div>
+    <label class="field"><span>Data do acerto</span><input id="a-data" type="date"></label>
+    <button type="submit" class="btn" id="a-save">Salvar acerto</button>
+  </form>
+</div>
+
+<!-- Folha: confirmar -->
+<div class="sheet" id="sh-confirm" role="dialog" aria-modal="true" aria-labelledby="c-title">
+  <div class="grab"></div>
+  <div class="sheet-head"><h2 id="c-title">Tem certeza?</h2><button type="button" class="close" data-close aria-label="Fechar">✕</button></div>
+  <div class="form">
+    <p class="helper" id="c-text" style="font-size:16px;color:var(--ink)"></p>
+    <div class="btn-row"><button type="button" class="btn ghost" data-close>Cancelar</button><button type="button" class="btn danger" id="c-yes">Confirmar</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  "use strict";
+  const VERSAO_APP = "1.3";
+  const KEY = "placas-nfc:v1";
+  const NFC_SVG = '<svg class="plate-nfc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 8.5a5 5 0 0 1 0 7"/><path d="M9.5 6a9 9 0 0 1 0 12"/><path d="M13 3.5a13 13 0 0 1 0 17"/></svg>';
+
+  // Placas padrão: o "fundo" imita a cor da placa física
+  const PADRAO = [
+    { id: "google", nome: "Google", cor: "#ffffff", fundo: "linear-gradient(140deg,#ffffff 0%,#eef1f6 100%)", tinta: "#1f2430", faixa: "linear-gradient(90deg,#4285f4 0 25%,#ea4335 25% 50%,#fbbc05 50% 75%,#34a853 75%)", brilho: "rgba(66,133,244,.55)" },
+    { id: "instagram", nome: "Instagram", cor: "#dd2a7b", fundo: "linear-gradient(140deg,#feda75 -20%,#fa7e1e 18%,#d62976 52%,#962fbf 82%,#4f5bd5 120%)", tinta: "#ffffff", brilho: "rgba(214,41,118,.6)" },
+    { id: "whatsapp", nome: "WhatsApp", cor: "#25d366", fundo: "linear-gradient(140deg,#3be07f 0%,#1fa855 55%,#128c4b 100%)", tinta: "#ffffff", brilho: "rgba(31,168,85,.6)" },
+    { id: "pix", nome: "Pix", cor: "#32bcad", fundo: "linear-gradient(140deg,#4fd6c6 0%,#20a597 55%,#147a70 100%)", tinta: "#ffffff", brilho: "rgba(32,165,151,.6)" },
+  ];
+  const CORES = ["#111318", "#2b4cff", "#7a3cff", "#e0245e", "#ff6a1a", "#f2b705", "#0f9d58", "#00a3c4", "#8a5a2b", "#9aa3b2"];
+  const BAIXO = 5;
+
+  const $ = (id) => document.getElementById(id);
+  const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+  const int = new Intl.NumberFormat("pt-BR");
+  const MESES = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+  const MES_C = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const hoje = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+  const fmtData = (s) => { if (!s) return ""; const [y, m, d] = s.split("-"); return `${+d} de ${MES_C[+m - 1]}`; };
+  const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+  const parseValor = (s) => {
+    s = String(s || "").trim().replace(/[^\d,.-]/g, "");
+    if (!s) return NaN;
+    if (s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
+    const v = parseFloat(s); return isFinite(v) ? v : NaN;
+  };
+  const fmtValorInput = (v) => v.toFixed(2).replace(".", ",");
+  const plural = (n, um, varios) => int.format(n) + " " + (n === 1 ? um : varios);
+
+  // ── estado ─────────────────────────────────────────
+  let S = carregar();
+  function novoEstado() { return { versao: 1, tipos: PADRAO.map(t => ({ ...t })), movs: [], cfg: { tema: "auto", pinHash: null, ultimoBackup: null, semAvisoInstalar: false, taxaCartao: 0 } }; }
+  function carregar() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) { const s = JSON.parse(raw); if (s && Array.isArray(s.movs) && Array.isArray(s.tipos)) { s.cfg = Object.assign(novoEstado().cfg, s.cfg || {}); s.movs.forEach(migrarMov); return s; } }
+    } catch (e) { /* segue com estado novo */ }
+    return novoEstado();
+  }
+  // Vendas da versão 1.0 guardavam uma forma de pagamento só, em "pag"
+  function migrarMov(m) {
+    if (m.mov !== "venda") return m;
+    if (!Array.isArray(m.pagamentos)) m.pagamentos = m.pag ? [{ forma: m.pag, valor: m.valor || 0 }] : [];
+    if (!(m.preco >= 0)) m.preco = m.qtd ? Math.round((m.valor || 0) / m.qtd * 100) / 100 : 0;
+    return m;
+  }
+  const FORMAS = ["Pix", "Dinheiro", "Cartão", "A receber"];
+  const nomesPag = (m) => [...new Set((m.pagamentos || []).map(p => p.forma))].map(f => f === "A receber" ? "Fiado" : f).join(" + ");
+  function salvar() {
+    try { localStorage.setItem(KEY, JSON.stringify(S)); return true; }
+    catch (e) { toast("Não deu para salvar: o armazenamento do celular está cheio ou bloqueado.", true); return false; }
+  }
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+
+  function visualTipo(t) {
+    if (!t) t = { nome: "?", cor: "#9aa3b2" };
+    if (t.fundo) return { bg: t.fundo, ink: t.tinta || "#fff", glow: t.brilho || "rgba(0,0,0,.4)", faixa: t.faixa };
+    const c = t.cor || "#9aa3b2";
+    const escuro = misturar(c, "#000000", 0.28), claro = misturar(c, "#ffffff", 0.18);
+    return { bg: `linear-gradient(140deg, ${claro} 0%, ${c} 50%, ${escuro} 100%)`, ink: luminancia(c) > 0.6 ? "#16181d" : "#ffffff", glow: hexA(c, .55) };
+  }
+  function hexRgb(h) { h = h.replace("#", ""); if (h.length === 3) h = h.split("").map(x => x + x).join(""); const n = parseInt(h, 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+  function misturar(a, b, p) { const x = hexRgb(a), y = hexRgb(b); return "#" + x.map((v, i) => Math.round(v + (y[i] - v) * p).toString(16).padStart(2, "0")).join(""); }
+  function luminancia(h) { const [r, g, b] = hexRgb(h); return (0.299 * r + 0.587 * g + 0.114 * b) / 255; }
+  function hexA(h, a) { const [r, g, b] = hexRgb(h); return `rgba(${r},${g},${b},${a})`; }
+  const styleTipo = (t) => { const v = visualTipo(t); return `--p-bg:${v.bg};--p-ink:${v.ink};--p-glow:${v.glow}`; };
+  const tipoDe = (id) => S.tipos.find(t => t.id === id) || { id, nome: "Tipo apagado", cor: "#9aa3b2" };
+
+  // ── cálculos ───────────────────────────────────────
+  function noPeriodo(m, per) {
+    const d = m.data || "", h = hoje();
+    if (per === "mes") return d.slice(0, 7) === h.slice(0, 7);
+    if (per === "ano") return d.slice(0, 4) === h.slice(0, 4);
+    return true;
+  }
+  // Custo médio de uma placa de cada tipo, usando só as entradas em que o custo foi informado.
+  // O lucro de uma venda é o que entrou menos o custo das placas que SAÍRAM, não de tudo o que chegou.
+  function custosMedios() {
+    const c = {};
+    S.movs.forEach(m => { if (m.mov === "entrada" && m.valor > 0 && m.qtd > 0) { c[m.tipo] = c[m.tipo] || { v: 0, q: 0 }; c[m.tipo].v += m.valor; c[m.tipo].q += m.qtd; } });
+    const r = {}; Object.keys(c).forEach(k => r[k] = c[k].v / c[k].q); return r;
+  }
+  // Quanto o cliente ainda deve nesta venda (a parte marcada como "A receber")
+  const pendente = (m) => (m.pagamentos || []).filter(p => p.forma === "A receber").reduce((s, p) => s + (p.valor || 0), 0);
+  // Taxa da maquininha: vale a que estava configurada quando a venda foi salva
+  const taxaDe = (m) => (m.taxa >= 0 ? m.taxa : (S.cfg.taxaCartao || 0));
+  const taxaVenda = (m) => Math.round((m.pagamentos || []).filter(p => p.forma === "Cartão").reduce((s, p) => s + (p.valor || 0), 0) * taxaDe(m)) / 100;
+  function lucroVenda(m, cm) { cm = cm || custosMedios(); const u = cm[m.tipo]; return u == null ? null : (m.valor || 0) - m.qtd * u - taxaVenda(m); }
+  const somaPorForma = (m) => { const r = {}; (m.pagamentos || []).forEach(p => r[p.forma] = Math.round(((r[p.forma] || 0) + (p.valor || 0)) * 100) / 100); return r; };
+  const vazio = () => ({ rec: 0, ven: 0, fat: 0, custo: 0, lucro: 0, fatComCusto: 0, semCusto: 0, loja: 0 });
+  // Placas deixadas numa loja (consignado). O que a loja vendeu vira uma venda comum com "consigId";
+  // o que voltou fica em "acertos". O que sobra continua na loja e fora do estoque.
+  const vendasDaLoja = (m) => S.movs.filter(v => v.mov === "venda" && v.consigId === m.id);
+  const restLoja = (m) => Math.max(0, m.qtd - vendasDaLoja(m).reduce((s, v) => s + v.qtd, 0) - (m.acertos || []).reduce((s, a) => s + (a.devolvidas || 0), 0));
+  const emEstoque = (x) => x.rec - x.ven - (x.loja || 0);
+  function porTipo(per) {
+    const r = {}, cm = custosMedios();
+    S.tipos.forEach(t => r[t.id] = vazio());
+    S.movs.forEach(m => {
+      if (!r[m.tipo]) r[m.tipo] = vazio();
+      if (m.mov === "loja") { if (!per) r[m.tipo].loja += restLoja(m); return; }
+      if (per && !noPeriodo(m, per)) return;
+      const x = r[m.tipo];
+      if (m.mov === "entrada") { x.rec += m.qtd; x.custo += m.valor || 0; return; }
+      x.ven += m.qtd; x.fat += m.valor || 0;
+      const l = lucroVenda(m, cm);
+      if (l == null) x.semCusto += m.qtd; else { x.lucro += l; x.fatComCusto += m.valor || 0; }
+    });
+    return r;
+  }
+  function estoque(id) { const x = porTipo()[id]; return x ? emEstoque(x) : 0; }
+  function ultimoPreco(id) {
+    const v = S.movs.filter(m => m.mov === "venda" && m.tipo === id && m.qtd > 0 && m.valor > 0).sort(ordem)[0];
+    return v ? (v.preco > 0 ? v.preco : v.valor / v.qtd) : null;
+  }
+  const ordem = (a, b) => (b.data || "").localeCompare(a.data || "") || (b.criadoEm || 0) - (a.criadoEm || 0);
+
+  // ── navegação ──────────────────────────────────────
+  let aba = "inicio", periodo = "mes", filtroMov = "", filtroTipo = "", filtroPag = "";
+  function irPara(nova) {
+    aba = nova;
+    ["inicio", "historico", "ajustes"].forEach(v => $("v-" + v).hidden = v !== nova);
+    document.querySelectorAll(".tab[data-tab]").forEach(b => b.dataset.tab === nova ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current"));
+    $("top-title").textContent = { inicio: "Placas NFC", historico: "Histórico", ajustes: "Ajustes" }[nova];
+    window.scrollTo({ top: 0 });
+    render();
+  }
+  document.querySelectorAll(".tab[data-tab]").forEach(b => b.addEventListener("click", () => {
+    if (b.dataset.tab === "entrada-rapido") { abrirLancar({ mov: "entrada" }); return; }
+    irPara(b.dataset.tab);
+  }));
+  $("fab").addEventListener("click", () => abrirLancar({ mov: "venda" }));
+
+  // ── render ─────────────────────────────────────────
+  function render() {
+    const d = new Date();
+    $("top-sub").textContent = aba === "inicio" ? `${MESES[d.getMonth()][0].toUpperCase() + MESES[d.getMonth()].slice(1)} de ${d.getFullYear()}` : aba === "historico" ? plural(S.movs.length, "registro", "registros") : "";
+    if (aba === "inicio") renderInicio();
+    if (aba === "historico") renderHist();
+    if (aba === "ajustes") renderAjustes();
+  }
+
+  function renderInicio() {
+    const tot = porTipo(), mes = porTipo("mes");
+    let est = 0, fatM = 0, venM = 0;
+    Object.values(tot).forEach(x => est += emEstoque(x));
+    Object.values(mes).forEach(x => { fatM += x.fat; venM += x.ven; });
+    $("h-estoque").textContent = int.format(est);
+    $("h-fat").textContent = brl.format(fatM);
+    $("h-fat-s").textContent = venM ? `média de ${brl.format(fatM / venM)} por placa` : "nenhuma venda este mês";
+    $("h-ven").textContent = int.format(venM);
+    $("h-ven-s").textContent = venM === 1 ? "placa" : "placas";
+
+    const al = [];
+    S.tipos.forEach(t => {
+      const x = tot[t.id]; if (!x || (x.rec === 0 && x.ven === 0)) return;
+      const e = emEstoque(x);
+      if (e <= 0) al.push(`<button type="button" class="alert out" data-tipo="${esc(t.id)}">${esc(t.nome)} esgotada</button>`);
+      else if (e <= BAIXO) al.push(`<button type="button" class="alert" data-tipo="${esc(t.id)}">${esc(t.nome)}: só ${e}</button>`);
+    });
+    $("alerts").hidden = !al.length; $("alerts").innerHTML = al.join("");
+
+    const abertas = S.movs.filter(m => m.mov === "loja" && restLoja(m) > 0);
+    const naLoja = abertas.reduce((s, m) => s + restLoja(m), 0);
+    const previsto = abertas.reduce((s, m) => s + restLoja(m) * (m.preco || 0), 0);
+    const lojas = new Set(abertas.map(m => (m.quem || "").trim().toLowerCase()));
+    $("h-est-l").textContent = naLoja ? `placas em estoque · mais ${int.format(naLoja)} nas lojas` : "placas em estoque";
+    $("loja-card").hidden = !abertas.length;
+    $("loja-total").textContent = plural(naLoja, "placa", "placas");
+    $("loja-sub").textContent = `em ${plural(lojas.size, "loja", "lojas")}${previsto ? ` · ${brl.format(previsto)} se venderem tudo` : ""} · toque para acertar`;
+
+    const pend = S.movs.filter(m => m.mov === "venda" && pendente(m) > 0.004);
+    const totPend = pend.reduce((s, m) => s + pendente(m), 0);
+    const clientes = new Set(pend.map(m => (m.quem || "").trim().toLowerCase() || "#" + m.id));
+    $("due-card").hidden = !pend.length;
+    $("due-total").textContent = brl.format(totPend);
+    $("due-sub").textContent = `${plural(clientes.size, "cliente", "clientes")} · toque para registrar quando pagarem`;
+
+    $("plates").innerHTML = S.tipos.map(t => plateHTML(t, tot[t.id])).join("") +
+      `<button type="button" class="plate add" id="plate-add"><span style="font-size:26px;line-height:1">+</span>Novo tipo</button>`;
+
+    renderStats();
+    renderChart();
+    $("install").hidden = !(!standalone() && !S.cfg.semAvisoInstalar);
+  }
+
+  function plateHTML(t, x, estatico) {
+    x = x || { rec: 0, ven: 0 };
+    const v = visualTipo(t), e = emEstoque(x);
+    let tag = "";
+    if (x.rec || x.ven) { if (e <= 0) tag = '<span class="plate-tag out">Esgotada</span>'; else if (e <= BAIXO) tag = '<span class="plate-tag">Acabando</span>'; }
+    const el = estatico ? "div" : "button";
+    return `<${el} ${estatico ? "" : 'type="button"'} class="plate" data-tipo="${esc(t.id)}" style="${styleTipo(t)}" aria-label="${esc(t.nome)}: ${e} em estoque">
+      <div class="plate-top"><span class="plate-name">${esc(t.nome)}</span>${NFC_SVG}</div>${tag}
+      <div class="plate-bottom">
+        <div class="plate-stock n">${int.format(e)}<small>em estoque</small></div>
+        <div class="plate-side n">${x.loja ? `${int.format(x.loja)} na loja<br>` : ""}${int.format(x.rec)} recebidas<br>${int.format(x.ven)} vendidas</div>
+      </div>${v.faixa ? `<span class="plate-strip" style="background:${v.faixa}"></span>` : ""}
+    </${el}>`;
+  }
+
+  function renderStats() {
+    document.querySelectorAll("[data-per]").forEach(b => b.setAttribute("aria-pressed", b.dataset.per === periodo));
+    const r = porTipo(periodo);
+    let rec = 0, ven = 0, fat = 0, custo = 0, lucro = 0, fatCC = 0, semCusto = 0;
+    Object.values(r).forEach(x => { rec += x.rec; ven += x.ven; fat += x.fat; custo += x.custo; lucro += x.lucro; fatCC += x.fatComCusto; semCusto += x.semCusto; });
+    const vendasPer = S.movs.filter(m => m.mov === "venda" && noPeriodo(m, periodo));
+    const temCusto = Object.keys(custosMedios()).length > 0;
+    const cards = [
+      ["Faturado", brl.format(fat), plural(vendasPer.length, "venda", "vendas")],
+      ["Placas vendidas", int.format(ven), ven ? `média ${brl.format(fat / ven)}` : "—"],
+      ["Placas recebidas", int.format(rec), custo ? `custaram ${brl.format(custo)}` : "entradas no estoque"],
+    ];
+    if (temCusto) {
+      let sub = fatCC > 0 ? `margem de ${Math.round(lucro / fatCC * 100)}%` : "sobre as placas vendidas";
+      if (semCusto) sub = `${plural(semCusto, "placa sem custo ficou", "placas sem custo ficaram")} de fora`;
+      cards.push(["Lucro", brl.format(lucro), sub]);
+    } else cards.push(["Lucro", "—", "lance o custo nas entradas"]);
+    $("stats").innerHTML = cards.map(c => `<div class="mini"><span>${c[0]}</span><b class="n">${c[1]}</b><small>${c[2]}</small></div>`).join("");
+
+    // Quanto entrou por forma de pagamento
+    const porForma = {}; let semForma = 0, taxas = 0;
+    vendasPer.forEach(m => { if (!(m.pagamentos || []).length) semForma += m.valor || 0; (m.pagamentos || []).forEach(p => porForma[p.forma] = (porForma[p.forma] || 0) + (p.valor || 0)); taxas += taxaVenda(m); });
+    const linhasPag = FORMAS.filter(f => porForma[f] > 0.004).map(f => `<div class="${f === "A receber" ? "pend" : ""}"><button type="button" class="go" data-forma="${f}" style="display:flex;justify-content:space-between;gap:10px"><span>${f === "A receber" ? "Ainda a receber" : f}</span><b>${brl.format(porForma[f])}</b></button></div>`);
+    if (taxas > 0) linhasPag.push(`<div class="fee"><span>Taxas da maquininha</span><b>−${brl.format(taxas)}</b></div>`);
+    if (semForma) linhasPag.push(`<div><span>Sem forma informada</span><b>${brl.format(semForma)}</b></div>`);
+    $("pays-wrap").hidden = !linhasPag.length;
+    $("pays").innerHTML = linhasPag.join("");
+
+    const lista = Object.entries(r).filter(([, x]) => x.ven > 0).sort((a, b) => b[1].ven - a[1].ven);
+    const max = lista.length ? lista[0][1].ven : 1;
+    $("rank").innerHTML = lista.length ? lista.map(([id, x]) => {
+      const t = tipoDe(id), v = visualTipo(t);
+      const cor = t.id === "google" ? "#4285f4" : (t.cor || "#9aa3b2");
+      return `<div class="rank-row"><span class="nm"><span class="sw" style="background:${v.bg}; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08)"></span>${esc(t.nome)}</span><span class="track"><i style="width:${x.ven / max * 100}%;background:${cor}"></i></span><span class="n" style="font-weight:700">${int.format(x.ven)}</span></div>`;
+    }).join("") : `<div class="helper">Nenhuma venda ${periodo === "mes" ? "este mês" : periodo === "ano" ? "este ano" : "ainda"}.</div>`;
+  }
+
+  function renderChart() {
+    const d = new Date(), meses = [];
+    for (let i = 5; i >= 0; i--) { const x = new Date(d.getFullYear(), d.getMonth() - i, 1); meses.push(x.getFullYear() + "-" + String(x.getMonth() + 1).padStart(2, "0")); }
+    const tot = meses.map(ym => S.movs.filter(m => m.mov === "venda" && (m.data || "").startsWith(ym)).reduce((s, m) => s + (m.valor || 0), 0));
+    if (!tot.some(Boolean)) { $("chart").innerHTML = `<div class="empty"><b>O gráfico aparece na primeira venda</b>Ele mostra quanto você faturou em cada um dos últimos 6 meses.</div>`; return; }
+    const max = Math.max(...tot), W = 340, H = 170, topo = 24, base = 138, bw = 38, gap = (W - bw * 6) / 6;
+    const curto = (v) => v >= 1000 ? (v / 1000).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) + " mil" : Math.round(v).toLocaleString("pt-BR");
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Faturamento dos últimos 6 meses">`;
+    s += `<line class="base" x1="0" x2="${W}" y1="${base + .5}" y2="${base + .5}"/>`;
+    meses.forEach((ym, i) => {
+      const h = tot[i] ? Math.max(3, tot[i] / max * (base - topo)) : 0, x = gap / 2 + i * (bw + gap), y = base - h;
+      s += `<rect class="bar${i === 5 ? " now" : ""}" x="${x}" y="${y}" width="${bw}" height="${h}" rx="7"/>`;
+      if (tot[i]) s += `<text class="val" x="${x + bw / 2}" y="${y - 7}" text-anchor="middle">${curto(tot[i])}</text>`;
+      s += `<text class="lbl" x="${x + bw / 2}" y="${base + 20}" text-anchor="middle">${MES_C[+ym.slice(5) - 1]}</text>`;
+    });
+    $("chart").innerHTML = s + "</svg>";
+  }
+
+  function renderHist() {
+    document.querySelectorAll("#f-mov .fchip").forEach(b => b.setAttribute("aria-pressed", b.dataset.f === filtroMov));
+    $("f-tipo").innerHTML = [`<button type="button" class="fchip" data-t="" aria-pressed="${filtroTipo === ""}">Todas as placas</button>`]
+      .concat(S.tipos.map(t => `<button type="button" class="fchip" data-t="${esc(t.id)}" aria-pressed="${filtroTipo === t.id}"><span class="sw" style="background:${visualTipo(t).bg};box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)"></span>${esc(t.nome)}</button>`)).join("");
+
+    $("f-pag").innerHTML = [`<button type="button" class="fchip" data-p="" aria-pressed="${filtroPag === ""}">Qualquer pagamento</button>`]
+      .concat(FORMAS.map(f => `<button type="button" class="fchip" data-p="${f}" aria-pressed="${filtroPag === f}">${f === "A receber" ? "Devendo" : f}</button>`)).join("");
+
+    if (!S.movs.length) {
+      $("hist").innerHTML = `<div class="list"><div class="empty"><b>Nada lançado ainda</b>Toque no + para registrar as placas que chegaram. Depois, cada venda desconta do estoque.</div></div>`;
+      return;
+    }
+    const passaPag = (m) => !filtroPag || (m.mov === "venda" && (filtroPag === "A receber" ? pendente(m) > 0.004 : (somaPorForma(m)[filtroPag] || 0) > 0));
+    const rows = S.movs.filter(m => (!filtroMov || m.mov === filtroMov) && (!filtroTipo || m.tipo === filtroTipo) && passaPag(m)).sort(ordem);
+    if (!rows.length) { $("hist").innerHTML = `<div class="list"><div class="empty">Nenhum registro com esse filtro.</div></div>`; return; }
+    const grupos = new Map();
+    rows.forEach(m => { const k = (m.data || "").slice(0, 7); if (!grupos.has(k)) grupos.set(k, []); grupos.get(k).push(m); });
+    let html = "";
+    grupos.forEach((lista, ym) => {
+      const [y, mm] = ym.split("-");
+      const fat = lista.filter(m => m.mov === "venda").reduce((s, m) => s + (m.valor || 0), 0);
+      const ven = lista.filter(m => m.mov === "venda").reduce((s, m) => s + m.qtd, 0);
+      const rec = lista.filter(m => m.mov === "entrada").reduce((s, m) => s + m.qtd, 0);
+      const lj = lista.filter(m => m.mov === "loja").reduce((s, m) => s + m.qtd, 0);
+      let resumo = [ven ? `${plural(ven, "vendida", "vendidas")} · ${brl.format(fat)}` : "", rec ? `${plural(rec, "recebida", "recebidas")}` : "", lj ? `${int.format(lj)} na loja` : ""].filter(Boolean).join(" · ");
+      if (filtroPag) resumo = `${filtroPag === "A receber" ? "Devendo" : filtroPag}: ${brl.format(lista.reduce((s, m) => s + (somaPorForma(m)[filtroPag] || 0), 0))}`;
+      html += `<div class="month"><div class="month-head"><h3>${MESES[+mm - 1]} ${y}</h3><span class="n">${resumo}</span></div><div class="list">`;
+      const cm = custosMedios();
+      html += lista.map(m => {
+        const t = tipoDe(m.tipo), venda = m.mov === "venda";
+        const det = [fmtData(m.data), m.quem, venda ? nomesPag(m) : "", m.obs].filter(Boolean).map(esc).join(" · ");
+        const lc = venda ? lucroVenda(m, cm) : null;
+        if (m.mov === "loja") {
+          const r = restLoja(m), vend = vendasDaLoja(m).reduce((s, v) => s + v.qtd, 0);
+          const detL = [fmtData(m.data), m.quem, vend ? `${int.format(vend)} vendidas` : "", m.obs].filter(Boolean).map(esc).join(" · ");
+          return `<button type="button" class="item" data-id="${esc(m.id)}">
+          <span class="ico n" style="${styleTipo(t)}">${m.qtd}</span>
+          <span style="min-width:0"><span class="t" style="display:block">Na loja · ${esc(t.nome)}</span><span class="d" style="display:block">${detL}</span></span>
+          <span class="v n">${r ? `${int.format(r)} na loja` : "Acertado"}${m.preco ? `<small>${brl.format(m.preco)} cada</small>` : ""}</span></button>`;
+        }
+        const pd = venda ? pendente(m) : 0;
+        const val = venda ? `${brl.format(m.valor || 0)}${pd > 0.004 ? `<small class="falta">falta ${brl.format(pd)}</small>` : ""}<small>${m.qtd > 1 ? brl.format(m.preco >= 0 ? m.preco : (m.valor || 0) / m.qtd) + " cada" : "1 placa"}</small>${lc != null ? `<small class="lucro">lucro ${brl.format(lc)}</small>` : ""}` : `+${int.format(m.qtd)}<small>${m.valor ? "custo " + brl.format(m.valor) : "no estoque"}</small>`;
+        return `<button type="button" class="item" data-id="${esc(m.id)}">
+          <span class="ico n" style="${styleTipo(t)}">${venda ? "−" : "+"}${m.qtd}</span>
+          <span style="min-width:0"><span class="t" style="display:block">${venda ? "Venda" : "Entrada"} · ${esc(t.nome)}</span><span class="d" style="display:block">${det}</span></span>
+          <span class="v n${venda ? "" : " in"}">${val}</span></button>`;
+      }).join("");
+      html += `</div></div>`;
+    });
+    $("hist").innerHTML = html;
+  }
+
+  function renderAjustes() {
+    const tot = porTipo();
+    $("tipos-list").innerHTML = S.tipos.map(t => {
+      const x = tot[t.id] || { rec: 0, ven: 0 };
+      return `<button type="button" class="row" data-edtipo="${esc(t.id)}"><span class="ico" style="${styleTipo(t)};width:34px;height:34px;border-radius:10px"></span><span class="grow">${esc(t.nome)}<small>${int.format(emEstoque(x))} em estoque</small></span><span class="chev">›</span></button>`;
+    }).join("") + `<button type="button" class="row" data-edtipo=""><span class="ico" style="--p-bg:var(--surface-2);--p-ink:var(--accent);width:34px;height:34px;border-radius:10px;font-size:20px">+</span><span class="grow" style="color:var(--accent);font-weight:600">Adicionar tipo</span></button>`;
+    if (document.activeElement !== $("cfg-taxa")) $("cfg-taxa").value = S.cfg.taxaCartao ? fmtValorInput(S.cfg.taxaCartao) : "";
+    $("pin-switch").setAttribute("aria-checked", !!S.cfg.pinHash);
+    $("pin-change").hidden = !S.cfg.pinHash;
+    $("bk-last").textContent = S.cfg.ultimoBackup ? "Última cópia: " + new Date(S.cfg.ultimoBackup).toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" }) : "Nenhuma cópia ainda";
+    document.querySelectorAll("[data-tema]").forEach(b => b.setAttribute("aria-pressed", b.dataset.tema === S.cfg.tema));
+    $("versao").textContent = `Placas NFC ${VERSAO_APP} · ${plural(S.movs.length, "registro", "registros")} neste aparelho`;
+  }
+
+  // ── eventos da tela ────────────────────────────────
+  $("plates").addEventListener("click", (e) => {
+    const b = e.target.closest(".plate"); if (!b) return;
+    if (b.id === "plate-add") { abrirEdTipo(""); return; }
+    abrirTipo(b.dataset.tipo);
+  });
+  $("alerts").addEventListener("click", (e) => { const b = e.target.closest("[data-tipo]"); if (b) abrirTipo(b.dataset.tipo); });
+  document.querySelectorAll("[data-per]").forEach(b => b.addEventListener("click", () => { periodo = b.dataset.per; renderStats(); }));
+  $("go-tipos").addEventListener("click", () => irPara("ajustes"));
+  $("f-mov").addEventListener("click", (e) => { const b = e.target.closest("[data-f]"); if (b) { filtroMov = b.dataset.f; renderHist(); } });
+  $("f-tipo").addEventListener("click", (e) => { const b = e.target.closest("[data-t]"); if (b) { filtroTipo = b.dataset.t; renderHist(); } });
+  $("f-pag").addEventListener("click", (e) => { const b = e.target.closest("[data-p]"); if (b) { filtroPag = b.dataset.p; if (filtroPag) filtroMov = ""; renderHist(); } });
+  $("pays").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-forma]"); if (!b) return;
+    if (b.dataset.forma === "A receber") { abrirReceber(); return; }
+    filtroPag = b.dataset.forma; filtroMov = ""; filtroTipo = ""; irPara("historico");
+  });
+  $("due-card").addEventListener("click", () => abrirReceber());
+  $("cfg-taxa").addEventListener("change", () => {
+    const raw = $("cfg-taxa").value.trim(), v = raw ? parseValor(raw) : 0;
+    if (!(v >= 0 && v < 100)) { toast("Coloque a taxa em porcentagem, por exemplo 3,99.", true); return; }
+    S.cfg.taxaCartao = Math.round(v * 100) / 100;
+    if (salvar()) { toast(v ? `Taxa de ${fmtValorInput(S.cfg.taxaCartao)}% salva` : "Taxa removida"); renderAjustes(); }
+  });
+  $("hist").addEventListener("click", (e) => { const b = e.target.closest("[data-id]"); if (b) abrirLancar({ editId: b.dataset.id }); });
+  $("tipos-list").addEventListener("click", (e) => { const b = e.target.closest("[data-edtipo]"); if (b) abrirEdTipo(b.dataset.edtipo); });
+  document.querySelectorAll("[data-tema]").forEach(b => b.addEventListener("click", () => { S.cfg.tema = b.dataset.tema; salvar(); aplicarTema(); renderAjustes(); }));
+  $("install-x").addEventListener("click", () => { S.cfg.semAvisoInstalar = true; salvar(); $("install").hidden = true; });
+  $("install-btn").addEventListener("click", abrirInstalar);
+  $("how-install").addEventListener("click", abrirInstalar);
+
+  function aplicarTema() {
+    const r = document.documentElement;
+    if (S.cfg.tema === "auto") r.removeAttribute("data-theme"); else r.setAttribute("data-theme", S.cfg.tema);
+  }
+
+  // ── folhas ─────────────────────────────────────────
+  let folhaAberta = null;
+  function abrirFolha(id) {
+    if (folhaAberta && folhaAberta !== id) $(folhaAberta).classList.remove("on");
+    else if (!folhaAberta) history.pushState({ folha: id }, "");
+    folhaAberta = id;
+    $(id).classList.add("on"); $("scrim").classList.add("on");
+    $(id).scrollTop = 0;
+  }
+  function fecharFolha(viaHistorico) {
+    if (!folhaAberta) return;
+    $(folhaAberta).classList.remove("on"); $("scrim").classList.remove("on");
+    folhaAberta = null;
+    if (!viaHistorico && history.state && history.state.folha) history.back();
+  }
+  window.addEventListener("popstate", () => fecharFolha(true));
+  $("scrim").addEventListener("click", () => fecharFolha());
+  document.querySelectorAll("[data-close]").forEach(b => b.addEventListener("click", () => fecharFolha()));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") fecharFolha(); });
+
+  // ── lançar / editar ────────────────────────────────
+  // Venda: o preço é POR PLACA e o total é calculado. O pagamento pode ser dividido entre várias formas.
+  let L = { mov: "venda", tipo: null, editId: null, pagSel: [], pagVal: {}, pagManual: {} };
+  function abrirLancar({ mov, tipo, editId } = {}) {
+    const m = editId ? S.movs.find(x => x.id === editId) : null;
+    L = { mov: m ? m.mov : (mov || "venda"), tipo: m ? m.tipo : (tipo || L.tipo || (S.tipos[0] && S.tipos[0].id)), editId: m ? m.id : null, pagSel: [], pagVal: {}, pagManual: {} };
+    if (!S.tipos.some(t => t.id === L.tipo) && S.tipos[0] && !m) L.tipo = S.tipos[0].id;
+    if (m && m.mov === "venda") {
+      const pf = somaPorForma(m);
+      L.pagSel = FORMAS.filter(f => pf[f] > 0 || (m.pagamentos || []).some(p => p.forma === f));
+      L.pagSel.forEach(f => { L.pagVal[f] = fmtValorInput(pf[f] || 0); L.pagManual[f] = true; });
+    }
+    $("l-qtd").value = m ? m.qtd : 1;
+    $("l-valor").value = !m ? "" : m.mov === "loja" ? (m.preco ? fmtValorInput(m.preco) : "") : m.mov === "venda" ? fmtValorInput(m.preco >= 0 ? m.preco : (m.valor || 0) / m.qtd) : (m.valor ? fmtValorInput(m.valor) : "");
+    $("l-data").value = m ? m.data : hoje();
+    $("l-quem").value = m ? (m.quem || "") : "";
+    $("l-obs").value = m ? (m.obs || "") : "";
+    $("l-del-wrap").hidden = !m; $("l-del").hidden = false; $("l-del-confirm").hidden = true;
+    $("l-acertar").hidden = !(m && m.mov === "loja" && restLoja(m) > 0);
+    atualizarLancar();
+    abrirFolha("sh-lancar");
+  }
+  function atualizarLancar() {
+    const venda = L.mov === "venda", loja = L.mov === "loja";
+    document.querySelectorAll("#l-mov [data-mov]").forEach(b => b.setAttribute("aria-pressed", b.dataset.mov === L.mov));
+    $("l-title").textContent = L.editId ? "Editar registro" : venda ? "Nova venda" : loja ? "Deixar na loja" : "Entrada no estoque";
+    $("l-save").textContent = L.editId ? "Salvar alterações" : venda ? "Salvar venda" : loja ? "Salvar" : "Salvar entrada";
+    $("l-valor-l").textContent = venda ? "Preço de cada placa" : loja ? "Preço combinado de cada placa" : "Quanto você pagou no total (opcional)";
+    $("l-quem-l").textContent = venda ? "Cliente" : loja ? "Nome da loja" : "Fornecedor";
+    $("l-quem").placeholder = loja ? "Obrigatório" : "Opcional";
+    $("l-pag-f").hidden = !venda;
+    const tot = porTipo();
+    $("l-picker").innerHTML = S.tipos.map(t => { const x = tot[t.id] || vazio(); return `<button type="button" class="pick" data-tipo="${esc(t.id)}" style="${styleTipo(t)}" aria-pressed="${t.id === L.tipo}">${esc(t.nome)}<small>${int.format(emEstoque(x))} em estoque</small></button>`; }).join("");
+    renderSplit();
+    calcLancar();
+  }
+  const totalVenda = () => { const q = parseInt($("l-qtd").value, 10) || 0, p = parseValor($("l-valor").value); return p >= 0 && q > 0 ? Math.round(p * q * 100) / 100 : NaN; };
+
+  // Desenha um campo de valor para cada forma marcada (só quando há duas ou mais)
+  function renderSplit() {
+    document.querySelectorAll("#l-pag [data-pag]").forEach(b => b.setAttribute("aria-pressed", L.pagSel.includes(b.dataset.pag)));
+    const box = $("l-split");
+    box.hidden = L.pagSel.length < 2;
+    box.innerHTML = L.pagSel.length < 2 ? "" : L.pagSel.map(f =>
+      `<label class="split-row"><span>${f}</span><span class="money"><input type="text" inputmode="decimal" placeholder="0,00" autocomplete="off" data-split="${f}" value="${esc(L.pagVal[f] || "")}" aria-label="Valor pago em ${f}"></span></label>`).join("");
+  }
+  // Se só um campo ficou sem preencher, ele recebe o que falta para fechar o total
+  function autoSplit() {
+    const total = totalVenda();
+    if (L.pagSel.length < 2 || !(total >= 0)) return;
+    const livres = L.pagSel.filter(f => !L.pagManual[f]);
+    if (livres.length !== 1) return;
+    const usado = L.pagSel.filter(f => L.pagManual[f]).reduce((s, f) => s + (parseValor(L.pagVal[f]) || 0), 0);
+    const resto = Math.max(0, Math.round((total - usado) * 100) / 100);
+    L.pagVal[livres[0]] = fmtValorInput(resto);
+    const inp = document.querySelector(`[data-split="${livres[0]}"]`);
+    if (inp && document.activeElement !== inp) inp.value = L.pagVal[livres[0]];
+  }
+  function somaSplit() { return L.pagSel.reduce((s, f) => s + (parseValor(L.pagVal[f]) || 0), 0); }
+
+  function calcLancar() {
+    const venda = L.mov === "venda";
+    const q = parseInt($("l-qtd").value, 10) || 0;
+    const v = parseValor($("l-valor").value);
+    if (venda) {
+      const total = totalVenda();
+      $("l-total").hidden = !(total > 0);
+      $("l-total").innerHTML = `<span>Total da venda (${plural(q, "placa", "placas")})</span><b>${brl.format(total || 0)}</b>`;
+      $("l-unit").hidden = true;
+      autoSplit();
+      const msg = $("l-split-msg");
+      if (L.pagSel.length >= 2 && total > 0) {
+        const dif = Math.round((total - somaSplit()) * 100) / 100;
+        msg.hidden = false;
+        if (Math.abs(dif) < 0.005) { msg.className = "helper ok"; msg.textContent = "Os pagamentos fecham com o total."; }
+        else { msg.className = "helper bad"; msg.textContent = dif > 0 ? `Falta ${brl.format(dif)} para fechar o total.` : `Passou ${brl.format(-dif)} do total.`; }
+      } else msg.hidden = true;
+      if (L.pagSel.includes("A receber") && !$("l-quem").value.trim()) {
+        msg.hidden = false; msg.className = "helper bad";
+        msg.textContent = (L.pagSel.length >= 2 && total > 0 ? msg.textContent + " " : "") + "Coloque o nome do cliente para saber quem está devendo.";
+      }
+    } else if (L.mov === "loja") {
+      $("l-split-msg").hidden = true; $("l-unit").hidden = true;
+      $("l-total").hidden = !(v > 0 && q > 0);
+      $("l-total").innerHTML = `<span>Se a loja vender tudo</span><b>${brl.format((v || 0) * q)}</b>`;
+    } else {
+      $("l-total").hidden = true; $("l-split-msg").hidden = true;
+      $("l-unit").hidden = !(q > 1 && v > 0);
+      $("l-unit").textContent = `${brl.format(v / q)} por placa`;
+    }
+    const up = venda ? ultimoPreco(L.tipo) : null;
+    $("l-quick").hidden = !(up && !(v > 0));
+    if (up) $("l-quick").textContent = `Usar último preço: ${brl.format(up)} cada`;
+    let est = estoque(L.tipo);
+    if (L.editId) { const m = S.movs.find(x => x.id === L.editId); if (m && m.tipo === L.tipo) est += m.mov === "venda" ? m.qtd : m.mov === "loja" ? restLoja(m) : -m.qtd; }
+    const w = $("l-warn");
+    if ((venda || L.mov === "loja") && q > est) { w.hidden = false; w.textContent = est > 0 ? `Você tem só ${plural(est, "placa", "placas")} de ${tipoDe(L.tipo).nome} no estoque. Dá para salvar, mas talvez falte lançar uma entrada.` : `O estoque de ${tipoDe(L.tipo).nome} está zerado. Dá para salvar, mas talvez falte lançar uma entrada.`; }
+    else w.hidden = true;
+  }
+  $("l-mov").addEventListener("click", (e) => { const b = e.target.closest("[data-mov]"); if (b) { L.mov = b.dataset.mov; atualizarLancar(); } });
+  $("l-picker").addEventListener("click", (e) => { const b = e.target.closest("[data-tipo]"); if (b) { L.tipo = b.dataset.tipo; document.querySelectorAll("#l-picker .pick").forEach(p => p.setAttribute("aria-pressed", p === b)); calcLancar(); } });
+  $("l-pag").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-pag]"); if (!b) return;
+    const f = b.dataset.pag;
+    if (L.pagSel.includes(f)) { L.pagSel = L.pagSel.filter(x => x !== f); delete L.pagVal[f]; delete L.pagManual[f]; }
+    else L.pagSel = FORMAS.filter(x => x === f || L.pagSel.includes(x));
+    // Com uma forma só, ela leva o total inteiro: os valores digitados antes deixam de valer
+    if (L.pagSel.length < 2) { L.pagVal = {}; L.pagManual = {}; }
+    renderSplit(); calcLancar();
+  });
+  $("l-split").addEventListener("input", (e) => {
+    const f = e.target.dataset.split; if (!f) return;
+    L.pagVal[f] = e.target.value; L.pagManual[f] = e.target.value.trim() !== "";
+    calcLancar();
+  });
+  $("q-menos").addEventListener("click", () => { $("l-qtd").value = Math.max(1, (parseInt($("l-qtd").value, 10) || 1) - 1); calcLancar(); });
+  $("q-mais").addEventListener("click", () => { $("l-qtd").value = (parseInt($("l-qtd").value, 10) || 0) + 1; calcLancar(); });
+  $("l-qtd").addEventListener("input", calcLancar);
+  $("l-quem").addEventListener("input", calcLancar);
+  $("l-valor").addEventListener("input", calcLancar);
+  $("l-quick").addEventListener("click", () => { const up = ultimoPreco(L.tipo); if (up) { $("l-valor").value = fmtValorInput(up); calcLancar(); } });
+  $("l-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!L.tipo) { toast("Crie um tipo de placa primeiro, em Ajustes.", true); return; }
+    const q = parseInt($("l-qtd").value, 10);
+    if (!(q > 0)) { toast("A quantidade precisa ser 1 ou mais.", true); $("l-qtd").focus(); return; }
+    const raw = $("l-valor").value.trim(), v = parseValor(raw);
+    const venda = L.mov === "venda";
+    const antigo = L.editId ? S.movs.find(x => x.id === L.editId) : null;
+    if (L.mov === "loja") {
+      if (!$("l-quem").value.trim()) { toast("Coloque o nome da loja.", true); $("l-quem").focus(); return; }
+      const acertadas = antigo && antigo.mov === "loja" ? antigo.qtd - restLoja(antigo) : 0;
+      if (q < acertadas) { toast(`Já foram acertadas ${acertadas} placas desta loja. A quantidade não pode ser menor.`, true); return; }
+    }
+    if (venda && !(v >= 0)) { toast("Coloque o preço de cada placa, por exemplo 35,00.", true); $("l-valor").focus(); return; }
+    if (raw && !(v >= 0)) { toast("Esse valor não parece um número. Use o formato 35,00.", true); return; }
+    const reg = {
+      id: L.editId || uid(), mov: L.mov, tipo: L.tipo, qtd: q,
+      data: $("l-data").value || hoje(), quem: $("l-quem").value.trim(), obs: $("l-obs").value.trim(),
+      criadoEm: L.editId ? (S.movs.find(x => x.id === L.editId) || {}).criadoEm || Date.now() : Date.now(),
+    };
+    if (venda) {
+      reg.preco = Math.round(v * 100) / 100;
+      reg.valor = Math.round(reg.preco * q * 100) / 100;
+      if (L.pagSel.length >= 2) {
+        const soma = Math.round(somaSplit() * 100) / 100;
+        if (Math.abs(soma - reg.valor) >= 0.005) { toast(`Os pagamentos somam ${brl.format(soma)}, mas a venda é de ${brl.format(reg.valor)}. Ajuste os valores.`, true); return; }
+        reg.pagamentos = L.pagSel.map(f => ({ forma: f, valor: Math.round((parseValor(L.pagVal[f]) || 0) * 100) / 100 }));
+      } else reg.pagamentos = L.pagSel.map(f => ({ forma: f, valor: reg.valor }));
+      if (antigo && antigo.consigId) reg.consigId = antigo.consigId;
+      if (reg.pagamentos.some(p => p.forma === "Cartão")) {
+        reg.taxa = antigo && antigo.taxa >= 0 ? antigo.taxa : (S.cfg.taxaCartao || 0);
+      }
+    } else if (L.mov === "loja") {
+      reg.preco = v > 0 ? Math.round(v * 100) / 100 : 0;
+      reg.acertos = antigo && antigo.mov === "loja" ? antigo.acertos || [] : [];
+    } else reg.valor = v > 0 ? Math.round(v * 100) / 100 : 0;
+    if (L.editId) S.movs = S.movs.map(x => x.id === L.editId ? reg : x); else S.movs.push(reg);
+    if (!salvar()) return;
+    fecharFolha();
+    const nome = tipoDe(reg.tipo).nome;
+    toast(L.editId ? "Alterações salvas" : venda ? `Venda salva: ${plural(q, "placa", "placas")} ${nome} por ${brl.format(reg.valor)}` : L.mov === "loja" ? `${plural(q, "placa", "placas")} ${nome} na ${reg.quem}` : `Entrada salva: +${q} ${nome}`);
+    if (navigator.vibrate) navigator.vibrate(12);
+    render();
+  });
+  $("l-del").addEventListener("click", () => { $("l-del").hidden = true; $("l-del-confirm").hidden = false; });
+  $("l-del-no").addEventListener("click", () => { $("l-del").hidden = false; $("l-del-confirm").hidden = true; });
+  $("l-del-yes").addEventListener("click", () => { S.movs = S.movs.filter(x => x.id !== L.editId); if (salvar()) { fecharFolha(); toast("Registro apagado"); render(); } });
+
+  // ── lojas (consignado) ─────────────────────────────
+  function abrirLojas() {
+    const abertas = S.movs.filter(m => m.mov === "loja" && restLoja(m) > 0).sort((a, b) => (a.data || "").localeCompare(b.data || ""));
+    if (!abertas.length) { if (folhaAberta) fecharFolha(); return; }
+    const tot = abertas.reduce((s, m) => s + restLoja(m), 0);
+    $("lj-resumo").textContent = `${plural(tot, "placa", "placas")} fora do seu estoque. Quando passar na loja, toque em Acertar.`;
+    $("lj-lista").innerHTML = abertas.map(m => {
+      const dias = diasDesde(m.data), t = tipoDe(m.tipo), r = restLoja(m);
+      const quando = dias === 0 ? "hoje" : dias === 1 ? "ontem" : `há ${dias} dias`;
+      return `<div class="due"><span class="who">${esc(m.quem || "Loja")}</span><span class="amt loja">${plural(r, "placa", "placas")}</span>
+        <span class="info">${esc(t.nome)} · deixadas ${fmtData(m.data)}, ${quando}${m.preco ? ` · ${brl.format(m.preco)} cada` : ""}</span>
+        <button type="button" data-acerto="${esc(m.id)}">Acertar</button></div>`;
+    }).join("");
+    abrirFolha("sh-lojas");
+  }
+  $("loja-card").addEventListener("click", () => abrirLojas());
+  $("lj-nova").addEventListener("click", () => abrirLancar({ mov: "loja" }));
+  $("lj-lista").addEventListener("click", (e) => { const b = e.target.closest("[data-acerto]"); if (b) abrirAcerto(b.dataset.acerto); });
+  $("l-acertar").addEventListener("click", () => abrirAcerto(L.editId));
+
+  let A = { id: null, forma: "Pix" };
+  function abrirAcerto(id) {
+    const m = S.movs.find(x => x.id === id); if (!m) return;
+    A = { id, forma: "Pix" };
+    $("a-title").textContent = `Acerto com ${m.quem || "a loja"}`;
+    $("a-na-loja").innerHTML = `<span>Estão na loja</span><b>${plural(restLoja(m), "placa", "placas")} ${esc(tipoDe(m.tipo).nome)}</b>`;
+    $("a-ven").value = 0; $("a-dev").value = 0;
+    $("a-preco").value = m.preco ? fmtValorInput(m.preco) : "";
+    $("a-data").value = hoje();
+    document.querySelectorAll("#a-forma [data-f]").forEach(b => b.setAttribute("aria-pressed", b.dataset.f === A.forma));
+    calcAcerto();
+    abrirFolha("sh-acerto");
+  }
+  function calcAcerto() {
+    const m = S.movs.find(x => x.id === A.id); if (!m) return;
+    const r = restLoja(m);
+    let ven = Math.max(0, Math.min(r, parseInt($("a-ven").value, 10) || 0));
+    let dev = Math.max(0, Math.min(r - ven, parseInt($("a-dev").value, 10) || 0));
+    if (String(ven) !== $("a-ven").value) $("a-ven").value = ven;
+    if (String(dev) !== $("a-dev").value) $("a-dev").value = dev;
+    const fica = r - ven - dev, preco = parseValor($("a-preco").value);
+    $("a-fica").textContent = fica ? `Continuam na loja: ${plural(fica, "placa", "placas")}.` : "Não fica nenhuma placa na loja.";
+    $("a-venda-f").hidden = !ven;
+    $("a-total").hidden = !(ven && preco > 0);
+    $("a-total").innerHTML = `<span>A loja te deve (${plural(ven, "placa", "placas")})</span><b>${brl.format((preco || 0) * ven)}</b>`;
+  }
+  $("a-form").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-step]"); if (!b) return;
+    const [id, d] = b.dataset.step.split(":"); $(id).value = Math.max(0, (parseInt($(id).value, 10) || 0) + +d); calcAcerto();
+  });
+  ["a-ven", "a-dev", "a-preco"].forEach(id => $(id).addEventListener("input", calcAcerto));
+  $("a-forma").addEventListener("click", (e) => { const b = e.target.closest("[data-f]"); if (!b) return; A.forma = b.dataset.f; document.querySelectorAll("#a-forma [data-f]").forEach(x => x.setAttribute("aria-pressed", x === b)); });
+  $("a-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const m = S.movs.find(x => x.id === A.id); if (!m) return;
+    calcAcerto();
+    const ven = parseInt($("a-ven").value, 10) || 0, dev = parseInt($("a-dev").value, 10) || 0;
+    if (!ven && !dev) { toast("Diga quantas a loja vendeu ou quantas voltaram.", true); return; }
+    const preco = parseValor($("a-preco").value), data = $("a-data").value || hoje();
+    if (ven && !(preco >= 0)) { toast("Coloque o preço de cada placa vendida.", true); $("a-preco").focus(); return; }
+    if (ven) {
+      const valor = Math.round(preco * ven * 100) / 100;
+      const venda = { id: uid(), mov: "venda", tipo: m.tipo, qtd: ven, preco: Math.round(preco * 100) / 100, valor, data, quem: m.quem, obs: "Vendida pela loja", consigId: m.id, pagamentos: [{ forma: A.forma, valor }], criadoEm: Date.now() };
+      if (A.forma === "Cartão") venda.taxa = S.cfg.taxaCartao || 0;
+      S.movs.push(venda);
+    }
+    if (dev) { m.acertos = (m.acertos || []).concat([{ data, devolvidas: dev }]); }
+    if (!salvar()) return;
+    const partes = [ven ? `${plural(ven, "vendida", "vendidas")}${A.forma === "A receber" ? " (a receber)" : ""}` : "", dev ? `${plural(dev, "voltou", "voltaram")} para o estoque` : ""].filter(Boolean).join(", ");
+    toast(`Acerto salvo: ${partes}`);
+    if (navigator.vibrate) navigator.vibrate(12);
+    render();
+    if (S.movs.some(x => x.mov === "loja" && restLoja(x) > 0)) abrirLojas(); else fecharFolha();
+  });
+
+  // ── a receber ──────────────────────────────────────
+  // Uma venda "A receber" guarda a parte pendente como um pagamento com forma "A receber".
+  // Quando o cliente paga, essa parte diminui e entra um pagamento novo (Pix, Dinheiro ou Cartão).
+  const diasDesde = (d) => Math.max(0, Math.round((new Date(hoje()) - new Date(d)) / 86400000));
+  function abrirReceber() {
+    const pend = S.movs.filter(m => m.mov === "venda" && pendente(m) > 0.004).sort((a, b) => (a.data || "").localeCompare(b.data || ""));
+    if (!pend.length) { if (folhaAberta) fecharFolha(); toast("Ninguém está devendo"); return; }
+    const tot = pend.reduce((s, m) => s + pendente(m), 0);
+    $("r-resumo").textContent = `${brl.format(tot)} no total, das vendas mais antigas para as mais novas.`;
+    $("r-lista").innerHTML = pend.map(m => {
+      const dias = diasDesde(m.data), t = tipoDe(m.tipo);
+      const quando = dias === 0 ? "hoje" : dias === 1 ? "ontem" : `há ${dias} dias`;
+      return `<div class="due"><span class="who">${esc(m.quem || "Cliente sem nome")}</span><span class="amt">${brl.format(pendente(m))}</span>
+        <span class="info">${plural(m.qtd, "placa", "placas")} ${esc(t.nome)} · ${fmtData(m.data)} · <span class="${dias > 30 ? "late" : ""}">${quando}</span></span>
+        <button type="button" data-receber="${esc(m.id)}">Recebi</button></div>`;
+    }).join("");
+    abrirFolha("sh-receber");
+  }
+  $("r-lista").addEventListener("click", (e) => { const b = e.target.closest("[data-receber]"); if (b) abrirRecebi(b.dataset.receber); });
+  let R = { id: null, forma: "Pix" };
+  function abrirRecebi(id) {
+    const m = S.movs.find(x => x.id === id); if (!m) return;
+    R = { id, forma: "Pix" };
+    $("rr-title").textContent = `Receber de ${m.quem || "cliente sem nome"}`;
+    $("rr-falta").innerHTML = `<span>Falta receber</span><b>${brl.format(pendente(m))}</b>`;
+    $("rr-valor").value = fmtValorInput(pendente(m));
+    document.querySelectorAll("#rr-forma [data-f]").forEach(b => b.setAttribute("aria-pressed", b.dataset.f === R.forma));
+    $("rr-msg").textContent = "Se ele pagou só uma parte, mude o valor. O resto continua em aberto.";
+    abrirFolha("sh-recebi");
+  }
+  $("rr-forma").addEventListener("click", (e) => { const b = e.target.closest("[data-f]"); if (!b) return; R.forma = b.dataset.f; document.querySelectorAll("#rr-forma [data-f]").forEach(x => x.setAttribute("aria-pressed", x === b)); });
+  $("rr-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const m = S.movs.find(x => x.id === R.id); if (!m) return;
+    const falta = Math.round(pendente(m) * 100) / 100, v = Math.round((parseValor($("rr-valor").value) || 0) * 100) / 100;
+    if (!(v > 0)) { toast("Coloque quanto o cliente pagou.", true); return; }
+    if (v > falta + 0.004) { toast(`O cliente deve só ${brl.format(falta)} nesta venda.`, true); return; }
+    let resto = v;
+    m.pagamentos = (m.pagamentos || []).map(p => {
+      if (p.forma !== "A receber" || resto <= 0) return p;
+      const tira = Math.min(p.valor || 0, resto); resto -= tira;
+      return { ...p, valor: Math.round(((p.valor || 0) - tira) * 100) / 100 };
+    }).filter(p => !(p.forma === "A receber" && p.valor <= 0.004));
+    m.pagamentos.push({ forma: R.forma, valor: v, recebidoEm: hoje() });
+    if (R.forma === "Cartão" && !(m.taxa >= 0)) m.taxa = S.cfg.taxaCartao || 0;
+    if (!salvar()) return;
+    const quitou = pendente(m) <= 0.004;
+    toast(quitou ? `${m.quem || "Cliente"} quitou: ${brl.format(v)} no ${R.forma}` : `Recebido ${brl.format(v)}. Ainda falta ${brl.format(pendente(m))}`);
+    if (navigator.vibrate) navigator.vibrate(12);
+    render();
+    if (S.movs.some(x => x.mov === "venda" && pendente(x) > 0.004)) abrirReceber(); else fecharFolha();
+  });
+
+  // ── detalhe da placa ───────────────────────────────
+  let tipoAberto = null;
+  function abrirTipo(id) {
+    tipoAberto = id;
+    const t = tipoDe(id), x = porTipo()[id] || vazio(), cmu = custosMedios()[id];
+    $("t-title").textContent = t.nome;
+    $("t-plate").innerHTML = plateHTML(t, x, true).replace('class="plate"', 'class="plate" style="width:100%"');
+    const up = ultimoPreco(id);
+    const linhas = [
+      ["Em estoque", int.format(emEstoque(x))], ...(x.loja ? [["Nas lojas", int.format(x.loja)]] : []), ["Recebidas", int.format(x.rec)], ["Vendidas", int.format(x.ven)],
+      ["Faturado", brl.format(x.fat)], ["Preço médio", x.ven ? brl.format(x.fat / x.ven) : "—"],
+    ];
+    if (up) linhas.push(["Último preço", brl.format(up)]);
+    if (cmu != null) {
+      linhas.push(["Custo de cada placa", brl.format(cmu)]);
+      linhas.push(["Lucro nas vendidas", brl.format(x.lucro)]);
+      if (x.ven) linhas.push(["Lucro por placa", brl.format(x.lucro / Math.max(1, x.ven - x.semCusto))]);
+    } else linhas.push(["Lucro", "lance o custo numa entrada"]);
+    $("t-dl").innerHTML = linhas.map(l => `<dt>${l[0]}</dt><dd>${l[1]}</dd>`).join("");
+    abrirFolha("sh-tipo");
+  }
+  $("t-vender").addEventListener("click", () => abrirLancar({ mov: "venda", tipo: tipoAberto }));
+  $("t-repor").addEventListener("click", () => abrirLancar({ mov: "entrada", tipo: tipoAberto }));
+  $("t-hist").addEventListener("click", () => { filtroTipo = tipoAberto; filtroMov = ""; fecharFolha(); irPara("historico"); });
+
+  // ── editar tipos ───────────────────────────────────
+  let E = { id: "", cor: CORES[1] };
+  function abrirEdTipo(id) {
+    const t = id ? S.tipos.find(x => x.id === id) : null;
+    E = { id: t ? t.id : "", cor: t ? t.cor : CORES[1] };
+    $("e-title").textContent = t ? "Editar tipo" : "Novo tipo";
+    $("e-save").textContent = t ? "Salvar" : "Adicionar tipo";
+    $("e-nome").value = t ? t.nome : "";
+    const usado = t && S.movs.some(m => m.tipo === t.id);
+    $("e-del").hidden = !t || usado;
+    $("e-help").hidden = !usado;
+    $("e-help").textContent = usado ? "Este tipo já tem registros, por isso não pode ser apagado. Você pode mudar o nome e a cor." : "";
+    $("e-cores").parentElement.hidden = !!(t && t.fundo);
+    renderEdTipo();
+    abrirFolha("sh-edtipo");
+  }
+  function renderEdTipo() {
+    const base = E.id ? S.tipos.find(x => x.id === E.id) : null;
+    const t = Object.assign({}, base || {}, { nome: $("e-nome").value.trim() || "Nova placa", cor: E.cor });
+    if (base && base.fundo) t.fundo = base.fundo;
+    $("e-preview").innerHTML = plateHTML(t, E.id ? porTipo()[E.id] : null, true).replace('class="plate"', 'class="plate" style="width:100%"');
+    $("e-cores").innerHTML = CORES.map(c => `<button type="button" class="color-dot" data-cor="${c}" style="background:${c}" aria-label="Cor ${c}" aria-pressed="${c === E.cor}"></button>`).join("");
+  }
+  $("e-nome").addEventListener("input", renderEdTipo);
+  $("e-cores").addEventListener("click", (e) => { const b = e.target.closest("[data-cor]"); if (b) { E.cor = b.dataset.cor; renderEdTipo(); } });
+  $("e-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const nome = $("e-nome").value.trim();
+    if (!nome) { toast("Dê um nome para o tipo de placa.", true); $("e-nome").focus(); return; }
+    if (E.id) { S.tipos = S.tipos.map(t => t.id === E.id ? Object.assign({}, t, { nome, cor: t.fundo ? t.cor : E.cor }) : t); }
+    else {
+      let id = nome.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "tipo";
+      while (S.tipos.some(t => t.id === id)) id += "-2";
+      S.tipos.push({ id, nome, cor: E.cor });
+    }
+    if (salvar()) { fecharFolha(); toast(E.id ? "Tipo salvo" : `Tipo ${nome} adicionado`); render(); }
+  });
+  $("e-del").addEventListener("click", () => {
+    const t = S.tipos.find(x => x.id === E.id); if (!t) return;
+    confirmar(`Apagar o tipo ${t.nome}? Ele não tem registros.`, "Apagar", () => { S.tipos = S.tipos.filter(x => x.id !== t.id); if (salvar()) { toast("Tipo apagado"); render(); } });
+  });
+
+  // ── confirmação ────────────────────────────────────
+  let acaoConfirmar = null;
+  function confirmar(texto, botao, fn) { $("c-text").textContent = texto; $("c-yes").textContent = botao; acaoConfirmar = fn; abrirFolha("sh-confirm"); }
+  $("c-yes").addEventListener("click", () => { const fn = acaoConfirmar; acaoConfirmar = null; fecharFolha(); if (fn) fn(); });
+
+  // ── backup ─────────────────────────────────────────
+  async function entregarArquivo(nome, conteudo, tipo) {
+    const blob = new Blob([conteudo], { type: tipo });
+    try {
+      const file = new File([blob], nome, { type: tipo });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: nome }); return true; }
+    } catch (e) { if (e && e.name === "AbortError") return false; }
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = nome;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    return true;
+  }
+  $("bk-save").addEventListener("click", async () => {
+    const dados = JSON.stringify({ app: "placas-nfc", versao: 1, salvoEm: new Date().toISOString(), tipos: S.tipos, movs: S.movs }, null, 1);
+    const ok = await entregarArquivo(`placas-nfc-backup-${hoje()}.json`, dados, "application/json");
+    if (ok) { S.cfg.ultimoBackup = Date.now(); salvar(); renderAjustes(); toast("Cópia de segurança criada"); }
+  });
+  $("bk-csv").addEventListener("click", async () => {
+    const c = (s) => `"${String(s ?? "").replace(/"/g, '""')}"`;
+    const num = (v) => (v || 0).toFixed(2).replace(".", ",");
+    const cm = custosMedios();
+    const linhas = [["Data", "Movimento", "Placa", "Quantidade", "Valor por placa (R$)", "Valor total (R$)", ...FORMAS.map(f => f + " (R$)"), "Taxa do cartão (R$)", "Lucro (R$)", "Cliente/Fornecedor", "Observação"].map(c).join(";")];
+    S.movs.slice().sort(ordem).reverse().forEach(m => {
+      const venda = m.mov === "venda", pg = {};
+      (m.pagamentos || []).forEach(p => pg[p.forma] = (pg[p.forma] || 0) + (p.valor || 0));
+      const lc = venda ? lucroVenda(m, cm) : null;
+      if (m.mov === "loja") {
+        linhas.push([m.data.split("-").reverse().join("/"), "Deixada na loja", tipoDe(m.tipo).nome, m.qtd, m.preco ? num(m.preco) : "", "", ...FORMAS.map(() => ""), "", "", m.quem, [m.obs, `restam ${restLoja(m)} na loja`].filter(Boolean).join(" · ")].map(c).join(";"));
+        return;
+      }
+      linhas.push([m.data.split("-").reverse().join("/"), venda ? "Venda" : "Entrada", tipoDe(m.tipo).nome, m.qtd,
+        m.qtd ? num(venda && m.preco >= 0 ? m.preco : (m.valor || 0) / m.qtd) : "", num(m.valor),
+        ...FORMAS.map(f => pg[f] ? num(pg[f]) : ""), venda && taxaVenda(m) ? num(taxaVenda(m)) : "", lc != null ? num(lc) : "", m.quem, m.obs].map(c).join(";"));
+    });
+    await entregarArquivo(`placas-nfc-${hoje()}.csv`, "﻿" + linhas.join("\r\n"), "text/csv");
+  });
+  $("bk-file").addEventListener("change", async (e) => {
+    const f = e.target.files && e.target.files[0]; e.target.value = "";
+    if (!f) return;
+    let d;
+    try { d = JSON.parse(await f.text()); } catch (err) { toast("Esse arquivo não é uma cópia do Placas NFC.", true); return; }
+    if (!d || d.app !== "placas-nfc" || !Array.isArray(d.movs) || !Array.isArray(d.tipos)) { toast("Esse arquivo não é uma cópia do Placas NFC.", true); return; }
+    const quando = d.salvoEm ? new Date(d.salvoEm).toLocaleDateString("pt-BR") : "data desconhecida";
+    confirmar(`Trocar os dados deste aparelho pela cópia de ${quando}, com ${plural(d.movs.length, "registro", "registros")}? O que está aqui agora será substituído.`, "Restaurar", () => {
+      S.tipos = d.tipos; S.movs = d.movs.map(migrarMov); if (salvar()) { toast("Cópia restaurada"); render(); }
+    });
+  });
+  $("wipe").addEventListener("click", () => confirmar("Apagar todos os registros e tipos deste aparelho? Isso não tem volta. Se quiser, salve uma cópia de segurança antes.", "Apagar tudo", () => {
+    const cfg = S.cfg; S = novoEstado(); S.cfg = cfg; salvar(); toast("Dados apagados"); render();
+  }));
+
+  // ── PIN ────────────────────────────────────────────
+  async function hashPin(p) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("placas-nfc:" + p));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+  let pinModo = "abrir", pinBuf = "", pinPrimeiro = "";
+  function mostrarLock(modo) {
+    pinModo = modo; pinBuf = ""; pinPrimeiro = "";
+    $("lock-title").textContent = modo === "abrir" ? "Digite seu PIN" : "Crie um PIN de 4 números";
+    $("lock-msg").textContent = modo === "abrir" ? "" : "Você vai digitar ele toda vez que abrir o app.";
+    $("lock-msg").className = "";
+    $("keypad").querySelector("[data-k='cancel']").style.visibility = modo === "abrir" ? "hidden" : "visible";
+    pintarDots(); $("lock").hidden = false;
+  }
+  function pintarDots() { [...$("lock-dots").children].forEach((d, i) => d.classList.toggle("on", i < pinBuf.length)); }
+  function erroPin(msg) { $("lock-msg").textContent = msg; $("lock-msg").className = "err"; $("lock-dots").classList.remove("shake"); void $("lock-dots").offsetWidth; $("lock-dots").classList.add("shake"); if (navigator.vibrate) navigator.vibrate([30, 40, 30]); pinBuf = ""; pintarDots(); }
+  async function pinCompleto() {
+    if (pinModo === "abrir") {
+      if (await hashPin(pinBuf) === S.cfg.pinHash) { $("lock").hidden = true; pinBuf = ""; } else erroPin("PIN errado. Tente de novo.");
+    } else if (!pinPrimeiro) {
+      pinPrimeiro = pinBuf; pinBuf = ""; pintarDots();
+      $("lock-title").textContent = "Digite o PIN de novo"; $("lock-msg").textContent = "Para confirmar."; $("lock-msg").className = "";
+    } else if (pinBuf === pinPrimeiro) {
+      S.cfg.pinHash = await hashPin(pinBuf); salvar(); $("lock").hidden = true; renderAjustes(); toast("PIN ativado");
+    } else { pinPrimeiro = ""; $("lock-title").textContent = "Crie um PIN de 4 números"; erroPin("Os dois PINs ficaram diferentes. Comece de novo."); }
+  }
+  $("keypad").innerHTML = ["1","2","3","4","5","6","7","8","9","cancel","0","del"].map(k =>
+    k === "cancel" ? `<button type="button" class="txt" data-k="cancel">Cancelar</button>` :
+    k === "del" ? `<button type="button" class="txt" data-k="del" aria-label="Apagar dígito">Apagar</button>` :
+    `<button type="button" data-k="${k}">${k}</button>`).join("");
+  $("keypad").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-k]"); if (!b) return;
+    const k = b.dataset.k;
+    if (k === "cancel") { $("lock").hidden = true; return; }
+    if (k === "del") { pinBuf = pinBuf.slice(0, -1); pintarDots(); return; }
+    if (pinBuf.length >= 4) return;
+    pinBuf += k; pintarDots();
+    if (pinBuf.length === 4) setTimeout(pinCompleto, 120);
+  });
+  document.addEventListener("keydown", (e) => {
+    if ($("lock").hidden) return;
+    if (/^\d$/.test(e.key)) $("keypad").querySelector(`[data-k="${e.key}"]`).click();
+    if (e.key === "Backspace") $("keypad").querySelector('[data-k="del"]').click();
+  });
+  $("pin-toggle").addEventListener("click", () => {
+    if (S.cfg.pinHash) confirmar("Desligar o PIN? O app vai abrir direto, sem pedir código.", "Desligar", () => { S.cfg.pinHash = null; salvar(); renderAjustes(); toast("PIN desligado"); });
+    else mostrarLock("criar");
+  });
+  $("pin-change").addEventListener("click", () => mostrarLock("criar"));
+  let escondidoEm = 0;
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) escondidoEm = Date.now();
+    else if (S.cfg.pinHash && escondidoEm && Date.now() - escondidoEm > 60000 && $("lock").hidden) { fecharFolha(); mostrarLock("abrir"); }
+  });
+
+  // ── instalar ───────────────────────────────────────
+  let promptInstalar = null;
+  const standalone = () => window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); promptInstalar = e; $("i-native").hidden = false; });
+  window.addEventListener("appinstalled", () => { promptInstalar = null; S.cfg.semAvisoInstalar = true; salvar(); render(); toast("App instalado"); });
+  function abrirInstalar() { $("i-native").hidden = !promptInstalar; abrirFolha("sh-install"); }
+  $("i-native").addEventListener("click", async () => { if (!promptInstalar) return; promptInstalar.prompt(); await promptInstalar.userChoice.catch(() => {}); promptInstalar = null; fecharFolha(); });
+
+  // ── toast ──────────────────────────────────────────
+  let toastT = 0;
+  function toast(msg, err) { const t = $("toast"); t.textContent = msg; t.className = "toast on" + (err ? " err" : ""); clearTimeout(toastT); toastT = setTimeout(() => t.className = "toast" + (err ? " err" : ""), err ? 3800 : 2400); }
+
+  // ── início ─────────────────────────────────────────
+  aplicarTema();
+  if (S.cfg.pinHash) mostrarLock("abrir");
+  render();
+  if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
+})();
+</script>
+</body>
+</html>
