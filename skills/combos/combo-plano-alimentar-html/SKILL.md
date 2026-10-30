@@ -37,3 +37,10 @@ Este combo não repete as skills: diz a ordem, os pontos de aprovação e o que 
 - **Impressão:** `break-before: page` em cada refeição, `break-inside: avoid` em linhas de tabela, blocos de macros e figuras; foto com altura fixa (~52 mm). Grade de cartões em impressão: troque para `display: flex`, senão o Chrome joga a linha inteira para a página seguinte. Resumo escuro vira fundo claro no `@media print`.
 - **Celular:** a coluna "Alimento" precisa de `min-width` (~180 px), senão vira uma palavra por linha; a tabela rola dentro do bloco (`overflow-x: auto`), nunca a página.
 - **Formato brasileiro** escrito à mão nos números (vírgula decimal, ponto de milhar); não dependa de `Intl` num documento estático.
+
+## Publicar para visualizar (artifact do claude.ai)
+
+- O artifact **bloqueia imagens de outros sites** (só fontes do Google passam). Rode `python3 skills/combos/combo-plano-alimentar-html/scripts/montar-artifact.py <página.html> <saída.html>`: ele baixa as fotos, reduz para 1200 px (JPEG 72), embute como `data:` e tira `<!DOCTYPE>`, `<html>`, `<head>` e `<body>` (o artifact põe os dele). A página de ~570 KB fica bem abaixo do limite de 16 MB.
+- Publique com a ferramenta Artifact (ícone `recipe`). O link é privado; para mostrar a outra pessoa, o Daniel compartilha pelo menu "Share" da página.
+- Botão "Imprimir/Salvar PDF" não funciona dentro do artifact: o PDF sai do arquivo HTML aberto no navegador (Ctrl+P) ou do Playwright.
+- Publicado em 30/10/2026: https://claude.ai/artifact/M4PFo65bKwjoeZ1if4yskf

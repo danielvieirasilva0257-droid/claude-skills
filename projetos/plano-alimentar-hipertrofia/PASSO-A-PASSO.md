@@ -35,3 +35,9 @@ pdftoppm -r 35 -png plano.pdf pg   # miniaturas das páginas
 
 - O Daniel aprovar a **categoria nova `skills/nutricao/`** e a skill `nutricionista-esportivo` (depois disso, listar a categoria no `CLAUDE.md` e no `guia/LEIA-ANTES-DE-USAR.md`, seção 3.3).
 - Quando as marcas de whey, pão de forma, ricota e pasta de amendoim forem definidas, trocar os valores com asterisco.
+
+## 30/10/2026: segunda rodada (UI/UX e publicação)
+
+- Revisão pela `ui-ux-pro-max`: texto em 16 px, tracking do título, menos rótulos em caixa alta, foco visível, margens seguras no celular.
+- **Página para ver:** https://claude.ai/artifact/M4PFo65bKwjoeZ1if4yskf (privada; compartilhar pelo menu Share).
+- Versão do artifact gerada com `skills/combos/combo-plano-alimentar-html/scripts/montar-artifact.py` (fotos embutidas, porque o artifact bloqueia imagens externas).
