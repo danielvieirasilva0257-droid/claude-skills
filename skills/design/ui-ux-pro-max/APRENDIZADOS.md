@@ -36,3 +36,9 @@ Adendos datados. O mais novo fica embaixo. O `SKILL.md` já incorpora os aprendi
 ## 13/10/2026: arquétipo do vídeo do Rotina
 
 - O "Palco escuro" (um fundo escuro o vídeo todo) deixou o v3 monótono. No v4 voltou o sistema do v2: papel com grade, vermelho e tinta alternando por seção, com o vermelho da marca como acento e como fundo nas viradas. Para vídeo, a variação de fundo entre seções conta mais que a paleta mínima. Detalhes: `projetos/rotina/PASSO-A-PASSO.md` (item 7).
+
+## 30/10/2026: documento para imprimir (plano alimentar)
+
+- Para documento A4, o checklist ganha itens de impressão: `@page`, `break-before` por seção, `break-inside: avoid` em linhas e blocos, `print-color-adjust: exact`, bloco escuro vira claro no papel. Grade em impressão: preferir `flex` (o Chrome empurra a linha inteira da grade para a página seguinte).
+- Cards aqui se justificam (opções "escolher uma" e jantar resumido), mesmo sem interação: são alternativas que não se somam.
+- Combo: `skills/combos/combo-plano-alimentar-html/SKILL.md`.

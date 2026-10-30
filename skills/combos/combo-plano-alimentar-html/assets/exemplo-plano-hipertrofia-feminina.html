@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plano alimentar · Ganho de massa muscular</title>
+<meta name="description" content="Plano alimentar de referência para ganho de massa muscular: 5 refeições com gramas, medidas caseiras, kcal e macronutrientes.">
+<meta name="theme-color" content="#F7F4EE">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F4EE;
+    --paper: #FFFDF9;
+    --line: #E3DED3;
+    --sage: #6E806A;
+    --sage-dark: #4F5F4C;
+    --sage-light: #E7ECE3;
+    --beige: #EFE8DC;
+    --gold: #B08D57;
+    --ink: #2B2E2A;
+    --ink-soft: #5D615A;
+    --serif: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+    --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --radius: 6px;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  ::selection { background: var(--sage-light); }
+
+  .doc { max-width: 960px; margin: 0 auto; padding: 56px 32px 72px; }
+
+  h1, h2, h3 { font-family: var(--serif); font-weight: 500; line-height: 1.1; margin: 0; text-wrap: balance; }
+  p { margin: 0 0 .75em; }
+  .num { font-variant-numeric: tabular-nums lining-nums; }
+  .small-caps {
+    font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+    font-weight: 600; color: var(--ink-soft);
+  }
+
+  /* ---------- 1. Header ---------- */
+  .masthead {
+    display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end;
+    padding-bottom: 28px; border-bottom: 1px solid var(--line);
+  }
+  .masthead h1 { font-size: clamp(48px, 9vw, 88px); letter-spacing: -.01em; }
+  .masthead .goal { font-family: var(--serif); font-size: clamp(20px, 3vw, 28px); font-style: italic; color: var(--sage-dark); margin-top: 6px; }
+  .masthead .meta { text-align: right; font-size: 13px; color: var(--ink-soft); }
+  .masthead .meta strong { display: block; color: var(--gold); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; font-size: 11px; margin-bottom: 4px; }
+
+  /* ---------- 2. ID strip ---------- */
+  .idstrip {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    margin: 28px 0 8px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius);
+  }
+  .idstrip div { padding: 16px 20px; }
+  .idstrip div + div { border-left: 1px solid var(--line); }
+  .idstrip dt { margin: 0 0 2px; }
+  .idstrip dd { margin: 0; font-family: var(--serif); font-size: 26px; font-weight: 500; }
+  .idnote { font-size: 12.5px; color: var(--ink-soft); margin: 8px 2px 0; }
+
+  /* ---------- 3. Protein target ---------- */
+  .protein {
+    margin-top: 40px; padding: 32px; background: var(--sage-light); border-radius: var(--radius);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 28px 40px;
+  }
+  .protein h2 { grid-column: 1 / -1; font-size: 30px; }
+  .protein .fig { font-family: var(--serif); font-size: 64px; line-height: 1; font-weight: 500; }
+  .protein .fig small { font-size: 26px; margin-left: 4px; }
+  .protein .lbl { font-size: 13.5px; color: var(--ink-soft); margin-top: 6px; }
+  .protein .delivered .fig { color: var(--sage-dark); }
+  .pbar { grid-column: 1 / -1; }
+  .pbar .track { position: relative; height: 10px; background: var(--paper); border-radius: 5px; border: 1px solid var(--line); }
+  .pbar .fill { position: absolute; inset: 0 auto 0 0; width: 97%; background: var(--sage); border-radius: 5px; }
+  .pbar .mark { position: absolute; top: -6px; bottom: -6px; left: 47.1%; width: 2px; background: var(--gold); }
+  .pbar .scale { position: relative; height: 20px; font-size: 12px; color: var(--ink-soft); margin-top: 8px; }
+  .pbar .scale span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+  .protein .note { grid-column: 1 / -1; font-size: 13.5px; margin: 0; }
+
+  /* ---------- 4. Timeline ---------- */
+  .timeline { margin-top: 56px; }
+  .section-title { font-size: 34px; margin-bottom: 20px; }
+  .timeline ol { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(5, 1fr); position: relative; }
+  .timeline ol::before { content: ""; position: absolute; left: 0; right: 0; top: 22px; height: 1px; background: var(--line); }
+  .timeline li { position: relative; padding-right: 12px; }
+  .timeline .n {
+    display: inline-block; font-family: var(--serif); font-size: 40px; line-height: 44px; font-weight: 500;
+    background: var(--bg); padding-right: 10px; position: relative; color: var(--sage-dark);
+  }
+  .timeline .t { font-weight: 600; font-size: 14.5px; margin-top: 8px; }
+  .timeline .d { font-size: 13px; color: var(--ink-soft); line-height: 1.45; }
+  .timeline .k { font-size: 13px; color: var(--gold); font-weight: 600; margin-top: 6px; }
+
+  /* ---------- Meal sections ---------- */
+  .meal {
+    margin-top: 64px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 40px;
+  }
+  .meal-head { display: grid; grid-template-columns: auto 1fr; gap: 0 24px; align-items: end; margin-bottom: 28px; }
+  .meal-head .big { font-family: var(--serif); font-size: 112px; line-height: .8; font-weight: 400; color: var(--sage); }
+  .meal-head .when { color: var(--gold); }
+  .meal-head h2 { font-size: clamp(32px, 5vw, 44px); margin-top: 4px; }
+  .meal-head .sub { color: var(--ink-soft); font-size: 14.5px; margin-top: 6px; }
+
+  figure { margin: 0 0 28px; }
+  .photo {
+    aspect-ratio: 16 / 7; background: var(--beige); border-radius: var(--radius); overflow: hidden;
+    display: flex; align-items: center; justify-content: center; color: var(--ink-soft); font-size: 13px;
+  }
+  .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  figcaption { font-size: 12px; color: var(--ink-soft); margin-top: 8px; }
+  figcaption a { color: inherit; }
+
+  /* Macro block: kcal + P/C/G, 4 columns */
+  .macros { display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); margin: 0 0 28px; break-inside: avoid; }
+  .macros > div { padding: 16px 20px; background: var(--paper); }
+  .macros > div + div { border-left: 1px solid var(--line); }
+  .macros .kcal { background: var(--sage-dark); color: #fff; }
+  .macros .kcal .small-caps { color: #D9E1D5; }
+  .macros .v { font-family: var(--serif); font-size: 40px; line-height: 1.05; font-weight: 500; font-variant-numeric: lining-nums tabular-nums; }
+  .macros .v small { font-family: var(--sans); font-size: 13px; font-weight: 500; margin-left: 3px; }
+  .macros.compact .v { font-size: 30px; }
+  .macros.compact > div { padding: 12px 14px; }
+
+  /* Tables */
+  .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 0 16px; border: 1px solid var(--line); border-radius: var(--radius); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 720px; }
+  caption { text-align: left; padding: 14px 16px 10px; font-family: var(--serif); font-size: 20px; font-weight: 500; caption-side: top; }
+  th {
+    font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; color: var(--ink-soft);
+    text-align: left; padding: 10px 12px; background: var(--beige); border-bottom: 1px solid var(--line); white-space: nowrap;
+  }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tbody tr:nth-child(even) td { background: #FBF8F2; }
+  tr { break-inside: avoid; }
+  .r { text-align: right; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+  td.src { font-size: 12px; color: var(--ink-soft); }
+  td.food { font-weight: 500; min-width: 180px; }
+  td.home { color: var(--ink-soft); }
+  tfoot td { background: var(--sage-light); font-weight: 600; border-bottom: 0; border-top: 2px solid var(--sage); }
+  .star { color: var(--gold); font-weight: 600; }
+
+  .aside { border-left: 2px solid var(--gold); padding: 2px 0 2px 16px; margin: 20px 0 0; font-size: 14px; }
+  .aside strong { font-weight: 600; }
+
+  .sub-title { font-family: var(--serif); font-size: 24px; font-weight: 500; margin: 32px 0 6px; }
+  .sub-lead { font-size: 14px; color: var(--ink-soft); margin-bottom: 16px; }
+
+  /* Option cards (cobertura / jantar) */
+  .options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .options.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .opt { border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; background: var(--bg); break-inside: avoid; display: flex; flex-direction: column; min-width: 0; }
+  .opt .tag { color: var(--gold); }
+  .opt h3 { font-size: 26px; margin: 4px 0 4px; }
+  .opt .portion { font-size: 13px; color: var(--ink-soft); margin-bottom: 14px; }
+  .opt .macros { margin: auto 0 0; }
+  .opt .macros > div { padding: 10px; min-width: 0; }
+  .opt .macros .v { font-size: 24px; }
+  .opt .macros { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .opt .macros .kcal { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: baseline; }
+  .opt .macros > div:nth-child(2) { border-left: 0; }
+  .opt .macros > div:nth-child(n+2) { border-top: 1px solid var(--line); }
+
+  /* ---------- 11. Summary ---------- */
+  .summary { margin-top: 64px; background: var(--sage-dark); color: #F4F2EC; border-radius: var(--radius); padding: 44px 40px; }
+  .summary h2 { font-size: clamp(34px, 5vw, 48px); color: #fff; }
+  .summary .lead { color: #D9E1D5; margin: 8px 0 28px; font-size: 14.5px; }
+  .summary .tbl-wrap { border-color: rgba(255,255,255,.18); }
+  .summary table { color: #F4F2EC; min-width: 520px; }
+  .summary th { background: rgba(255,255,255,.08); color: #D9E1D5; border-bottom-color: rgba(255,255,255,.18); }
+  .summary td { border-bottom-color: rgba(255,255,255,.12); }
+  .summary tbody tr:nth-child(even) td { background: rgba(255,255,255,.04); }
+  .summary tfoot td { background: rgba(255,255,255,.1); border-top-color: var(--gold); color: #fff; font-size: 15px; }
+  .ranges { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-top: 28px; border-top: 1px solid rgba(255,255,255,.18); }
+  .ranges > div { padding: 20px 20px 0 0; }
+  .ranges > div + div { padding-left: 20px; border-left: 1px solid rgba(255,255,255,.18); }
+  .ranges .small-caps { color: #D9E1D5; }
+  .ranges .v { font-family: var(--serif); font-size: 30px; line-height: 1.1; font-weight: 500; color: #fff; font-variant-numeric: lining-nums; }
+  .ranges p { font-size: 13px; color: #D9E1D5; margin: 4px 0 0; }
+
+  /* ---------- 12. Notes ---------- */
+  .notes { margin-top: 64px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  .notes h2 { font-size: 30px; margin-bottom: 14px; }
+  .notes ul, .notes ol { margin: 0; padding-left: 18px; font-size: 14px; }
+  .notes li { margin-bottom: 8px; }
+  .notes ol li { font-size: 13px; color: var(--ink-soft); }
+  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-soft); display: flex; justify-content: space-between; gap: 24px; }
+  footer strong { color: var(--ink); font-weight: 600; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 760px) {
+    body { font-size: 14.5px; }
+    .doc { padding: 32px 16px 48px; }
+    .masthead { grid-template-columns: 1fr; }
+    .masthead .meta { text-align: left; }
+    .idstrip { grid-template-columns: repeat(2, 1fr); }
+    .idstrip div:nth-child(3) { border-left: 0; }
+    .idstrip div:nth-child(n+3) { border-top: 1px solid var(--line); }
+    .idstrip dd { font-size: 22px; }
+    .protein { grid-template-columns: 1fr; padding: 24px 20px; gap: 20px; }
+    .protein .fig { font-size: 52px; }
+    .timeline ol { grid-template-columns: 1fr; gap: 14px; }
+    .timeline ol::before { left: 22px; right: auto; top: 0; bottom: 0; width: 1px; height: auto; }
+    .timeline li { display: grid; grid-template-columns: 56px 1fr; column-gap: 8px; }
+    .timeline .n { grid-row: span 3; font-size: 34px; text-align: center; padding: 0; }
+    .timeline .t { margin-top: 2px; }
+    .meal { padding: 24px 16px; margin-top: 40px; }
+    .meal-head { grid-template-columns: 1fr; }
+    .meal-head .big { font-size: 72px; margin-bottom: 12px; }
+    .photo { aspect-ratio: 4 / 3; }
+    .macros { grid-template-columns: 1fr 1fr; }
+    .macros:not(.compact) > div:nth-child(3) { border-left: 0; }
+    .macros:not(.compact) > div:nth-child(n+3) { border-top: 1px solid var(--line); }
+    .macros .v { font-size: 32px; }
+    .options, .options.two { grid-template-columns: 1fr; }
+    .summary { padding: 28px 16px; }
+    .ranges { grid-template-columns: 1fr; }
+    .ranges > div + div { border-left: 0; padding-left: 0; border-top: 1px solid rgba(255,255,255,.18); margin-top: 16px; }
+    .notes { grid-template-columns: 1fr; gap: 32px; }
+    footer { flex-direction: column; }
+  }
+
+  /* ---------- Print A4 ---------- */
+  @page { size: A4; margin: 12mm; }
+  @media print {
+    body { background: #fff; font-size: 10pt; }
+    .doc { max-width: none; padding: 0; }
+    .meal { break-before: page; margin-top: 0; border: 0; padding: 0; background: #fff; }
+    .photo { aspect-ratio: auto; height: 52mm; }
+    .tbl-wrap { overflow: visible; }
+    table { min-width: 0; font-size: 8.5pt; }
+    th, td { padding: 6px 8px; }
+    .macros, .opt, figure, .aside, .protein, .idstrip { break-inside: avoid; }
+    .summary { break-before: page; margin-top: 0; background: var(--sage-light); color: var(--ink); }
+    .summary h2, .summary tfoot td, .ranges .v { color: var(--ink); }
+    .summary .lead, .ranges p, .ranges .small-caps, .summary th { color: var(--ink-soft); }
+    .summary table { color: var(--ink); }
+    .summary th { background: var(--beige); border-bottom-color: var(--line); }
+    .summary td { border-bottom-color: var(--line); }
+    .summary tbody tr:nth-child(even) td { background: rgba(255,255,255,.5); }
+    .summary tfoot td { background: #fff; }
+    .summary .tbl-wrap, .ranges, .ranges > div + div { border-color: var(--line); }
+    .notes { break-before: page; margin-top: 0; }
+    .options { display: flex; gap: 10px; }
+    .options > .opt { flex: 1 1 0; break-inside: auto; }
+    .meal { break-inside: auto; }
+    a { text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+<main class="doc">
+
+  <!-- 1. Cabeçalho -->
+  <header class="masthead">
+    <div>
+      <h1>Plano alimentar</h1>
+      <p class="goal">Objetivo: ganho de massa muscular</p>
+    </div>
+    <div class="meta">
+      <strong>Plano de referência</strong>
+      5 refeições por dia<br>Valores por TACO e rótulos
+    </div>
+  </header>
+
+  <!-- 2. Identificação -->
+  <section aria-label="Identificação">
+    <dl class="idstrip">
+      <div><dt class="small-caps">Sexo</dt><dd>Feminino</dd></div>
+      <div><dt class="small-caps">Peso</dt><dd class="num">48 kg</dd></div>
+      <div><dt class="small-caps">Altura</dt><dd class="num">1,45–1,50 m</dd></div>
+      <div><dt class="small-caps">Treino</dt><dd>4–5× por semana</dd></div>
+    </dl>
+    <p class="idnote">Idade não informada: as estimativas consideram de 20 a 35 anos.</p>
+  </section>
+
+  <!-- 3. Meta proteica -->
+  <section class="protein" aria-labelledby="t-prot">
+    <h2 id="t-prot">Meta de proteína</h2>
+    <div>
+      <div class="fig num">76,8<small>g/dia</small></div>
+      <div class="lbl">Mínimo recomendado: 1,6 g por kg de peso (48 kg × 1,6).</div>
+    </div>
+    <div class="delivered">
+      <div class="fig num">~158<small>g/dia</small></div>
+      <div class="lbl">Entregue por este plano: 158 a 163 g/dia, ou 3,3 a 3,4 g por kg.</div>
+    </div>
+    <div class="pbar" aria-hidden="true">
+      <div class="track"><div class="fill"></div><div class="mark"></div></div>
+      <div class="scale num">
+        <span style="left:0;transform:none">0 g</span>
+        <span style="left:47.1%">mínimo 76,8 g</span>
+        <span style="left:100%;transform:translateX(-100%)">163 g</span>
+      </div>
+    </div>
+    <p class="note">A estrutura das refeições foi mantida por decisão de planejamento. Por isso a proteína fica acima do mínimo; 76,8 g é o piso, não o alvo.</p>
+  </section>
+
+  <!-- 4. Linha do tempo -->
+  <section class="timeline" aria-labelledby="t-dia">
+    <h2 class="section-title" id="t-dia">O dia em 5 refeições</h2>
+    <ol>
+      <li><span class="n">01</span><div class="t">Café da manhã</div><div class="d">Pão francês com ovo e mingau de farinha láctea com banana</div><div class="k num">625 kcal</div></li>
+      <li><span class="n">02</span><div class="t">Pós-treino</div><div class="d">Whey, 1 fatia de pão de forma e uma cobertura à escolha</div><div class="k num">228–272 kcal</div></li>
+      <li><span class="n">03</span><div class="t">Almoço</div><div class="d">Opção A (frango, arroz e feijão) ou opção B (macarrão com frango)</div><div class="k num">459–520 kcal</div></li>
+      <li><span class="n">04</span><div class="t">Lanche da tarde</div><div class="d">1 scoop de whey</div><div class="k num">121 kcal</div></li>
+      <li><span class="n">05</span><div class="t">Jantar</div><div class="d">Igual ao almoço: opção A ou B, podendo variar no mesmo dia</div><div class="k num">459–520 kcal</div></li>
+    </ol>
+  </section>
+
+  <!-- 5. Café da manhã -->
+  <section class="meal" aria-labelledby="t-r1">
+    <div class="meal-head">
+      <div class="big num" aria-hidden="true">01</div>
+      <div>
+        <div class="small-caps when">Refeição 01</div>
+        <h2 id="t-r1">Café da manhã</h2>
+        <div class="sub">Pão francês com ovo e mingau de farinha láctea com banana</div>
+      </div>
+    </div>
+    <figure>
+      <div class="photo"><img src="https://images.unsplash.com/photo-1687630433865-f86f07be989a?auto=format&fit=crop&w=1400&q=75" alt="Ovos mexidos em tigela branca ao lado de fatias de pão" width="1400" height="613" loading="lazy" onerror="this.replaceWith('Imagem indisponível')"></div>
+      <figcaption>Imagem ilustrativa. Foto: Imad 786, <a href="https://unsplash.com/@imad_786">Unsplash</a>.</figcaption>
+    </figure>
+    <div class="macros" role="group" aria-label="Totais da refeição">
+      <div class="kcal"><div class="small-caps">Energia</div><div class="v">625<small>kcal</small></div></div>
+      <div><div class="small-caps">Proteína</div><div class="v">27,9<small>g</small></div></div>
+      <div><div class="small-caps">Carboidrato</div><div class="v">78,8<small>g</small></div></div>
+      <div><div class="small-caps">Gordura</div><div class="v">21,4<small>g</small></div></div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Alimento</th><th class="r">Peso</th><th>Medida caseira aprox.</th><th class="r">kcal</th><th class="r">Prot. (g)</th><th class="r">Carb. (g)</th><th class="r">Gord. (g)</th><th>Fonte</th></tr></thead>
+        <tbody>
+          <tr><td class="food">Pão francês</td><td class="r">50 g</td><td class="home">1 unidade</td><td class="r">150</td><td class="r">4,0</td><td class="r">29,3</td><td class="r">1,6</td><td class="src">TACO</td></tr>
+          <tr><td class="food">Ovos mexidos ou na chapa</td><td class="r">100 g</td><td class="home">2 unidades</td><td class="r">146</td><td class="r">13,3</td><td class="r">0,6</td><td class="r">9,5</td><td class="src">TACO (ovo cozido)</td></tr>
+          <tr><td class="food">Azeite para o preparo dos ovos</td><td class="r">2 g</td><td class="home">1 fio (≈ ½ colher de chá)</td><td class="r">18</td><td class="r">0,0</td><td class="r">0,0</td><td class="r">2,0</td><td class="src">TACO</td></tr>
+          <tr><td class="food">Farinha Láctea Nestlé</td><td class="r">30 g</td><td class="home">4 colheres de sopa rasas</td><td class="r">121</td><td class="r">3,9</td><td class="r">22,1</td><td class="r">1,9</td><td class="src">Rótulo Nestlé</td></tr>
+          <tr><td class="food">Leite integral (base do mingau)</td><td class="r">200 ml</td><td class="home">1 copo (200 ml)</td><td class="r">122</td><td class="r">5,8</td><td class="r">8,6</td><td class="r">6,4</td><td class="src">TACO</td></tr>
+          <tr><td class="food">Banana prata picada no mingau</td><td class="r">70 g</td><td class="home">1 unidade média, sem casca</td><td class="r">69</td><td class="r">0,9</td><td class="r">18,2</td><td class="r">0,1</td><td class="src">TACO</td></tr>
+        </tbody>
+        <tfoot><tr><td>Total</td><td></td><td></td><td class="r">625</td><td class="r">27,9</td><td class="r">78,8</td><td class="r">21,4</td><td></td></tr></tfoot>
+      </table>
+    </div>
+    <p class="aside"><strong>Preparo.</strong> Dissolver a farinha láctea no leite, aquecer mexendo até engrossar e finalizar com a banana em rodelas. Fazer os ovos em frigideira antiaderente com um fio de azeite.</p>
+  </section>
+
+  <!-- 6. Pós-treino -->
+  <section class="meal" aria-labelledby="t-r2">
+    <div class="meal-head">
+      <div class="big num" aria-hidden="true">02</div>
+      <div>
+        <div class="small-caps when">Refeição 02 · entre o café e o almoço</div>
+        <h2 id="t-r2">Pós-treino</h2>
+        <div class="sub">1 scoop de whey, 1 fatia de pão de forma e uma cobertura à escolha</div>
+      </div>
+    </div>
+    <figure>
+      <div class="photo"><img src="https://images.unsplash.com/photo-1528945522327-7032b0774637?auto=format&fit=crop&w=1400&q=75" alt="Torrada com rodelas de banana e calda em prato cinza" width="1400" height="613" loading="lazy" onerror="this.replaceWith('Imagem indisponível')"></div>
+      <figcaption>Imagem ilustrativa. Foto: Eiliv Aceron, <a href="https://unsplash.com/photos/9ybpfHSl4D8">Unsplash</a>.</figcaption>
+    </figure>
+
+    <div class="tbl-wrap">
+      <table>
+        <caption>Base</caption>
+        <thead><tr><th>Alimento</th><th class="r">Peso</th><th>Medida caseira aprox.</th><th class="r">kcal</th><th class="r">Prot. (g)</th><th class="r">Carb. (g)</th><th class="r">Gord. (g)</th><th>Fonte</th></tr></thead>
+        <tbody>
+          <tr><td class="food">Whey protein concentrado (diluído em 200 ml de água)<span class="star">*</span></td><td class="r">30 g</td><td class="home">1 scoop</td><td class="r">121</td><td class="r">24,0</td><td class="r">3,0</td><td class="r">1,5</td><td class="src">Rótulo genérico (estimativa)</td></tr>
+          <tr><td class="food">Pão de forma tradicional<span class="star">*</span></td><td class="r">25 g</td><td class="home">1 fatia</td><td class="r">63</td><td class="r">2,2</td><td class="r">12,0</td><td class="r">0,6</td><td class="src">Rótulo genérico (estimativa)</td></tr>
+        </tbody>
+        <tfoot><tr><td>Subtotal da base</td><td></td><td></td><td class="r">184</td><td class="r">26,2</td><td class="r">15,0</td><td class="r">2,1</td><td></td></tr></tfoot>
+      </table>
+    </div>
+
+    <h3 class="sub-title">Cobertura: escolher uma</h3>
+    <p class="sub-lead">As três são alternativas e nunca se somam. Cada cartão mostra o total da refeição completa (base + cobertura).</p>
+    <div class="options">
+      <article class="opt">
+        <div class="small-caps tag">Opção 1</div>
+        <h3>Nutella</h3>
+        <div class="portion num">15 g · 1 colher de sobremesa rasa<br>Cobertura: 81 kcal · P 0,9 · C 8,6 · G 4,6<br>Fonte: rótulo Ferrero</div>
+        <div class="macros compact">
+          <div class="kcal"><div class="small-caps">kcal</div><div class="v">264</div></div>
+          <div><div class="small-caps">P</div><div class="v">27,1</div></div>
+          <div><div class="small-caps">C</div><div class="v">23,6</div></div>
+          <div><div class="small-caps">G</div><div class="v">6,7</div></div>
+        </div>
+      </article>
+      <article class="opt">
+        <div class="small-caps tag">Opção 2</div>
+        <h3>Pasta de amendoim integral<span class="star">*</span></h3>
+        <div class="portion num">15 g · 1 colher de sobremesa rasa<br>Cobertura: 88 kcal · P 3,8 · C 3,0 · G 7,6<br>Fonte: USDA (estimativa)</div>
+        <div class="macros compact">
+          <div class="kcal"><div class="small-caps">kcal</div><div class="v">272</div></div>
+          <div><div class="small-caps">P</div><div class="v">29,9</div></div>
+          <div><div class="small-caps">C</div><div class="v">18,0</div></div>
+          <div><div class="small-caps">G</div><div class="v">9,7</div></div>
+        </div>
+      </article>
+      <article class="opt">
+        <div class="small-caps tag">Opção 3</div>
+        <h3>Creme de ricota light<span class="star">*</span></h3>
+        <div class="portion num">30 g · 2 colheres de sopa rasas<br>Cobertura: 45 kcal · P 2,7 · C 1,2 · G 3,3<br>Fonte: rótulo genérico (estimativa)</div>
+        <div class="macros compact">
+          <div class="kcal"><div class="small-caps">kcal</div><div class="v">228</div></div>
+          <div><div class="small-caps">P</div><div class="v">28,9</div></div>
+          <div><div class="small-caps">C</div><div class="v">16,2</div></div>
+          <div><div class="small-caps">G</div><div class="v">5,4</div></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- 7. Almoço A -->
+  <section class="meal" aria-labelledby="t-r3a">
+    <div class="meal-head">
+      <div class="big num" aria-hidden="true">03</div>
+      <div>
+        <div class="small-caps when">Refeição 03 · opção A</div>
+        <h2 id="t-r3a">Almoço: frango, arroz e feijão</h2>
+        <div class="sub">Sobrecoxa assada, ovo, arroz, feijão carioca, legumes e brócolis</div>
+      </div>
+    </div>
+    <figure>
+      <div class="photo"><img src="https://images.unsplash.com/photo-1762631383628-77f92d18b184?auto=format&fit=crop&w=1400&q=75" alt="Tigela com frango grelhado fatiado, arroz branco e feijão" width="1400" height="613" loading="lazy" onerror="this.replaceWith('Imagem indisponível')"></div>
+      <figcaption>Imagem ilustrativa. Foto: joe boshra, <a href="https://unsplash.com/s/photos/rice-and-beans-chicken">Unsplash</a>.</figcaption>
+    </figure>
+    <div class="macros" role="group" aria-label="Totais da refeição">
+      <div class="kcal"><div class="small-caps">Energia</div><div class="v">520<small>kcal</small></div></div>
+      <div><div class="small-caps">Proteína</div><div class="v">39,6<small>g</small></div></div>
+      <div><div class="small-caps">Carboidrato</div><div class="v">49,4<small>g</small></div></div>
+      <div><div class="small-caps">Gordura</div><div class="v">17,3<small>g</small></div></div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Alimento</th><th class="r">Peso</th><th>Medida caseira aprox.</th><th class="r">kcal</th><th class="r">Prot. (g)</th><th class="r">Carb. (g)</th><th class="r">Gord. (g)</th><th>Fonte</th></tr></thead>
+        <tbody>
+          <tr><td class="food">Sobrecoxa de frango sem pele, assada</td><td class="r">80 g</td><td class="home">1 unidade média, sem osso</td><td class="r">186</td><td class="r">23,4</td><td class="r">0,0</td><td class="r">9,6</td><td class="src">TACO</td></tr>
+          <tr><td class="food">Ovo</td><td class="r">50 g</td><td class="home">1 unidade</td><td class="r">73</td><td class="r">6,7</td><td class="r">0,3</td><td class="r">4,8</td><td class="src">TACO</td></tr>
+          <tr><td class="food">Arroz branco cozido</td><td class="r">100 g</td><td class="home">4 colheres de sopa cheias</td><td class="r">128</td><td class="r">2,5</td><td class="r">28,1</td><td class="r">0,2</td><td class="src">TACO</td></tr>
+          <tr><td class="food">Feijão carioca cozido</td><td class="r">90 g</td><td class="home">1 concha média</td><td class="r">68</td><td class="r">4,3</td><td class="r">12,2</td><td class="r">0,5</td><td class="src">TACO</td></tr>
+          <tr><td class="food">Mistura de legumes em cubos Swift</td><td class="r">60 g</td><td class="home">3 colheres de sopa</td><td class="r">34</td><td class="r">1,7</td><td class="r">6,6</td><td class="r">0,0</td><td class="src">Rótulo Swift</td></tr>
+          <tr><td class="food">Brócolis cozido (ou couve-flor)</td><td class="r">50 g</td><td class="home">3 ramos médios</td><td class="r">13</td><td class="r">1,1</td><td class="r">2,2</td><td class="r">0,3</td><td class="src">TACO</td></tr>
+          <tr><td class="food">Azeite para o preparo</td><td class="r">2 g</td><td class="home">1 fio (≈ ½ colher de chá)</td><td class="r">18</td><td class="r">0,0</td><td class="r">0,0</td><td class="r">2,0</td><td class="src">TACO</td></tr>
+        </tbody>
+        <tfoot><tr><td>Total</td><td></td><td></td><td class="r">520</td><td class="r">39,6</td><td class="r">49,4</td><td class="r">17,3</td><td></td></tr></tfoot>
+      </table>
+    </div>
+    <p class="aside num"><strong>Substituição.</strong> 50 g de couve-flor cozida no lugar do brócolis = 10 kcal · P 0,6 · C 2,0 · G 0,2 (TACO).</p>
+  </section>
+
+  <!-- 8. Almoço B -->
+  <section class="meal" aria-labelledby="t-r3b">
+    <div class="meal-head">
+      <div class="big num" aria-hidden="true">03</div>
+      <div>
+        <div class="small-caps when">Refeição 03 · opção B</div>
+        <h2 id="t-r3b">Almoço: macarrão com frango</h2>
+        <div class="sub">Peito de frango, macarrão ao molho vermelho, ovo, legumes e brócolis</div>
+      </div>
+    </div>
+    <figure>
+      <div class="photo"><img src="https://images.unsplash.com/photo-1676300184847-4ee4030409c0?auto=format&fit=crop&w=1400&q=75" alt="Prato branco com macarrão ao molho de tomate" width="1400" height="613" loading="lazy" onerror="this.replaceWith('Imagem indisponível')"></div>
+      <figcaption>Imagem ilustrativa. Foto: Orkun Orcan, <a href="https://unsplash.com/photos/w0GyGNyGo6Y">Unsplash</a>.</figcaption>
+    </figure>
+    <div class="macros" role="group" aria-label="Totais da refeição">
+      <div class="kcal"><div class="small-caps">Energia</div><div class="v">459<small>kcal</small></div></div>
+      <div><div class="small-caps">Proteína</div><div class="v">40,4<small>g</small></div></div>
+      <div><div class="small-caps">Carboidrato</div><div class="v">50,3<small>g</small></div></div>
+      <div><div class="small-caps">Gordura</div><div class="v">9,7<small>g</small></div></div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Alimento</th><th class="r">Peso</th><th>Medida caseira aprox.</th><th class="r">kcal</th><th class="r">Prot. (g)</th><th class="r">Carb. (g)</th><th class="r">Gord. (g)</th><th>Fonte</th></tr></thead>
+        <tbody>
+          <tr><td class="food">Frango (peito) desfiado ou moído, grelhado</td><td class="r">80 g</td><td class="home">1 filé pequeno ou 4 colheres de sopa de desfiado</td><td class="r">127</td><td class="r">25,6</td><td class="r">0,0</td><td class="r">2,0</td><td class="src">TACO</td></tr>
+          <tr><td class="food">Macarrão (peso cru)</td><td class="r">50 g</td><td class="home">≈ 115 g cozido · 1 xícara de chá</td><td class="r">186</td><td class="r">5,0</td><td class="r">39,0</td><td class="r">0,7</td><td class="src">TACO</td></tr>
+          <tr><td class="food">Extrato de tomate (molho vermelho estilo bolonhesa)</td><td class="r">15 g</td><td class="home">1 colher de sopa + água</td><td class="r">9</td><td class="r">0,4</td><td class="r">2,3</td><td class="r">0,0</td><td class="src">TACO</td></tr>
+          <tr><td class="food">Ovo</td><td class="r">50 g</td><td class="home">1 unidade</td><td class="r">73</td><td class="r">6,7</td><td class="r">0,3</td><td class="r">4,8</td><td class="src">TACO</td></tr>
+          <tr><td class="food">Mistura de legumes em cubos Swift</td><td class="r">60 g</td><td class="home">3 colheres de sopa</td><td class="r">34</td><td class="r">1,7</td><td class="r">6,6</td><td class="r">0,0</td><td class="src">Rótulo Swift</td></tr>
+          <tr><td class="food">Brócolis cozido (ou couve-flor)</td><td class="r">50 g</td><td class="home">3 ramos médios</td><td class="r">13</td><td class="r">1,1</td><td class="r">2,2</td><td class="r">0,3</td><td class="src">TACO</td></tr>
+          <tr><td class="food">Azeite para refogar o molho</td><td class="r">2 g</td><td class="home">1 fio (≈ ½ colher de chá)</td><td class="r">18</td><td class="r">0,0</td><td class="r">0,0</td><td class="r">2,0</td><td class="src">TACO</td></tr>
+        </tbody>
+        <tfoot><tr><td>Total</td><td></td><td></td><td class="r">459</td><td class="r">40,4</td><td class="r">50,3</td><td class="r">9,7</td><td></td></tr></tfoot>
+      </table>
+    </div>
+    <p class="aside"><strong>Nota.</strong> Carboidratos e proteínas equivalentes aos da opção A, com menos gordura por usar peito de frango. O macarrão está em peso cru.</p>
+  </section>
+
+  <!-- 9. Lanche da tarde -->
+  <section class="meal" aria-labelledby="t-r4">
+    <div class="meal-head">
+      <div class="big num" aria-hidden="true">04</div>
+      <div>
+        <div class="small-caps when">Refeição 04 · entre o almoço e o jantar</div>
+        <h2 id="t-r4">Lanche da tarde</h2>
+        <div class="sub">1 scoop de whey diluído em água</div>
+      </div>
+    </div>
+    <div class="macros" role="group" aria-label="Totais da refeição">
+      <div class="kcal"><div class="small-caps">Energia</div><div class="v">121<small>kcal</small></div></div>
+      <div><div class="small-caps">Proteína</div><div class="v">24,0<small>g</small></div></div>
+      <div><div class="small-caps">Carboidrato</div><div class="v">3,0<small>g</small></div></div>
+      <div><div class="small-caps">Gordura</div><div class="v">1,5<small>g</small></div></div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Alimento</th><th class="r">Peso</th><th>Medida caseira aprox.</th><th class="r">kcal</th><th class="r">Prot. (g)</th><th class="r">Carb. (g)</th><th class="r">Gord. (g)</th><th>Fonte</th></tr></thead>
+        <tbody>
+          <tr><td class="food">Whey protein concentrado (diluído em 200 ml de água)<span class="star">*</span></td><td class="r">30 g</td><td class="home">1 scoop</td><td class="r">121</td><td class="r">24,0</td><td class="r">3,0</td><td class="r">1,5</td><td class="src">Rótulo genérico (estimativa)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 10. Jantar -->
+  <section class="meal" aria-labelledby="t-r5">
+    <div class="meal-head">
+      <div class="big num" aria-hidden="true">05</div>
+      <div>
+        <div class="small-caps when">Refeição 05</div>
+        <h2 id="t-r5">Jantar</h2>
+        <div class="sub">Mesmas quantidades do almoço. Pode ser uma opção diferente da escolhida no almoço do mesmo dia.</div>
+      </div>
+    </div>
+    <div class="options two">
+      <article class="opt">
+        <div class="small-caps tag">Opção A</div>
+        <h3>Frango, arroz e feijão</h3>
+        <div class="portion">Detalhes na refeição 03, opção A</div>
+        <div class="macros compact">
+          <div class="kcal"><div class="small-caps">kcal</div><div class="v">520</div></div>
+          <div><div class="small-caps">P</div><div class="v">39,6</div></div>
+          <div><div class="small-caps">C</div><div class="v">49,4</div></div>
+          <div><div class="small-caps">G</div><div class="v">17,3</div></div>
+        </div>
+      </article>
+      <article class="opt">
+        <div class="small-caps tag">Opção B</div>
+        <h3>Macarrão com frango</h3>
+        <div class="portion">Detalhes na refeição 03, opção B</div>
+        <div class="macros compact">
+          <div class="kcal"><div class="small-caps">kcal</div><div class="v">459</div></div>
+          <div><div class="small-caps">P</div><div class="v">40,4</div></div>
+          <div><div class="small-caps">C</div><div class="v">50,3</div></div>
+          <div><div class="small-caps">G</div><div class="v">9,7</div></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- 11. Resumo diário -->
+  <section class="summary" aria-labelledby="t-sum">
+    <h2 id="t-sum">Resumo do dia</h2>
+    <p class="lead">Dia-exemplo: café da manhã, pós-treino com Nutella, almoço A, lanche da tarde e jantar A.</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Refeição</th><th class="r">kcal</th><th class="r">Prot. (g)</th><th class="r">Carb. (g)</th><th class="r">Gord. (g)</th></tr></thead>
+        <tbody>
+          <tr><td>01 · Café da manhã</td><td class="r">625</td><td class="r">27,9</td><td class="r">78,8</td><td class="r">21,4</td></tr>
+          <tr><td>02 · Pós-treino (com Nutella)</td><td class="r">264</td><td class="r">27,1</td><td class="r">23,6</td><td class="r">6,7</td></tr>
+          <tr><td>03 · Almoço (opção A)</td><td class="r">520</td><td class="r">39,6</td><td class="r">49,4</td><td class="r">17,3</td></tr>
+          <tr><td>04 · Lanche da tarde</td><td class="r">121</td><td class="r">24,0</td><td class="r">3,0</td><td class="r">1,5</td></tr>
+          <tr><td>05 · Jantar (opção A)</td><td class="r">520</td><td class="r">39,6</td><td class="r">49,4</td><td class="r">17,3</td></tr>
+        </tbody>
+        <tfoot><tr><td>Total do dia</td><td class="r">2.050</td><td class="r">158,2</td><td class="r">204,3</td><td class="r">64,1</td></tr></tfoot>
+      </table>
+    </div>
+    <div class="ranges">
+      <div>
+        <div class="small-caps">Energia, todas as combinações</div>
+        <div class="v">1.892–2.057 kcal</div>
+        <p>Carboidratos e gorduras também variam conforme as opções escolhidas.</p>
+      </div>
+      <div>
+        <div class="small-caps">Proteína</div>
+        <div class="v">158–163 g</div>
+        <p>3,3 a 3,4 g/kg por dia. Meta mínima: 76,8 g.</p>
+      </div>
+      <div>
+        <div class="small-caps">Gasto estimado</div>
+        <div class="v">~1.650–1.800 kcal</div>
+        <p>Mifflin-St Jeor, fator de atividade 1,55, idade de 20 a 35 anos. O plano fica de 5% a 25% acima: superávit compatível com ganho de massa.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12. Observações e referências -->
+  <section class="notes">
+    <div>
+      <h2>Observações</h2>
+      <ul>
+        <li>As medidas caseiras são aproximadas. Sempre que possível, pese os alimentos prontos.</li>
+        <li>Arroz, feijão, frango e legumes estão em peso preparado; o macarrão está em peso cru.</li>
+        <li>O azeite (cerca de 2 g por preparo) está contabilizado à parte. Nenhum outro óleo foi incluído.</li>
+        <li>Itens com <span class="star">*</span> usam valores genéricos de rótulo (estimativa) e devem ser trocados pelos da marca quando ela for definida.</li>
+        <li>Os totais vêm dos valores sem arredondamento; somar as linhas da tabela pode dar diferença de 0,1 g ou 1 kcal.</li>
+        <li>Alternativas (coberturas do pós-treino e opções A e B) nunca se somam entre si.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Referências</h2>
+      <ol>
+        <li>NEPA/UNICAMP. Tabela Brasileira de Composição de Alimentos – TACO. 4ª ed. Campinas, 2011.</li>
+        <li>FoRC/USP. Tabela Brasileira de Composição de Alimentos – TBCA. Versão 7.2. São Paulo, 2023.</li>
+        <li>Pinheiro ABV et al. Tabela para avaliação de consumo alimentar em medidas caseiras. 5ª ed. São Paulo: Atheneu.</li>
+        <li>Nestlé Brasil. Rótulo Farinha Láctea Nestlé Tradicional (porção 30 g = 4 colheres de sopa rasas = 121 kcal).</li>
+        <li>Ferrero. Rótulo Nutella (por 100 g: 539 kcal · P 6,3 · C 57,5 · G 30,9).</li>
+        <li>Swift. Informação nutricional da Mistura de Legumes em cubos (por 100 g: 56 kcal · P 2,9 · C 11 · G 0).</li>
+        <li>USDA FoodData Central. Peanut butter, smooth style (referência para pasta de amendoim integral).</li>
+        <li>Whey concentrado, pão de forma e creme de ricota light: médias de rótulos comerciais (estimativa).</li>
+      </ol>
+    </div>
+  </section>
+
+  <footer>
+    <span><strong>Plano de referência.</strong> Não substitui consulta individual: recomenda-se acompanhamento de nutricionista com registro no CRN.</span>
+    <span>Imagens ilustrativas: Unsplash.</span>
+  </footer>
+</main>
+</body>
+</html>

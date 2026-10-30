@@ -47,6 +47,9 @@ deploy-to-vercel | publicar o site na Vercel: preview primeiro, produção só c
 seo-audit | SEO depois que o site está no ar: não aparece no Google, tráfego caiu, SEO local, títulos (skill de terceiros, MIT, intacta) | skills/sites/seo-audit/SKILL.md (origem em ORIGEM.md)
 scroll-cinematico | animação premium que acompanha a rolagem do site (estilo páginas de produto da Apple): sequência de quadros no canvas, vídeo ligado ao scroll, CSS scroll-driven, GSAP/Lenis; caminho Blender/Remotion/IA de vídeo → ffmpeg → site; as 4 regras de composição do editor, "reduzir movimento" e desempenho; guia de IA de vídeo grátis e de GPU | skills/sites/scroll-cinematico/SKILL.md (scripts testados em scripts/; IA de vídeo em references/ia-de-video.md)
 
+[NUTRIÇÃO (skills/nutricao/): categoria nova, aguarda aprovação do Daniel]
+nutricionista-esportivo | plano alimentar de nutrição esportiva (ganho de massa, perder gordura mantendo músculo): anamnese, gasto (Mifflin-St Jeor), metas de proteína/carboidrato/gordura, TACO/TBCA/rótulos, medidas caseiras, conferência de somas, sinais de alerta e rodapé do CRN (skill nossa) | skills/nutricao/nutricionista-esportivo/SKILL.md
+
 [FERRAMENTAS DE SKILLS (skills/ferramentas-de-skills/)]
 find-skills | caçador de skills: procurar uma skill pronta no catálogo público (skills.sh, npx skills find) antes de fazer do zero; nunca instalar sem aprovação (skill de terceiros, MIT, intacta) | skills/ferramentas-de-skills/find-skills/SKILL.md (leia antes o APRENDIZADOS.md: regras nossas; origem em ORIGEM.md)
 
@@ -59,6 +62,7 @@ humanizer | tirar o jeito de IA de um texto (detectar padrões, reescrever em 5 
 combo-copy-humanizada | texto que convence e não parece de IA, em português do Brasil: primeiro copywriting, depois humanizer; também serve para roteiro de narração de vídeo | skills/combos/combo-copy-humanizada/SKILL.md
 combo-video-explicativo | vídeo explicativo/promo de app com narração, música, legendas e motion premium (usa remotion-video + voz-pt-br + trilha-e-mixagem; opcionais motion-video, ui-ux-pro-max) | skills/combos/combo-video-explicativo/SKILL.md
 combo-site-premium | fazer um site do zero com visual premium: mapa → texto → DESIGN.md e referência → shadcn → código → animação → conversão → prints → qualidade → publicar, com 5 aprovações do Daniel (usa skills/sites/ + ui-ux-pro-max, estilos-premium, frontend-design, motion-oficial, button-animation, scroll-cinematico, combo-copy-humanizada; opcionais: taste-skill, image-to-code, web-design-guidelines, MCPs de mcps-para-sites) | skills/combos/combo-site-premium/SKILL.md
+combo-plano-alimentar-html | plano alimentar numa página HTML com cara de nutricionista premium, responsiva e pronta para A4/PDF (usa nutricionista-esportivo + frontend-design, ui-ux-pro-max, web-design-guidelines, webapp-testing); modelo pronto em assets/ | skills/combos/combo-plano-alimentar-html/SKILL.md
 
 2) CONHECIMENTO E RECURSOS (ler só se a tarefa precisar)
 --------------------------------------------------------
@@ -88,6 +92,7 @@ manual de utilização do repositório (pastas, arquivos, receitas, GitHub, apro
 2b) PROJETOS (cada um tem só um PASSO-A-PASSO com o que foi feito e os caminhos das habilidades)
 --------------------------------------------------------------------------------------------------
 Rotina (vídeos do app: teaser 10 s, explicativo 60 s, promo v2/v2.1 30 s com celular 3D, promo v3 30 s com o celular todo no Blender e promo v4 30 s = celular do Blender + visual papel e tinta do v2) | projetos/rotina/PASSO-A-PASSO.md (código: branch rotina-video, pasta rotina-video/)
+Plano alimentar hipertrofia feminina (página HTML A4 de nutricionista, 5 refeições, 30/10/2026) | projetos/plano-alimentar-hipertrofia/PASSO-A-PASSO.md (página: skills/combos/combo-plano-alimentar-html/assets/)
 
 3) HABILIDADES DA PLATAFORMA (não estão no repositório; chamar pelo nome com a ferramenta Skill)
 -------------------------------------------------------------------------------------------------
