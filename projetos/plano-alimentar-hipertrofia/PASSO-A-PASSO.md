@@ -73,3 +73,8 @@ pdftoppm -r 35 -png plano.pdf pg   # miniaturas das páginas
   ```
 - Testes: `aapt2 dump badging` (nome "Minha Dieta", alvo SDK 34, mínimo 24), `dexdump` (MainActivity), página embutida aberta **sem internet** no Chromium (fonte carregou, botão voltar ok, sem erros). Sem teste em aparelho real.
 - Chave de assinatura só no container (`/root/.config/rotina/minha-dieta.jks`). Perguntado ao Daniel se quer guardar a chave para as próximas versões.
+
+## 30/10/2026: sétima rodada (Minha Dieta v2: pratos e receitas)
+
+- Mesmo arquivo `assets/minha-dieta.html` e mesmo link (versão 3 do artifact). APK `MinhaDieta-1.1.apk` (código 2) enviado no chat, mesma assinatura da 1.0.
+- Testado (390 e 1280 px): Bulking fixa na abertura e sem escolha na tela Hoje; receita "🥞 Panqueca de banana" (ovo 1,5×, banana, azeite = 197 kcal) criada dentro do café e adicionada só no dia; arroz "todos os dias" criou "Bulking 2" (padrão passou para ela); tirar prato no mesmo dia manteve "Bulking 2"; "☀️ Lanche da manhã" criado para todos os dias; Cutting editado (Ceia + prato, movida) e salvo como "Cutting 2"; 11 receitas; voltar do Android; recarregar mantém tudo; migração do formato antigo ok; sem erros.

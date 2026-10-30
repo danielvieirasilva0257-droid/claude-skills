@@ -50,3 +50,14 @@ Adendos datados. O mais novo fica embaixo.
 - **Ícone:** gerado por código (gradiente vermelho → roxo, "M" em Archivo 900 instanciada com `fontTools.varLib.instancer`), em 5 densidades.
 - **Pegadinha corrigida:** o aviso (toast) escondido com `translate` ainda aparecia atrás da barra de abas; agora some com `opacity: 0` e `visibility: hidden`.
 - **Chave de assinatura:** criada em `/root/.config/rotina/minha-dieta.jks` (senha no `.pass` ao lado), **fora do repositório**. O container é temporário: para uma atualização instalar por cima sem apagar os dados, precisa da **mesma chave**. Sem ela, é preciso desinstalar (e os dados do celular somem). Não testado em celular de verdade (sem emulador no container: não há `/dev/kvm`).
+
+## 30/10/2026: Minha Dieta v2 (pratos, receitas e versões de dieta)
+
+- **Pedido do Daniel:** a dieta do dia vem só do Plano (sem escolher na tela Hoje); o checklist é por **prato** (receita completa), não por alimento; cada seção tem um **+** no canto que abre a biblioteca (**Receitas** e **Alimentos**), onde dá para criar receita na hora; ao escolher, pergunta **"Só neste dia"** ou **"Todos os dias"**; mudar uma dieta cria **"Cutting 2"** e guarda a original; criar e tirar seções de refeição com nome e emoji.
+- **Modelo novo (v2):** `foods` (alimentos), `recipes` `{id, e, n, items:[{id, q}]}` (totais somam sozinhos), dieta → `meals:[{id, e, name, dishes:[{u, t:'r'|'f', id, q}]}]`. O `u` é a identidade do prato na seção (o checklist usa `seção:u`), e sobrevive à cópia da dieta.
+- **"Só neste dia":** o dia ganha uma cópia própria das seções (`log.meals` + `log.mealsFrom`), e a mudança vai só nela. **"Todos os dias":** muda a dieta; se ela foi criada antes de hoje, nasce uma versão nova (`nextName`: "Bulking" → "Bulking 2" → "Bulking 3"), e o plano a partir de hoje (padrão, semana, trocas de dia e registros de hoje em diante) passa a apontar para ela (`retarget`). Mudanças no mesmo dia vão na versão já criada (sem gerar "3", "4"…).
+- **Editor da aba Dietas trabalha num rascunho:** "Salvar" pergunta "Salvar como «X 2»" ou "Atualizar «X»". Seções podem ser criadas, renomeadas (emoji + nome), movidas (↑↓) e tiradas.
+- **Janela (sheet) com pilha de telas:** escolher → criar receita → escolher ingrediente → criar alimento… e volta. Antes de empilhar ou redesenhar, `syncForm()` copia o que foi digitado para o estado, senão o texto some.
+- **Migração automática** do formato antigo (v1, guardado em `minha-dieta-v1` e no banco): cada opção vira uma receita, a 1ª opção de cada refeição vira o prato da dieta, o histórico (totais) fica. Testado.
+- **APK 1.1** (código 2) com a **mesma chave** da 1.0: instala por cima e mantém os dados.
+- Telas: no celular, a linha do prato precisa de `white-space: normal` nas macros, senão a coluna do nome fica estreita; botões de escolha com texto em 2 linhas usam `flex-direction: column`; com uma janela aberta, o aviso (toast) vai para o topo.
