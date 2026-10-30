@@ -55,3 +55,10 @@ pdftoppm -r 35 -png plano.pdf pg   # miniaturas das páginas
 - O documento A4 continua em `exemplo-plano-hipertrofia-feminina.html` (artifact M4PFo65bKwjoeZ1if4yskf).
 - Testado com Playwright: café inteiro = 625 kcal; sem farinha láctea = 505 kcal e P 24,0 g; almoço B + couve-flor = 457 kcal; recarregar mantém o que foi marcado.
 - Próximo passo: o Daniel dizer se quer opções novas para café e lanche (valores a montar pela skill de nutrição).
+
+## 30/10/2026: quinta rodada (app Minha Dieta)
+
+- Arquivo: `skills/combos/combo-plano-alimentar-html/assets/minha-dieta.html`. **Publicado:** https://claude.ai/artifact/EHS5mnhRhE2aB4zDjhHVHg
+- Pedido do Daniel: refeições extras, biblioteca de alimentos com emoji (adicionar, editar, tirar), várias dietas (bulking, cutting), checklist diário, planejamento semanal e mensal, gráficos diário, semanal e mensal.
+- Testado com Playwright (390 px e 1280 px): café 626 → sem farinha 505 → extra "🥖 Pão de queijo" 625; biblioteca 21 → 23 itens; alimento adicionado no cutting com 1,5×; sábado em cutting; gráficos e calendário; recarregar mantém tudo; sem erros no console.
+- **Próximo passo:** o Daniel aprovar o app; depois gerar o APK "Minha Dieta" para Android (a mensagem dele terminou em "E um...": perguntar o resto).

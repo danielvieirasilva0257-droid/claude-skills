@@ -29,3 +29,15 @@ Adendos datados. O mais novo fica embaixo.
   - no celular a barra fixa quebrava em 2 linhas: `nowrap` e emojis escondidos abaixo de 640 px;
   - o script `scripts/montar-artifact.py` agora embute também fotos que estão em strings do JavaScript (e não repete a mesma foto).
 - **Café e lanche têm uma opção só** (é o que o plano tem). Opções novas precisam de valores da TACO/rótulo pela skill `nutricionista-esportivo` e aprovação do Daniel.
+
+## 30/10/2026: app "Minha Dieta" (várias dietas, biblioteca, semana e mês)
+
+- Arquivo: `assets/minha-dieta.html` (HTML único, JS puro). Publicado: https://claude.ai/artifact/EHS5mnhRhE2aB4zDjhHVHg
+- **5 abas** (barra fixa embaixo): Hoje (checklist do dia + refeições extras), Progresso (dia, semana e mês), Plano (dieta de cada dia da semana e calendário do mês), Dietas (criar, duplicar, editar, excluir, padrão) e Biblioteca (alimentos com emoji, porção, kcal e macros).
+- **Modelo de dados:** biblioteca `{id, e, n, por, k, p, c, g, f}`; dieta → refeições → opções → itens `{lib, q}` (q em passos de 0,5); a dieta de um dia = troca do dia > plano da semana > dieta padrão. O registro do dia guarda os totais calculados (`tot`) e a meta (`tgt`), para os gráficos não mudarem se a biblioteca mudar depois.
+- **Valores agora são a soma dos itens** (café = 626 kcal, não 625). Diferença de arredondamento; está nas observações.
+- **Cutting pré-carregado** é um **modelo** montado com os mesmos alimentos (1.363 kcal, P 139 g ≈ 2,9 g/kg). Precisa de validação da nutricionista.
+- **Emoji:** campo de texto que aceita o emoji do teclado (fica só o último grafema, `Intl.Segmenter`) + grade de ~85 emojis de comida.
+- **Gráficos (skill dataviz):** uma série por vez (kcal, P, C ou G), meta tracejada, dica ao passar ou tocar; paleta validada no fundo escuro: P `#967CEB`, C `#6236D0`, G `#D9488F` (o roxo fica abaixo de 3:1 de contraste, por isso tem rótulos e números visíveis). No celular o `viewBox` muda para 380 de largura, senão os números dos eixos ficam minúsculos.
+- **Banco:** `data/users/<id>/config` (configuração inteira em JSON) e `data/users/<id>/log-AAAA-MM` (dias do mês). Carrega o mês atual e o anterior. `localStorage` como cópia local.
+- **APK (próximo passo, aprovado só depois do "sim"):** o container tem Java 21 e Gradle 8.14, e `dl.google.com` responde; dá para baixar as command-line tools do Android e montar um app WebView com o HTML dentro (sem o banco da conta, que só existe no claude.ai: no APK salva no aparelho).
