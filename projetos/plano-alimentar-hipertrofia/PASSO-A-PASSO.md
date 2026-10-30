@@ -47,3 +47,11 @@ pdftoppm -r 35 -png plano.pdf pg   # miniaturas das páginas
 - O Daniel recusou a serifa. Pesquisadas no catálogo as skills `impeccable/typeset` e `web-typography` (lidas inteiras; não instaladas, aguardam aprovação). Notas: `research_notes/Tipografia 2026-10/skills-de-tipografia.md`.
 - Toda a tipografia virou **Archivo** (sans, bold, larga). Ajustes de tabela, cartões e impressão no `APRENDIZADOS.md` do combo.
 - Artifact atualizado (versão 2), mesmo link. PDF continua com 9 páginas.
+
+## 30/10/2026: quarta rodada (app com checklist)
+
+- Novo arquivo: `skills/combos/combo-plano-alimentar-html/assets/app-plano-alimentar.html`. Tema escuro com gradiente vermelho/roxo/lilás, emojis, opções com nome de prato, checklist por alimento, totais e gráfico ao vivo, janelas pop-up, "Zerar o dia".
+- **App publicado:** https://claude.ai/artifact/V3cMiwpprb9UeoJQsdXAgA (salva o dia na conta, privado).
+- O documento A4 continua em `exemplo-plano-hipertrofia-feminina.html` (artifact M4PFo65bKwjoeZ1if4yskf).
+- Testado com Playwright: café inteiro = 625 kcal; sem farinha láctea = 505 kcal e P 24,0 g; almoço B + couve-flor = 457 kcal; recarregar mantém o que foi marcado.
+- Próximo passo: o Daniel dizer se quer opções novas para café e lanche (valores a montar pela skill de nutrição).

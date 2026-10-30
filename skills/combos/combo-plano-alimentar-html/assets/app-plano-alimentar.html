@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Meu plano alimentar</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..900&display=swap" rel="stylesheet">
+<style>
+  /* Layout: one column app; sticky totals bar, day dashboard, 5 meal cards, bottom-sheet pop-ups. */
+  :root {
+    --black: #08060C;
+    --surface: rgba(255, 255, 255, .045);
+    --surface-2: rgba(255, 255, 255, .08);
+    --line: rgba(255, 255, 255, .10);
+    --text: #F6F3FB;
+    --text-2: #BDB4CC;
+    --text-3: #8E849F;
+    --red: #FF3B5C;
+    --purple: #8B5CF6;
+    --lilac: #CDB8FF;
+    --pink: #F472B6;
+    --grad: linear-gradient(135deg, #FF3B5C 0%, #A23BEB 55%, #8B5CF6 100%);
+    --sans: "Archivo", "Helvetica Neue", Arial, system-ui, sans-serif;
+    --r-sm: 10px; --r-md: 16px; --r-lg: 24px;
+    --ease-out: cubic-bezier(.16, 1, .3, 1);
+    --spring: cubic-bezier(.34, 1.56, .64, 1);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  html { scroll-padding-top: calc(110px + env(safe-area-inset-top, 0px)); }
+  body {
+    margin: 0; min-height: 100%;
+    color: var(--text); font-family: var(--sans); font-size: 16px; line-height: 1.5;
+    background-color: var(--black);
+    -webkit-font-smoothing: antialiased;
+  }
+  /* fixed gradient layer (background-attachment: fixed is unreliable on iOS) */
+  .bgfx {
+    position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(70% 55% at 0% 0%, rgba(139, 92, 246, .62), transparent 70%),
+      radial-gradient(60% 50% at 100% 18%, rgba(255, 59, 92, .48), transparent 70%),
+      radial-gradient(80% 60% at 50% 105%, rgba(205, 184, 255, .32), transparent 70%),
+      linear-gradient(170deg, #160A26 0%, #08060C 45%, #1C0612 100%);
+  }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--black); }
+  ::selection { background: rgba(139, 92, 246, .5); }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--lilac); outline-offset: 2px; }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding-block: 20px 96px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .num { font-variant-numeric: tabular-nums; }
+  .label { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); }
+  h1, h2, h3 { margin: 0; line-height: 1.05; letter-spacing: -.03em; text-wrap: balance; }
+
+  /* ---------- Pop button (button-animation: press .96, spring release, no transition: all) ---------- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 44px; padding: 10px 18px; border-radius: 999px; border: 1px solid var(--line);
+    background: var(--surface-2); font-weight: 700; font-size: 15px; cursor: pointer;
+    transition: transform .35s var(--spring), background-color .2s ease, border-color .2s ease;
+    touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  }
+  .btn:hover { background: rgba(255, 255, 255, .13); }
+  .btn:active { transform: scale(.94); transition-duration: .1s; }
+  .btn.primary { background: var(--grad); border-color: transparent; box-shadow: 0 8px 24px -10px rgba(255, 59, 92, .7); }
+  .btn.ghost { background: transparent; }
+  .btn.small { min-height: 36px; padding: 6px 14px; font-size: 14px; }
+  .pop { animation: pop .45s var(--spring); }
+  @keyframes pop { 0% { transform: scale(.9); } 60% { transform: scale(1.06); } 100% { transform: scale(1); } }
+
+  /* ---------- Top ---------- */
+  .top { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .top h1 { font-size: clamp(40px, 9vw, 72px); font-weight: 900; font-stretch: 118%; letter-spacing: -.045em; line-height: .9; }
+  .top h1 span { display: block; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .top .meta { color: var(--text-2); font-size: 14px; text-align: right; }
+  .top .meta strong { display: block; color: var(--text); font-size: 16px; }
+
+  /* ---------- Sticky bar ---------- */
+  .sticky {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; margin: 0 -4px 16px;
+    padding: 10px 14px; border-radius: var(--r-md);
+    background: rgba(12, 9, 18, .82); border: 1px solid var(--line);
+    backdrop-filter: saturate(160%) blur(16px); -webkit-backdrop-filter: saturate(160%) blur(16px);
+    display: flex; gap: 14px; align-items: center; flex-wrap: nowrap; overflow: hidden; white-space: nowrap; font-size: 14px; font-weight: 600;
+  }
+  .sticky .k { color: var(--red); font-weight: 800; }
+  .sticky .chip { white-space: nowrap; color: var(--text-2); }
+  .sticky .chip b { color: var(--text); }
+
+  /* ---------- Dashboard ---------- */
+  .dash { display: grid; grid-template-columns: 240px 1fr; gap: 20px; padding: 24px; border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--line); }
+  .ring { position: relative; width: 220px; height: 220px; justify-self: center; }
+  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring .bg { stroke: rgba(255, 255, 255, .08); }
+  .ring .fg { transition: stroke-dashoffset .8s var(--ease-out); }
+  .ring .center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .ring .big { font-size: 46px; font-weight: 900; font-stretch: 112%; letter-spacing: -.04em; line-height: 1; }
+  .ring .of { color: var(--text-2); font-size: 14px; margin-top: 4px; }
+  .bars { display: grid; gap: 14px; align-content: center; min-width: 0; }
+  .bar-row { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: baseline; }
+  .bar-row .name { font-weight: 700; font-size: 15px; }
+  .bar-row .val { font-size: 14px; color: var(--text-2); }
+  .bar-row .val b { color: var(--text); font-size: 18px; font-weight: 800; }
+  .track { grid-column: 1 / -1; position: relative; height: 12px; border-radius: 999px; background: rgba(255, 255, 255, .08); overflow: visible; }
+  .fill { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 999px; transition: width .8s var(--ease-out); }
+  .fill.p { background: var(--lilac); } .fill.c { background: var(--purple); } .fill.g { background: var(--pink); }
+  .marker { position: absolute; top: -5px; bottom: -5px; width: 2px; background: #fff; border-radius: 2px; }
+  .marker::after { content: attr(data-label); position: absolute; top: 18px; left: 50%; transform: translateX(-50%); font-size: 11px; color: var(--text-2); white-space: nowrap; }
+  .bar-row.has-marker { margin-bottom: 14px; }
+  .meals-done { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding-top: 16px; border-top: 1px solid var(--line); }
+  .meals-done .dot { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,.05); color: var(--text-3); font-size: 13px; font-weight: 600; transition: background-color .25s ease, color .25s ease; }
+  .meals-done .dot.on { background: rgba(139, 92, 246, .28); color: var(--text); }
+  .meals-done .dot.full { background: var(--grad); color: #fff; }
+  .meals-done .sp { margin-left: auto; }
+
+  /* ---------- Meal card ---------- */
+  .meal { margin-top: 20px; padding: 22px; border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--line); }
+  .meal-head { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; }
+  .badge { width: 56px; height: 56px; border-radius: 18px; display: grid; place-items: center; font-size: 30px; background: var(--surface-2); border: 1px solid var(--line); }
+  .meal-head .n { color: var(--lilac); font-weight: 800; font-size: 13px; letter-spacing: .06em; }
+  .meal-head h2 { font-size: clamp(22px, 4vw, 30px); font-weight: 800; }
+  .meal-head .when { color: var(--text-2); font-size: 14px; }
+  .meal-kcal { text-align: right; }
+  .meal-kcal b { display: block; font-size: 24px; font-weight: 900; font-stretch: 112%; letter-spacing: -.03em; color: var(--red); }
+  .meal-kcal span { font-size: 12px; color: var(--text-3); }
+
+  .opts { display: flex; gap: 8px; flex-wrap: wrap; margin: 18px 0 6px; }
+  .opt {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 16px 8px 12px; border-radius: 999px;
+    border: 1px solid var(--line); background: rgba(255,255,255,.04); cursor: pointer; font-weight: 700; font-size: 14px; text-align: left;
+    transition: transform .35s var(--spring), background-color .2s ease, border-color .2s ease;
+  }
+  .opt:active { transform: scale(.94); transition-duration: .1s; }
+  .opt .e { font-size: 20px; }
+  .opt small { font-weight: 500; color: var(--text-3); font-size: 12px; }
+  .opt[aria-pressed="true"] { background: var(--grad); border-color: transparent; }
+  .opt[aria-pressed="true"] small { color: rgba(255,255,255,.85); }
+  .opt-hint { font-size: 13px; color: var(--text-3); margin: 0 0 10px; }
+
+  .items { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+  .item { display: grid; grid-template-columns: auto auto 1fr auto; gap: 12px; align-items: center; padding: 10px 12px; border-radius: var(--r-md); background: rgba(255,255,255,.03); border: 1px solid transparent; transition: background-color .2s ease, border-color .2s ease, opacity .2s ease; }
+  .item.on { background: rgba(139, 92, 246, .14); border-color: rgba(205, 184, 255, .22); }
+  .item.off { opacity: .62; }
+  .item label { display: contents; cursor: pointer; }
+  .item input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .box { width: 28px; height: 28px; border-radius: 9px; border: 2px solid rgba(255,255,255,.28); display: grid; place-items: center; transition: background-color .2s ease, border-color .2s ease; cursor: pointer; }
+  .box svg { width: 16px; height: 16px; stroke: #fff; stroke-width: 3; fill: none; stroke-dasharray: 22; stroke-dashoffset: 22; transition: stroke-dashoffset .3s var(--ease-out) .05s; }
+  .item input:checked + .box { background: var(--grad); border-color: transparent; animation: pop .45s var(--spring); }
+  .item input:checked + .box svg { stroke-dashoffset: 0; }
+  .item input:focus-visible + .box { outline: 2px solid var(--lilac); outline-offset: 2px; }
+  .item .ie { font-size: 24px; width: 30px; text-align: center; }
+  .item .txt { min-width: 0; cursor: pointer; }
+  .item .nm { font-weight: 700; font-size: 15px; line-height: 1.25; }
+  .item .ms { font-size: 13px; color: var(--text-3); }
+  .item .mac { text-align: right; font-size: 12px; color: var(--text-3); white-space: nowrap; }
+  .item .mac b { display: block; font-size: 15px; color: var(--text); font-weight: 800; }
+  .star { color: var(--pink); font-weight: 800; }
+  .swap { margin-top: 4px; font-size: 12px; font-weight: 700; padding: 3px 10px; min-height: 0; border-radius: 999px; background: rgba(255,255,255,.07); border: 1px solid var(--line); cursor: pointer; transition: transform .35s var(--spring); }
+  .swap:active { transform: scale(.92); }
+
+  .meal-foot { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 16px; }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; margin-right: auto; }
+  .pill { padding: 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 700; background: rgba(255,255,255,.06); }
+  .pill i { font-style: normal; color: var(--text-3); font-weight: 600; margin-right: 4px; }
+  .pill.k { color: var(--red); } .pill.p { color: var(--lilac); } .pill.c { color: #B79BFF; } .pill.g { color: var(--pink); }
+
+  /* ---------- Sheet (pop-up) ---------- */
+  .scrim { position: fixed; inset: 0; z-index: 40; background: rgba(4, 2, 8, .6); opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+  .sheet {
+    position: fixed; z-index: 50; left: 50%; bottom: 0; width: min(720px, 100%); max-height: 88dvh; overflow: auto;
+    transform: translate(-50%, 104%); transition: transform .45s var(--spring);
+    background: #120E1A; border: 1px solid var(--line); border-bottom: 0; border-radius: 28px 28px 0 0;
+    padding: 12px max(20px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px));
+    overscroll-behavior: contain;
+  }
+  .sheet.open { transform: translate(-50%, 0); }
+  .sheet .grab { width: 44px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.2); margin: 0 auto 16px; }
+  .sheet h3 { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+  .sheet .sub { color: var(--text-2); margin: 0 0 16px; font-size: 15px; }
+  .sheet .photo { aspect-ratio: 16 / 8; max-width: 100%; border-radius: var(--r-md); overflow: hidden; background: rgba(255,255,255,.06); margin-bottom: 6px; }
+  .sheet .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .sheet .cap { font-size: 12px; color: var(--text-3); margin-bottom: 16px; }
+  .tbl-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-md); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 620px; }
+  th { text-align: left; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--text-3); font-weight: 600; padding: 10px; background: rgba(255,255,255,.05); white-space: nowrap; }
+  td { padding: 9px 10px; border-top: 1px solid var(--line); vertical-align: top; }
+  td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.src { color: var(--text-3); font-size: 12px; }
+  tfoot td { font-weight: 800; background: rgba(139, 92, 246, .16); }
+  .prep { margin: 16px 0 0; padding: 14px 16px; border-radius: var(--r-md); background: rgba(255,255,255,.05); font-size: 15px; }
+  .sheet-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap; }
+
+  /* ---------- Toast ---------- */
+  .toast {
+    position: fixed; z-index: 60; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    transform: translate(-50%, 160%); transition: transform .5s var(--spring);
+    padding: 12px 20px; border-radius: 999px; background: var(--grad); font-weight: 800; box-shadow: 0 12px 32px -12px rgba(255, 59, 92, .8);
+    white-space: nowrap; max-width: calc(100% - 32px); overflow: hidden; text-overflow: ellipsis;
+  }
+  .toast.show { transform: translate(-50%, 0); }
+
+  /* ---------- Notes ---------- */
+  .notes { margin-top: 28px; padding: 20px 22px; border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--line); }
+  .notes summary { cursor: pointer; font-weight: 800; font-size: 18px; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+  .notes summary::-webkit-details-marker { display: none; }
+  .notes summary::after { content: "＋"; color: var(--lilac); }
+  .notes[open] summary::after { content: "－"; }
+  .notes ul, .notes ol { color: var(--text-2); font-size: 14px; padding-left: 20px; margin: 14px 0 0; }
+  .notes li { margin-bottom: 6px; }
+  .notes h4 { margin: 18px 0 0; font-size: 15px; }
+  .foot { margin-top: 24px; color: var(--text-3); font-size: 13px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .sync { font-size: 12px; color: var(--text-3); }
+
+  @media (max-width: 640px) {
+    .dash { grid-template-columns: 1fr; padding: 18px; }
+    .ring { width: 190px; height: 190px; }
+    .meal { padding: 16px; }
+    .meal-head { grid-template-columns: auto 1fr; }
+    .meal-kcal { grid-column: 1 / -1; text-align: left; display: flex; gap: 8px; align-items: baseline; }
+    .meal-kcal b { display: inline; }
+    .item { grid-template-columns: auto auto 1fr; }
+    .item .mac { grid-column: 3; text-align: left; }
+    .item .mac b { display: inline; margin-right: 6px; }
+    .top .meta { text-align: left; }
+    .sticky { gap: 10px; font-size: 13px; padding: 9px 12px; }
+    .sticky .chip .ce { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+<div class="bgfx" aria-hidden="true"></div>
+<div class="wrap">
+
+  <header class="top">
+    <h1>Meu plano <span>alimentar 💪</span></h1>
+    <div class="meta"><strong id="today">Hoje</strong>Ganho de massa · 48 kg · treino 4–5×/semana</div>
+  </header>
+
+  <div class="sticky num" aria-live="polite" id="sticky"></div>
+
+  <section class="dash" aria-label="Resumo do dia">
+    <div class="ring">
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF3B5C"/><stop offset="1" stop-color="#8B5CF6"/></linearGradient></defs>
+        <circle class="bg" cx="60" cy="60" r="52" fill="none" stroke-width="12"/>
+        <circle class="fg" id="ringFg" cx="60" cy="60" r="52" fill="none" stroke="url(#rg)" stroke-width="12" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="326.73"/>
+      </svg>
+      <div class="center"><span class="label">🔥 Calorias</span><span class="big num" id="kcalNow">0</span><span class="of num" id="kcalOf">de 0 kcal</span></div>
+    </div>
+    <div class="bars" id="bars"></div>
+    <div class="meals-done" id="mealsDone"></div>
+  </section>
+
+  <main id="meals"></main>
+
+  <details class="notes">
+    <summary>📌 Observações e referências</summary>
+    <ul>
+      <li>Medidas caseiras são aproximadas. Sempre que possível, pese os alimentos prontos.</li>
+      <li>Arroz, feijão, frango e legumes estão em peso preparado; o macarrão está em peso cru.</li>
+      <li>O azeite (cerca de 2 g por preparo) está contado à parte. Nenhum outro óleo foi incluído.</li>
+      <li>Itens com <span class="star">*</span> usam valores genéricos de rótulo (estimativa) e devem ser trocados pelos da marca quando ela for definida.</li>
+      <li>As opções de cada refeição nunca se somam: escolha uma.</li>
+      <li>Com a refeição inteira marcada, o total é o oficial do plano. Somar item por item pode dar 0,1 g ou 1 kcal de diferença (arredondamento da tabela).</li>
+      <li>Meta mínima de proteína: 1,6 g/kg = 76,8 g/dia. O plano entrega 158–163 g/dia (3,3–3,4 g/kg). Gasto estimado: ~1.650–1.800 kcal/dia (Mifflin-St Jeor, fator 1,55, 20–35 anos).</li>
+    </ul>
+    <h4>Referências</h4>
+    <ol>
+      <li>NEPA/UNICAMP. Tabela Brasileira de Composição de Alimentos – TACO. 4ª ed. Campinas, 2011.</li>
+      <li>FoRC/USP. Tabela Brasileira de Composição de Alimentos – TBCA. Versão 7.2. São Paulo, 2023.</li>
+      <li>Pinheiro ABV et al. Tabela para avaliação de consumo alimentar em medidas caseiras. 5ª ed. São Paulo: Atheneu.</li>
+      <li>Nestlé Brasil. Rótulo Farinha Láctea Nestlé Tradicional (porção 30 g = 4 colheres de sopa rasas = 121 kcal).</li>
+      <li>Ferrero. Rótulo Nutella (por 100 g: 539 kcal · P 6,3 · C 57,5 · G 30,9).</li>
+      <li>Swift. Mistura de Legumes em cubos (por 100 g: 56 kcal · P 2,9 · C 11 · G 0).</li>
+      <li>USDA FoodData Central. Peanut butter, smooth style (referência para pasta de amendoim integral).</li>
+      <li>Whey concentrado, pão de forma e creme de ricota light: médias de rótulos comerciais (estimativa).</li>
+    </ol>
+  </details>
+
+  <div class="foot">
+    <span>Plano de referência. Recomenda-se acompanhamento de nutricionista com registro no CRN.</span>
+    <button class="btn small ghost" id="resetBtn" type="button">🔄 Zerar o dia</button>
+  </div>
+  <div class="sync" id="sync"></div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  // ---------- Data (values exactly as in the approved plan) ----------
+  const I = (id, e, n, w, m, k, p, c, g, f, est) => ({ id, e, n, w, m, k, p, c, g, f, est: !!est });
+  const WHEY = I('whey', '🥤', 'Whey protein concentrado (em 200 ml de água)', '30 g', '1 scoop', 121, 24.0, 3.0, 1.5, 'Rótulo genérico (estimativa)', true);
+  const PAO_FORMA = I('paoforma', '🍞', 'Pão de forma tradicional', '25 g', '1 fatia', 63, 2.2, 12.0, 0.6, 'Rótulo genérico (estimativa)', true);
+  const OVO = I('ovo', '🥚', 'Ovo', '50 g', '1 unidade', 73, 6.7, 0.3, 4.8, 'TACO');
+  const LEG = I('legumes', '🥕', 'Mistura de legumes em cubos Swift', '60 g', '3 colheres de sopa', 34, 1.7, 6.6, 0.0, 'Rótulo Swift');
+  const BROC = Object.assign(I('brocolis', '🥦', 'Brócolis cozido', '50 g', '3 ramos médios', 13, 1.1, 2.2, 0.3, 'TACO'),
+    { alt: I('couveflor', '🥬', 'Couve-flor cozida', '50 g', '3 ramos médios', 10, 0.6, 2.0, 0.2, 'TACO') });
+  const POS_PHOTO = 'https://images.unsplash.com/photo-1528945522327-7032b0774637?auto=format&fit=crop&w=1400&q=75';
+  const LUNCH_OPTS = [
+    { id: 'A', e: '🍗', name: 'Frango, arroz e feijão', photo: 'https://images.unsplash.com/photo-1762631383628-77f92d18b184?auto=format&fit=crop&w=1400&q=75', credit: 'Foto: joe boshra, Unsplash',
+      total: [520, 39.6, 49.4, 17.3], items: [
+        I('sobrecoxa', '🍗', 'Sobrecoxa de frango sem pele, assada', '80 g', '1 unidade média, sem osso', 186, 23.4, 0.0, 9.6, 'TACO'),
+        OVO,
+        I('arroz', '🍚', 'Arroz branco cozido', '100 g', '4 colheres de sopa cheias', 128, 2.5, 28.1, 0.2, 'TACO'),
+        I('feijao', '🫘', 'Feijão carioca cozido', '90 g', '1 concha média', 68, 4.3, 12.2, 0.5, 'TACO'),
+        LEG, BROC,
+        I('azeite', '🫒', 'Azeite para o preparo', '2 g', '1 fio (≈ ½ colher de chá)', 18, 0.0, 0.0, 2.0, 'TACO')] },
+    { id: 'B', e: '🍝', name: 'Macarrão com frango', photo: 'https://images.unsplash.com/photo-1676300184847-4ee4030409c0?auto=format&fit=crop&w=1400&q=75', credit: 'Foto: Orkun Orcan, Unsplash',
+      total: [459, 40.4, 50.3, 9.7], note: 'Carboidratos e proteínas equivalentes aos da opção A, com menos gordura (peito de frango). Macarrão em peso cru.', items: [
+        I('peito', '🍗', 'Peito de frango desfiado ou moído, grelhado', '80 g', '1 filé pequeno ou 4 colheres de sopa de desfiado', 127, 25.6, 0.0, 2.0, 'TACO'),
+        I('macarrao', '🍝', 'Macarrão (peso cru)', '50 g', '≈ 115 g cozido · 1 xícara de chá', 186, 5.0, 39.0, 0.7, 'TACO'),
+        I('extrato', '🍅', 'Extrato de tomate (molho estilo bolonhesa)', '15 g', '1 colher de sopa + água', 9, 0.4, 2.3, 0.0, 'TACO'),
+        OVO, LEG, BROC,
+        I('azeite', '🫒', 'Azeite para refogar o molho', '2 g', '1 fio (≈ ½ colher de chá)', 18, 0.0, 0.0, 2.0, 'TACO')] }
+  ];
+  const MEALS = [
+    { id: 'cafe', e: '🍳', n: '01', name: 'Café da manhã', when: 'Pão com ovo e mingau com banana', options: [
+      { id: 'paomingau', e: '🥖', name: 'Pão com ovo + mingau', photo: 'https://images.unsplash.com/photo-1687630433865-f86f07be989a?auto=format&fit=crop&w=1400&q=75', credit: 'Foto: Imad 786, Unsplash',
+        total: [625, 27.9, 78.8, 21.4], prep: 'Dissolver a farinha láctea no leite, aquecer mexendo até engrossar e finalizar com a banana em rodelas. Fazer os ovos em frigideira antiaderente com um fio de azeite.', items: [
+          I('pao', '🥖', 'Pão francês', '50 g', '1 unidade', 150, 4.0, 29.3, 1.6, 'TACO'),
+          I('ovos', '🍳', 'Ovos mexidos ou na chapa', '100 g', '2 unidades', 146, 13.3, 0.6, 9.5, 'TACO (ovo cozido)'),
+          I('azeite', '🫒', 'Azeite para o preparo dos ovos', '2 g', '1 fio (≈ ½ colher de chá)', 18, 0.0, 0.0, 2.0, 'TACO'),
+          I('farinha', '🥣', 'Farinha Láctea Nestlé', '30 g', '4 colheres de sopa rasas', 121, 3.9, 22.1, 1.9, 'Rótulo Nestlé'),
+          I('leite', '🥛', 'Leite integral (base do mingau)', '200 ml', '1 copo (200 ml)', 122, 5.8, 8.6, 6.4, 'TACO'),
+          I('banana', '🍌', 'Banana prata picada no mingau', '70 g', '1 unidade média, sem casca', 69, 0.9, 18.2, 0.1, 'TACO')] }] },
+    { id: 'pos', e: '🏋️', n: '02', name: 'Pós-treino', when: 'Entre o café e o almoço', options: [
+      { id: 'nutella', e: '🍫', name: 'Pão com Nutella', total: [264, 27.1, 23.6, 6.7], photo: POS_PHOTO, credit: 'Foto: Eiliv Aceron, Unsplash',
+        items: [WHEY, PAO_FORMA, I('nutella', '🍫', 'Nutella', '15 g', '1 colher de sobremesa rasa', 81, 0.9, 8.6, 4.6, 'Rótulo Ferrero')] },
+      { id: 'amendoim', e: '🥜', name: 'Pão com pasta de amendoim', total: [272, 29.9, 18.0, 9.7], photo: POS_PHOTO, credit: 'Foto: Eiliv Aceron, Unsplash',
+        items: [WHEY, PAO_FORMA, I('amendoim', '🥜', 'Pasta de amendoim integral', '15 g', '1 colher de sobremesa rasa', 88, 3.8, 3.0, 7.6, 'USDA (estimativa)', true)] },
+      { id: 'ricota', e: '🧀', name: 'Pão com creme de ricota', total: [228, 28.9, 16.2, 5.4], photo: POS_PHOTO, credit: 'Foto: Eiliv Aceron, Unsplash',
+        items: [WHEY, PAO_FORMA, I('ricota', '🧀', 'Creme de ricota light', '30 g', '2 colheres de sopa rasas', 45, 2.7, 1.2, 3.3, 'Rótulo genérico (estimativa)', true)] }] },
+    { id: 'almoco', e: '🍛', n: '03', name: 'Almoço', when: 'Escolha um prato', options: LUNCH_OPTS },
+    { id: 'lanche', e: '🥤', n: '04', name: 'Lanche da tarde', when: 'Entre o almoço e o jantar', options: [
+      { id: 'whey', e: '🥤', name: 'Shake de whey', total: [121, 24.0, 3.0, 1.5], items: [WHEY] }] },
+    { id: 'jantar', e: '🌙', n: '05', name: 'Jantar', when: 'Mesmas quantidades do almoço; pode ser outro prato', options: LUNCH_OPTS }
+  ];
+  const PROT_MIN = 76.8;
+
+  // ---------- State ----------
+  const todayKey = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  const LS = 'plano-alimentar-v1';
+  const freshState = (opts) => ({ day: todayKey(), opts: opts || {}, checked: {}, swaps: {} });
+  let state = freshState();
+  try {
+    const saved = JSON.parse(localStorage.getItem(LS) || 'null');
+    if (saved && saved.day === todayKey()) state = Object.assign(freshState(), saved);
+    else if (saved) state = freshState(saved.opts);
+  } catch (e) {}
+
+  const optOf = (m) => m.options.find(o => o.id === state.opts[m.id]) || m.options[0];
+  const key = (m, o, it) => m.id + ':' + o.id + ':' + it.id;
+  const itemOf = (m, o, it) => (it.alt && state.swaps[key(m, o, it)]) ? it.alt : it;
+
+  function mealTotals(m) {
+    const o = optOf(m);
+    let k = 0, p = 0, c = 0, g = 0, n = 0, swapped = false;
+    o.items.forEach(it => {
+      if (it.alt && state.swaps[key(m, o, it)]) swapped = true;
+      if (!state.checked[key(m, o, it)]) return;
+      const x = itemOf(m, o, it); n++;
+      k += x.k; p += x.p; c += x.c; g += x.g;
+    });
+    const all = n === o.items.length;
+    if (all && !swapped) [k, p, c, g] = o.total;
+    const plan = swapped ? o.items.reduce((a, it) => { const x = itemOf(m, o, it); return [a[0] + x.k, a[1] + x.p, a[2] + x.c, a[3] + x.g]; }, [0, 0, 0, 0]) : o.total;
+    return { now: [k, p, c, g], plan, n, of: o.items.length, all };
+  }
+
+  // ---------- Format ----------
+  const f0 = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 });
+  const f1 = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const kc = (v) => f0.format(Math.round(v));
+  const gr = (v) => f1.format(Math.round(v * 10) / 10);
+  const esc = (s) => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+
+  // ---------- Render ----------
+  const $ = (id) => document.getElementById(id);
+  const CHECK = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function renderMeal(m) {
+    const o = optOf(m), t = mealTotals(m);
+    const opts = m.options.length > 1
+      ? '<div class="opts" role="group" aria-label="Opções de ' + esc(m.name) + '">' + m.options.map(x =>
+          '<button type="button" class="opt" data-act="opt" data-meal="' + m.id + '" data-opt="' + x.id + '" aria-pressed="' + (x.id === o.id) + '"><span class="e">' + x.e + '</span><span>' + esc(x.name) + '<br><small class="num">' + kc(x.total[0]) + ' kcal · P ' + gr(x.total[1]) + ' g</small></span></button>').join('') + '</div>'
+        + '<p class="opt-hint">As opções não se somam: marque uma.</p>'
+      : '<div class="opts"><span class="opt" aria-pressed="true" style="cursor:default"><span class="e">' + o.e + '</span><span>' + esc(o.name) + '</span></span></div>';
+    const items = o.items.map(it => {
+      const k = key(m, o, it), x = itemOf(m, o, it), on = !!state.checked[k];
+      const swap = it.alt ? '<br><button type="button" class="swap" data-act="swap" data-meal="' + m.id + '" data-item="' + it.id + '">🔄 Trocar por ' + esc((state.swaps[k] ? it : it.alt).n.split(' ')[0].toLowerCase()) + '</button>' : '';
+      return '<li class="item ' + (on ? 'on' : 'off') + '"><label for="' + k + '"><input type="checkbox" id="' + k + '" data-act="check" data-meal="' + m.id + '" data-item="' + it.id + '"' + (on ? ' checked' : '') + '><span class="box" aria-hidden="true">' + CHECK + '</span><span class="ie" aria-hidden="true">' + x.e + '</span>'
+        + '<span class="txt"><span class="nm">' + esc(x.n) + (x.est ? '<span class="star">*</span>' : '') + '</span><br><span class="ms">' + esc(x.w) + ' · ' + esc(x.m) + '</span></span></label>'
+        + '<span class="mac num"><b>' + kc(x.k) + ' kcal</b>P ' + gr(x.p) + ' · C ' + gr(x.c) + ' · G ' + gr(x.g) + swap + '</span></li>';
+    }).join('');
+    return '<article class="meal" id="m-' + m.id + '">'
+      + '<div class="meal-head"><div class="badge" aria-hidden="true">' + m.e + '</div><div><div class="n">REFEIÇÃO ' + m.n + '</div><h2>' + esc(m.name) + '</h2><div class="when">' + esc(m.when) + '</div></div>'
+      + '<div class="meal-kcal num"><b>' + kc(t.now[0]) + '</b><span>de ' + kc(t.plan[0]) + ' kcal · ' + t.n + '/' + t.of + ' itens</span></div></div>'
+      + opts + '<ul class="items">' + items + '</ul>'
+      + '<div class="meal-foot"><div class="pills num"><span class="pill k"><i>kcal</i>' + kc(t.now[0]) + '</span><span class="pill p"><i>P</i>' + gr(t.now[1]) + ' g</span><span class="pill c"><i>C</i>' + gr(t.now[2]) + ' g</span><span class="pill g"><i>G</i>' + gr(t.now[3]) + ' g</span></div>'
+      + '<button type="button" class="btn small" data-act="details" data-meal="' + m.id + '">📋 Detalhes</button>'
+      + '<button type="button" class="btn small ' + (t.all ? '' : 'primary') + '" data-act="all" data-meal="' + m.id + '">' + (t.all ? '↩️ Desmarcar' : '✅ Comi tudo') + '</button></div>'
+      + '</article>';
+  }
+
+  function renderDash() {
+    let now = [0, 0, 0, 0], plan = [0, 0, 0, 0];
+    const done = MEALS.map(m => { const t = mealTotals(m); for (let i = 0; i < 4; i++) { now[i] += t.now[i]; plan[i] += t.plan[i]; } return t; });
+    const C = 326.73, pct = plan[0] ? Math.min(now[0] / plan[0], 1) : 0;
+    $('ringFg').setAttribute('stroke-dashoffset', String(C * (1 - pct)));
+    $('kcalNow').textContent = kc(now[0]);
+    $('kcalOf').textContent = 'de ' + kc(plan[0]) + ' kcal';
+    const rows = [
+      ['p', '💪 Proteína', 1], ['c', '⚡ Carboidrato', 2], ['g', '🥑 Gordura', 3]
+    ].map(([cls, label, i]) => {
+      const max = Math.max(plan[i], now[i]) || 1;
+      const marker = cls === 'p' ? '<span class="marker" style="left:' + Math.min(PROT_MIN / max * 100, 100) + '%" data-label="mínimo 76,8 g"></span>' : '';
+      return '<div class="bar-row' + (marker ? ' has-marker' : '') + '"><span class="name">' + label + '</span><span class="val num"><b>' + gr(now[i]) + '</b> / ' + gr(plan[i]) + ' g</span>'
+        + '<div class="track"><div class="fill ' + cls + '" style="width:' + (now[i] / max * 100) + '%"></div>' + marker + '</div></div>';
+    }).join('');
+    $('bars').innerHTML = rows;
+    const full = done.filter(t => t.all).length;
+    $('mealsDone').innerHTML = MEALS.map((m, i) => '<span class="dot ' + (done[i].all ? 'full' : done[i].n ? 'on' : '') + '">' + m.e + ' ' + esc(m.name) + '</span>').join('')
+      + '<span class="sp label num">' + full + '/5 refeições</span>';
+    $('sticky').innerHTML = '<span class="k">🔥 ' + kc(now[0]) + ' / ' + kc(plan[0]) + ' kcal</span><span class="chip"><span class="ce">💪 </span>P <b>' + gr(now[1]) + '</b> g</span><span class="chip"><span class="ce">⚡ </span>C <b>' + gr(now[2]) + '</b> g</span><span class="chip"><span class="ce">🥑 </span>G <b>' + gr(now[3]) + '</b> g</span>';
+    return full;
+  }
+
+  function render() {
+    $('meals').innerHTML = MEALS.map(renderMeal).join('');
+    renderDash();
+  }
+
+  const d = new Date();
+  $('today').textContent = d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }).replace(/^./, s => s.toUpperCase());
+
+  // ---------- Toast ----------
+  let toastT;
+  function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200); }
+
+  // ---------- Sheet ----------
+  let lastFocus = null;
+  function openSheet(html) {
+    const s = $('sheet'); lastFocus = document.activeElement;
+    s.innerHTML = '<div class="grab"></div>' + html; s.hidden = false;
+    requestAnimationFrame(() => { s.classList.add('open'); $('scrim').classList.add('open'); const b = s.querySelector('button'); if (b) b.focus({ preventScroll: true }); });
+  }
+  function closeSheet() {
+    const s = $('sheet'); s.classList.remove('open'); $('scrim').classList.remove('open');
+    setTimeout(() => { if (!s.classList.contains('open')) s.hidden = true; }, 450);
+    if (lastFocus) lastFocus.focus({ preventScroll: true });
+  }
+  $('scrim').addEventListener('click', closeSheet);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('sheet').classList.contains('open')) closeSheet(); });
+
+  function detailsHtml(m) {
+    const o = optOf(m);
+    const rows = o.items.map(it => { const x = itemOf(m, o, it); return '<tr><td>' + x.e + ' ' + esc(x.n) + (x.est ? '<span class="star">*</span>' : '') + '</td><td class="r">' + esc(x.w) + '</td><td>' + esc(x.m) + '</td><td class="r">' + kc(x.k) + '</td><td class="r">' + gr(x.p) + '</td><td class="r">' + gr(x.c) + '</td><td class="r">' + gr(x.g) + '</td><td class="src">' + esc(x.f) + '</td></tr>'; }).join('');
+    const t = mealTotals(m).plan;
+    return '<h3 id="sheetTitle">' + m.e + ' ' + esc(m.name) + ': ' + esc(o.name) + '</h3><p class="sub">' + esc(m.when) + '</p>'
+      + (o.photo ? '<div class="photo"><img src="' + o.photo + '" alt="' + esc(o.name) + ' (imagem ilustrativa)" width="1400" height="700" loading="lazy" onerror="this.remove()"></div><div class="cap">Imagem ilustrativa. ' + esc(o.credit) + '.</div>' : '')
+      + '<div class="tbl-wrap"><table><thead><tr><th>Alimento</th><th class="r">Peso</th><th>Medida caseira</th><th class="r">kcal</th><th class="r">P (g)</th><th class="r">C (g)</th><th class="r">G (g)</th><th>Fonte</th></tr></thead><tbody>' + rows + '</tbody>'
+      + '<tfoot><tr><td>Total</td><td></td><td></td><td class="r">' + kc(t[0]) + '</td><td class="r">' + gr(t[1]) + '</td><td class="r">' + gr(t[2]) + '</td><td class="r">' + gr(t[3]) + '</td><td></td></tr></tfoot></table></div>'
+      + (o.prep ? '<p class="prep">👩‍🍳 <b>Preparo.</b> ' + esc(o.prep) + '</p>' : '')
+      + (o.note ? '<p class="prep">💡 ' + esc(o.note) + '</p>' : '')
+      + '<div class="sheet-actions"><button type="button" class="btn" data-act="close">Fechar</button></div>';
+  }
+
+  // ---------- Events ----------
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-act]'); if (!b || b.dataset.act === 'check') return;
+    const m = MEALS.find(x => x.id === b.dataset.meal);
+    switch (b.dataset.act) {
+      case 'opt': state.opts[m.id] = b.dataset.opt; commit(); focusAfter('[data-act="opt"][data-meal="' + m.id + '"][data-opt="' + b.dataset.opt + '"]'); toast(optOf(m).e + ' ' + m.name + ': ' + optOf(m).name); break;
+      case 'swap': { const o = optOf(m); const k = m.id + ':' + o.id + ':' + b.dataset.item; state.swaps[k] = !state.swaps[k]; commit(); focusAfter('[data-act="swap"][data-meal="' + m.id + '"]'); break; }
+      case 'all': { const o = optOf(m), t = mealTotals(m); o.items.forEach(it => { state.checked[key(m, o, it)] = !t.all; }); commit(); focusAfter('[data-act="all"][data-meal="' + m.id + '"]', true); if (!t.all) toast('✅ ' + m.name + ' registrado!'); break; }
+      case 'details': openSheet(detailsHtml(m)); break;
+      case 'close': closeSheet(); break;
+      case 'reset-yes': state = freshState(state.opts); commit(); closeSheet(); toast('🔄 Dia zerado'); break;
+    }
+  });
+  document.addEventListener('change', e => {
+    const b = e.target.closest('[data-act="check"]'); if (!b) return;
+    const m = MEALS.find(x => x.id === b.dataset.meal), o = optOf(m);
+    const k = m.id + ':' + o.id + ':' + b.dataset.item;
+    state.checked[k] = b.checked;
+    const nowAll = mealTotals(m).all;
+    commit(); focusAfter('#' + CSS.escape(k));
+    if (b.checked && nowAll) toast('✅ ' + m.name + ' completo!');
+  });
+  $('resetBtn').addEventListener('click', () => openSheet('<h3 id="sheetTitle">🔄 Zerar o dia?</h3><p class="sub">Todos os itens marcados hoje voltam a ficar em branco. As opções escolhidas continuam.</p><div class="sheet-actions"><button type="button" class="btn" data-act="close">Cancelar</button><button type="button" class="btn primary" data-act="reset-yes">Zerar o dia</button></div>'));
+
+  function focusAfter(sel, pop) {
+    const el = document.querySelector(sel);
+    if (el) { el.focus({ preventScroll: true }); if (pop) { el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); } }
+  }
+
+  // ---------- Persistence: localStorage now, private db doc when the viewer has it ----------
+  let dbDoc = null, saving = false, dirty = false, saveT;
+  function commit() {
+    render();
+    try { localStorage.setItem(LS, JSON.stringify(state)); } catch (e) {}
+    if (dbDoc) { dirty = true; clearTimeout(saveT); saveT = setTimeout(flush, 700); }
+  }
+  async function flush() {
+    if (!dbDoc || saving || !dirty) return;
+    saving = true; dirty = false;
+    try { await dbDoc.set({ day: state.day, opts: state.opts, checked: state.checked, swaps: state.swaps, updatedAt: new Date().toISOString() }); $('sync').textContent = '☁️ Salvo na sua conta'; }
+    catch (e) { $('sync').textContent = 'Não foi possível salvar na conta agora; ficou salvo neste aparelho.'; }
+    saving = false;
+    if (dirty) flush();
+  }
+  async function connect() {
+    if (!window.claude || typeof window.claude.use !== 'function') return;
+    const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+    if (!db || !user) return;
+    let uid;
+    try { uid = await user.id(); } catch (e) { return; }
+    if (!uid) return;
+    const ref = db.doc('data/users/' + uid + '/' + state.day);
+    const timer = setTimeout(() => { $('sync').textContent = 'Conta demorando a responder; salvando neste aparelho.'; }, 10000);
+    try {
+      const snap = await ref.get();
+      clearTimeout(timer);
+      if (snap.exists) {
+        const v = snap.data() || {};
+        state = { day: state.day, opts: v.opts || state.opts, checked: v.checked || {}, swaps: v.swaps || {} };
+        render();
+        try { localStorage.setItem(LS, JSON.stringify(state)); } catch (e) {}
+      }
+      dbDoc = ref;
+      $('sync').textContent = '☁️ Sincronizado com a sua conta';
+    } catch (e) { clearTimeout(timer); $('sync').textContent = 'Salvando só neste aparelho.'; }
+  }
+
+  render();
+  connect();
+})();
+</script>
+</body>
+</html>
