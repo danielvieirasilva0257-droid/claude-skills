@@ -41,3 +41,12 @@ Adendos datados. O mais novo fica embaixo.
 - **Gráficos (skill dataviz):** uma série por vez (kcal, P, C ou G), meta tracejada, dica ao passar ou tocar; paleta validada no fundo escuro: P `#967CEB`, C `#6236D0`, G `#D9488F` (o roxo fica abaixo de 3:1 de contraste, por isso tem rótulos e números visíveis). No celular o `viewBox` muda para 380 de largura, senão os números dos eixos ficam minúsculos.
 - **Banco:** `data/users/<id>/config` (configuração inteira em JSON) e `data/users/<id>/log-AAAA-MM` (dias do mês). Carrega o mês atual e o anterior. `localStorage` como cópia local.
 - **APK (próximo passo, aprovado só depois do "sim"):** o container tem Java 21 e Gradle 8.14, e `dl.google.com` responde; dá para baixar as command-line tools do Android e montar um app WebView com o HTML dentro (sem o banco da conta, que só existe no claude.ai: no APK salva no aparelho).
+
+## 30/10/2026: APK "Minha Dieta" para Android
+
+- Gerado **sem Gradle e sem Android Studio**: `scripts/apk/build.sh <página.html> <pasta>` usa `aapt2` + `javac --release 11` + `d8` + `zipalign` + `apksigner` (build-tools 34 e platform android-34 baixados de `dl.google.com/android/repository/`: `platform-34-ext7_r03.zip` e `build-tools_r34-linux.zip`, ~60 MB cada, descompactados em `/root/android/`). Leva uns 30 s.
+- O app é uma `WebView` que abre `file:///android_asset/index.html`: **funciona sem internet** e **sem permissão nenhuma** (nem INTERNET). As fontes Archivo (latin e latin-ext, woff2) vão dentro do APK (`prepare_assets.py` troca o link do Google Fonts por `@font-face` local). Os dados ficam no `localStorage` da WebView (só no celular; o banco da conta só existe no claude.ai).
+- **Botão voltar do Android:** a página expõe `window.__mdBack()` (fecha a janela aberta → sai do editor de dieta → volta para a aba Hoje → senão o app fecha).
+- **Ícone:** gerado por código (gradiente vermelho → roxo, "M" em Archivo 900 instanciada com `fontTools.varLib.instancer`), em 5 densidades.
+- **Pegadinha corrigida:** o aviso (toast) escondido com `translate` ainda aparecia atrás da barra de abas; agora some com `opacity: 0` e `visibility: hidden`.
+- **Chave de assinatura:** criada em `/root/.config/rotina/minha-dieta.jks` (senha no `.pass` ao lado), **fora do repositório**. O container é temporário: para uma atualização instalar por cima sem apagar os dados, precisa da **mesma chave**. Sem ela, é preciso desinstalar (e os dados do celular somem). Não testado em celular de verdade (sem emulador no container: não há `/dev/kvm`).

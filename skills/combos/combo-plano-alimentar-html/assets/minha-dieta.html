@@ -223,8 +223,8 @@
   .sheet .grab { width: 44px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.2); margin: 0 auto 16px; }
   .sheet h3 { font-size: 24px; font-weight: 800; margin-bottom: 14px; }
   .sheet-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap; }
-  .toast { position: fixed; z-index: 60; left: 50%; bottom: calc(var(--tabbar) + 16px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 260%); transition: transform .5s var(--spring); padding: 12px 20px; border-radius: 999px; background: var(--grad); font-weight: 800; box-shadow: 0 12px 32px -12px rgba(255,59,92,.8); white-space: nowrap; max-width: calc(100% - 32px); overflow: hidden; text-overflow: ellipsis; }
-  .toast.show { transform: translate(-50%, 0); }
+  .toast { position: fixed; z-index: 60; left: 50%; bottom: calc(var(--tabbar) + 16px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 40px); opacity: 0; visibility: hidden; transition: transform .5s var(--spring), opacity .2s ease, visibility 0s linear .5s; padding: 12px 20px; border-radius: 999px; background: var(--grad); font-weight: 800; box-shadow: 0 12px 32px -12px rgba(255,59,92,.8); white-space: nowrap; max-width: calc(100% - 32px); overflow: hidden; text-overflow: ellipsis; }
+  .toast.show { transform: translate(-50%, 0); opacity: 1; visibility: visible; transition: transform .5s var(--spring), opacity .2s ease, visibility 0s; }
   .sync { font-size: 12px; color: var(--text-3); margin-top: 16px; text-align: center; }
 
   @media (max-width: 640px) {
@@ -775,6 +775,14 @@
   document.addEventListener('pointerover', e => { const h = e.target.closest && e.target.closest('.hit'); if (h) showTip(h); });
   document.addEventListener('pointerdown', e => { const h = e.target.closest && e.target.closest('.hit'); if (h) showTip(h); else document.querySelectorAll('.tip').forEach(t => t.remove()); });
   document.addEventListener('pointerout', e => { if (e.target.closest && e.target.closest('.chart') && !(e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('.chart'))) document.querySelectorAll('.tip').forEach(t => t.remove()); });
+
+  // Android back button (APK wrapper calls this; returns true when handled)
+  window.__mdBack = () => {
+    if ($('sheet').classList.contains('open')) { closeSheet(); return true; }
+    if (ui.tab === 'dietas' && ui.editDiet) { ui.editDiet = null; render(); return true; }
+    if (ui.tab !== 'hoje') { ui.tab = 'hoje'; render(); window.scrollTo({ top: 0 }); return true; }
+    return false;
+  };
 
   const mq = window.matchMedia('(max-width: 639px)');
   (mq.addEventListener ? mq.addEventListener.bind(mq, 'change') : mq.addListener.bind(mq))(() => { if (ui.tab === 'progresso') render(); });

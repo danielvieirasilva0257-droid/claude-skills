@@ -62,3 +62,14 @@ pdftoppm -r 35 -png plano.pdf pg   # miniaturas das páginas
 - Pedido do Daniel: refeições extras, biblioteca de alimentos com emoji (adicionar, editar, tirar), várias dietas (bulking, cutting), checklist diário, planejamento semanal e mensal, gráficos diário, semanal e mensal.
 - Testado com Playwright (390 px e 1280 px): café 626 → sem farinha 505 → extra "🥖 Pão de queijo" 625; biblioteca 21 → 23 itens; alimento adicionado no cutting com 1,5×; sábado em cutting; gráficos e calendário; recarregar mantém tudo; sem erros no console.
 - **Próximo passo:** o Daniel aprovar o app; depois gerar o APK "Minha Dieta" para Android (a mensagem dele terminou em "E um...": perguntar o resto).
+
+## 30/10/2026: sexta rodada (APK para a Ana)
+
+- APK `MinhaDieta.apk` (versão 1.0, código 1, pacote `com.minhadieta.app`, Android 7 ou mais novo, 233 KB) enviado no chat. Não fica no repositório; para gerar de novo:
+  ```bash
+  # baixar uma vez: platform-34-ext7_r03.zip e build-tools_r34-linux.zip em /root/android/{platform,bt}
+  skills/combos/combo-plano-alimentar-html/scripts/apk/build.sh skills/combos/combo-plano-alimentar-html/assets/minha-dieta.html /tmp/saida
+  VERSION_CODE=2 VERSION_NAME=1.1 ...   # numa atualização
+  ```
+- Testes: `aapt2 dump badging` (nome "Minha Dieta", alvo SDK 34, mínimo 24), `dexdump` (MainActivity), página embutida aberta **sem internet** no Chromium (fonte carregou, botão voltar ok, sem erros). Sem teste em aparelho real.
+- Chave de assinatura só no container (`/root/.config/rotina/minha-dieta.jks`). Perguntado ao Daniel se quer guardar a chave para as próximas versões.
