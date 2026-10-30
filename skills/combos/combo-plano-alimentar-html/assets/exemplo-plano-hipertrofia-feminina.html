@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#F7F4EE">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..900&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #F7F4EE;
@@ -21,8 +21,11 @@
     --gold: #B08D57;
     --ink: #2B2E2A;
     --ink-soft: #5D615A;
-    --serif: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
-    --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    /* Type system: one family (Archivo), roles split by weight + width.
+       Scale 1.25 from 16px: 12 · 13 · 14 · 16 · 20 · 25 · 31 · 39 · 49 · 61 · 76 · 95 · 119 */
+    --sans: "Archivo", "Helvetica Neue", Arial, system-ui, sans-serif;
+    --serif: var(--sans); /* legacy alias: every role is Archivo now */
+    --display-wdth: 118%;
     --radius: 6px;
     color-scheme: light;
   }
@@ -36,6 +39,8 @@
     font-family: var(--sans);
     font-size: 16px;
     line-height: 1.6;
+    font-feature-settings: "tnum" 0;
+    -webkit-font-smoothing: antialiased;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
@@ -44,11 +49,15 @@
 
   .doc { max-width: 960px; margin: 0 auto; padding-block: 56px 72px; padding-left: max(32px, env(safe-area-inset-left, 0px)); padding-right: max(32px, env(safe-area-inset-right, 0px)); }
 
-  h1, h2, h3 { font-family: var(--serif); font-weight: 500; line-height: 1.1; margin: 0; text-wrap: balance; }
-  p { margin: 0 0 .75em; }
+  h1, h2, h3 { font-family: var(--sans); font-weight: 700; line-height: 1.1; letter-spacing: -.02em; margin: 0; text-wrap: balance; }
+  p { margin: 0 0 .75em; text-wrap: pretty; }
+  /* display role: heavy, expanded, tight */
+  .display, .masthead h1, .meal-head .big, .timeline .n, .protein .fig, .macros .v, .ranges .v {
+    font-weight: 800; font-stretch: var(--display-wdth); letter-spacing: -.035em; font-variant-numeric: tabular-nums lining-nums;
+  }
   .num { font-variant-numeric: tabular-nums lining-nums; }
   .small-caps {
-    font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+    font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
     font-weight: 600; color: var(--ink-soft);
   }
 
@@ -57,10 +66,10 @@
     display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end;
     padding-bottom: 28px; border-bottom: 1px solid var(--line);
   }
-  .masthead h1 { font-size: clamp(48px, 9vw, 88px); letter-spacing: -.03em; }
-  .masthead .goal { font-family: var(--serif); font-size: clamp(20px, 3vw, 28px); font-style: italic; color: var(--sage-dark); margin-top: 6px; }
-  .masthead .meta { text-align: right; font-size: 13px; color: var(--ink-soft); }
-  .masthead .meta strong { display: block; color: var(--gold); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; font-size: 11px; margin-bottom: 4px; }
+  .masthead h1 { font-size: clamp(56px, 12.5vw, 119px); line-height: .86; letter-spacing: -.045em; font-weight: 900; }
+  .masthead .goal { font-size: clamp(20px, 2.6vw, 25px); font-weight: 600; letter-spacing: -.01em; color: var(--sage-dark); margin-top: 20px; }
+  .masthead .meta { text-align: right; font-size: 14px; line-height: 1.5; color: var(--ink-soft); }
+  .masthead .meta strong { display: block; color: var(--ink); font-weight: 700; font-size: 16px; margin-bottom: 2px; }
 
   /* ---------- 2. ID strip ---------- */
   .idstrip {
@@ -70,18 +79,18 @@
   .idstrip div { padding: 16px 20px; }
   .idstrip div + div { border-left: 1px solid var(--line); }
   .idstrip dt { margin: 0 0 2px; }
-  .idstrip dd { margin: 0; font-family: var(--serif); font-size: 26px; font-weight: 500; }
-  .idnote { font-size: 12.5px; color: var(--ink-soft); margin: 8px 2px 0; }
+  .idstrip dd { margin: 0; font-size: clamp(20px, 2.4vw, 25px); white-space: nowrap; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: lining-nums; }
+  .idnote { font-size: 13px; color: var(--ink-soft); margin: 8px 2px 0; }
 
   /* ---------- 3. Protein target ---------- */
   .protein {
     margin-top: 40px; padding: 32px; background: var(--sage-light); border-radius: var(--radius);
     display: grid; grid-template-columns: 1fr 1fr; gap: 28px 40px;
   }
-  .protein h2 { grid-column: 1 / -1; font-size: 30px; }
-  .protein .fig { font-family: var(--serif); font-size: 64px; line-height: 1; font-weight: 500; }
-  .protein .fig small { font-size: 26px; margin-left: 4px; }
-  .protein .lbl { font-size: 13.5px; color: var(--ink-soft); margin-top: 6px; }
+  .protein h2 { grid-column: 1 / -1; font-size: 31px; }
+  .protein .fig { font-size: 76px; line-height: .9; }
+  .protein .fig small { font-size: 20px; font-weight: 600; font-stretch: 100%; letter-spacing: 0; margin-left: 6px; }
+  .protein .lbl { font-size: 14px; color: var(--ink-soft); margin-top: 6px; }
   .protein .delivered .fig { color: var(--sage-dark); }
   .pbar { grid-column: 1 / -1; }
   .pbar .track { position: relative; height: 10px; background: var(--paper); border-radius: 5px; border: 1px solid var(--line); }
@@ -89,21 +98,21 @@
   .pbar .mark { position: absolute; top: -6px; bottom: -6px; left: 47.1%; width: 2px; background: var(--gold); }
   .pbar .scale { position: relative; height: 20px; font-size: 12px; color: var(--ink-soft); margin-top: 8px; }
   .pbar .scale span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
-  .protein .note { grid-column: 1 / -1; font-size: 13.5px; margin: 0; }
+  .protein .note { grid-column: 1 / -1; font-size: 14px; margin: 0; max-width: 65ch; }
 
   /* ---------- 4. Timeline ---------- */
   .timeline { margin-top: 56px; }
-  .section-title { font-size: 34px; margin-bottom: 20px; }
+  .section-title { font-size: 39px; letter-spacing: -.03em; margin-bottom: 24px; }
   .timeline ol { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(5, 1fr); position: relative; }
   .timeline ol::before { content: ""; position: absolute; left: 0; right: 0; top: 22px; height: 1px; background: var(--line); }
   .timeline li { position: relative; padding-right: 12px; }
   .timeline .n {
-    display: inline-block; font-family: var(--serif); font-size: 40px; line-height: 44px; font-weight: 500;
+    display: inline-block; font-size: 39px; line-height: 44px;
     background: var(--bg); padding-right: 10px; position: relative; color: var(--sage-dark);
   }
-  .timeline .t { font-weight: 600; font-size: 14.5px; margin-top: 8px; }
-  .timeline .d { font-size: 13px; color: var(--ink-soft); line-height: 1.45; }
-  .timeline .k { font-size: 13px; color: var(--gold); font-weight: 600; margin-top: 6px; }
+  .timeline .t { font-weight: 700; font-size: 16px; letter-spacing: -.01em; margin-top: 10px; }
+  .timeline .d { font-size: 14px; color: var(--ink-soft); line-height: 1.45; margin-top: 2px; }
+  .timeline .k { font-size: 14px; color: var(--sage-dark); font-weight: 700; margin-top: 8px; font-variant-numeric: tabular-nums; }
 
   /* ---------- Meal sections ---------- */
   .meal {
@@ -111,10 +120,10 @@
     padding: 40px;
   }
   .meal-head { display: grid; grid-template-columns: auto 1fr; gap: 0 24px; align-items: end; margin-bottom: 28px; }
-  .meal-head .big { font-family: var(--serif); font-size: 112px; line-height: .8; font-weight: 400; color: var(--sage); }
+  .meal-head .big { font-size: 119px; line-height: .78; font-weight: 900; color: var(--sage); }
   .meal-head .when { color: var(--gold); }
-  .meal-head h2 { font-size: clamp(32px, 5vw, 44px); margin-top: 4px; }
-  .meal-head .sub { color: var(--ink-soft); font-size: 14.5px; margin-top: 6px; }
+  .meal-head h2 { font-size: clamp(31px, 5vw, 49px); line-height: 1; letter-spacing: -.035em; font-weight: 800; margin-top: 6px; }
+  .meal-head .sub { color: var(--ink-soft); font-size: 16px; margin-top: 10px; max-width: 60ch; }
 
   figure { margin: 0 0 28px; }
   .photo {
@@ -122,7 +131,7 @@
     display: flex; align-items: center; justify-content: center; color: var(--ink-soft); font-size: 13px;
   }
   .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  figcaption { font-size: 12px; color: var(--ink-soft); margin-top: 8px; }
+  figcaption { font-size: 13px; color: var(--ink-soft); margin-top: 8px; }
   figcaption a { color: inherit; }
 
   /* Macro block: kcal + P/C/G, 4 columns */
@@ -131,45 +140,46 @@
   .macros > div + div { border-left: 1px solid var(--line); }
   .macros .kcal { background: var(--sage-dark); color: #fff; }
   .macros .kcal .small-caps { color: #D9E1D5; }
-  .macros .v { font-family: var(--serif); font-size: 40px; line-height: 1.05; font-weight: 500; font-variant-numeric: lining-nums tabular-nums; }
-  .macros .v small { font-family: var(--sans); font-size: 13px; font-weight: 500; margin-left: 3px; }
-  .macros.compact .v { font-size: 30px; }
+  .macros .v { font-size: 39px; line-height: 1; margin-top: 6px; }
+  .macros .v small { font-size: 14px; font-weight: 600; font-stretch: 100%; letter-spacing: 0; margin-left: 4px; }
+  .macros.compact .v { font-size: 31px; }
   .macros.compact > div { padding: 12px 14px; }
 
   /* Tables */
   .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 0 16px; border: 1px solid var(--line); border-radius: var(--radius); }
-  table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 720px; }
-  caption { text-align: left; padding: 14px 16px 10px; font-family: var(--serif); font-size: 20px; font-weight: 500; caption-side: top; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.4; min-width: 720px; }
+  caption { text-align: left; padding: 14px 16px 10px; font-size: 20px; font-weight: 700; letter-spacing: -.02em; caption-side: top; }
   th {
-    font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; color: var(--ink-soft);
-    text-align: left; padding: 10px 12px; background: var(--beige); border-bottom: 1px solid var(--line); white-space: nowrap;
+    font-size: 11.5px; letter-spacing: .04em; text-transform: uppercase; font-weight: 600; color: var(--ink-soft);
+    text-align: left; padding: 10px 10px; background: var(--beige); border-bottom: 1px solid var(--line); white-space: nowrap;
   }
-  td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td { padding: 10px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
   tbody tr:nth-child(even) td { background: #FBF8F2; }
   tr { break-inside: avoid; }
-  .r { text-align: right; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
-  td.src { font-size: 12px; color: var(--ink-soft); }
-  td.food { font-weight: 500; min-width: 180px; }
+  .r { text-align: right; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; font-weight: 500; }
+  td.src { min-width: 92px; font-size: 13px; color: var(--ink-soft); }
+  td.food { font-weight: 600; min-width: 150px; }
   td.home { color: var(--ink-soft); }
-  tfoot td { background: var(--sage-light); font-weight: 600; border-bottom: 0; border-top: 2px solid var(--sage); }
+  tfoot td { background: var(--sage-light); font-weight: 800; border-bottom: 0; border-top: 2px solid var(--sage); }
   .star { color: var(--gold); font-weight: 600; }
 
-  .aside { border-left: 2px solid var(--gold); padding: 2px 0 2px 16px; margin: 20px 0 0; font-size: 14px; }
-  .aside strong { font-weight: 600; }
+  .aside { border-left: 2px solid var(--gold); padding: 2px 0 2px 16px; margin: 20px 0 0; font-size: 16px; max-width: 70ch; }
+  .aside strong { font-weight: 700; }
 
-  .sub-title { font-family: var(--serif); font-size: 24px; font-weight: 500; margin: 32px 0 6px; }
-  .sub-lead { font-size: 14px; color: var(--ink-soft); margin-bottom: 16px; }
+  .sub-title { font-size: 25px; font-weight: 800; letter-spacing: -.025em; margin: 40px 0 6px; }
+  .sub-lead { font-size: 16px; color: var(--ink-soft); margin-bottom: 16px; }
 
   /* Option cards (cobertura / jantar) */
   .options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
   .options.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .opt { border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; background: var(--bg); break-inside: avoid; display: flex; flex-direction: column; min-width: 0; }
   .opt .tag { color: var(--gold); }
-  .opt h3 { font-size: 26px; margin: 4px 0 4px; }
-  .opt .portion { font-size: 13px; color: var(--ink-soft); margin-bottom: 14px; }
+  .opt h3 { font-size: 25px; font-weight: 800; letter-spacing: -.03em; line-height: 1.05; margin: 6px 0 8px; }
+  .opt .portion { font-size: 14px; color: var(--ink-soft); margin-bottom: 14px; }
   .opt .macros { margin: auto 0 0; }
   .opt .macros > div { padding: 10px; min-width: 0; }
-  .opt .macros .v { font-size: 24px; }
+  .opt .macros .v { font-size: 22px; font-stretch: 100%; letter-spacing: -.02em; }
+  .opt .macros .kcal .v { font-size: 25px; font-stretch: var(--display-wdth); }
   .opt .macros { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .opt .macros .kcal { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: baseline; }
   .opt .macros > div:nth-child(2) { border-left: 0; }
@@ -177,33 +187,32 @@
 
   /* ---------- 11. Summary ---------- */
   .summary { margin-top: 64px; background: var(--sage-dark); color: #F4F2EC; border-radius: var(--radius); padding: 44px 40px; }
-  .summary h2 { font-size: clamp(34px, 5vw, 48px); color: #fff; }
-  .summary .lead { color: #D9E1D5; margin: 8px 0 28px; font-size: 14.5px; }
+  .summary h2 { font-size: clamp(39px, 6vw, 61px); line-height: .95; letter-spacing: -.04em; font-weight: 900; font-stretch: var(--display-wdth); color: #fff; }
+  .summary .lead { color: #D9E1D5; margin: 12px 0 28px; font-size: 16px; }
   .summary .tbl-wrap { border-color: rgba(255,255,255,.18); }
   .summary table { color: #F4F2EC; min-width: 520px; }
   .summary th { background: rgba(255,255,255,.08); color: #D9E1D5; border-bottom-color: rgba(255,255,255,.18); }
   .summary td { border-bottom-color: rgba(255,255,255,.12); }
   .summary tbody tr:nth-child(even) td { background: rgba(255,255,255,.04); }
-  .summary tfoot td { background: rgba(255,255,255,.1); border-top-color: var(--gold); color: #fff; font-size: 15px; }
+  .summary tfoot td { background: rgba(255,255,255,.1); border-top-color: var(--gold); color: #fff; font-size: 16px; }
   .ranges { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-top: 28px; border-top: 1px solid rgba(255,255,255,.18); }
   .ranges > div { padding: 20px 20px 0 0; }
   .ranges > div + div { padding-left: 20px; border-left: 1px solid rgba(255,255,255,.18); }
   .ranges .small-caps { color: #D9E1D5; }
-  .ranges .v { font-family: var(--serif); font-size: 30px; line-height: 1.1; font-weight: 500; color: #fff; font-variant-numeric: lining-nums; }
-  .ranges p { font-size: 13px; color: #D9E1D5; margin: 4px 0 0; }
+  .ranges .v { font-size: 31px; line-height: 1; margin: 6px 0 8px; color: #fff; }
+  .ranges p { font-size: 14px; color: #D9E1D5; margin: 4px 0 0; }
 
   /* ---------- 12. Notes ---------- */
   .notes { margin-top: 64px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
-  .notes h2 { font-size: 30px; margin-bottom: 14px; }
-  .notes ul, .notes ol { margin: 0; padding-left: 18px; font-size: 14px; }
+  .notes h2 { font-size: 31px; letter-spacing: -.03em; font-weight: 800; margin-bottom: 16px; }
+  .notes ul, .notes ol { margin: 0; padding-left: 18px; font-size: 15px; }
   .notes li { margin-bottom: 8px; }
-  .notes ol li { font-size: 13px; color: var(--ink-soft); }
-  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-soft); display: flex; justify-content: space-between; gap: 24px; }
-  footer strong { color: var(--ink); font-weight: 600; }
+  .notes ol li { font-size: 14px; color: var(--ink-soft); }
+  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-soft); display: flex; justify-content: space-between; gap: 24px; }
+  footer strong { color: var(--ink); font-weight: 700; }
 
   /* ---------- Responsive ---------- */
   @media (max-width: 760px) {
-    body { font-size: 14.5px; }
     .doc { padding-block: 32px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
     .masthead { grid-template-columns: 1fr; }
     .masthead .meta { text-align: left; }
@@ -212,7 +221,7 @@
     .idstrip div:nth-child(n+3) { border-top: 1px solid var(--line); }
     .idstrip dd { font-size: 22px; }
     .protein { grid-template-columns: 1fr; padding: 24px 20px; gap: 20px; }
-    .protein .fig { font-size: 52px; }
+    .protein .fig { font-size: 61px; }
     .timeline ol { grid-template-columns: 1fr; gap: 14px; }
     .timeline ol::before { left: 22px; right: auto; top: 0; bottom: 0; width: 1px; height: auto; }
     .timeline li { display: grid; grid-template-columns: 56px 1fr; column-gap: 8px; }
@@ -240,7 +249,7 @@
     body { background: #fff; font-size: 10pt; }
     .doc { max-width: none; padding: 0; }
     .meal { break-before: page; margin-top: 0; border: 0; padding: 0; background: #fff; }
-    .photo { aspect-ratio: auto; height: 52mm; }
+    .photo { aspect-ratio: auto; height: 46mm; }
     .tbl-wrap { overflow: visible; }
     table { min-width: 0; font-size: 8.5pt; }
     th, td { padding: 6px 8px; }
@@ -256,7 +265,21 @@
     .summary .tbl-wrap, .ranges, .ranges > div + div { border-color: var(--line); }
     .notes { break-before: page; margin-top: 0; }
     .options { display: flex; gap: 10px; }
-    .options > .opt { flex: 1 1 0; break-inside: auto; }
+    .options > .opt { flex: 1 1 0; break-inside: avoid; }
+    .masthead h1 { font-size: 64pt; }
+    .masthead .goal { margin-top: 10px; }
+    .idstrip { margin-top: 16px; }
+    .protein { margin-top: 20px; padding: 20px 24px; gap: 16px 32px; }
+    .protein .fig { font-size: 44pt; }
+    .timeline { margin-top: 28px; break-inside: avoid; }
+    .meal-head { margin-bottom: 16px; }
+    .meal-head .big { font-size: 64pt; }
+    .meal-head h2 { font-size: 26pt; }
+    .macros { margin-bottom: 16px; }
+    .macros .v { font-size: 24pt; }
+    .opt { padding: 14px; }
+    .sub-title { margin-top: 20px; }
+    figure { margin-bottom: 16px; }
     .meal { break-inside: auto; }
     a { text-decoration: none; }
   }
@@ -268,7 +291,7 @@
   <!-- 1. Cabeçalho -->
   <header class="masthead">
     <div>
-      <h1>Plano alimentar</h1>
+      <h1>Plano<br>alimentar</h1>
       <p class="goal">Objetivo: ganho de massa muscular</p>
     </div>
     <div class="meta">

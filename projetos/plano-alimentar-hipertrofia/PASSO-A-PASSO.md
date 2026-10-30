@@ -41,3 +41,9 @@ pdftoppm -r 35 -png plano.pdf pg   # miniaturas das páginas
 - Revisão pela `ui-ux-pro-max`: texto em 16 px, tracking do título, menos rótulos em caixa alta, foco visível, margens seguras no celular.
 - **Página para ver:** https://claude.ai/artifact/M4PFo65bKwjoeZ1if4yskf (privada; compartilhar pelo menu Share).
 - Versão do artifact gerada com `skills/combos/combo-plano-alimentar-html/scripts/montar-artifact.py` (fotos embutidas, porque o artifact bloqueia imagens externas).
+
+## 30/10/2026: terceira rodada (tipografia sans bold)
+
+- O Daniel recusou a serifa. Pesquisadas no catálogo as skills `impeccable/typeset` e `web-typography` (lidas inteiras; não instaladas, aguardam aprovação). Notas: `research_notes/Tipografia 2026-10/skills-de-tipografia.md`.
+- Toda a tipografia virou **Archivo** (sans, bold, larga). Ajustes de tabela, cartões e impressão no `APRENDIZADOS.md` do combo.
+- Artifact atualizado (versão 2), mesmo link. PDF continua com 9 páginas.
