@@ -17,7 +17,7 @@ rmSync(frames, { recursive: true, force: true }); mkdirSync(frames, { recursive:
 
 const run = (cmd, args, quiet) => spawnSync(cmd, args, { stdio: quiet ? 'pipe' : 'inherit', shell: false });
 const t0 = Date.now();
-let r = run('node', [render, '--from', from, '--to', to, '--fps', fps, '--scale', scale, '--out', frames, '--jpg'].map(String));
+let r = run('node', [render, '--page', opt('page', 'comp'), '--from', from, '--to', to, '--fps', fps, '--scale', scale, '--out', frames, '--jpg'].map(String));
 if (r.status !== 0) { console.error('render failed'); process.exit(1); }
 const n = readdirSync(frames).filter(f => /^\d{5}\.jpg$/.test(f)).length;
 if (!n) { console.error(`no frames in ${frames} (expected 00000.jpg …)`); process.exit(1); }

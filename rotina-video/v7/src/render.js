@@ -10,7 +10,7 @@ fs.mkdirSync(out, { recursive: true });
   const run = async (w) => {
     const p = await b.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: scale });
     p.on('pageerror', e => console.log('PAGEERR', e.message));
-    await p.goto(`http://localhost:${port}/src/comp.html`, { waitUntil: 'networkidle' });
+    await p.goto(`http://localhost:${port}/src/${opt('page', 'comp')}.html`, { waitUntil: 'networkidle' });
     await p.evaluate(() => document.fonts.ready);
     for (let k = w; k < n; k += workers) {
       const t = from + k / fps; await p.evaluate(t => window.renderFrame(t), t);
