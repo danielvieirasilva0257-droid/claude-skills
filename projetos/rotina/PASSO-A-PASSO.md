@@ -151,7 +151,7 @@ Este arquivo guarda só o que foi feito, como foi feito e onde estão as habilid
      - a vinheta mudando de uma vez na troca de fundo;
      - os textos do fechamento cruzando o botão do CTA.
 
-8. **Promo v7 de 49,6 s: o app de verdade sendo usado, estilo da referência do Daniel** (04/11/2026). Código em `rotina-video/v7/` (branch `rotina-video`). Saída: `rotina-video/v7/renders/rotina-v7.mp4`.
+8. **Promo v7 de 49,6 s: o app de verdade sendo usado, estilo da referência do Daniel** (04/11/2026). Código em `rotina-video/v7/` (branch `rotina-video`). Saída: `rotina-video/v7/rotina-v7.mp4` (CRF 22, 35 MB; o master CRF 17 de 98 MB não vai para o Git).
    - **Obs.:** a branch já tinha um v5 e um v6 que não estavam registrados aqui. Este é o v7.
    - **Pedido:** mostrar o financeiro completo (cartões, investimentos, gastos pontuais e variáveis, relatórios) e passar rápido por hábitos, treino e gráficos da semana e do mês. Roteiro com a `copywriting` e depois a `humanizer`, voz no ElevenLabs, a skill nova `motion-video-director` e a `watch` para estudar o vídeo de referência. O app tinha que aparecer **sendo usado**, entrando e saindo das telas.
    - **Referência** (`watch` + folhas de quadros a 4 fps): fundo de estúdio claro com sombra de persiana, vermelho e verde, título condensado pesado, frases em Poppins, letras que voam e se juntam, desfoque de movimento, blocos verdes que entram pela borda, órbita em volta de um objeto, palavra com reflexo no chão, cena escura com texto em neon e fecho com glitch e barra de busca.
@@ -167,6 +167,18 @@ Este arquivo guarda só o que foi feito, como foi feito e onde estão as habilid
    - **Composição** (`v7/src/comp.html` + `comp.js`, `renderFrame(t)` determinístico, contrato `src/render.js --from --to --fps --scale --out` da skill): celular desenhado em CSS com a gravação na tela e os toques como bolinhas; 15 cenas com fundos que mudam (estúdio, bloco verde pela esquerda, cena escura com neon, chão verde, bloco verde pela direita, barras vermelhas atrás do celular, fecho escuro com glitch e barra de busca digitando "Rotina").
      - **As 4 regras:** todo texto fica numa camada atrás do celular; entra pela borda do quadro ou sai de trás do celular; nenhum recorte no meio da tela; troca de palavra só depois de a anterior sair.
    - **Som:** trilha `v7/audio/trilha_v7.py` (cópia da v6 com a grade nova: 100 BPM, batida 0 no quadro 8, virada em "Rotina", golpe final no fecho); 120 efeitos em `v7/audio/sons_v7.py` (mesmas palavras e toques do vídeo); mixagem com `mixar_com_efeitos.py` (música −13 dB, efeitos −5 dB): −14,0 LUFS, −1,5 dBTP, voz no mínimo 12,6 dB acima do fundo (mediana 15,8).
+   - **Glow** (o Daniel disse que gosta): neon verde que acende piscando no "todo mês", valor e título com brilho, luz verde atrás do celular na cena escura, "LINK NA BIO" em neon vermelho no fecho.
+   - **Conferido:** folhas de quadros de todas as cenas (2 rodadas de correção: celular e textos maiores, palavras longe das bordas do celular, nada na zona de baixo), transcrição do áudio final igual ao roteiro, −14,0 LUFS. Render: 1488 quadros em 4 min 40 s (3 páginas do Chromium).
+   - **Comandos** (dentro de `rotina-video/v7/`, com o app servido em `localhost:8765` e a pasta `v7` em `localhost:8770`):
+     ```bash
+     node rec/rec.js http://localhost:8765/index.html cache/rec1     # grava o app (index.html = HTML do artifact Rotina)
+     node scripts/preview.mjs 5 17.5 --fps 4 --scale 0.25 --cols 10  # folha de quadros de um trecho
+     python -I audio/trilha_v7.py audio/trilha_v7.wav audio/trilha-v7_eventos.json && python3 audio/sons_v7.py
+     python -I <main>/skills/audio/trilha-e-mixagem/scripts/mixar_com_efeitos.py --voz audio/voz.wav --musica audio/trilha_v7.wav \
+       --efeitos audio/sons.json --saida audio/mix_v7.wav --duracao 49.6 --musica-db -13 --efeitos-db -5 --linha-do-tempo audio/voz_linhas.json
+     node src/render.js --from 0 --to 49.6 --fps 30 --scale 1 --out cache/final --workers 3 --quality 94
+     ```
+   - **Próximo passo:** o Daniel assiste e dá o veredito de editor (ritmo, tamanho do celular, glow, voz Liam). Se a voz não agradar: as vozes em português da conta precisam de plano pago do ElevenLabs.
 
 ## Comandos (dentro de `rotina-video/`)
 
