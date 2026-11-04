@@ -14,6 +14,7 @@ As skills ficam em skills/<categoria>/<nome>/. Skill nova entra na categoria do 
 [VÍDEO (skills/video/)]
 remotion-video | vídeos em React/Remotion: promo e explicativo de app, legendas animadas, celular 3D, voz, música, regras de motion premium e regras de composição do editor (obrigatórias) | skills/video/remotion-video/SKILL.md
 motion-video | vídeo de motion design em canvas (sem Remotion), estilo premium tech, iPhone realista, cards 3D, sons sintetizados, estilo novo a partir de vídeo de referência | skills/video/motion-video/.claude/skills/motion-video/SKILL.md (motor: skills/video/motion-video/motion-studio/; como rodar aqui: skills/video/motion-video/APRENDIZADOS.md)
+motion-video-director | manual de direção e produção de vídeo (Miftahul, versão grátis 3.0.0 do MotionSmith): motion em código (Canvas/SVG/Three.js/GSAP), edição de vídeo gravado e talking head, legendas, roteiro de voz, som, mixagem -14 LUFS, prévias rápidas e aprovações | skills/video/motion-video-director/SKILL.md (adaptações em APRENDIZADOS.md; origem em ORIGEM.md)
 blender-ia | 3D no Blender escrito pelo Claude (bpy, sem interface), com cara de comercial: direção de animação (duração, curva e suavização de cada keyframe), visual premium (luz de estúdio, cor fiel, materiais), celular genérico bem modelado, fundo transparente para compor no Remotion; MCP do Blender no computador do Daniel | skills/video/blender-ia/SKILL.md (scripts testados em scripts/; detalhes em references/)
 
 [ÁUDIO (skills/audio/)]
@@ -105,4 +106,5 @@ loop | repetir uma tarefa em intervalos
 ----------------------
 GitHub (MCP) | ler e alterar este repositório, PRs
 Higgsfield (MCP) | gerar imagem, vídeo, voz e 3D por IA (gasta créditos do Higgsfield)
+MotionSmith (MCP) | motion design (Director: plano, animação, voz ElevenLabs, sons, render no computador do usuário). Endereço https://motionsmith.miftahul.com/api/mcp. Precisa de assinatura paga (a partir de US$ 5,96/mês); sem ela só lista os motores. Conectado em 04/11/2026, ainda sem assinatura. Skill grátis v3.0.0 achada: research_notes/MotionSmith 2026-11/notas.md
 Google AI Studio (Gemini) | voz Gemini TTS e música Lyria. A chave NÃO fica no repositório: fica no container em /root/.config/rotina/gemini.key e precisa ser passada de novo em cada container novo.
