@@ -133,7 +133,7 @@ const jaSabe = T('back', 'pp', 'você abre e já sabe.', { fontSize: '50px', fon
 const pill = (lab, val, col) => mk('back', '', `<div class="pill" style="background:#fff;width:400px"><div class="lab" style="color:${col}">${lab}</div><div class="bc" style="font-size:96px;color:${col};margin-top:6px">${val}</div></div>`);
 const pSal = pill('Salário', '+ R$ 4.800', C.green);
 const pFix = pill('Contas fixas', '− R$ 1.890', C.red);
-const pSaldo = mk('back', '', `<div class="pill" style="background:#1E1E1E;width:400px"><div class="lab" style="color:#A3A3A3">Saldo do mês</div><div class="bc" id="saldoN" style="font-size:112px;color:#fff;margin-top:6px">R$ 3.480</div></div>`);
+const pSaldo = mk('back', '', `<div class="pill" style="background:#1E1E1E;width:400px"><div class="lab" style="color:#A3A3A3">Saldo do mês</div><div class="bc" id="saldoN" style="font-size:112px;color:#fff;margin-top:6px;text-shadow:0 0 14px rgba(255,255,255,.45),0 0 36px rgba(255,90,90,.35)">R$ 3.480</div></div>`);
 // --- S3 iFood
 const g1 = T('back', 'bc', 'GASTOU NO iFOOD?', { fontSize: '150px', color: C.red, textTransform: 'none' });
 const g2 = T('back', 'bc', 'ANOTA NA HORA.', { fontSize: '150px', color: C.ink });
@@ -164,8 +164,9 @@ const k1 = T('back', 'bc', 'FATURA', { fontSize: '120px', color: C.ink });
 const k2 = mk('back', '', `<div class="pp" style="font-size:40px;font-weight:700;color:#fff;background:#232323;padding:20px 28px 16px;border-radius:40px">24% do limite</div>`);
 const k3 = mk('back', '', `<div style="background:#fff;border-radius:26px;padding:22px 28px;width:440px;box-shadow:0 18px 40px rgba(0,0,0,.18)"><div class="lab" style="color:#6B6B6B;font-size:26px">Parcelas que faltam</div><div style="display:flex;justify-content:space-between;margin-top:10px"><span class="pp" style="font-size:34px;font-weight:700;color:#232323">Monitor 4K</span><span class="bc" style="font-size:44px;color:#7C3AED">6/10</span></div><div style="display:flex;justify-content:space-between"><span class="pp" style="font-size:34px;font-weight:700;color:#232323">iPhone 15</span><span class="bc" style="font-size:44px;color:#7C3AED">9/12</span></div></div>`);
 // --- S7 assinaturas (dark scene)
-const s1 = T('back', 'bc', 'ASSINATURAS', { fontSize: '150px', color: '#fff' });
-const s2 = mk('back', '', `<div class="bc" id="subN" style="font-size:190px;color:#fff;text-shadow:0 0 40px rgba(124,255,178,.45)">R$ 365,60</div>`);
+const s1 = T('back', 'bc', 'ASSINATURAS', { fontSize: '150px', color: '#fff', textShadow: '0 0 18px rgba(124,255,178,.55),0 0 46px rgba(43,227,138,.45)' });
+const halo = mk('panels', '', '', { width: '1100px', height: '1500px', background: 'radial-gradient(closest-side,rgba(60,255,160,.42),rgba(25,181,108,.18) 45%,rgba(0,0,0,0) 100%)', filter: 'blur(10px)' });
+const s2 = mk('back', '', `<div class="bc" id="subN" style="font-size:190px;color:#fff;text-shadow:0 0 10px rgba(255,255,255,.7),0 0 34px rgba(124,255,178,.75),0 0 80px rgba(43,227,138,.55)">R$ 365,60</div>`);
 const s3 = T('back', 'sc', 'todo mês', { fontSize: '150px', color: '#C9FFE0', textShadow: '0 0 12px #7CFFB2,0 0 34px #2BE38A,0 0 70px #19B56C' });
 // --- S8 investimentos
 const i1 = T('back', 'bc', 'INVESTIMENTOS', { fontSize: '132px', color: C.ink });
@@ -188,8 +189,8 @@ const hb2 = T('back', 'pp', 'de hábitos', { fontSize: '60px', fontWeight: 500, 
 const habit = (txt) => mk('back', '', `<div style="display:flex;align-items:center;gap:26px"><div class="chk"><b></b><svg width="44" height="40" viewBox="0 0 44 40"><path d="M4 21 L16 33 L40 6" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="60" stroke-dashoffset="60"/></svg></div><span class="pp" style="font-size:42px;font-weight:700;color:#232323">${txt}</span></div>`);
 const hbs = ['Beber 3L de água', 'Dieta', 'Ler 10 páginas', 'Treinar'].map(habit);
 // --- S12 treino (green right)
-const tr1 = T('back', 'bc', 'TREINO', { fontSize: '150px', color: '#fff' });
-const tr2 = mk('back', '', `<div><div class="lab" style="color:#CFFFE6">Carga sugerida</div><div style="display:flex;align-items:baseline;gap:12px"><span class="bc" id="kgN" style="font-size:190px;color:#fff">47,5</span><span class="bc" style="font-size:90px;color:#fff">KG</span></div><div class="pp" style="font-size:36px;font-weight:500;color:#E8FFF4">Desenvolvimento</div></div>`);
+const tr1 = T('back', 'bc', 'TREINO', { fontSize: '150px', color: '#fff', textShadow: '0 0 20px rgba(200,255,230,.45)' });
+const tr2 = mk('back', '', `<div><div class="lab" style="color:#CFFFE6">Carga sugerida</div><div style="display:flex;align-items:baseline;gap:12px"><span class="bc" id="kgN" style="font-size:190px;color:#fff;text-shadow:0 0 16px rgba(255,255,255,.6),0 0 46px rgba(180,255,220,.55)">47,5</span><span class="bc" style="font-size:90px;color:#fff">KG</span></div><div class="pp" style="font-size:36px;font-weight:500;color:#E8FFF4">Desenvolvimento</div></div>`);
 const tr3 = T('back', 'pp', 'série a série', { fontSize: '52px', fontWeight: 700, color: '#fff' }, true);
 // --- S13 gráficos
 const gr1 = T('back', 'bc', 'GRÁFICOS', { fontSize: '190px', color: C.ink });
@@ -199,9 +200,11 @@ const gr3 = T('back', 'bc', '+ MÊS', { fontSize: '170px', color: C.ink });
 const c1 = T('back', 'bc', 'BAIXE O ROTINA', { fontSize: '150px', color: C.ink });
 const c2 = T('back', 'bc', 'AGORA.', { fontSize: '200px', color: C.red });
 const endBg = mk('end', '', '', { width: '1080px', height: '1920px', background: '#0D0F16' });
-const endLogo = mk('end', '', `<div style="display:flex;align-items:center;gap:26px"><div style="width:150px;height:150px;border-radius:38px;background:#CC0000;display:flex;align-items:center;justify-content:center;box-shadow:0 0 60px rgba(204,0,0,.45)"><svg width="92" height="80" viewBox="0 0 92 80"><path d="M8 42 L34 68 L84 10" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="bc" style="font-size:170px;color:#fff;letter-spacing:.01em">ROTINA</span></div>`);
+const endGlowSlot = document.createElement('div'); $('end').appendChild(endGlowSlot);
+const endLogo = mk('end', '', `<div style="display:flex;align-items:center;gap:26px"><div style="width:150px;height:150px;border-radius:38px;background:#CC0000;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(255,60,60,.7),0 0 110px rgba(204,0,0,.55)" class="lg"><svg width="92" height="80" viewBox="0 0 92 80"><path d="M8 42 L34 68 L84 10" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="bc" style="font-size:170px;color:#fff;letter-spacing:.01em">ROTINA</span></div>`);
 const endBar = mk('end', '', `<div style="position:relative;width:760px;height:110px"><div class="eb" style="position:absolute;inset:0;border-radius:24px;background:#E3262B;transform:translate(-9px,-7px)"></div><div class="eb" style="position:absolute;inset:0;border-radius:24px;background:#22E1E8;transform:translate(9px,7px)"></div><div style="position:absolute;inset:0;border-radius:24px;background:#fff;display:flex;align-items:center;padding:0 34px;gap:22px"><svg width="44" height="44" viewBox="0 0 44 44"><circle cx="19" cy="19" r="13" fill="none" stroke="#111" stroke-width="5"/><path d="M29 29 L40 40" stroke="#111" stroke-width="5" stroke-linecap="round"/></svg><span class="pp" id="typed" style="font-size:50px;font-weight:700;color:#111"></span><span id="caret" style="width:4px;height:56px;background:#111"></span></div></div>`);
-const endLink = T('end', 'bc', 'LINK NA BIO', { fontSize: '120px', color: '#fff' }, true);
+const endLink = T('end', 'bc', 'LINK NA BIO', { fontSize: '120px', color: '#FFE9E9', textShadow: '0 0 8px #fff,0 0 22px #FF4D4D,0 0 48px #E3262B,0 0 90px #CC0000' }, true);
+const endGlow = mk('end', '', '', { width: '1000px', height: '1000px', background: 'radial-gradient(closest-side,rgba(227,38,43,.38),rgba(227,38,43,.10) 50%,rgba(0,0,0,0))' }); $('end').insertBefore(endGlow, endGlowSlot);
 const scan = mk('fx', '', '', { width: '1080px', height: '1920px' });
 const statC = document.createElement('canvas'); statC.width = 270; statC.height = 480; Object.assign(statC.style, { position: 'absolute', left: 0, top: 0, width: '1080px', height: '1920px', imageRendering: 'pixelated', display: 'none', opacity: .5 }); $('fx').appendChild(statC); const statX = statC.getContext('2d');
 
@@ -303,10 +306,11 @@ window.renderFrame = async (t) => {
     const tin = L[7][0] - .35, tout = L[8][0] - .3;
     const dy = t < tin ? 1920 : t < tin + .4 ? lerp(1920, 0, E.oe(clamp((t - tin) / .4))) : t > tout ? lerp(0, 1920, E.ie(clamp((t - tout) / .35))) : 0;
     put(dark, t < tin || t > tout + .35 ? null : { x: 540, y: 960 + dy, op: 1, blur: false });
+    { const P = pose(t); put(halo, t < tin + .2 || t > tout + .1 ? null : { x: P.x, y: P.y, op: clamp((t - tin - .2) / .4) * clamp((tout + .1 - t) / .2) * (.85 + .15 * Math.sin(t * 5)), s: 1 + .03 * Math.sin(t * 2.3), blur: false }); }
     mv(s1, t, tt => whip(tt, 540, 330, Wd('assinaturas') - .05, .4, 'D', Wd('pra') - .1, .25, 'U'));
     mv(s2, t, tt => whip(tt, 540, 290, Wd('pra') + .1, .35, 'D', tout, .32, 'D'));
     $('subN').textContent = fmtBRL(tw(t, Wd('quanto', 1) - .1, Wd('sai') + .3, 0, 365.6, E.oc), 2);
-    mv(s3, t, tt => { if (tt < Wd('todo') - .1 || tt > tout + .32) return null; return { x: 540, y: 455 + (tt > tout ? -1500 * E.ie(clamp((tt - tout) / .32)) : 0), op: clamp((tt - Wd('todo') + .1) / .25) * (.85 + .15 * Math.sin(tt * 40)) }; });
+    mv(s3, t, tt => { if (tt < Wd('todo') - .1 || tt > tout + .32) return null; const u = tt - Wd('todo') + .1; const fl = u < .45 ? ([1, 0, 1, .2, 1, 0, 0, 1, .4, 1][Math.floor(u / .045)] ?? 1) : (.9 + .1 * Math.sin(tt * 9)); return { x: 540, y: 455 + (tt > tout ? -1500 * E.ie(clamp((tt - tout) / .32)) : 0), op: fl, blur: false }; });
   }
 
   // ---------- S8 investimentos (green floor rises)
@@ -389,7 +393,8 @@ window.renderFrame = async (t) => {
     put(endLogo, endOn ? { x: 540, y: 760, s: tw(t, tG + .12, tG + .5, .85, 1, E.ob), op: 1 } : null);
     put(endBar, endOn ? { x: 540, y: 1000, s: tw(t, tG + .25, tG + .55, .4, 1, E.ob), op: clamp((t - tG - .2) / .1) } : null);
     endBar.querySelectorAll('.eb').forEach((e, i) => { const sp = tw(t, tG + .25, tG + .9, 1, .25, E.oc); e.style.transform = i ? `translate(${(9 * sp).toFixed(1)}px,${(7 * sp).toFixed(1)}px)` : `translate(${(-9 * sp).toFixed(1)}px,${(-7 * sp).toFixed(1)}px)`; });
-    put(endLink, endOn && t > Wd('link') - .05 ? { x: 540, y: 1190, op: 1 } : null); if (endOn) stagger(endLink, t, Wd('link') - .05, .035);
+    { const u = t - Wd('link') + .05; const fl = u < .5 ? ([1, .1, 1, 0, .6, 1, .2, 1, 1, .5, 1][Math.floor(u / .045)] ?? 1) : (.92 + .08 * Math.sin(t * 7)); put(endLink, endOn && u > 0 ? { x: 540, y: 1190, op: fl, blur: false } : null); }
+    put(endGlow, endOn ? { x: 540, y: 900, op: clamp((t - tG - .15) / .4) * (.85 + .15 * Math.sin(t * 3)), blur: false } : null);
     // glitch burst between tG-.1 and tG+.35: rgb split + slices + static
     const g = t > tG - .12 && t < tG + .32; const gi = g ? 1 - Math.abs((t - tG - .1) / .22) : 0;
     $('stage').style.filter = g ? `drop-shadow(${(14 * gi).toFixed(1)}px 0 0 rgba(255,0,60,.75)) drop-shadow(${(-14 * gi).toFixed(1)}px 0 0 rgba(0,240,255,.75))` : 'none';
