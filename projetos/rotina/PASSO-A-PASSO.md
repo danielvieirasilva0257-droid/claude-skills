@@ -151,6 +151,23 @@ Este arquivo guarda só o que foi feito, como foi feito e onde estão as habilid
      - a vinheta mudando de uma vez na troca de fundo;
      - os textos do fechamento cruzando o botão do CTA.
 
+8. **Promo v7 de 49,6 s: o app de verdade sendo usado, estilo da referência do Daniel** (04/11/2026). Código em `rotina-video/v7/` (branch `rotina-video`). Saída: `rotina-video/v7/renders/rotina-v7.mp4`.
+   - **Obs.:** a branch já tinha um v5 e um v6 que não estavam registrados aqui. Este é o v7.
+   - **Pedido:** mostrar o financeiro completo (cartões, investimentos, gastos pontuais e variáveis, relatórios) e passar rápido por hábitos, treino e gráficos da semana e do mês. Roteiro com a `copywriting` e depois a `humanizer`, voz no ElevenLabs, a skill nova `motion-video-director` e a `watch` para estudar o vídeo de referência. O app tinha que aparecer **sendo usado**, entrando e saindo das telas.
+   - **Referência** (`watch` + folhas de quadros a 4 fps): fundo de estúdio claro com sombra de persiana, vermelho e verde, título condensado pesado, frases em Poppins, letras que voam e se juntam, desfoque de movimento, blocos verdes que entram pela borda, órbita em volta de um objeto, palavra com reflexo no chão, cena escura com texto em neon e fecho com glitch e barra de busca.
+   - **Roteiro:** 15 falas, 133 palavras. Gancho "Quanto sobrou do seu salário esse mês?" e CTA "Baixe o Rotina agora. Link na bio." Texto em `v7/plan/falas.txt`.
+   - **Voz:** ElevenLabs `eleven_v4`, voz **Liam** (pronta da ElevenLabs), 47,3 s, endpoint `with-timestamps`: o tempo de cada letra vem junto e vira o tempo de cada palavra (`v7/plan/voz.json`), sem WhisperX.
+     - As vozes em português da conta (Lucas Shorts, Roberta, Arnold) são da biblioteca e o plano grátis não deixa usar pela API. Também não deixa MP3 a 192 kbps (usamos 128).
+     - Escolha da voz: 4 vozes prontas falando a mesma frase, conferidas pela transcrição do faster-whisper (Liam teve a maior confiança). Take 2 escolhido porque o take 1 disse "agendo".
+   - **Gravação do app de verdade** (`v7/rec/rec.js` + `session.js`): o HTML do artifact roda local; o Playwright faz os toques no tempo de cada palavra e o CDP (`Page.startScreencast`) grava os quadros com horário.
+     - Data simulada 05/11/2026 08:40 (dia do salário) por um `Date` falso no `addInitScript`.
+     - Nitidez: o screencast sai no tamanho CSS; a saída foi viewport 1170×2532 com `html{zoom:3}` (o app fica com 390 px de largura e o quadro com 1170 px).
+     - Rolagem suave por código; com zoom, a distância medida precisa ser dividida pelo fator do zoom. Abas escondidas na direita: `scrollIntoView` antes do toque. Ao trocar de aba, a rolagem volta ao topo.
+     - Sessão: abre o app → Financeiro → "Paguei" na fatura (saldo 3.480 → 1.590) → despesa iFood R$ 58 (Alimentação, Crédito) → Agendar (Único, Mensal, Parcelado) → Orçamentos (Outros estourado) → Cartões → Parcelamentos → Assinaturas → Investimentos → Relatórios (gráficos animando) → Hábitos (4 marcados) → Treinos (2 feitos) → Gráficos → Visão.
+   - **Composição** (`v7/src/comp.html` + `comp.js`, `renderFrame(t)` determinístico, contrato `src/render.js --from --to --fps --scale --out` da skill): celular desenhado em CSS com a gravação na tela e os toques como bolinhas; 15 cenas com fundos que mudam (estúdio, bloco verde pela esquerda, cena escura com neon, chão verde, bloco verde pela direita, barras vermelhas atrás do celular, fecho escuro com glitch e barra de busca digitando "Rotina").
+     - **As 4 regras:** todo texto fica numa camada atrás do celular; entra pela borda do quadro ou sai de trás do celular; nenhum recorte no meio da tela; troca de palavra só depois de a anterior sair.
+   - **Som:** trilha `v7/audio/trilha_v7.py` (cópia da v6 com a grade nova: 100 BPM, batida 0 no quadro 8, virada em "Rotina", golpe final no fecho); 120 efeitos em `v7/audio/sons_v7.py` (mesmas palavras e toques do vídeo); mixagem com `mixar_com_efeitos.py` (música −13 dB, efeitos −5 dB): −14,0 LUFS, −1,5 dBTP, voz no mínimo 12,6 dB acima do fundo (mediana 15,8).
+
 ## Comandos (dentro de `rotina-video/`)
 
 ```bash
