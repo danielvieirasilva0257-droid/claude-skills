@@ -1,0 +1,6 @@
+cache/
+renders/previews/
+.env
+*.env
+node_modules/
+frames/
