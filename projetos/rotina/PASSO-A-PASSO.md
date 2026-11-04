@@ -179,6 +179,12 @@ Este arquivo guarda só o que foi feito, como foi feito e onde estão as habilid
      node src/render.js --from 0 --to 49.6 --fps 30 --scale 1 --out cache/final --workers 3 --quality 94
      ```
    - **Próximo passo:** o Daniel assiste e dá o veredito de editor (ritmo, tamanho do celular, glow, voz Liam). Se a voz não agradar: as vozes em português da conta precisam de plano pago do ElevenLabs.
+9. **Promo v8 (04/11/2026): a v7 redesenhada pelo veredito do Daniel.** Mesma voz, gravação e trilha. Código: `rotina-video/v7/src/v8.html` + `v8_body.js` (junta com `v8_head.js` em `v8.js`); efeitos `v7/audio/sons_v8.py`; mix `v7/audio/mix_v8.wav`. Saída: `rotina-video/v7/rotina-v8.mp4`.
+   - **Pedido:** celular fora da tela em parte do tempo; wallpaper em degradê desfocado e animado; formas fluidas sem divisão chapada; mais efeitos; ícones animados; usar `button-animation` e `motion-oficial`.
+   - **Cenas sem celular:** saldo (cartão "Saldo do período", chip do salário, conta com botão "Paguei" → "Pago" e o saldo caindo), conta fixa (selo de calendário e seletor Único | Mensal | Parcelado com destaque deslizante), orçamentos (3 categorias com ícone e barra; "Outros" estoura e treme), assinaturas (6 ícones neon em órbita que se juntam no total R$ 365,60), relatório (gráfico de fluxo de caixa crescendo e linha do saldo se desenhando), treino (cartão do exercício com 47,5 kg e botão 3D "Marcar como feito" → "FEITO") e CTA (botão "BAIXE AGORA" com anel girando e brilho).
+   - **Cenas com o app real no celular:** abertura, iFood, cartões, investimentos (com porquinho e moedas caindo), hábitos, gráficos.
+   - **Som:** 159 efeitos (`sons_v8.py`); −14,0 LUFS, −1,5 dBTP, voz no mínimo 12,4 dB acima do fundo (mediana 16,1).
+   - Render: `node src/render.js --page v8 --from 0 --to 49.6 --fps 30 --scale 1 --out cache/final8 --workers 3 --quality 94`.
 
 ## Comandos (dentro de `rotina-video/`)
 

@@ -17,3 +17,19 @@
 - **Velocidade:** 1080×1920 a 30 fps com 3 páginas do Chromium em paralelo: ~1,1 quadro/s (49,6 s de vídeo em ~22 min).
 - **Voz pelo ElevenLabs:** o endpoint `with-timestamps` dá o tempo de cada letra; isso substitui o faster-whisper para os tempos das palavras. No plano grátis, só as vozes prontas (premade) funcionam pela API, e a saída máxima é MP3 a 128 kbps.
 - **Gosto do Daniel: ele gosta do efeito de glow** (texto neon com brilho, como o "Mágica" da referência). Use em cena escura: `text-shadow` em camadas (branco perto + cor do acento longe), acender piscando nos primeiros 0,45 s e um pulso leve depois, e uma luz radial atrás do celular.
+
+## 04/11/2026: v8 do Rotina, depois do veredito do Daniel sobre a v7
+
+- **O que o Daniel pediu (vale como gosto dele para os próximos vídeos):**
+  - o celular **não** fica na tela o tempo todo: alterne cenas com o app de verdade e cenas só com peças grandes do app (cartões, botões, gráficos) desenhadas em código;
+  - **wallpaper em degradê desfocado e animado**, nunca parado, com as cores mudando suavemente por cena;
+  - **shape layers fluidas** (formas orgânicas que se mexem, faixas onduladas) e **nada de divisão chapada** (bloco reto de cor cortando a tela);
+  - **muitos efeitos e ideias novas**, ícones animados e as skills `button-animation` e `motion-oficial` aplicadas.
+- **Como foi feito** (`v7/src/v8_body.js`, branch `rotina-video`):
+  - wallpaper: 6 círculos com `radial-gradient` (sem `filter: blur`, que pesa) andando em curvas de seno, cores interpoladas entre paletas por cena;
+  - formas líquidas: caminho SVG fechado por 9 pontos que oscilam, suavizado com Catmull-Rom → Bézier; entram e saem por fora do quadro;
+  - faixas onduladas com gradiente atravessando o quadro atrás do conteúdo nas trocas de cena; ondas de choque (círculos) e faíscas nos impactos;
+  - ícones Lucide (os mesmos do app, ISC) baixados de `lucide-static@0.400.0`. **Armadilha:** ao extrair o miolo do SVG, pegue o que está entre a tag `<svg ...>` e `</svg>`, não a partir do primeiro `>` (o comentário de licença tem `>` e o texto seguinte sumia dentro de um `<svg>` aberto);
+  - botões (button-animation): toque 0,96 + ondulação, troca de rótulo em sequência (o velho sai, depois o novo entra, com blur 4 px), botão 3D que afunda, destaque deslizante com mola 650/40/0,5, tremor de erro de 6 px, anel de gradiente girando dentro da borda real do botão e brilho passando;
+  - **regra 1 na prática:** ícones que se juntam num total não podem passar por cima do número; o número só aparece depois que eles somem.
+- **Armadilha de canvas:** `<canvas>` com `inset: 0` não estica (é elemento substituído). A granulação da v7 cobria só um quarto do quadro; precisa de `width` e `height` explícitos.
