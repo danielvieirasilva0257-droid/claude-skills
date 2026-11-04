@@ -20,4 +20,4 @@
   versus o nosso PASSO-A-PASSO.md, render no container (Chrome com --no-sandbox).
 
 ## Status
-- Aguardando aprovação do Daniel para trazer como `skills/video/motion-video-director/`.
+- Trazida em 04/11/2026 para `skills/video/motion-video-director/` (aprovado pelo Daniel).
