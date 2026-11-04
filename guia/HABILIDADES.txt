@@ -105,4 +105,5 @@ loop | repetir uma tarefa em intervalos
 ----------------------
 GitHub (MCP) | ler e alterar este repositório, PRs
 Higgsfield (MCP) | gerar imagem, vídeo, voz e 3D por IA (gasta créditos do Higgsfield)
+MotionSmith (MCP) | motion design (Director: plano, animação, voz ElevenLabs, sons, render no computador do usuário). Endereço https://motionsmith.miftahul.com/api/mcp. Precisa de assinatura paga (a partir de US$ 5,96/mês); sem ela só lista os motores. Conectado em 04/11/2026, ainda sem assinatura.
 Google AI Studio (Gemini) | voz Gemini TTS e música Lyria. A chave NÃO fica no repositório: fica no container em /root/.config/rotina/gemini.key e precisa ser passada de novo em cada container novo.
