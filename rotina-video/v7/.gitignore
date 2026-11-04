@@ -4,3 +4,4 @@ renders/previews/
 *.env
 node_modules/
 frames/
+renders/*.mp4
