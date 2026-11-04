@@ -42,3 +42,9 @@ Adendos datados. O mais novo fica embaixo.
 - **Efeitos:** 96, todos em `src/v3/sons.ts` com os quadros da animação. Novo: o "plim" de notificação = `chime` com `n1 1760, n2 2349,3, gap 0,05, dur 0,35`, ganho 0,1.
 - **Resultado:** −14,0 LUFS e −1,6 dBTP no vídeo final; voz no mínimo 12,8 dB acima do fundo (mediana 17,1 dB). A transcrição do áudio final (95,6%) ficou acima da voz sozinha (93,4%): a trilha não cobre a fala.
 - Detalhes: `projetos/rotina/PASSO-A-PASSO.md` (item 6) e `reports/Vídeo Rotina v3, skills e combos usados (2026-10-12).md`.
+
+## 04/11/2026: Rotina v7 (49,6 s)
+
+- **Reaproveitar a trilha de outro vídeo trocando só a grade:** `trilha_v6.py` virou `trilha_v7.py` mudando `DUR`, a fase da batida (`beat_t(k) = (8 + 18k)/30`) e as constantes `T_*` para as batidas que caem nas palavras-chave (virada em "Rotina", seções nas trocas de fundo, silêncio sob "Baixe", golpe final no fecho). Gera em ~20 s.
+- **Vídeo mais longo e com muitos efeitos pede música mais baixa:** com música −9 dB, as falas do meio ficaram de 8,7 a 10,4 dB acima do fundo. Com música −13 dB e efeitos −5 dB: mínimo 12,6 dB, mediana 15,8 dB, −14,0 LUFS e −1,5 dBTP.
+- 120 efeitos calculados das mesmas palavras e dos toques gravados no app (`v7/audio/sons_v7.py` na branch `rotina-video`), com um clique baixo (ganho 0,06) em cada toque do dedo.

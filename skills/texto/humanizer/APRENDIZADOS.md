@@ -17,3 +17,7 @@ Adendos datados. O mais novo fica embaixo. Os arquivos oficiais ficam intactos.
 ## 12/10/2026: roteiro do Rotina v3
 
 - `rewrite --purpose marketing`, voz `casual`. Tirou o tom de anúncio ("Aí cada coisa fica num app diferente", "cai direto no gráfico") sem mexer nos fatos nem na CTA. Antes e depois: `research_notes/Rotina v3 2026-10/roteiro/`.
+
+## 04/11/2026: roteiro do Rotina v7
+
+- Voz `casual`, `--purpose marketing`. Pouco a mexer: o roteiro já era feito de fatos do app (valores, nomes de telas). Trocou "Ah, e tem mais" (fórmula) por "O resto da rotina também mora aqui." e "Lança em dois toques" (não era verdade: o formulário tem mais passos) por "Anota na hora, com categoria e cartão."

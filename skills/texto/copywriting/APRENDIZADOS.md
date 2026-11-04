@@ -16,3 +16,8 @@ Adendos datados. O mais novo fica embaixo. Os arquivos oficiais ficam intactos.
 
 - Ângulo "Segunda eu começo": a semana é o fio (segunda → quarta → o dia a dia no app → "nem precisa esperar a segunda" → "agora"). 13 falas, 91 palavras, gancho de 2 s, uma CTA só.
 - Para a voz caber em 30 s com a Leda a ~1,1x, a meta de 80 a 95 palavras funcionou. Arquivos: `research_notes/Rotina v3 2026-10/roteiro/`.
+
+## 04/11/2026: roteiro do Rotina v7 (49,6 s, financeiro completo)
+
+- 15 falas, 133 palavras, uma ideia por fala, cada uma ligada a uma tela do app que aparece sendo usada. Gancho em pergunta ("Quanto sobrou do seu salário esse mês?") e a mesma CTA dos vídeos anteriores.
+- A 2,8 palavras por segundo (voz Liam do ElevenLabs a 1,0x), 133 palavras deram 47,3 s.

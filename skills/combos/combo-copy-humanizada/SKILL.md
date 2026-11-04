@@ -76,3 +76,4 @@ As duas skills foram escritas para inglês. A **estrutura** dos tiques de IA val
 ## Histórico do combo
 
 - **09/10/2026:** criado quando o usuário pediu para usar a `copywriting` e depois a `humanizer`. Ainda não foi usado em um texto real. O primeiro uso será o roteiro do próximo vídeo do Rotina.
+- **04/11/2026:** usado no roteiro do Rotina v7 (15 falas). Aprendizado: num roteiro de demonstração, conferir cada frase contra o que o app faz de verdade antes de gravar a tela ("dois toques" era falso e saiu).
