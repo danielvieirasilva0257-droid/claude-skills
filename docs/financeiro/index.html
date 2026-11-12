@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Finanças mudou de endereço</title>
+<meta http-equiv="refresh" content="2; url=https://antoniofeli3478-rgb.github.io/Finan-as/">
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0e1116;color:#eceff4;font:16px system-ui,sans-serif;text-align:center;padding:24px}a{color:#e3b453;font-weight:600}</style>
+</head>
+<body>
+<div><h1 style="font-size:22px">O Finanças mudou de endereço</h1><p>Agora ele é um app separado. Seus dados continuam lá.</p><p><a href="https://antoniofeli3478-rgb.github.io/Finan-as/">Abrir o Finanças</a></p></div>
+<script>
+// Remove o app antigo deste endereço (o service worker) e leva para o novo
+(async function () {
+  try {
+    if ("serviceWorker" in navigator) {
+      var regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.filter(function (r) { return r.scope.indexOf("/claude-skills/financeiro/") !== -1; }).map(function (r) { return r.unregister(); }));
+    }
+    if (window.caches) {
+      var keys = await caches.keys();
+      await Promise.all(keys.filter(function (k) { return k.indexOf("/claude-skills/financeiro/") !== -1; }).map(function (k) { return caches.delete(k); }));
+    }
+  } catch (e) {}
+  location.replace("https://antoniofeli3478-rgb.github.io/Finan-as/");
+})();
+</script>
+</body>
+</html>
