@@ -17,3 +17,8 @@ Adendos datados. O mais novo fica embaixo. Os arquivos oficiais ficam intactos.
 ## 12/10/2026: roteiro do Rotina v3
 
 - `rewrite --purpose marketing`, voz `casual`. Tirou o tom de anúncio ("Aí cada coisa fica num app diferente", "cai direto no gráfico") sem mexer nos fatos nem na CTA. Antes e depois: `research_notes/Rotina v3 2026-10/roteiro/`.
+
+## 17/10/2026: roteiro de vídeo com falas curtas (Rotina v6)
+
+- O aviso de "três falas seguidas com tamanho parecido" dispara fácil com falas de 8 a 11 palavras. Julgue pela forma das frases e pelo CoV do roteiro todo, como a guarda da skill manda.
+- Em roteiro que passeia pelas abas do app, as falas tendem a começar todas com "No X," ("No Rotina", "Nos hábitos", "No financeiro"). Confira as aberturas seguidas. Detalhes: `projetos/rotina/PASSO-A-PASSO.md` (item 9).

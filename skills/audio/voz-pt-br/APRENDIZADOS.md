@@ -73,3 +73,8 @@ As outras (Despina, Autonoe, Pulcherrima e Aoede) não foram destacadas. As trê
 - **Chave:** a primeira chave do Gemini respondeu 401; o script passou sozinho para a segunda. Nenhuma chave entrou no repositório.
 - **Transcrição (`conferir_voz.py`, modelo small):** 93,4% na voz sozinha e 95,6% no áudio final. Erros: "eu começo" virou "o começo", "Rotina" virou "rutina" e "anotou peso" saiu colado ("anotopeza"). O modelo `large-v3-turbo` quebrou no alinhamento de palavras do faster-whisper (`IndexError` em `find_alignment`); fique no small ou passe sem marcação de palavras.
 - Detalhes: `projetos/rotina/PASSO-A-PASSO.md` (item 6) e `reports/Vídeo Rotina v3, skills e combos usados (2026-10-12).md`.
+
+## 17/10/2026: ritmo da Leda a 1,0x e conferência de palavras curtas (Rotina v5 e v6)
+
+- A Leda a 1,0x fala ~3,3 palavras/s dentro da fala; com 0,5 s entre falas, dá ~2,5 a 2,6 palavras/s no total (v5: 45 palavras em 17,8 s; v6: 94 palavras em 35,6 s).
+- O Whisper small ouviu "Tudo num app só" como "Tudo não é piçó". O large-v3-turbo, num trecho curto (2 s), ouviu certo. Use o small para a passada geral e o turbo nos trechos com diferença. Detalhes: `projetos/rotina/PASSO-A-PASSO.md` (item 9).
