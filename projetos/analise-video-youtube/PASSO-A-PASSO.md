@@ -41,6 +41,16 @@
 - No celular, a janela de aprovação de mudança de rede pode ser recusada sozinha. Peça ao Daniel para aprovar pelo navegador.
 - A transcrição small erra nomes próprios. Confira os nomes nos quadros (texto na tela) antes de citar.
 
+## Versão 3 do mapa (13/11/2026, pedido do Daniel)
+
+- **O que mudou:** o mapa virou **HTML puro** (sem D3), feito com a `skills/design/ui-ux-pro-max/SKILL.md`. Modo Operar/Ler, arquétipo "instrumento de precisão" claro, com escuro automático. Uma fonte (Instrument Sans 400/500/600), um acento azul só para ação, raios 8/12/pílula, sem sombra em card, alvos de 44px.
+- **Estrutura da tela:**
+  - à esquerda, o **mapa mental por categorias** (árvore que abre e fecha, com busca); no celular, ele vira uma gaveta pelo botão "Mapa";
+  - à direita, a página da parte, nesta ordem: definição → **opções de acesso às partes de dentro** → por que funciona → como aplicar → **como adaptar a qualquer tema e formato** → frase-modelo → exemplo do vídeo analisado → erros comuns → **anotações** → **outras partes / voltar** → anterior e próximo passo.
+- **Anotações:** ficam salvas no navegador (localStorage), com um ponto azul no mapa onde houver nota. A página "Anotações" junta todas e baixa em `.md`.
+- **Sem minutagem:** foram tirados todos os tempos e timestamps, para a estrutura servir para qualquer tema e formato.
+- **Conferido** com o Playwright em 1440px (claro e escuro) e no iPhone 13: sem erros e sem rolagem lateral; a anotação continua lá depois de recarregar.
+
 ## Próximo passo
 
 - Usar o `template-roteiro.md` e o `prompt-roteiro.md` num vídeo real do Daniel e anotar aqui o que funcionou.
