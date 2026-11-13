@@ -7,7 +7,8 @@
   - `analise.md`: resumo, gancho de 3/10/30 s, linha do tempo, loops, técnicas, conceitos, frases-modelo e o esqueleto
   - `mapa-mental.md`: Mermaid mindmap
   - `processo.md`: Mermaid flowchart + tabela "o que fazer em cada etapa"
-  - `slides.html`: 12 slides escuros, setas ou deslize, checklist que fica salvo no navegador
+  - `mapa-construcao.html`: **a entrega principal (pedido do Daniel em 13/11).** Mapa mental navegável da arquitetura do vídeo, da ideia à publicação, com 9 fases e ~70 ramos. Clicar num ramo abre os filhos e um painel com: o que é, por que funciona, como aplicar, estrutura (filhos), exemplo no vídeo com tempo, frase-modelo e erros comuns. Botões anterior/próximo percorrem o mapa na ordem de construção. O D3 7.9.0 está embutido no arquivo (funciona sem internet). Skill de design usada: `skills/design/frontend-design/SKILL.md`
+  - (o `slides.html` foi removido: o Daniel não quer slides com checklist, quer um mapa/arquitetura)
   - `template-roteiro.md`: template em branco
   - `prompt-roteiro.md`: prompt pronto para a IA escrever o roteiro
 - **O vídeo e os quadros foram apagados no fim.** Só as análises ficaram.
@@ -27,9 +28,13 @@
    - Hosts do Hugging Face liberados: `huggingface.co`, `cas-server.xethub.hf.co`, `us.aws.cdn.hf.co`, `cas-bridge.xethub.hf.co`, `transfer.xethub.hf.co`.
    - **Problema:** o `PyAV` novo quebra o `decode_audio` (`metadata_errors`). **Solução:** extrair um WAV mono de 16 kHz com o ffmpeg e passar para o `transcribe()` um array numpy lido com o módulo `wave`.
    - Comando: `ffmpeg -i video.mp4 -vn -ac 1 -ar 16000 audio.wav`, depois `model.transcribe(arr, language="pt", beam_size=1, vad_filter=True, condition_on_previous_text=False)`.
-6. **Slides conferidos** com o Playwright em 1280×720 e no iPhone 13: sem erros e sem rolagem lateral.
+6. **Mapa conferido** com o Playwright em 1440×860 e no iPhone 13 (clicar, abrir tudo, anterior/próximo): sem erros e sem rolagem lateral.
+   - Cuidado 1: o cdnjs é bloqueado neste container. Embuta a biblioteca (`npm pack d3@7.9.0`, copie `dist/d3.min.js` para dentro do HTML).
+   - Cuidado 2: um `<svg>` com `position:fixed; inset:0` fica com 300×150; ponha `width:100%; height:100%` explícitos.
 
 ## Aprendizados
+
+- **Preferência do Daniel (13/11/2026):** para guias de produção, ele quer **mapa mental navegável / arquitetura** (clicar e ver a explicação: o que é, por que funciona, como aplicar), e **não slides com checklist**. Foco em estrutura de roteiro e de vídeo (gancho, começo, meio, fim), não em teoria do algoritmo.
 
 - Para vídeos do YouTube na nuvem: **peça logo o MP4 (Drive) ou uma chave do Gemini** (motor `gemini` da skill `watch`, em que o Google assiste pelo link). Não perca tempo tentando o yt-dlp direto.
 - A chave do Gemini **não** dá para salvar pelo formulário de credencial, porque ela vai no cabeçalho `x-goog-api-key`. Ela entra pelas configurações do ambiente (segredo de rede) ou colada no chat e salva só no container.
