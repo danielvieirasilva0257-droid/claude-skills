@@ -23,7 +23,7 @@ Este combo **não repete** o conteúdo das skills: ele diz qual usar em cada eta
 | Música, efeitos, ducking, −14 LUFS | trilha-e-mixagem | `skills/audio/trilha-e-mixagem/SKILL.md` |
 | Exportar e conferir por plataforma | ffmpeg | `skills/video/ffmpeg/SKILL.md` |
 | Visual e paleta | ui-ux-pro-max | `skills/design/ui-ux-pro-max/SKILL.md` |
-| Plataformas pagas opcionais (não são skills) | HeyGen (avatar), ElevenLabs (voz clonada, efeitos, trilha) | usar só se o Daniel pedir e passar a chave |
+| Plataformas pagas (só se o Daniel pedir e passar a chave) | heygen (avatar), elevenlabs (voz clonada, efeitos, trilha, transcrição) | `skills/video/heygen/` e `skills/audio/elevenlabs/` |
 
 ## Escolha do caminho (antes de tudo)
 
