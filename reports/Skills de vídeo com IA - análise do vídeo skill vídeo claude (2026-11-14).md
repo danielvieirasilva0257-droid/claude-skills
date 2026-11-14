@@ -2,7 +2,7 @@
 
 **Fonte:** vídeo `skill vídeo claude.mp4`, da pasta do Drive do Daniel (7min36s). Assisti com a skill `watch` (96 quadros) e com transcrição local; o prompt e os números li direto na tela. O vídeo foi apagado depois da análise. As anotações brutas estão em `research_notes/Caça de skills 2026-11 (vídeo com IA)/notas-video-skill-video-claude.md`.
 
-**Status:** lista pronta. **Nada foi instalado ainda**: esperando a aprovação do Daniel.
+**Status (14/11/2026):** o Daniel aprovou e foram instaladas `hyperframes`, `hyperframes-comunidade`, `gsap`, `video-use`, `remotion-oficial`, `ffmpeg` e `watch` (em `skills/video/`). HeyGen e ElevenLabs ficaram como **plataformas** que se usam direto, e não como skills. O mapa de uso é o `skills/combos/combo-video-ia-completo/SKILL.md`. A skill própria de visão computacional foi proposta e aguarda aprovação.
 
 ---
 
