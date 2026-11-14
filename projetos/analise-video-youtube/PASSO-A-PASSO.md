@@ -51,6 +51,12 @@
 - **Sem minutagem:** foram tirados todos os tempos e timestamps, para a estrutura servir para qualquer tema e formato.
 - **Conferido** com o Playwright em 1440px (claro e escuro) e no iPhone 13: sem erros e sem rolagem lateral; a anotação continua lá depois de recarregar.
 
+## Artefato publicado (14/11/2026)
+
+- **Link (privado, só do Daniel até ele compartilhar):** https://claude.ai/artifact/5ebHrHCQQM6h7L2S57SyN7
+- Para atualizar: publicar de novo o mesmo arquivo (`reports/analise-video-LK1GKHCdNAA/mapa-construcao.html`) com a ferramenta Artifact, ou passar esse link como `url` numa outra conversa.
+- Capacidades: `db` + `user` (as anotações ficam em `data/users/<id>`, privadas para cada pessoa e iguais em todos os aparelhos; o navegador fica de reserva) e `downloads` (o "Baixar anotações (.md)" usa `downloads.save`, porque um link de download comum não funciona dentro do visualizador de artefatos).
+
 ## Próximo passo
 
 - Usar o `template-roteiro.md` e o `prompt-roteiro.md` num vídeo real do Daniel e anotar aqui o que funcionou.

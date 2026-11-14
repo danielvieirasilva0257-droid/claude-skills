@@ -499,12 +499,40 @@ const path = n => { const p=[]; for(let a=n;a;a=a.parent) p.unshift(a); return p
 const esc = s => String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const countAll = n => n.kids.reduce((s,k)=>s+1+countAll(k),0);
 
-/* ---------- NOTES (per-viewer, browser storage) ---------- */
-const KEY = 'arquitetura-video-notas';
+/* ---------- NOTES ----------
+   Saved privately per viewer in the artifact db (data/users/<id>), so they follow the person
+   across devices; browser storage is the instant cache and the fallback when db is absent. */
+const KEY = 'arquitetura-video-notas-v2';
 let notes = {};
 try { notes = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch(e){ notes = {}; }
-const saveNotes = () => { try { localStorage.setItem(KEY, JSON.stringify(notes)); return true; } catch(e){ return false; } };
-const noteKey = n => path(n).map(p=>p.n).join(' / ');
+const noteId = n => 'p' + n.id;
+const noteKey = noteId;
+const label = n => path(n).slice(1).map(p=>p.n).join(' / ');
+let notesCol = null; let notesWhere = 'neste navegador';
+const saveLocal = () => { try { localStorage.setItem(KEY, JSON.stringify(notes)); return true; } catch(e){ return false; } };
+async function saveNote(n){
+  const ok = saveLocal();
+  if(!notesCol) return ok;
+  const ref = notesCol.doc(noteId(n)); const text = (notes[noteId(n)]||'');
+  try { if(text.trim()) await ref.set({text, label: label(n), updatedAt: Date.now()}); else await ref.delete(); return true; }
+  catch(e){ return ok; }
+}
+(async function connectNotes(){
+  if(!window.claude || typeof window.claude.use !== 'function') return;
+  try {
+    const [db, user] = await Promise.all([claude.use('db'), claude.use('user')]);
+    const uid = user ? await user.id() : null;
+    if(!db || !uid) return;
+    const col = db.collection('data/users/' + uid);
+    const snap = await Promise.race([col.get(), new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),10000))]);
+    const remote = {}; snap.docs.forEach(d=>{ const v=d.data(); if(v && typeof v.text==='string') remote[d.id]=v.text; });
+    notesCol = col; notesWhere = 'na sua conta';
+    for(const [k,v] of Object.entries(notes)){ if(!(k in remote) && v && v.trim()){ const n=byId[+k.slice(1)]; if(n){ remote[k]=v; try{ await col.doc(k).set({text:v,label:label(n),updatedAt:Date.now()}); }catch(e){} } } }
+    notes = remote; saveLocal(); refreshNoteMarks();
+    const ta = document.getElementById('note'); if(ta && cur && document.activeElement!==ta) ta.value = notes[noteId(cur)] || '';
+    if(document.getElementById('dl') !== null || location.hash==='#anotacoes') renderNotes();
+  } catch(e){ /* keep browser storage */ }
+})();
 function refreshNoteMarks(){
   const filled = Object.values(notes).filter(v=>v && v.trim()).length;
   document.getElementById('ncount').textContent = filled;
@@ -584,20 +612,27 @@ function render(n){
   page.innerHTML = h;
 
   const ta = document.getElementById('note');
-  if(ta){ let t; ta.addEventListener('input', ()=>{ notes[noteKey(n)] = ta.value; clearTimeout(t); t=setTimeout(()=>{ document.getElementById('nst').textContent = saveNotes() ? 'Salvo neste navegador' : 'Não foi possível salvar neste navegador'; refreshNoteMarks(); }, 400); }); }
+  if(ta){ let t; ta.addEventListener('input', ()=>{ notes[noteKey(n)] = ta.value; clearTimeout(t); t=setTimeout(async ()=>{ const st=document.getElementById('nst'); if(st) st.textContent='Salvando…'; const ok = await saveNote(n); const st2=document.getElementById('nst'); if(st2) st2.textContent = ok ? 'Salvo ' + notesWhere : 'Não foi possível salvar agora'; refreshNoteMarks(); }, 500); }); }
 }
 function renderNotes(){
   cur = null; renderTree();
   const items = nodes.filter(n=>(notes[noteKey(n)]||'').trim());
-  let h = `<div class="fade"><nav class="crumb"><button data-go="0">Início</button></nav><h1>Minhas anotações</h1><p class="lead">Tudo o que você escreveu nas partes do mapa, na ordem da construção. As anotações ficam salvas neste navegador.</p>`;
-  h += `<div class="actions"><button class="btn-p" id="dl" ${items.length?'':'disabled'}>Baixar anotações (.md)</button><button class="btn-s" data-go="1">Começar pelo passo 1</button></div>`;
-  h += items.length ? `<div class="nlist">${items.map(n=>`<div class="nitem"><button data-go="${n.id}">${esc(noteKey(n).replace(/^Vídeo \/ /,''))}</button><p>${esc(notes[noteKey(n)])}</p></div>`).join('')}</div>` : `<p class="note-line">Nenhuma anotação ainda. Abra uma parte do mapa e escreva no campo “Anotações” no fim da página.</p>`;
+  let h = `<div class="fade"><nav class="crumb"><button data-go="0">Início</button></nav><h1>Minhas anotações</h1><p class="lead">Tudo o que você escreveu nas partes do mapa, na ordem da construção. As anotações ficam salvas só para você.</p>`;
+  h += `<div class="actions"><button class="btn-p" id="dl" ${items.length?'':'disabled'}>Baixar anotações (.md)</button><button class="btn-s" data-go="1">Começar pelo passo 1</button></div><p class="st" id="dlst" aria-live="polite" style="font-size:13px;color:var(--text-3);margin-top:8px"></p>`;
+  h += items.length ? `<div class="nlist">${items.map(n=>`<div class="nitem"><button data-go="${n.id}">${esc(label(n))}</button><p>${esc(notes[noteKey(n)])}</p></div>`).join('')}</div>` : `<p class="note-line">Nenhuma anotação ainda. Abra uma parte do mapa e escreva no campo “Anotações” no fim da página.</p>`;
   h += `</div>`;
   page.innerHTML = h;
   const dl = document.getElementById('dl');
-  if(dl) dl.onclick = ()=>{
-    const md = '# Minhas anotações: arquitetura do vídeo\n\n' + items.map(n=>`## ${noteKey(n).replace(/^Vídeo \/ /,'')}\n\n${notes[noteKey(n)].trim()}\n`).join('\n');
-    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([md],{type:'text/markdown'})); a.download = 'anotacoes-arquitetura-video.md'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+  if(dl) dl.onclick = async ()=>{
+    const md = '# Minhas anotações: arquitetura do vídeo\n\n' + items.map(n=>`## ${label(n)}\n\n${notes[noteKey(n)].trim()}\n`).join('\n');
+    const st = document.getElementById('dlst'); const filename = 'anotacoes-arquitetura-video.md';
+    let dls = null; try { dls = window.claude && claude.use ? await claude.use('downloads') : null; } catch(e){}
+    if(dls){
+      try { await dls.save({filename, data: md}); st.textContent = 'Arquivo salvo.'; }
+      catch(e){ st.textContent = e && e.code==='declined' ? 'Download cancelado.' : e && e.code==='rate_limited' ? 'Aguarde um instante e tente de novo.' : 'O download não está disponível aqui.'; }
+      return;
+    }
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([md],{type:'text/markdown'})); a.download = filename; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
   };
   scrollTo({top:0});
   history.replaceState(null,'','#anotacoes');
