@@ -1,0 +1,5 @@
+mediapipe>=1.2
+opencv-contrib-python-headless>=5.0
+pytesseract>=0.3
+numpy
+pillow

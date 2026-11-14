@@ -22,6 +22,7 @@ Este combo **não repete** o conteúdo das skills: ele diz qual usar em cada eta
 | Editar gravação real (cortes pela transcrição) | video-use | `skills/video/video-use/SKILL.md` |
 | Música, efeitos, ducking, −14 LUFS | trilha-e-mixagem | `skills/audio/trilha-e-mixagem/SKILL.md` |
 | Exportar e conferir por plataforma | ffmpeg | `skills/video/ffmpeg/SKILL.md` |
+| Rosto, recorte da pessoa, rastreamento, OCR e checagem das regras | visao-computacional | `skills/video/visao-computacional/SKILL.md` |
 | Visual e paleta | ui-ux-pro-max | `skills/design/ui-ux-pro-max/SKILL.md` |
 | Plataformas pagas (só se o Daniel pedir e passar a chave) | heygen (avatar), elevenlabs (voz clonada, efeitos, trilha, transcrição) | `skills/video/heygen/` e `skills/audio/elevenlabs/` |
 
@@ -48,14 +49,14 @@ Este combo **não repete** o conteúdo das skills: ele diz qual usar em cada eta
 | 7 | Animação e montagem | Cenas no motor escolhido, cada entrada presa a uma palavra, curvas do padrão premium, as 4 regras do editor | remotion-video **ou** hyperframes + gsap **ou** motion-video | projeto do vídeo |
 | 8 | Som | Trilha com o tamanho dos capítulos, efeitos ligados a algo visível, ducking, −14 LUFS | trilha-e-mixagem | `mix.wav` |
 | 9 | Prévia | Render rápido (720p) e folha de quadros | motor + ffmpeg (`look.py`) | `preview.mp4` ✋ |
-| 10 | **Autorrevisão** (antes de mostrar) | Ver os quadros de cada cena; texto sobre rosto ou sobre texto; recorte no meio da tela; **transcrever o áudio final e comparar com o roteiro**; medir o volume. No máximo 3 passadas, depois avisar o que sobrou | watch + ffmpeg + `hyperframes check/snapshot` | `REVISAO.md` |
+| 10 | **Autorrevisão** (antes de mostrar) | Ver os quadros de cada cena; **`conferir_regras.py`** (texto sobre rosto ou sobre texto); recorte no meio da tela; **transcrever o áudio final e comparar com o roteiro**; medir o volume. No máximo 3 passadas, depois avisar o que sobrou | visao-computacional + watch + ffmpeg + `hyperframes check/snapshot` | `REVISAO.md` |
 | 11 | Render final e conferência | Um render por vez; `check.py --platform` (YouTube, Reels, TikTok) | motor + ffmpeg | `final.mp4` ✋ |
 | 12 | Publicação e aprendizado | Teste A/B de título e thumb, tela final para outro vídeo; anotar o que funcionou | arquitetura (ramo 9) | `PASSO-A-PASSO.md` do projeto e `APRENDIZADOS.md` das skills |
 
 ## Avisos aprendidos
 
 - **O tempo de cada palavra manda.** Cortes, entradas de texto e efeitos caem numa palavra (`voz.json` da voz-pt-br, ou transcrição local com faster-whisper na gravação).
-- **Visão computacional a serviço das regras do editor:** com o rosto localizado, nenhum texto passa na frente dele; com a pessoa recortada, o título pode ficar atrás dela sem máscara no meio da tela. Recorte: `hyperframes remove-background` ou o matting do Remotion oficial. Rastreamento e OCR: skill nossa proposta (`video/visao-computacional`, aguardando aprovação).
+- **Visão computacional a serviço das regras do editor:** com o rosto localizado, nenhum texto passa na frente dele; com a pessoa recortada, o título pode ficar atrás dela sem máscara no meio da tela. Recorte: `hyperframes remove-background` ou o matting do Remotion oficial. Rastreamento, OCR e a checagem automática de "texto sobre o rosto": `skills/video/visao-computacional/` (testada em 14/11/2026).
 - **Reaproveite o motor do projeto anterior.** Cada projeto deixa componentes e funções que o próximo usa (no vídeo analisado, 419 linhas do motor anterior entraram de base).
 - **Telemetria desligada** nas skills do HyperFrames (`HYPERFRAMES_NO_TELEMETRY=1 DO_NOT_TRACK=1`).
 - **Container:** 4 CPUs, sem GPU, um render por vez; o YouTube não baixa daqui (vídeos de referência pelo Google Drive).

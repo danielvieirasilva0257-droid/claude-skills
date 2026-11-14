@@ -17,6 +17,8 @@ MODELOS = {
     "rosto": _BASE + "face_detector/blaze_face_short_range/float16/latest/blaze_face_short_range.tflite",
     "pessoa": _BASE + "image_segmenter/selfie_segmenter/float16/latest/selfie_segmenter.tflite",
     "pessoa_multiclasse": _BASE + "image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite",
+    # text-region detector (PP-OCRv3 DB, Apache-2.0) from the official OpenCV model zoo; finds text by shape, any colour
+    "texto": "https://media.githubusercontent.com/media/opencv/opencv_zoo/main/models/text_detection_ppocr/text_detection_en_ppocrv3_2023may.onnx",
 }
 
 
