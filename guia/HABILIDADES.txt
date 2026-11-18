@@ -89,6 +89,7 @@ manual de utilização do repositório (pastas, arquivos, receitas, GitHub, apro
 2b) PROJETOS (cada um tem só um PASSO-A-PASSO com o que foi feito e os caminhos das habilidades)
 --------------------------------------------------------------------------------------------------
 Rotina (vídeos do app: teaser 10 s, explicativo 60 s, promo v2/v2.1 30 s com celular 3D, promo v3 30 s com o celular todo no Blender e promo v4 30 s = celular do Blender + visual papel e tinta do v2) | projetos/rotina/PASSO-A-PASSO.md (código: branch rotina-video, pasta rotina-video/)
+App Barbeiros (app mobile para o barbeiro individual: agenda, faturamento, comissão escalonada, metas, IA de insights e 67 estratégias; etapas e skills de cada etapa, botão 3D "pulo com giro") | projetos/app-barbeiros/PASSO-A-PASSO.md (banco: banco_de_dados_app_barbeiros_para_ia.sql; plano completo no Claude Docs)
 
 3) HABILIDADES DA PLATAFORMA (não estão no repositório; chamar pelo nome com a ferramenta Skill)
 -------------------------------------------------------------------------------------------------
