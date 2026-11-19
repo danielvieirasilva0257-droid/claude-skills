@@ -1,0 +1,69 @@
+{
+  "name": "app-barbeiros",
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "dependencies": {
+    "@expo-google-fonts/inter": "^0.4.2",
+    "@hookform/resolvers": "^7.0.7",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@supabase/supabase-js": "^2.119.2",
+    "@tanstack/react-query": "^5.108.1",
+    "date-fns": "^4.4.0",
+    "expo": "~58.0.26",
+    "expo-constants": "~58.0.16",
+    "expo-font": "~58.0.12",
+    "expo-haptics": "~58.0.8",
+    "expo-linking": "~58.0.17",
+    "expo-router": "~58.0.32",
+    "expo-splash-screen": "~58.0.14",
+    "expo-status-bar": "~58.0.5",
+    "expo-symbols": "~58.0.5",
+    "expo-web-browser": "~58.1.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-hook-form": "^7.92.0",
+    "react-native": "0.88.1",
+    "react-native-gesture-handler": "~3.3.0",
+    "react-native-reanimated": "4.7.1",
+    "react-native-safe-area-context": "~5.11.1",
+    "react-native-screens": "~4.30.1",
+    "react-native-url-polyfill": "^4.0.0",
+    "react-native-web": "~0.21.4",
+    "react-native-worklets": "0.13.0",
+    "zod": "^4.6.7",
+    "zustand": "^5.1.0"
+  },
+  "devDependencies": {
+    "@jest/globals": "^30.5.2",
+    "@testing-library/react-native": "^14.1.0",
+    "@types/react": "~19.3.0",
+    "jest": "^30.5.2",
+    "jest-expo": "~58.0.15",
+    "supabase": "^3.2.0",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "db:start": "bash scripts/supabase-local.sh start",
+    "db:stop": "bash scripts/supabase-local.sh stop",
+    "db:reset": "bash scripts/supabase-local.sh db reset",
+    "db:status": "bash scripts/supabase-local.sh status",
+    "web:export": "expo export --platform web",
+    "smoke": "node scripts/smoke-web.mjs",
+    "test:db": "bash scripts/supabase-local.sh test db"
+  },
+  "private": true,
+  "jest": {
+    "preset": "jest-expo",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/",
+      "/supabase/"
+    ]
+  }
+}

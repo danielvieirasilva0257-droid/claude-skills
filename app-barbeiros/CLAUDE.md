@@ -19,3 +19,19 @@ Esta pasta é o código do App Barbeiros. Antes de qualquer tarefa:
 - **Sem dark patterns:** cancelamento visível, sem culpa, sem contagem regressiva falsa, exportação de dados em todos os planos.
 - **Peça aprovação do Daniel** nos pontos marcados com ✋ na especificação (DESIGN.md, telas, animações por frames, revisão final).
 - Máquina da nuvem tem 4 CPUs e sem GPU: não rode vários builds/renders ao mesmo tempo.
+
+## Comandos (desde a Fase 0)
+
+Rode dentro de `app-barbeiros/`. Detalhes e porquês em `../projetos/app-barbeiros/PASSO-A-PASSO.md`.
+
+| Comando | O que faz |
+| --- | --- |
+| `npm run db:start` | sobe o Supabase local (Postgres, Auth, REST) pelo Docker |
+| `npm run db:reset` | recria o banco: migrations + `supabase/seed.sql` |
+| `npm run test:db` | testes pgTAP do banco com o seed (`supabase/tests/`) |
+| `npm run typecheck` / `npm test` | TypeScript estrito / Jest |
+| `npm run web:export && npm run smoke` | teste de fumaça no navegador (abre, entra, lê `v_metricas_mes`) |
+
+- `.env` local: copie `.env.example` e use a URL e a `ANON_KEY` de `npm run db:status`.
+- **Container da nuvem:** o Docker não sobe sozinho (`nohup dockerd > /tmp/dockerd.log 2>&1 &`); as imagens vêm do Docker Hub (o script já faz isso); `npx expo install` e `npx expo export` precisam de `EXPO_OFFLINE=1`, porque o proxy bloqueia a API da Expo.
+- Versões do Expo mudam a cada SDK: antes de usar uma API, confira a documentação da versão (`https://docs.expo.dev/versions/v58.0.0/`).

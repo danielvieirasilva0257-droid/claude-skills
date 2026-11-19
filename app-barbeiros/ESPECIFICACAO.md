@@ -1,7 +1,7 @@
 # App Barbeiros — especificação para construir no Claude Code
 
-**Fase atual:** Fase 0 (preparar o projeto)
-**Versão:** 1 · 19/11/2026
+**Fase atual:** Fase 1 (design e componentes) ✋ · Fase 0 pronta em 19/11/2026
+**Versão:** 1.1 · 19/11/2026
 **Fonte de negócio:** Plano de Negócio — App Barbeiros (https://claude.ai/artifact/S6HbgHKHwANXCssPUsmQAn). Se algo aqui contradizer o plano, pergunte ao Daniel.
 
 ---
@@ -335,12 +335,21 @@ Skills do repositório ficam em `../skills/...`. Externas (marcadas com *) ainda
 
 ### Fase 0 — Preparar o projeto
 Skills: `../skills/sites/vercel-react-best-practices` (partes React); *animating-react-native-expo.
-- [ ] Projeto Expo + TypeScript estrito + Expo Router com as 5 abas vazias
-- [ ] `src/theme/tokens.ts` igual à seção 6 e fonte Inter carregada
-- [ ] Supabase local (ou projeto de teste) com a migration 0001 aplicada sem erro
-- [ ] `supabase/seed.sql` com 1 barbeiro, 7 serviços, combos padrão, 3 clientes, 3 meses de atendimentos e ofertas
-- [ ] `.env.example` e `.gitignore` (sem segredos)
-- [ ] Teste de fumaça: o app abre, faz login de teste e lê `v_metricas_mes`
+- [x] Projeto Expo + TypeScript estrito + Expo Router com as 5 abas vazias
+- [x] `src/theme/tokens.ts` igual à seção 6 e fonte Inter carregada
+- [x] Supabase local (ou projeto de teste) com a migration 0001 aplicada sem erro
+- [x] `supabase/seed.sql` com 1 barbeiro, 7 serviços, combos padrão, 3 clientes, 3 meses de atendimentos e ofertas
+- [x] `.env.example` e `.gitignore` (sem segredos)
+- [x] Teste de fumaça: o app abre, faz login de teste e lê `v_metricas_mes`
+
+**Como ficou (19/11/2026):**
+- Expo SDK 58 · React Native 0.88 · React 19.3 · Expo Router 58 · Reanimated 4.7 · TypeScript 6 (estrito + `noUncheckedIndexedAccess`). Rive, Skia e confete entram na Fase 1.
+- Supabase local pelo Docker (Postgres 17): `npm run db:start` e `npm run db:reset` (migrations + seed). Login de teste: `barbeiro.teste@example.com` / `senha-teste-123` (só no banco local).
+- **Migration 0002** (nova): (1) liga RLS em `combos_padrao`, que era a única tabela aberta (com a chave pública dava para apagar os combos); (2) põe o banco no fuso `America/Sao_Paulo`, porque em UTC um corte às 22h do dia 31 caía no mês seguinte nas views.
+- Seed com datas relativas a hoje (horário de Brasília). Ele reproduz as conferências da seção 5, que viraram teste: `npm run test:db` (pgTAP, 13 testes).
+- Teste de fumaça: `npm run web:export && npm run smoke` (Playwright: abre, senha errada mostra erro, entra, Início mostra o faturamento igual ao do banco, as 5 abas abrem, sair volta para Entrar). O bundle Android também compila (`npx expo export --platform android`).
+- Login da Fase 0 é só e-mail e senha; Google, cadastro, linha em `barbeiros` no 1º login e onboarding ficam na Fase 2. O botão da Fase 0 (`BotaoProvisorio`) é trocado pelo `DuoButton` na Fase 1.
+- Rotas: a tela de login fica em `app/(auth)/entrar.tsx` **sem** `_layout` no grupo (com layout e sem `index`, quem saía caía em "Tela não encontrada"). O layout raiz usa `Stack.Protected`.
 
 ### Fase 1 — Design e componentes ✋
 Skills: `../skills/design/ui-ux-pro-max` (DESIGN.md), `../skills/design/estilos-premium`, `../skills/design/frontend-design`, `../skills/design/taste-skill`, `../skills/design/motion-oficial`, `../skills/design/button-animation`, `../skills/design/animation-vocabulary`; *fintech-ux, *color-expert.
@@ -393,7 +402,7 @@ Skills: dataviz (Claude) para os gráficos, *financial-design-systems, `../skill
 ### Fase 8 — Qualidade (em todas as fases)
 Skills: `../skills/design/review-animations`, `../skills/design/web-design-guidelines`, `../skills/sites/web-quality/accessibility`, `../skills/sites/webapp-testing`, `../skills/sites/playwright-cli`.
 - [ ] Testes unitários dos formatadores e da lógica de planos
-- [ ] Teste SQL das funções do banco com o seed (comissão total e marginal, ofertas, `pode_enviar`)
+- [x] Teste SQL das funções do banco com o seed (comissão total e marginal, ofertas, `pode_enviar`) · `supabase/tests/`, desde a Fase 0
 - [ ] Fluxos E2E: lançar atendimento, fechar caixa, bater meta, configurar comissão
 - [ ] Revisão de animação e acessibilidade ✋ aprovação final
 
