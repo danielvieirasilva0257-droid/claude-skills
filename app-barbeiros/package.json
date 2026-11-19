@@ -42,6 +42,7 @@
     "@jest/globals": "^30.5.2",
     "@testing-library/react-native": "^14.1.0",
     "@types/react": "~19.3.0",
+    "deno": "^2.9.6",
     "jest": "^30.5.2",
     "jest-expo": "~58.0.15",
     "supabase": "^3.2.0",
@@ -62,7 +63,9 @@
     "smoke": "node scripts/smoke-web.mjs",
     "test:db": "bash scripts/supabase-local.sh test db",
     "galeria": "node scripts/galeria-prints.mjs",
-    "e2e": "node scripts/e2e-web.mjs"
+    "e2e": "node scripts/e2e-web.mjs",
+    "funcoes:dev": "bash scripts/funcoes-env.sh deno run --config supabase/functions/deno.json --allow-net --allow-env --allow-read supabase/functions/_dev/servidor.ts",
+    "test:funcoes": "bash scripts/funcoes-env.sh deno test --config supabase/functions/deno.json --allow-net --allow-env --allow-read supabase/functions/_testes/"
   },
   "private": true,
   "jest": {
