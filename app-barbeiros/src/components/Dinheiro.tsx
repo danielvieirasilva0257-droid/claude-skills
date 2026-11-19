@@ -9,7 +9,9 @@ type Props = Omit<TextoProps, 'children'> & { valor: number | string | null | un
 
 export function Dinheiro({ valor, sinal, ...props }: Props) {
   const oculto = usePreferencias((s) => s.ocultarValores);
-  const texto = oculto ? VALOR_OCULTO : formatMoeda(valor);
+  // With an explicit sign, show the absolute value ("− R$ 19,40", never "− -R$ 19,40").
+  const mostrar = sinal && valor !== null && valor !== undefined ? Math.abs(Number(valor)) : valor;
+  const texto = oculto ? VALOR_OCULTO : formatMoeda(mostrar);
   return (
     <Texto numero {...props} accessibilityLabel={oculto ? 'Valor escondido' : undefined}>
       {sinal && !oculto ? `${sinal} ` : ''}

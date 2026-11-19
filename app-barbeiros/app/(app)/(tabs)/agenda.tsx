@@ -18,6 +18,7 @@ import { AgendarSheet } from '@/features/agenda/AgendarSheet';
 import { useAgendaDia, useFecharCaixa, useReabrirCaixa, useResumoDia, type ItemAgenda } from '@/features/agenda/api';
 import { AtendimentoSheet, NOME_STATUS } from '@/features/agenda/AtendimentoSheet';
 import { LancarSheet } from '@/features/agenda/LancarSheet';
+import { OfertasNaCadeira } from '@/features/agenda/OfertasNaCadeira';
 import { diaISO, formatDiaLongo, formatHora, somarDias } from '@/lib/format';
 import { color, radius, space } from '@/theme/tokens';
 
@@ -128,7 +129,8 @@ export default function Agenda() {
 
       <LancarSheet aberto={lancando} onFechar={() => setLancando(false)} />
       <AgendarSheet key={dia} aberto={agendando} onFechar={() => setAgendando(false)} diaInicial={dia} />
-      <AtendimentoSheet item={aberto} caixaFechado={caixaFechado} onFechar={() => setAberto(null)} />
+      <AtendimentoSheet item={aberto} caixaFechado={caixaFechado} onFechar={() => setAberto(null)}
+        extraAgendado={(item) => <OfertasNaCadeira atendimentoId={item.id} />} />
     </TelaBase>
   );
 }

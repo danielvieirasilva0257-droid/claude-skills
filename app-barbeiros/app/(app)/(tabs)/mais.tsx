@@ -79,7 +79,7 @@ export default function Mais() {
         <LinhaMenu testID="mais-taxas" rotulo="Maquininha e pagamento"
           detalhe={`Débito ${pct(barbeiro.data?.taxa_debito)}% · Crédito ${pct(barbeiro.data?.taxa_credito)}%`} onPress={abrirTaxas} />
         {ATALHOS.map((a) => (
-          <LinhaMenu key={a.rotulo} rotulo={a.rotulo} detalhe={a.detalhe} bloqueado={!libera(meuPlano, a.recurso)} onPress={() => router.push(a.rota)} />
+          <LinhaMenu key={a.rotulo} testID={a.testID} rotulo={a.rotulo} detalhe={a.detalhe} bloqueado={!libera(meuPlano, a.recurso)} onPress={() => router.push(a.rota)} />
         ))}
       </View>
 

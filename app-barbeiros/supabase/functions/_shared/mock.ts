@@ -16,6 +16,17 @@ const TITULO: Record<string, (s: Sinal) => string> = {
   narrativa_vencedora: () => 'Narrativa que funciona',
 };
 
+const PORQUE: Record<string, string> = {
+  queda_servico: 'Saiu bem menos do que no mês passado.',
+  clientes_sumidos: 'Quem some por muito tempo costuma ter ido para outro lugar.',
+  faixa_comissao: 'Passando de faixa, o percentual sobe.',
+  meta_em_risco: 'No ritmo atual, o mês fecha abaixo da meta.',
+  aceitacao_baixa: 'Você oferece bastante, mas poucos aceitam.',
+  produto_parado: 'Produto parado é dinheiro parado na prateleira.',
+  ratio_caindo: 'Cada cliente está levando menos serviços.',
+  narrativa_vencedora: 'Essa frase convence mais que as outras.',
+};
+
 const ACAO: Record<string, string> = {
   queda_servico: 'Hoje, ofereça junto do corte usando a narrativa que mais fecha.',
   clientes_sumidos: 'Mande uma mensagem curta para quem sumiu, sem desconto de cara.',
@@ -32,7 +43,7 @@ export function mockInsights(sinais: Sinal[], poucosDados: boolean) {
     insights: sinais.slice(0, 3).map((s, i) => ({
       sinal_id: i,
       titulo: (TITULO[s.sinal] ?? (() => 'Olho nos números'))(s).split(/\s+/).slice(0, 5).join(' '),
-      porque: i === 0 && poucosDados ? 'Ainda são poucos dados, mas o sinal já aparece.' : `Os números mostram: ${s.numero}.`,
+      porque: i === 0 && poucosDados ? 'Ainda são poucos dados, mas o sinal já aparece.' : (PORQUE[s.sinal] ?? 'Os números mudaram.'),
       acao: ACAO[s.sinal] ?? 'Veja os detalhes no relatório.',
       botao: s.botao ?? 'Ver detalhes',
     })),

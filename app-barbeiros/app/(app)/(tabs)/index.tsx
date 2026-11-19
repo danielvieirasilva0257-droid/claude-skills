@@ -14,6 +14,11 @@ import { TelaBase } from '@/components/TelaBase';
 import { Texto } from '@/components/Texto';
 import { useProximos, useResumoDia } from '@/features/agenda/api';
 import { LancarSheet } from '@/features/agenda/LancarSheet';
+import { Celebracao } from '@/features/conquistas/Celebracao';
+import { useInsights } from '@/features/pago/api';
+import { InsightCard } from '@/components/InsightCard';
+import { usePlano } from '@/features/conta/barbeiro';
+import { libera } from '@/lib/plano';
 import { useBarbeiro } from '@/features/conta/barbeiro';
 import { alternarOcultarValores, usePreferencias } from '@/features/conta/preferencias';
 import { diaISO, formatDiaLongo, formatHora } from '@/lib/format';
@@ -25,6 +30,10 @@ export default function Inicio() {
   const barbeiro = useBarbeiro();
   const resumo = useResumoDia();
   const proximos = useProximos();
+  const plano = usePlano();
+  const comIA = libera(plano.data ?? 'gratis', 'insights');
+  const insights = useInsights();
+  const primeiro = comIA ? insights.data?.[0] : undefined;
   const oculto = usePreferencias((s) => s.ocultarValores);
   const [visao, setVisao] = useState<Visao>('faturamento');
   const [lancando, setLancando] = useState(false);
@@ -73,6 +82,11 @@ export default function Inicio() {
         )}
       </Cartao>
 
+      {primeiro ? (
+        <InsightCard testID="inicio-insight" titulo={primeiro.titulo} numero={primeiro.numero} porque={primeiro.porque}
+          acao={primeiro.acao} botao="Ver insights" onPress={() => router.push('/insights')} />
+      ) : null}
+
       <Texto variante="h3" accessibilityRole="header">Próximos horários</Texto>
       {proximos.isPending ? (
         <Carregando />
@@ -99,6 +113,7 @@ export default function Inicio() {
         })
       )}
       <LancarSheet aberto={lancando} onFechar={() => setLancando(false)} />
+      <Celebracao />
     </TelaBase>
   );
 }

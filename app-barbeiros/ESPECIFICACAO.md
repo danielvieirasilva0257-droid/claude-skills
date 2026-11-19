@@ -1,6 +1,6 @@
 # App Barbeiros — especificação para construir no Claude Code
 
-**Fase atual:** Fase 3 (plano Pago e IA) · Fases 0, 1 e 2 prontas em 19/11/2026
+**Fase atual:** Fase 4 (Premium) · Fases 0 a 3 prontas em 19/11/2026
 **Versão:** 1.1 · 19/11/2026
 **Fonte de negócio:** Plano de Negócio — App Barbeiros (https://claude.ai/artifact/S6HbgHKHwANXCssPUsmQAn). Se algo aqui contradizer o plano, pergunte ao Daniel.
 
@@ -373,14 +373,16 @@ Skills: `../skills/design/ui-ux-pro-max`, `../skills/combos/combo-copy-humanizad
 
 ### Fase 3 — Plano Pago (telas 6–15) e IA
 Skills: dataviz (Claude) para os gráficos, *financial-design-systems, `../skills/combos/combo-copy-humanizada`; para a IA, a seção 9.
-- [ ] Clientes com ficha e faixa de sumidos (`v_clientes_sumidos`)
-- [ ] Financeiro, Meta (`sugerir_metas`), Relatórios com todos os indicadores e gráficos da seção 8
-- [ ] Comissão fixa/escalonada e extrato (`extrato_mes`, `proxima_faixa`) com cascata e PDF
-- [ ] MEI com alerta em 80% e 100%
-- [ ] `sugerir_ofertas` mostrado quando o cliente senta, com narrativa
-- [ ] Edge Functions `ia-insights`, `ia-chat`, `ia-narrativa`, `ia-entrevista` com saída validada
-- [ ] Celebrações com `ConquistaButton` e mascote em 50%/100% da meta
-- [ ] `LockedScreen` com prévia borrada para quem está no Grátis
+- [x] Clientes com ficha e faixa de sumidos (`v_clientes_sumidos`)
+- [x] Financeiro, Meta (`sugerir_metas`), Relatórios com todos os indicadores e gráficos da seção 8
+- [x] Comissão fixa/escalonada e extrato (`extrato_mes`, `proxima_faixa`) com cascata e PDF
+- [x] MEI com alerta em 80% e 100%
+- [x] `sugerir_ofertas` mostrado quando o cliente senta, com narrativa
+- [x] Edge Functions `ia-insights`, `ia-chat`, `ia-narrativa`, `ia-entrevista` com saída validada
+- [x] Celebrações com `ConquistaButton` e mascote em 50%/100% da meta
+- [x] `LockedScreen` com prévia borrada para quem está no Grátis
+
+**Como ficou (19/11/2026):** migration `0004` (parâmetros por ano com MEI 2026: limite R$ 81 mil, DAS serviços R$ 86,05; `v_clientes_lista`, `financeiro`, `progresso_meta`, `definir_meta`, conquistas, `v_mapa_calor`, `relatorio_mes`, `resumo_semana`, regra de comissão com faixas que emendam, `extrato_completo`, `mei_ano`, `sinais_insights`, `contexto_ia` sem nome nem telefone, `consumir_ia` com limite diário por plano). Edge Functions em `supabase/functions/` com o SDK oficial da Anthropic (`@anthropic-ai/sdk` 1.10.0): saída estruturada (`zodOutputFormat`) validada de novo com zod, `fallbacks: "default"` para recusa, chat em streaming, nomes trocados por "Cliente N" e de volta só na tela; **o número de cada insight é o do banco, nunca o da IA**. `LLM_PROVIDER=mock` (padrão) escreve textos a partir dos números, sem custo; `LLM_PROVIDER=anthropic` + `LLM_API_KEY` usa a IA de verdade. **Modelo:** `LLM_MODEL` vem `claude-opus-5-5` (o padrão da skill da API); para caber no custo-alvo de R$ 0,50 a R$ 2 por barbeiro/mês, a troca para `claude-haiku-5-5` é decisão do Daniel (seção 12). Gráficos com cores validadas pela skill `dataviz` (`src/theme/grafico.ts`), uma série por eixo, legenda, toque para ver o valor e "Ver em tabela". Testes: pgTAP (15 novos), Deno das funções (6, `npm run test:funcoes`) e E2E do plano Pago (insights, relatórios, meta com celebração de 50%, comissão, extrato, clientes, entrevista, chat, coach, MEI, financeiro, ofertas na cadeira) e do bloqueio no Grátis.
 
 ### Fase 4 — Premium (telas 16–19)
 - [ ] Expediente e lista de espera (estratégia V1)

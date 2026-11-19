@@ -1,6 +1,8 @@
 // End-to-end flows in the browser (web build of the app + local Supabase).
-// Run on a fresh database: npm run db:reset && npm run web:export && npm run e2e
+// Each flow resets the database to the seed first (E2E_SEM_RESET=1 skips it).
+// Needs: npm run web:export, and npm run funcoes:dev running (AI functions, mock).
 // Usage: node scripts/e2e-web.mjs [prints-dir] [flow-name ...]
+import { execSync } from 'node:child_process';
 import { mkdirSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join, resolve } from 'node:path';
@@ -36,6 +38,19 @@ async function print(page, nome) {
 
 async function aba(page, nome) {
   await page.getByRole('tab', { name: nome }).click();
+}
+
+// Celebrations pop up once per achievement; close any that is pending.
+async function fecharCelebracoes(page) {
+  for (let i = 0; i < 4; i++) {
+    const sheet = page.getByTestId('celebracao');
+    if (!(await sheet.isVisible().catch(() => false))) {
+      await page.waitForTimeout(800);
+      if (!(await sheet.isVisible().catch(() => false))) return;
+    }
+    await page.getByTestId('comemorar').click();
+    await sheet.waitFor({ state: 'detached', timeout: 10_000 });
+  }
 }
 
 function esperar(condicao, msg) {
@@ -104,6 +119,110 @@ export const fluxos = {
     await page.getByTestId('caixa-fechado').waitFor({ timeout: 10_000 });
     await print(page, 'f2-15-caixa-fechado');
   },
+  // Fase 3: plano Pago e IA (barbeiro do seed, Premium Plus; funções de IA locais em modo simulado).
+  async plano_pago_e_ia(page) {
+    await entrar(page, 'barbeiro.teste@example.com');
+    await page.getByTestId('hoje-valor').waitFor({ timeout: 20_000 });
+    await fecharCelebracoes(page);
+
+    await page.goto(`${BASE}/insights`);
+    await page.getByTestId('gerar-insights').click();
+    await page.getByTestId('insight').first().waitFor({ timeout: 20_000 });
+    const n = await page.getByTestId('insight').count();
+    esperar(n >= 1 && n <= 3, `insights: esperava 1 a 3, veio ${n}`);
+    await print(page, 'f3-01-insights');
+
+    await page.goto(`${BASE}/relatorios`);
+    await page.getByTestId('indicadores').waitFor({ timeout: 20_000 });
+    await page.getByTestId('grafico-servicos').waitFor();
+    await print(page, 'f3-02-relatorios');
+    await page.getByTestId('mapa-calor').scrollIntoViewIfNeeded();
+    await print(page, 'f3-03-mapa-calor');
+
+    await page.goto(`${BASE}/meta`);
+    await page.getByTestId('meta-sugerida').waitFor({ timeout: 20_000 });
+    await print(page, 'f3-04-meta-sugerida');
+    await page.getByTestId('meta-valor').fill('150');
+    await page.getByText('Salvar minha meta').click();
+    await page.getByTestId('meta-anel').waitFor();
+    await page.getByText('Metade da meta!').waitFor({ timeout: 10_000 });
+    await print(page, 'f3-05-meta-50-celebracao');
+    await page.getByTestId('comemorar').click();
+    await page.getByTestId('celebracao').waitFor({ state: 'detached', timeout: 10_000 });
+    const falta = normalizar(await page.getByTestId('meta-falta').innerText());
+    esperar(falta.includes('R$ 60,00') && falta.includes('2 cortes'), `meta: ${falta}`);
+    await print(page, 'f3-06-meta');
+
+    await page.goto(`${BASE}/comissao`);
+    await page.getByTestId('tipo-escalonada').click();
+    await page.getByTestId('comissao-salvar').click();
+    await page.getByText('✓ Salvo').waitFor({ timeout: 10_000 });
+    await print(page, 'f3-07-comissao');
+    await page.goto(`${BASE}/extrato`);
+    await page.getByTestId('cascata').waitFor({ timeout: 20_000 });
+    await page.getByTestId('proxima-faixa').waitFor();
+    await print(page, 'f3-08-extrato');
+
+    await page.goto(`${BASE}/clientes`);
+    await page.getByTestId('faixa-sumidos').waitFor({ timeout: 20_000 });
+    await print(page, 'f3-09-clientes');
+    await page.getByTestId('cliente-linha').first().click();
+    await page.getByTestId('ficha-salvar').waitFor({ timeout: 20_000 });
+    await print(page, 'f3-10-ficha');
+
+    await page.goto(`${BASE}/ia/chat`);
+    await page.getByTestId('entrevista').waitFor({ timeout: 20_000 });
+    await print(page, 'f3-11-entrevista');
+    for (let i = 0; i < 8; i++) {
+      await page.getByTestId('entrevista-resposta').fill(i === 6 ? 'O Rafael eu chamo no WhatsApp' : `Resposta ${i + 1}`);
+      await page.getByTestId('entrevista-continuar').click();
+    }
+    await page.getByTestId('chat-pergunta').waitFor({ timeout: 20_000 });
+    await page.getByTestId('chat-pergunta').fill('Como faço o Rafael voltar mais vezes?');
+    await page.getByTestId('chat-enviar').click();
+    await page.getByTestId('msg-ia').getByText(/faturou/).waitFor({ timeout: 20_000 });
+    const resposta = await page.getByTestId('msg-ia').innerText();
+    esperar(resposta.includes('Rafael'), 'o nome do cliente volta só na tela');
+    await print(page, 'f3-12-chat');
+
+    await page.goto(`${BASE}/coach`);
+    await page.getByTestId('pedir-narrativa').click();
+    await page.getByTestId('narrativa-sheet').waitFor({ timeout: 20_000 });
+    await print(page, 'f3-13-coach-rascunho-ia');
+    await page.getByTestId('narrativa-salvar').click();
+    await page.getByTestId('narrativa-sheet').waitFor({ state: 'detached', timeout: 10_000 });
+
+    await page.goto(`${BASE}/mei`);
+    await page.getByText('DAS do MEI').waitFor({ timeout: 20_000 });
+    await print(page, 'f3-14-mei');
+    await page.goto(`${BASE}/financeiro`);
+    await page.getByTestId('grafico-financeiro').waitFor({ timeout: 20_000 });
+    await print(page, 'f3-15-financeiro');
+
+    await page.goto(`${BASE}/agenda`);
+    await page.getByLabel('Próximo dia').click();
+    await page.getByTestId('agenda-item').first().click();
+    await page.getByTestId('ofertas-cadeira').waitFor({ timeout: 20_000 });
+    await page.getByTestId('cadeira-aceitou-Sobrancelha').click();
+    await page.getByText('✓ Aceitou: entrou no atendimento').waitFor({ timeout: 10_000 });
+    await print(page, 'f3-16-ofertas-na-cadeira');
+  },
+
+  // Fase 3: no Grátis, as telas pagas abrem bloqueadas com prévia.
+  async gratis_bloqueado(page) {
+    await entrar(page, 'gratis.teste@example.com');
+    await page.getByTestId('onb-preco').or(page.getByTestId('hoje-valor')).first().waitFor({ timeout: 20_000 });
+    if (await page.getByTestId('onb-preco').isVisible()) {
+      await page.getByTestId('onb-preco').fill('40');
+      for (let i = 0; i < 4; i++) await page.getByTestId('onb-continuar').click();
+    }
+    await page.getByTestId('hoje-valor').waitFor({ timeout: 20_000 });
+    for (const rota of ['/financeiro', '/insights', '/extrato', '/relatorios']) {
+      await page.goto(`${BASE}${rota}`);
+      await page.getByTestId('tela-bloqueada').waitFor({ timeout: 20_000 });
+    }
+    await print(page, 'f3-20-relatorios-bloqueado');
+  },
 };
 
 async function main() {
@@ -113,6 +232,8 @@ async function main() {
   try {
     for (const [nome, fluxo] of Object.entries(fluxos)) {
       if (so.length && !so.includes(nome)) continue;
+      // Each flow starts from the seed (independent and repeatable).
+      if (process.env.E2E_SEM_RESET !== '1') execSync('bash scripts/supabase-local.sh db reset', { cwd: root, stdio: 'ignore' });
       const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, acceptDownloads: true });
       const page = await ctx.newPage();
       const erros = [];
