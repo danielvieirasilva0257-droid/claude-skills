@@ -5,7 +5,8 @@ App mobile para o barbeiro individual controlar o resultado da própria cadeira 
 - Plano de Negócio completo (fonte da verdade): https://claude.ai/artifact/S6HbgHKHwANXCssPUsmQAn
 - Estratégias em detalhe: https://claude.ai/artifact/JbrpEkhSzYdt9dfVnwJFEP
 - IA (formatos de entrada e saída): https://claude.ai/artifact/QQPZw4MEBAjgEKCeQaicGk
-- Banco de dados: `banco_de_dados_app_barbeiros_para_ia.sql` (versão 2). Código fica fora da `main`, numa branch ou repositório próprio do projeto.
+- **Código:** branch `app-barbeiros`, pasta `app-barbeiros/`. Lá estão `CLAUDE.md` (regras), `ESPECIFICACAO.md` (especificação completa para o Claude Code, com fases, skills e critérios de pronto) e o banco em `supabase/migrations/0001_banco_app_barbeiros_para_ia.sql` (versão 2).
+- **Para construir:** no Claude Code, abra a branch `app-barbeiros` e peça: "Leia app-barbeiros/CLAUDE.md e app-barbeiros/ESPECIFICACAO.md e faça a fase atual."
 
 ## Decisões travadas (18/11/2026)
 
@@ -67,4 +68,4 @@ fintech-ux (ravipalwe/design-skills), color-expert (meodai/skill.color-expert), 
 
 ## Próximo passo
 
-Fechar a estrutura da IA e começar o protótipo das telas Início, Agenda, Relatórios e Meta (etapa 5).
+No Claude Code, rodar a Fase 0 da `ESPECIFICACAO.md` (projeto Expo, tokens, banco no Supabase, seed). Em paralelo, fechar as decisões pendentes da seção 12 da especificação.
