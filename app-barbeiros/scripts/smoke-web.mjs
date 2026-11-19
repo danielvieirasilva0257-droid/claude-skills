@@ -5,10 +5,11 @@
 // `.env` pointing to it, and a fresh web build (`npm run web:export`).
 // Usage: node scripts/smoke-web.mjs [screenshot-dir]
 import { createClient } from '@supabase/supabase-js';
-import { createReadStream, existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
-import { createServer } from 'node:http';
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { extname, join, resolve } from 'node:path';
+import { join, resolve } from 'node:path';
+
+import { servir } from './servidor-estatico.mjs';
 
 const require = createRequire(import.meta.url);
 const root = resolve(import.meta.dirname, '..');
@@ -25,21 +26,6 @@ function lerEnv() {
     if (m) env[m[1]] = m[2];
   }
   return env;
-}
-
-function servir() {
-  const tipos = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json',
-    '.png': 'image/png', '.ico': 'image/x-icon', '.ttf': 'font/ttf', '.woff2': 'font/woff2', '.svg': 'image/svg+xml' };
-  const server = createServer((req, res) => {
-    const caminho = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-    let arquivo = join(dist, caminho);
-    if (!arquivo.startsWith(dist) || !existsSync(arquivo) || statSync(arquivo).isDirectory()) {
-      arquivo = join(dist, 'index.html'); // SPA fallback
-    }
-    res.writeHead(200, { 'content-type': tipos[extname(arquivo)] ?? 'application/octet-stream' });
-    createReadStream(arquivo).pipe(res);
-  });
-  return new Promise((ok) => server.listen(PORT, '127.0.0.1', () => ok(server)));
 }
 
 async function esperado(env) {
@@ -68,7 +54,7 @@ async function main() {
   const alvo = await esperado(env);
   console.log(`banco: ${alvo.mes} faturamento ${alvo.moeda}, ${alvo.atendimentos} atendimentos`);
 
-  const server = await servir();
+  const server = await servir(dist, PORT);
   const { chromium } = require('playwright');
   const browser = await chromium.launch();
   const erros = [];

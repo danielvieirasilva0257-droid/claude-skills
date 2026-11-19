@@ -10,11 +10,15 @@
     "@tanstack/react-query": "^5.108.1",
     "date-fns": "^4.4.0",
     "expo": "~58.0.26",
+    "expo-blur": "~58.0.6",
     "expo-constants": "~58.0.16",
+    "expo-file-system": "~58.0.14",
     "expo-font": "~58.0.12",
     "expo-haptics": "~58.0.8",
     "expo-linking": "~58.0.17",
+    "expo-print": "~58.0.9",
     "expo-router": "~58.0.32",
+    "expo-sharing": "~58.0.23",
     "expo-splash-screen": "~58.0.14",
     "expo-status-bar": "~58.0.5",
     "expo-symbols": "~58.0.5",
@@ -27,6 +31,7 @@
     "react-native-reanimated": "4.7.1",
     "react-native-safe-area-context": "~5.11.1",
     "react-native-screens": "~4.30.1",
+    "react-native-svg": "15.16.0",
     "react-native-url-polyfill": "^4.0.0",
     "react-native-web": "~0.21.4",
     "react-native-worklets": "0.13.0",
@@ -55,7 +60,8 @@
     "db:status": "bash scripts/supabase-local.sh status",
     "web:export": "expo export --platform web",
     "smoke": "node scripts/smoke-web.mjs",
-    "test:db": "bash scripts/supabase-local.sh test db"
+    "test:db": "bash scripts/supabase-local.sh test db",
+    "galeria": "node scripts/galeria-prints.mjs"
   },
   "private": true,
   "jest": {

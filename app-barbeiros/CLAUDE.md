@@ -14,6 +14,7 @@ Esta pasta é o código do App Barbeiros. Antes de qualquer tarefa:
 - **Antes de qualquer mensagem automática**, chame `pode_enviar(cliente, categoria)` e respeite o resultado.
 - **Chaves de API** ficam em `.env` (ignorado pelo git) e nos secrets do Supabase. Nunca no repositório.
 - **Visual:** branco, verde #15803D, azul #1D4ED8 (IA). Nada do Rotina. Tokens em `src/theme/tokens.ts`; componente nunca recebe hex direto.
+- **Antes de mudar qualquer UI, leia `DESIGN.md`.** Cores, tipografia e espaço vêm dele; campos, textos, estados e comportamento vêm da especificação. Use os componentes de `src/components/` (`Texto`, `DuoButton`, `Cartao`, `Estado`…) em vez de estilos soltos.
 - **Animação:** o que se usa dezenas de vezes por dia é rápido e sem quique. Encanto (confete de dinheiro, pulo, mascote) só em metas e conquistas. Sempre respeite "reduzir movimento".
 - **Acessibilidade:** toque mínimo 44×44, contraste conferido, nada informado só por cor (sempre sinal, seta ou rótulo).
 - **Sem dark patterns:** cancelamento visível, sem culpa, sem contagem regressiva falsa, exportação de dados em todos os planos.

@@ -1,6 +1,6 @@
 # App Barbeiros — especificação para construir no Claude Code
 
-**Fase atual:** Fase 1 (design e componentes) ✋ · Fase 0 pronta em 19/11/2026
+**Fase atual:** Fase 2 (plano Grátis) ✋ · Fases 0 e 1 prontas em 19/11/2026
 **Versão:** 1.1 · 19/11/2026
 **Fonte de negócio:** Plano de Negócio — App Barbeiros (https://claude.ai/artifact/S6HbgHKHwANXCssPUsmQAn). Se algo aqui contradizer o plano, pergunte ao Daniel.
 
@@ -353,10 +353,12 @@ Skills: `../skills/sites/vercel-react-best-practices` (partes React); *animating
 
 ### Fase 1 — Design e componentes ✋
 Skills: `../skills/design/ui-ux-pro-max` (DESIGN.md), `../skills/design/estilos-premium`, `../skills/design/frontend-design`, `../skills/design/taste-skill`, `../skills/design/motion-oficial`, `../skills/design/button-animation`, `../skills/design/animation-vocabulary`; *fintech-ux, *color-expert.
-- [ ] `DESIGN.md` do app (cena, tokens, componentes, estados) ✋ aprovação 1
-- [ ] Componentes da seção 7 com todos os estados (normal, foco, pressionado, desativado, carregando, vazio, erro)
-- [ ] `ConquistaButton` igual à tabela; frames de início, meio e fim enviados ao Daniel ✋ aprovação 2
-- [ ] Reduzir movimento funcionando em todos os componentes
+- [x] `DESIGN.md` do app (cena, tokens, componentes, estados) ✋ aprovação 1 (Daniel aprovou tudo em 19/11)
+- [x] Componentes da seção 7 com todos os estados (normal, foco, pressionado, desativado, carregando, vazio, erro)
+- [x] `ConquistaButton` igual à tabela; frames de início, meio e fim enviados ao Daniel ✋ aprovação 2 (aprovado em 19/11)
+- [x] Reduzir movimento funcionando em todos os componentes
+
+**Como ficou (19/11/2026):** `DESIGN.md` na pasta do app; componentes em `src/components/` (mais `Texto`, `Cartao` e `Estado` para vazio, carregando e erro); curvas e "reduzir movimento" em `src/theme/motion.ts` (`useMovimentoReduzido` lê o sistema e ouve a mudança); anel de foco só com teclado (`useFocoVisivel`). Galeria em `/dev/componentes` (só com `EXPO_PUBLIC_GALERIA=1`) e `npm run galeria` tira os prints e os frames do `ConquistaButton` com o relógio do navegador parado (0, 60, 180, 300, 420, 540, 720, 900 e 1.210 ms). Decisões: notas e moedas com Reanimated (12 `Animated.View`, sem Skia); gráficos com `react-native-svg`; mascote em SVG com os 4 estados até a arte final do Rive.
 
 ### Fase 2 — Plano Grátis (telas 1–5) ✋
 Skills: `../skills/design/ui-ux-pro-max`, `../skills/combos/combo-copy-humanizada` (textos), `../skills/sites/cro` (onboarding).

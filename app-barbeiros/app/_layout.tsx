@@ -43,11 +43,12 @@ export default function RootLayout() {
           <StatusBar style="dark" />
           <Stack screenOptions={{ headerShown: false, contentStyle: styles.root }}>
             <Stack.Protected guard={logado}>
-              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="(app)" />
             </Stack.Protected>
             <Stack.Protected guard={!logado}>
               <Stack.Screen name="(auth)/entrar" />
             </Stack.Protected>
+            <Stack.Screen name="dev/componentes" />
           </Stack>
         </QueryClientProvider>
       </SafeAreaProvider>
