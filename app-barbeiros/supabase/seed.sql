@@ -297,3 +297,42 @@ insert into consentimentos (cliente_id, tipo, aceito, texto_aceito, registrado_e
 insert into contatos_enviados (barbeiro_id, cliente_id, categoria, mensagem, enviado_em, respondeu, agendou) values
   ('b0b0b0b0-0000-4000-8000-000000000001', 'c0000000-0000-4000-8000-000000000001', 'marketing',
    'Rafa, chegou a pomada nova que segura o dia todo. Quer que eu separe uma?', now() - interval '3 days', true, false);
+
+-- ---------- Premium e Premium Plus (Fases 4 e 5) ----------
+-- Expediente: terça a sábado, 9h às 19h, pausa 12h–13h; domingo e segunda fechado.
+insert into expediente (barbeiro_id, dia_semana, inicio, fim, pausa_inicio, pausa_fim)
+select 'b0b0b0b0-0000-4000-8000-000000000001', d, '09:00', '19:00', '12:00', '13:00' from generate_series(2, 6) d;
+insert into expediente (barbeiro_id, dia_semana, inicio, fim)
+values ('b0b0b0b0-0000-4000-8000-000000000001', 7, '09:00', '13:00');
+
+-- Automações ligadas: confirmação D-1, pós-visita, reagendamento, reativação, aniversário, lista de espera.
+insert into barbeiro_estrategias (barbeiro_id, codigo)
+select 'b0b0b0b0-0000-4000-8000-000000000001', c from unnest(array['R4', 'A15', 'R6', 'R9', 'R12', 'V1']) c;
+
+-- Carlos está na lista de espera de sábado de manhã.
+insert into lista_espera (barbeiro_id, cliente_id, servico_id, preferencia)
+select 'b0b0b0b0-0000-4000-8000-000000000001', 'c0000000-0000-4000-8000-000000000003', id, 'sábado de manhã'
+from servicos where barbeiro_id = 'b0b0b0b0-0000-4000-8000-000000000001' and nome = 'Corte';
+
+-- Canais em modo de teste (contas fictícias; tokens nunca no seed).
+insert into canais (barbeiro_id, tipo, conta_externa, nome_exibicao) values
+  ('b0b0b0b0-0000-4000-8000-000000000001', 'whatsapp', 'wa-teste-001', '(11) 90000-0000 · teste'),
+  ('b0b0b0b0-0000-4000-8000-000000000001', 'instagram', 'ig-teste-001', '@barbeiro.teste');
+
+-- Palavras-código do funil e a origem do Bruno.
+insert into origens (barbeiro_id, codigo, canal, parceiro, custo_mensal) values
+  ('b0b0b0b0-0000-4000-8000-000000000001', 'REELS', 'Instagram', null, 0),
+  ('b0b0b0b0-0000-4000-8000-000000000001', 'GOOGLE', 'Google', null, 0),
+  ('b0b0b0b0-0000-4000-8000-000000000001', 'ACADEMIA', 'Parceria', 'Academia do bairro', 50);
+update clientes set origem_codigo = 'REELS' where id = 'c0000000-0000-4000-8000-000000000002';
+
+-- Uma conversa de WhatsApp e um comentário no Instagram (fictícios).
+insert into conversas (id, barbeiro_id, canal, contato_externo, nome_contato, cliente_id, janela_ate, ultima_mensagem_em, nao_lidas)
+values ('d0000000-0000-4000-8000-000000000001', 'b0b0b0b0-0000-4000-8000-000000000001', 'whatsapp', '5511900000001',
+        'Rafa', 'c0000000-0000-4000-8000-000000000001', now() + interval '20 hours', now() - interval '4 hours', 0);
+insert into mensagens (conversa_id, barbeiro_id, direcao, autor, texto, criado_em) values
+  ('d0000000-0000-4000-8000-000000000001', 'b0b0b0b0-0000-4000-8000-000000000001', 'entrada', 'cliente', 'Fala! Tem horário sábado?', now() - interval '4 hours'),
+  ('d0000000-0000-4000-8000-000000000001', 'b0b0b0b0-0000-4000-8000-000000000001', 'saida', 'ia', 'Oi, Rafa! Sábado tenho às 10h e às 10h45. Qual fica melhor?', now() - interval '4 hours' + interval '20 seconds');
+insert into instagram_eventos (barbeiro_id, tipo, autor_externo, autor_nome, texto, comentario_id, midia_id, recebido_em, codigo_detectado)
+values ('b0b0b0b0-0000-4000-8000-000000000001', 'comentario', 'ig-user-77', 'joao.silva', 'REELS quero esse corte!', 'c-1', 'm-1',
+        now() - interval '1 day', 'REELS');
