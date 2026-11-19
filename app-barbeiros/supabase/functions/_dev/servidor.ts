@@ -5,12 +5,22 @@ import { handler as chat } from '../ia-chat/handler.ts';
 import { handler as entrevista } from '../ia-entrevista/handler.ts';
 import { handler as insights } from '../ia-insights/handler.ts';
 import { handler as narrativa } from '../ia-narrativa/handler.ts';
+import { handler as canalConectar } from '../canal-conectar/handler.ts';
+import { handler as canalEnviar } from '../canal-enviar/handler.ts';
+import { handler as enviarFila } from '../enviar-fila/handler.ts';
+import { handler as instagram } from '../instagram-webhook/handler.ts';
+import { handler as whatsapp } from '../whatsapp-webhook/handler.ts';
 
 const rotas: Record<string, (req: Request) => Promise<Response>> = {
   'ia-chat': chat,
   'ia-entrevista': entrevista,
   'ia-insights': insights,
   'ia-narrativa': narrativa,
+  'canal-conectar': canalConectar,
+  'canal-enviar': canalEnviar,
+  'enviar-fila': enviarFila,
+  'instagram-webhook': instagram,
+  'whatsapp-webhook': whatsapp,
 };
 
 const porta = Number(Deno.env.get('PORTA_FUNCOES') ?? 54329);
