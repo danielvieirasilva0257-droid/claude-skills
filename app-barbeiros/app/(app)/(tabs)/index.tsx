@@ -1,78 +1,109 @@
-// Início. In Phase 0 it only proves the chain app → login → Supabase → view:
-// it reads this month's row of `v_metricas_mes`. The real screen is Phase 2.
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+// Início: today's revenue or profit (from resumo_dia), next appointments,
+// "+ Atendimento" fixed at the bottom right, eye to hide values.
+import { router } from 'expo-router';
+import { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 
-import { BotaoProvisorio } from '@/components/BotaoProvisorio';
+import { BotaoIcone } from '@/components/BotaoIcone';
+import { Cartao } from '@/components/Cartao';
+import { Chip } from '@/components/Chip';
+import { Dinheiro } from '@/components/Dinheiro';
+import { DuoButton } from '@/components/DuoButton';
+import { Carregando, EstadoErro, EstadoVazio } from '@/components/Estado';
 import { TelaBase } from '@/components/TelaBase';
-import { useMetricasMes } from '@/features/relatorios/metricasMes';
-import { formatDecimal, formatInteiro, formatMes, formatMoeda, inicioDoMes } from '@/lib/format';
-import { inter, tabularNums } from '@/theme/fonts';
-import { color, radius, size, space } from '@/theme/tokens';
+import { Texto } from '@/components/Texto';
+import { useProximos, useResumoDia } from '@/features/agenda/api';
+import { LancarSheet } from '@/features/agenda/LancarSheet';
+import { useBarbeiro } from '@/features/conta/barbeiro';
+import { alternarOcultarValores, usePreferencias } from '@/features/conta/preferencias';
+import { diaISO, formatDiaLongo, formatHora } from '@/lib/format';
+import { space } from '@/theme/tokens';
+
+type Visao = 'faturamento' | 'lucro';
 
 export default function Inicio() {
-  const mes = inicioDoMes();
-  const { data, isPending, isError, refetch } = useMetricasMes(mes);
+  const barbeiro = useBarbeiro();
+  const resumo = useResumoDia();
+  const proximos = useProximos();
+  const oculto = usePreferencias((s) => s.ocultarValores);
+  const [visao, setVisao] = useState<Visao>('faturamento');
+  const [lancando, setLancando] = useState(false);
+  const hoje = diaISO();
+  const primeiroNome = barbeiro.data?.nome.split(' ')[0] ?? '';
 
   return (
-    <TelaBase titulo="Início">
-      <View style={styles.cartao} testID="metricas-mes">
-        <Text style={styles.legenda}>Este mês · {formatMes(mes)}</Text>
-        {isPending ? (
-          <ActivityIndicator color={color.brand} accessibilityLabel="Carregando" />
-        ) : isError ? (
-          <View style={styles.bloco}>
-            <Text style={styles.erro}>⚠ Não deu para carregar os números.</Text>
-            <BotaoProvisorio rotulo="Tentar de novo" variante="secundario" onPress={() => refetch()} />
-          </View>
-        ) : data ? (
-          <View style={styles.bloco}>
-            <Text style={styles.rotulo}>Faturamento</Text>
-            <Text style={styles.valor} testID="metricas-faturamento">
-              {formatMoeda(data.faturamento)}
-            </Text>
-            <View style={styles.linha}>
-              <Numero rotulo="Atendimentos" valor={formatInteiro(data.atendimentos)} testID="metricas-atendimentos" />
-              <Numero rotulo="Ticket médio" valor={formatMoeda(data.ticket_medio)} />
-              <Numero rotulo="Ratio" valor={formatDecimal(data.ratio_servicos_por_cliente)} />
-            </View>
-          </View>
+    <TelaBase
+      titulo={primeiroNome ? `Oi, ${primeiroNome}` : 'Início'}
+      subtitulo={formatDiaLongo(hoje)}
+      onAtualizar={() => {
+        resumo.refetch();
+        proximos.refetch();
+      }}
+      direita={
+        <BotaoIcone testID="olho" rotulo={oculto ? 'Mostrar valores' : 'Esconder valores'} onPress={alternarOcultarValores}
+          icone={oculto ? { ios: 'eye.slash', android: 'visibility_off', web: 'visibility_off' } : { ios: 'eye', android: 'visibility', web: 'visibility' }} />
+      }
+      flutuante={resumo.data?.caixa_fechado ? undefined : <DuoButton testID="inicio-atendimento" rotulo="+ Atendimento" onPress={() => setLancando(true)} />}
+    >
+      <Cartao testID="hoje">
+        <View style={styles.linha}>
+          <Texto variante="caption" cor="textMuted" style={styles.flex}>Hoje</Texto>
+          <Chip testID="ver-faturamento" rotulo="Faturamento" selecionado={visao === 'faturamento'} onPress={() => setVisao('faturamento')} />
+          <Chip testID="ver-lucro" rotulo="Lucro" selecionado={visao === 'lucro'} onPress={() => setVisao('lucro')} />
+        </View>
+        {resumo.isPending ? (
+          <Carregando />
+        ) : resumo.isError || !resumo.data ? (
+          <EstadoErro onTentar={() => resumo.refetch()} />
         ) : (
-          <Text style={styles.vazio} testID="metricas-vazio">
-            Nenhum atendimento neste mês ainda.
-          </Text>
+          <>
+            <Dinheiro testID="hoje-valor" variante="display" valor={visao === 'faturamento' ? resumo.data.faturamento : resumo.data.lucro}
+              cor={visao === 'lucro' && Number(resumo.data.lucro) < 0 ? 'danger' : 'text'}
+              sinal={visao === 'lucro' && Number(resumo.data.lucro) < 0 ? '−' : undefined} />
+            <Texto variante="bodySm" cor="textMuted" numero testID="hoje-detalhe">
+              {resumo.data.atendimentos} atendimento(s) · {resumo.data.agendados} agendado(s)
+              {resumo.data.caixa_fechado ? ' · caixa fechado' : ''}
+            </Texto>
+            {visao === 'lucro' ? (
+              <Texto variante="caption" cor="textMuted">
+                Lucro = faturamento − taxas da maquininha − produtos usados − gastos de hoje.
+              </Texto>
+            ) : null}
+          </>
         )}
-      </View>
+      </Cartao>
+
+      <Texto variante="h3" accessibilityRole="header">Próximos horários</Texto>
+      {proximos.isPending ? (
+        <Carregando />
+      ) : proximos.isError ? (
+        <EstadoErro onTentar={() => proximos.refetch()} />
+      ) : proximos.data.length === 0 ? (
+        <EstadoVazio titulo="Nenhum horário marcado" acao="Abrir a agenda" onAcao={() => router.push('/agenda')} />
+      ) : (
+        proximos.data.map((p) => {
+          const dia = diaISO(new Date(p.inicio));
+          return (
+            <Cartao key={p.id} onPress={() => router.push('/agenda')} accessibilityLabel={`${formatHora(p.inicio)}, ${p.cliente?.nome ?? 'sem cliente'}`}>
+              <View style={styles.linha}>
+                <Texto variante="h3" numero>{formatHora(p.inicio)}</Texto>
+                <View style={styles.flex}>
+                  <Texto peso="medium">{p.cliente?.nome ?? 'Sem cliente'}</Texto>
+                  <Texto variante="bodySm" cor="textMuted">
+                    {dia === hoje ? 'Hoje' : formatDiaLongo(dia)} · {p.itens.map((i) => i.servico?.nome).filter(Boolean).join(' + ')}
+                  </Texto>
+                </View>
+              </View>
+            </Cartao>
+          );
+        })
+      )}
+      <LancarSheet aberto={lancando} onFechar={() => setLancando(false)} />
     </TelaBase>
   );
 }
 
-function Numero({ rotulo, valor, testID }: { rotulo: string; valor: string; testID?: string }) {
-  return (
-    <View style={styles.numero}>
-      <Text style={styles.rotulo}>{rotulo}</Text>
-      <Text style={styles.numeroValor} testID={testID}>
-        {valor}
-      </Text>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
-  cartao: {
-    backgroundColor: color.surface,
-    borderColor: color.border,
-    borderWidth: 1,
-    borderRadius: radius.lg,
-    padding: space[4],
-    gap: space[3],
-  },
-  bloco: { gap: space[2] },
-  legenda: { ...inter('medium'), fontSize: size.caption, color: color.textMuted },
-  rotulo: { ...inter('regular'), fontSize: size.bodySm, color: color.textMuted },
-  valor: { ...inter('semibold'), ...tabularNums, fontSize: size.display, color: color.text },
-  linha: { flexDirection: 'row', flexWrap: 'wrap', columnGap: space[4], rowGap: space[3], marginTop: space[2] },
-  numero: { flexGrow: 1, minWidth: 104, gap: space[1] },
-  numeroValor: { ...inter('semibold'), ...tabularNums, fontSize: size.h3, color: color.text },
-  vazio: { ...inter('regular'), fontSize: size.body, color: color.textMuted },
-  erro: { ...inter('medium'), fontSize: size.body, color: color.danger },
+  linha: { flexDirection: 'row', alignItems: 'center', gap: space[3] },
+  flex: { flex: 1 },
 });

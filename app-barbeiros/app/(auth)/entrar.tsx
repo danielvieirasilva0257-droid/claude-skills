@@ -1,109 +1,123 @@
-// Phase 0: e-mail + password sign-in only (enough for the smoke test).
-// Phase 2 adds Google, sign-up, the `barbeiros` row on first login and onboarding.
+// Entrar / Criar conta (e-mail + senha) and Google. The barber's row is
+// created by the database on sign-up (trigger criar_barbeiro_do_usuario).
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
 
-import { BotaoProvisorio } from '@/components/BotaoProvisorio';
-import { entrarComEmail } from '@/features/auth/sessao';
-import { inter } from '@/theme/fonts';
-import { color, radius, size, space } from '@/theme/tokens';
+import { Campo } from '@/components/Campo';
+import { DuoButton } from '@/components/DuoButton';
+import { SecondaryButton } from '@/components/SecondaryButton';
+import { Texto } from '@/components/Texto';
+import { cadastrar, entrarComEmail, entrarComGoogle } from '@/features/auth/sessao';
+import { color, space } from '@/theme/tokens';
 
 const schema = z.object({
+  nome: z.string(),
   email: z.email('Digite um e-mail válido.'),
   senha: z.string().min(6, 'A senha tem pelo menos 6 caracteres.'),
 });
 
 type Campos = z.infer<typeof schema>;
+type Modo = 'entrar' | 'criar';
 
 export default function Entrar() {
+  const [modo, setModo] = useState<Modo>('entrar');
   const [erro, setErro] = useState<string | null>(null);
+  const [aviso, setAviso] = useState<string | null>(null);
+  const [google, setGoogle] = useState(false);
   const {
     control,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
-  } = useForm<Campos>({ resolver: zodResolver(schema), defaultValues: { email: '', senha: '' } });
+  } = useForm<Campos>({ resolver: zodResolver(schema), defaultValues: { nome: '', email: '', senha: '' } });
 
-  const enviar = handleSubmit(async ({ email, senha }) => {
+  const enviar = handleSubmit(async ({ nome, email, senha }) => {
     setErro(null);
+    setAviso(null);
+    if (modo === 'criar') {
+      if (nome.trim().length < 2) {
+        setError('nome', { message: 'Como você quer ser chamado?' });
+        return;
+      }
+      const r = await cadastrar(nome.trim(), email.trim(), senha);
+      if (r.erro) setErro(r.erro);
+      else if (r.confirmar) setAviso('Enviamos um link para o seu e-mail. Abra o link para entrar.');
+      return;
+    }
     const mensagem = await entrarComEmail(email.trim(), senha);
     if (mensagem) setErro(mensagem);
   });
 
+  async function comGoogle() {
+    setErro(null);
+    setGoogle(true);
+    const mensagem = await entrarComGoogle();
+    setGoogle(false);
+    if (mensagem) setErro(mensagem);
+  }
+
+  const criando = modo === 'criar';
+
   return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={styles.conteudo}>
-          <Text style={styles.titulo} accessibilityRole="header">
-            Entrar
-          </Text>
-          <Text style={styles.subtitulo}>Acompanhe o resultado da sua cadeira.</Text>
+        <ScrollView contentContainerStyle={styles.conteudo} keyboardShouldPersistTaps="handled">
+          <Texto variante="display" accessibilityRole="header">
+            {criando ? 'Criar conta' : 'Entrar'}
+          </Texto>
+          <Texto cor="textMuted">Acompanhe o resultado da sua cadeira.</Texto>
 
-          <View style={styles.campo}>
-            <Text style={styles.rotulo} nativeID="rotulo-email">
-              E-mail
-            </Text>
-            <Controller
-              control={control}
-              name="email"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  testID="entrar-email"
-                  aria-labelledby="rotulo-email"
-                  accessibilityLabel="E-mail"
-                  style={[styles.input, errors.email ? styles.inputErro : null]}
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  keyboardType="email-address"
-                  textContentType="emailAddress"
-                  placeholder="voce@email.com"
-                  placeholderTextColor={color.textMuted}
-                />
-              )}
-            />
-            {errors.email ? <Text style={styles.erro}>⚠ {errors.email.message}</Text> : null}
+          <SecondaryButton testID="entrar-google" rotulo="Continuar com Google" onPress={comGoogle} carregando={google} />
+          <View style={styles.ou}>
+            <View style={styles.linha} />
+            <Texto variante="caption" cor="textMuted">ou com e-mail</Texto>
+            <View style={styles.linha} />
           </View>
 
-          <View style={styles.campo}>
-            <Text style={styles.rotulo} nativeID="rotulo-senha">
-              Senha
-            </Text>
-            <Controller
-              control={control}
-              name="senha"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  testID="entrar-senha"
-                  aria-labelledby="rotulo-senha"
-                  accessibilityLabel="Senha"
-                  style={[styles.input, errors.senha ? styles.inputErro : null]}
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  secureTextEntry
-                  autoComplete="current-password"
-                  textContentType="password"
-                  onSubmitEditing={() => enviar()}
-                />
-              )}
-            />
-            {errors.senha ? <Text style={styles.erro}>⚠ {errors.senha.message}</Text> : null}
-          </View>
+          {criando ? (
+            <Controller control={control} name="nome" render={({ field: { onChange, onBlur, value } }) => (
+              <Campo testID="entrar-nome" rotulo="Seu nome" value={value} onChangeText={onChange} onBlur={onBlur}
+                autoComplete="name" textContentType="name" erro={errors.nome?.message} />
+            )} />
+          ) : null}
+          <Controller control={control} name="email" render={({ field: { onChange, onBlur, value } }) => (
+            <Campo testID="entrar-email" rotulo="E-mail" value={value} onChangeText={onChange} onBlur={onBlur}
+              autoCapitalize="none" autoComplete="email" keyboardType="email-address" textContentType="emailAddress"
+              placeholder="voce@email.com" erro={errors.email?.message} />
+          )} />
+          <Controller control={control} name="senha" render={({ field: { onChange, onBlur, value } }) => (
+            <Campo testID="entrar-senha" rotulo="Senha" value={value} onChangeText={onChange} onBlur={onBlur}
+              secureTextEntry autoComplete={criando ? 'new-password' : 'current-password'}
+              textContentType={criando ? 'newPassword' : 'password'} onSubmitEditing={() => enviar()}
+              erro={errors.senha?.message} ajuda={criando ? 'Pelo menos 6 caracteres.' : undefined} />
+          )} />
 
           {erro ? (
-            <Text style={styles.erro} accessibilityRole="alert" testID="entrar-erro">
+            <Texto peso="medium" cor="danger" accessibilityRole="alert" testID="entrar-erro">
               ⚠ {erro}
-            </Text>
+            </Texto>
+          ) : null}
+          {aviso ? (
+            <Texto peso="medium" cor="brandLip" accessibilityRole="alert" testID="entrar-aviso">
+              ✓ {aviso}
+            </Texto>
           ) : null}
 
-          <BotaoProvisorio testID="entrar-botao" rotulo="Entrar" onPress={enviar} carregando={isSubmitting} />
-        </View>
+          <DuoButton testID="entrar-botao" rotulo={criando ? 'Criar conta' : 'Entrar'} onPress={() => enviar()} carregando={isSubmitting} />
+          <SecondaryButton
+            testID="entrar-trocar"
+            rotulo={criando ? 'Já tenho conta' : 'Criar conta grátis'}
+            onPress={() => {
+              setErro(null);
+              setAviso(null);
+              setModo(criando ? 'entrar' : 'criar');
+            }}
+          />
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -112,22 +126,7 @@ export default function Entrar() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: color.bg },
   flex: { flex: 1 },
-  conteudo: { flex: 1, justifyContent: 'center', padding: space[5], gap: space[4] },
-  titulo: { ...inter('semibold'), fontSize: size.display, color: color.text },
-  subtitulo: { ...inter('regular'), fontSize: size.body, color: color.textMuted, marginBottom: space[2] },
-  campo: { gap: space[2] },
-  rotulo: { ...inter('medium'), fontSize: size.bodySm, color: color.text },
-  input: {
-    ...inter('regular'),
-    minHeight: 52,
-    borderWidth: 1,
-    borderColor: color.border,
-    borderRadius: radius.md,
-    paddingHorizontal: space[4],
-    fontSize: size.body,
-    color: color.text,
-    backgroundColor: color.bg,
-  },
-  inputErro: { borderColor: color.danger, borderWidth: 2 },
-  erro: { ...inter('medium'), fontSize: size.bodySm, color: color.danger },
+  conteudo: { flexGrow: 1, justifyContent: 'center', padding: space[5], gap: space[4] },
+  ou: { flexDirection: 'row', alignItems: 'center', gap: space[3] },
+  linha: { flex: 1, height: 1, backgroundColor: color.border },
 });

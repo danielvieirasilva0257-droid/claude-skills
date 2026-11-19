@@ -1,6 +1,6 @@
 # App Barbeiros — especificação para construir no Claude Code
 
-**Fase atual:** Fase 2 (plano Grátis) ✋ · Fases 0 e 1 prontas em 19/11/2026
+**Fase atual:** Fase 3 (plano Pago e IA) · Fases 0, 1 e 2 prontas em 19/11/2026
 **Versão:** 1.1 · 19/11/2026
 **Fonte de negócio:** Plano de Negócio — App Barbeiros (https://claude.ai/artifact/S6HbgHKHwANXCssPUsmQAn). Se algo aqui contradizer o plano, pergunte ao Daniel.
 
@@ -362,12 +362,14 @@ Skills: `../skills/design/ui-ux-pro-max` (DESIGN.md), `../skills/design/estilos-
 
 ### Fase 2 — Plano Grátis (telas 1–5) ✋
 Skills: `../skills/design/ui-ux-pro-max`, `../skills/combos/combo-copy-humanizada` (textos), `../skills/sites/cro` (onboarding).
-- [ ] Login (Google + e-mail) e criação da linha em `barbeiros`
-- [ ] Onboarding com preço do corte, público, modelo de trabalho e estratégia
-- [ ] Lançar atendimento em 2 toques; "Ofereceu algo?" grava em `ofertas`
-- [ ] Serviços com combos e recorrência
-- [ ] Exportar dados (CSV) e cancelar plano visíveis
-- [ ] Prints das telas no celular ✋ aprovação 3
+- [x] Login (Google + e-mail) e criação da linha em `barbeiros`
+- [x] Onboarding com preço do corte, público, modelo de trabalho e estratégia
+- [x] Lançar atendimento em 2 toques; "Ofereceu algo?" grava em `ofertas`
+- [x] Serviços com combos e recorrência
+- [x] Exportar dados (CSV) e cancelar plano visíveis
+- [x] Prints das telas no celular ✋ aprovação 3 (Daniel aprovou tudo em 19/11)
+
+**Como ficou (19/11/2026):** migration `0003` com o plano do app (`app_assinatura`, só o servidor muda; `meu_plano()`), gatilho que cria `barbeiros` + plano Grátis no cadastro, `configurar_inicio` (onboarding: perfil + 7 serviços com preço proporcional ao corte + combos padrão), `lancar_atendimento`, `registrar_oferta`, `concluir_atendimento`, `mudar_pagamento`, `resumo_dia`, `agenda_dia`, `fechar_caixa`/`reabrir_caixa` e `exportar_atendimentos`; taxa da maquininha por barbeiro. Telas: Entrar/Criar conta (e-mail e Google), onboarding em 4 passos, Início (hoje, lucro, próximos, olho), Agenda (2 toques, "Ofereceu algo?", agendar, concluir, falta, cancelar e apagar segurando 2 s, fechar o caixa com o `ConquistaButton`), Serviços, Planos e Mais (maquininha, exportar CSV, cancelar plano sempre visível). Clientes e Relatórios mostram a `LockedScreen` com prévia dos dados reais no Grátis. Testes: `supabase/tests/fase2_plano_gratis.test.sql` (16) e `npm run e2e` (onboarding e bloqueios; lançar, ofertar e fechar o caixa). **Pendente fora do código:** ligar o Google no Supabase (ID e segredo do Google Cloud); sem isso o botão mostra "Entrar com Google ainda não foi ligado neste servidor".
 
 ### Fase 3 — Plano Pago (telas 6–15) e IA
 Skills: dataviz (Claude) para os gráficos, *financial-design-systems, `../skills/combos/combo-copy-humanizada`; para a IA, a seção 9.

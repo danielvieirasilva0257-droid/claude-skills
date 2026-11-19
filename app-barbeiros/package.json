@@ -61,7 +61,8 @@
     "web:export": "expo export --platform web",
     "smoke": "node scripts/smoke-web.mjs",
     "test:db": "bash scripts/supabase-local.sh test db",
-    "galeria": "node scripts/galeria-prints.mjs"
+    "galeria": "node scripts/galeria-prints.mjs",
+    "e2e": "node scripts/e2e-web.mjs"
   },
   "private": true,
   "jest": {

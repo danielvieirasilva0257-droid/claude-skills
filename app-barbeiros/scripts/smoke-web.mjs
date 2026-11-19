@@ -35,14 +35,13 @@ async function esperado(env) {
   });
   const { error: erroLogin } = await sb.auth.signInWithPassword({ email: EMAIL, password: SENHA });
   if (erroLogin) throw new Error(`login de teste falhou na API: ${erroLogin.message}`);
-  const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit' })
-    .formatToParts(new Date());
-  const mes = `${parts.find((p) => p.type === 'year').value}-${parts.find((p) => p.type === 'month').value}-01`;
-  const { data, error } = await sb.from('v_metricas_mes').select('faturamento, atendimentos').eq('mes', mes).maybeSingle();
-  if (error) throw new Error(`v_metricas_mes falhou: ${error.message}`);
-  if (!data) throw new Error(`v_metricas_mes sem linha para ${mes}: rode npm run db:reset`);
-  const moeda = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(data.faturamento));
-  return { mes, moeda, atendimentos: String(data.atendimentos) };
+  const { data, error } = await sb.rpc('resumo_dia');
+  if (error) throw new Error(`resumo_dia falhou: ${error.message}`);
+  const hoje = data[0];
+  const { data: metricas, error: e2 } = await sb.from('v_metricas_mes').select('mes').limit(1);
+  if (e2 || !metricas?.length) throw new Error('v_metricas_mes vazia: rode npm run db:reset');
+  const moeda = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(hoje.faturamento));
+  return { mes: hoje.dia, moeda, atendimentos: String(hoje.atendimentos) };
 }
 
 const normalizar = (t) => t.replace(/\s+/g, ' ').trim();
@@ -52,7 +51,7 @@ async function main() {
   mkdirSync(shots, { recursive: true });
   const env = lerEnv();
   const alvo = await esperado(env);
-  console.log(`banco: ${alvo.mes} faturamento ${alvo.moeda}, ${alvo.atendimentos} atendimentos`);
+  console.log(`banco: hoje (${alvo.mes}) faturamento ${alvo.moeda}, ${alvo.atendimentos} atendimento(s); v_metricas_mes ok`);
 
   const server = await servir(dist, PORT);
   const { chromium } = require('playwright');
@@ -80,13 +79,13 @@ async function main() {
 
     await page.getByTestId('entrar-senha').fill(SENHA);
     await page.getByTestId('entrar-botao').click();
-    await page.getByTestId('metricas-faturamento').waitFor({ timeout: 30_000 });
-    const tela = normalizar(await page.getByTestId('metricas-faturamento').innerText());
-    const atend = normalizar(await page.getByTestId('metricas-atendimentos').innerText());
+    await page.getByTestId('hoje-valor').waitFor({ timeout: 30_000 });
+    const tela = normalizar(await page.getByTestId('hoje-valor').innerText());
+    const atend = normalizar(await page.getByTestId('hoje-detalhe').innerText());
     await page.screenshot({ path: join(shots, '2-inicio.png') });
     if (tela !== normalizar(alvo.moeda)) throw new Error(`faturamento na tela "${tela}" ≠ banco "${alvo.moeda}"`);
-    if (atend !== alvo.atendimentos) throw new Error(`atendimentos na tela "${atend}" ≠ banco "${alvo.atendimentos}"`);
-    console.log(`ok: login de teste e Início mostra ${tela} e ${atend} atendimentos (igual ao banco)`);
+    if (!atend.startsWith(`${alvo.atendimentos} atendimento`)) throw new Error(`atendimentos na tela "${atend}" ≠ banco "${alvo.atendimentos}"`);
+    console.log(`ok: login de teste e Início mostra ${tela} hoje e ${alvo.atendimentos} atendimento(s) (igual ao banco)`);
 
     for (const aba of ['Agenda', 'Relatórios', 'Clientes', 'Mais']) {
       await page.getByRole('tab', { name: aba }).click();

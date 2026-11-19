@@ -9,8 +9,9 @@
 -- As datas são relativas a HOJE (horário de Brasília): o seed sempre tem
 -- "este mês" e "3 meses para trás", não importa quando rodar.
 --
--- Login de teste (só no banco local, nunca em produção):
---   e-mail: barbeiro.teste@example.com   senha: senha-teste-123
+-- Logins de teste (só no banco local, nunca em produção), senha senha-teste-123:
+--   barbeiro.teste@example.com  (Premium Plus, com 3 meses de dados)
+--   gratis.teste@example.com    (Grátis, sem onboarding)
 --
 -- Histórias que os dados contam (úteis para os testes da Fase 8):
 --   Rafael (C1): volta a cada 10 dias, faz corte; hidratação é recorrente
@@ -122,34 +123,38 @@ begin
   return v_id;
 end $$;
 
--- ---------- Login de teste (auth.users + identidade de e-mail) ----------
-insert into auth.users (
-  instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
-  raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
-  confirmation_token, recovery_token, email_change, email_change_token_new
-) values (
-  '00000000-0000-0000-0000-000000000000', 'b0b0b0b0-0000-4000-8000-000000000001',
-  'authenticated', 'authenticated', 'barbeiro.teste@example.com',
-  extensions.crypt('senha-teste-123', extensions.gen_salt('bf')), now(),
-  '{"provider": "email", "providers": ["email"]}', '{"nome": "Barbeiro Teste"}',
-  now() - interval '120 days', now(), '', '', '', ''
-);
+-- ---------- Logins de teste (auth.users + identidade de e-mail) ----------
+-- O gatilho criar_barbeiro_do_usuario (0003) cria a linha em barbeiros e o
+-- plano Grátis; aqui só completamos o perfil e o plano.
+create function pg_temp.criar_usuario(p_id uuid, p_email text, p_senha text, p_nome text) returns void
+language sql as $$
+  insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+    raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+    confirmation_token, recovery_token, email_change, email_change_token_new)
+  values ('00000000-0000-0000-0000-000000000000', p_id, 'authenticated', 'authenticated', p_email,
+    extensions.crypt(p_senha, extensions.gen_salt('bf')), now(),
+    '{"provider": "email", "providers": ["email"]}', jsonb_build_object('nome', p_nome),
+    now() - interval '120 days', now(), '', '', '', '');
+  insert into auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+  values (gen_random_uuid(), p_id, p_id,
+    jsonb_build_object('sub', p_id, 'email', p_email, 'email_verified', true), 'email', now(), now(), now());
+$$;
 
-insert into auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
-values (
-  gen_random_uuid(), 'b0b0b0b0-0000-4000-8000-000000000001', 'b0b0b0b0-0000-4000-8000-000000000001',
-  jsonb_build_object('sub', 'b0b0b0b0-0000-4000-8000-000000000001', 'email', 'barbeiro.teste@example.com',
-                     'email_verified', true),
-  'email', now(), now(), now()
-);
+-- Barbeiro principal (todos os dados abaixo), no plano Premium Plus para ver todas as telas.
+select pg_temp.criar_usuario('b0b0b0b0-0000-4000-8000-000000000001', 'barbeiro.teste@example.com', 'senha-teste-123', 'Barbeiro Teste');
+-- Barbeiro novo no Grátis, sem onboarding: testa o primeiro uso e as telas bloqueadas.
+select pg_temp.criar_usuario('b0b0b0b0-0000-4000-8000-000000000002', 'gratis.teste@example.com', 'senha-teste-123', 'Novo Barbeiro');
 
 -- ---------- Barbeiro ----------
-insert into barbeiros (id, nome, cidade, modelo_trabalho, publico, estrategia, preco_corte,
-                       dias_trabalho_semana, horas_dia, intervalo_retorno_padrao_dias,
-                       pct_visitas_com_extra_alvo, filosofia_atendimento, criado_em)
-values ('b0b0b0b0-0000-4000-8000-000000000001', 'Barbeiro Teste', 'São Paulo', 'comissionado', 'C',
-        'equilibrado', 45.00, 6, 9, 21, 0.5,
-        'Atender sempre como se fosse a primeira vez.', now() - interval '120 days');
+update barbeiros set nome = 'Barbeiro Teste', cidade = 'São Paulo', modelo_trabalho = 'comissionado', publico = 'C',
+       estrategia = 'equilibrado', preco_corte = 45.00, dias_trabalho_semana = 6, horas_dia = 9,
+       intervalo_retorno_padrao_dias = 21, pct_visitas_com_extra_alvo = 0.5,
+       filosofia_atendimento = 'Atender sempre como se fosse a primeira vez.', criado_em = now() - interval '120 days',
+       onboarding_concluido = true, taxa_debito = 0.0150, taxa_credito = 0.0320
+ where id = 'b0b0b0b0-0000-4000-8000-000000000001';
+update app_assinatura set plano = 'plus', status = 'ativa', periodo = 'mensal', provedor = 'manual',
+       renova_em = now() + interval '30 days'
+ where barbeiro_id = 'b0b0b0b0-0000-4000-8000-000000000001';
 
 -- ---------- 7 serviços e 2 produtos ----------
 insert into servicos (barbeiro_id, nome, categoria, preco, duracao_min, custo_insumo, intervalo_recomendado_dias) values

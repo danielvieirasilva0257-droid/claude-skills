@@ -58,3 +58,38 @@ export function formatMes(mes: string): string {
   const date = new Date(Date.UTC(year, month - 1, 1, 12));
   return new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(date);
 }
+
+/** "2026-11-19" for a date in the barber's time zone. */
+export function diaISO(date: Date = new Date(), timeZone: string = FUSO): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);
+}
+
+/** "2026-11-19" + 1 → "2026-11-20" (calendar math, no time zone involved). */
+export function somarDias(iso: string, dias: number): string {
+  const [y, m, d] = iso.split('-').map(Number);
+  const data = new Date(Date.UTC(y ?? 1970, (m ?? 1) - 1, (d ?? 1) + dias, 12));
+  return data.toISOString().slice(0, 10);
+}
+
+/** "14:30" in the barber's time zone. */
+export function formatHora(valor: string | Date, timeZone: string = FUSO): string {
+  const data = typeof valor === 'string' ? new Date(valor) : valor;
+  return new Intl.DateTimeFormat('pt-BR', { timeZone, hour: '2-digit', minute: '2-digit' }).format(data);
+}
+
+/** "2026-11-19" → "quinta, 19 de novembro". */
+export function formatDiaLongo(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number);
+  const data = new Date(Date.UTC(y ?? 1970, (m ?? 1) - 1, d ?? 1, 12));
+  return new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' })
+    .format(data)
+    .replace('-feira', '');
+}
+
+/** ISO timestamp for "day at HH:MM" in São Paulo (fixed −03:00; Brazil has no DST since 2019). */
+export function horarioEm(dia: string, hhmm: string): string {
+  return `${dia}T${hhmm}:00-03:00`;
+}
+
+/** Hidden money for the "eye" toggle. */
+export const VALOR_OCULTO = 'R$ •••••';

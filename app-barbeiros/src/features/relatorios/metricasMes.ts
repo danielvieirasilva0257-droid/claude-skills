@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
+import { useUsuarioId } from '@/features/conta/barbeiro';
 import { inicioDoMes } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
 
@@ -28,12 +29,15 @@ export type MetricasMes = {
  * only shows). RLS limits the rows to the signed-in barber.
  */
 export function useMetricasMes(mes: string = inicioDoMes()) {
+  const uid = useUsuarioId();
   return useQuery({
-    queryKey: ['v_metricas_mes', mes],
+    queryKey: ['v_metricas_mes', uid, mes],
+    enabled: uid !== null,
     queryFn: async (): Promise<MetricasMes | null> => {
       const { data, error } = await supabase
         .from('v_metricas_mes')
         .select('*')
+        .eq('barbeiro_id', uid!)
         .eq('mes', mes)
         .maybeSingle<MetricasMes>();
       if (error) throw error;
