@@ -22,6 +22,7 @@ export type Barbeiro = {
   taxa_credito: number | string;
   pagamento_padrao: FormaPagamento;
   ia_perfil: Record<string, unknown>;
+  ia_personalidade: { tom: 'parceiro' | 'formal' | 'descontraido'; emojis: boolean; assinatura: string; evitar: string[] } | null;
   fuso: string;
 };
 

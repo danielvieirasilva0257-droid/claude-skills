@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: space[2],
-    backgroundColor: color.bg,
+    backgroundColor: color.surface,
   },
   caixaFoco: { borderColor: color.brand, borderWidth: 2, paddingHorizontal: space[4] - 1 },
   caixaErro: { borderColor: color.danger, borderWidth: 2, paddingHorizontal: space[4] - 1 },

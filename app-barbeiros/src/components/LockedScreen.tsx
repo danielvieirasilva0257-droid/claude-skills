@@ -10,6 +10,7 @@ import { color, plano as corPlano, radius, space } from '@/theme/tokens';
 
 import { DuoButton } from './DuoButton';
 import { Texto } from './Texto';
+import { Vidro } from './Vidro';
 
 type Props = {
   plano: Exclude<Plano, 'gratis'>;
@@ -26,9 +27,9 @@ export function LockedScreen({ plano, titulo, descricao, previa, onConhecer }: P
       <View style={styles.previa} pointerEvents="none" importantForAccessibility="no-hide-descendants" aria-hidden>
         {previa}
       </View>
-      <BlurView intensity={28} tint="light" experimentalBlurMethod="dimezisBlurView" style={StyleSheet.absoluteFill} />
+      <BlurView intensity={28} tint="dark" experimentalBlurMethod="dimezisBlurView" style={StyleSheet.absoluteFill} />
       <View style={[StyleSheet.absoluteFill, styles.veu]} />
-      <View style={styles.cartao}>
+      <Vidro tom="forte" style={styles.cartao}>
         <View style={[styles.cadeado, { borderColor: corPlano[plano] }]}>
           <SymbolView name={{ ios: 'lock.fill', android: 'lock', web: 'lock' }} tintColor={corPlano[plano]} size={28} />
         </View>
@@ -42,7 +43,7 @@ export function LockedScreen({ plano, titulo, descricao, previa, onConhecer }: P
           {descricao}
         </Texto>
         <DuoButton rotulo="Conhecer o plano" onPress={onConhecer} style={styles.botao} testID="conhecer-plano" />
-      </View>
+      </Vidro>
     </View>
   );
 }
@@ -50,16 +51,12 @@ export function LockedScreen({ plano, titulo, descricao, previa, onConhecer }: P
 const styles = StyleSheet.create({
   raiz: { flex: 1, backgroundColor: color.bg },
   previa: { flex: 1, padding: space[4], gap: space[4] },
-  veu: { backgroundColor: color.bg, opacity: 0.35 },
+  veu: { backgroundColor: color.overlay, opacity: 0.5 },
   cartao: {
     position: 'absolute',
     left: space[4],
     right: space[4],
     top: '22%',
-    backgroundColor: color.bg,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: color.border,
     padding: space[5],
     alignItems: 'center',
     gap: space[2],

@@ -34,8 +34,8 @@ const LABIO = 4;
 
 const faces: Record<Aparencia, { face: string; labio: string; texto: keyof typeof color; borda?: string }> = {
   normal: { face: color.brand, labio: color.brandLip, texto: 'onBrand' },
-  sucesso: { face: color.brandSoft, labio: color.brand, texto: 'brandLip' },
-  erro: { face: color.bg, labio: color.danger, texto: 'danger', borda: color.danger },
+  sucesso: { face: color.surfaceStrong, labio: color.brandLip, texto: 'brand' },
+  erro: { face: color.surface, labio: color.danger, texto: 'danger', borda: color.danger },
 };
 
 export function DuoButton({
@@ -109,7 +109,7 @@ export function DuoButton({
 }
 
 const styles = StyleSheet.create({
-  raiz: { height: ALTURA, borderRadius: radius.lg },
+  raiz: { height: ALTURA, borderRadius: radius.pill },
   foco: { outlineColor: color.brand, outlineStyle: 'solid', outlineWidth: 2, outlineOffset: 2 },
   labio: {
     position: 'absolute',
@@ -117,11 +117,11 @@ const styles = StyleSheet.create({
     right: 0,
     top: LABIO,
     height: ALTURA - LABIO,
-    borderRadius: radius.lg,
+    borderRadius: radius.pill,
   },
   face: {
     height: ALTURA - LABIO,
-    borderRadius: radius.lg,
+    borderRadius: radius.pill,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: space[5],

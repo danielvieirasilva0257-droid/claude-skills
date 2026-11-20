@@ -84,10 +84,10 @@ export function HoldToConfirm({ rotulo, onConfirmar, duracao = 2000, testID, sty
 const styles = StyleSheet.create({
   base: {
     minHeight: 52,
-    borderRadius: radius.lg,
+    borderRadius: radius.pill,
     borderWidth: 1,
     borderColor: color.danger,
-    backgroundColor: color.bg,
+    backgroundColor: color.surface,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: space[5],

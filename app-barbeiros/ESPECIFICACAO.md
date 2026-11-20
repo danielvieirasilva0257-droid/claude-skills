@@ -1,6 +1,6 @@
 # App Barbeiros — especificação para construir no Claude Code
 
-**Fase atual:** Fase 4 (Premium) · Fases 0 a 3 prontas em 19/11/2026
+**Fase atual:** Fase 6 (Barbearias) · Fases 0 a 3 prontas em 19/11/2026; Fases 4 e 5 e o visual v2 (vidro líquido) prontos em 20/11/2026
 **Versão:** 1.1 · 19/11/2026
 **Fonte de negócio:** Plano de Negócio — App Barbeiros (https://claude.ai/artifact/S6HbgHKHwANXCssPUsmQAn). Se algo aqui contradizer o plano, pergunte ao Daniel.
 
@@ -148,43 +148,15 @@ Arquivo: `supabase/migrations/0001_banco_app_barbeiros_para_ia.sql` (versão 2, 
 
 ## 6. Design (tokens)
 
-```ts
-// src/theme/tokens.ts
-export const color = {
-  bg: '#FFFFFF', surface: '#F4F8F6', border: '#E2E8E5',
-  text: '#0F1A14',        // 17,8:1
-  textMuted: '#5B6B63',   // 5,6:1
-  brand: '#15803D', brandLip: '#0F5F2D', brandSoft: '#DCFCE7', onBrand: '#FFFFFF', // 5,0:1
-  ai: '#1D4ED8', aiSoft: '#EFF6FF',                                               // 6,7:1
-  warning: '#B45309',     // meta em risco
-  danger: '#C62828',      // prejuízo, erro (nunca para gasto comum)
-  gold: '#E3B341', goldText: '#8A6A12', onGold: '#0F1A14',                         // Premium Plus, conquista
-  wave: '#FACC15',        // onda do botão de conquista
-  bill: '#22C55E',        // notinhas
-} as const;
+**Versão 2 (20/11/2026):** o Daniel trocou a direção visual para **escuro com vidro líquido (Liquid Glass)**, com 6 referências de app financeiro. A fonte da verdade dos valores é `src/theme/tokens.ts` e o porquê de cada um está no `DESIGN.md`. Resumo:
 
-export const plano = { gratis: '#8A8F98', pago: '#15803D', premium: '#1D4ED8', plus: '#E3B341', barbearias: '#0A0A0B' } as const;
+- Fundo `#050506`; vidro = branco 6% com desfoque, borda branca 10% e brilho branco 22% no alto (`GlassView` nativo no iOS 26, desfoque no Android e na web); véu preto 62%.
+- Texto `#F4F4F0`, texto secundário `#A1A19A` (contrastes de 6:1 a 18:1 conferidos).
+- Dinheiro e ação: verde-limão `#C5F23A` (lábio `#9DC42A`, texto sobre ele `#0B0F02`). IA: lavanda `#9AA8FF`. Selecionado: pílula branca com texto escuro.
+- Risco `#FFB020`, prejuízo/erro `#FF6464`, conquista `#F5C451`, onda `#FACC15`, notinhas `#22C55E`.
+- Raios 10 / 16 / 24 / pílula. Espaço, tipografia (Inter por peso, números tabulares) e movimento iguais à versão 1 (curvas `easeOut` 0.23,1,0.32,1 e `easeInOut` 0.45,0,0.55,1; molas `springBack` 500/18/0,6 e `springCalm` 620/36/0,6).
 
-export const font = { family: 'Inter', weight: { regular: '400', medium: '500', semibold: '600' } } as const;
-export const size = { display: 34, title: 28, h2: 22, h3: 20, body: 17, bodySm: 15, caption: 13, tiny: 12 } as const;
-export const space = { 1: 4, 2: 8, 3: 12, 4: 16, 5: 24, 6: 32, 7: 48 } as const;
-export const radius = { sm: 8, md: 12, lg: 16, pill: 999 } as const;
-
-export const motion = {
-  easeOut: [0.23, 1, 0.32, 1],      // padrão
-  easeInOut: [0.45, 0, 0.55, 1],    // subida e descida suaves
-  easeSoftOut: [0.33, 1, 0.68, 1],
-  celebrate: [0.34, 1.56, 0.64, 1], // com overshoot
-  press: { duration: 60 },
-  springBack: { stiffness: 500, damping: 18, mass: 0.6 },   // botão Duolingo
-  springCalm: { stiffness: 620, damping: 36, mass: 0.6 },   // sheet, modal, abas (sem quique)
-  screen: 300, stagger: 40, countUp: 800,
-} as const;
-```
-
-Regras: números com `fontVariant: ['tabular-nums']`; um botão principal por tela; sem sombra borrada (profundidade por superfície e borda de 1px; o "lábio" do botão é sólido); gasto comum em texto neutro com "−"; nada só por cor.
-
----
+Regras: números com `fontVariant: ['tabular-nums']`; um botão principal por tela; sem sombra borrada (profundidade pelo vidro); nunca vidro sobre vidro; gasto comum em texto neutro com "−"; nada só por cor.
 
 ## 7. Componentes base
 
@@ -385,16 +357,20 @@ Skills: dataviz (Claude) para os gráficos, *financial-design-systems, `../skill
 **Como ficou (19/11/2026):** migration `0004` (parâmetros por ano com MEI 2026: limite R$ 81 mil, DAS serviços R$ 86,05; `v_clientes_lista`, `financeiro`, `progresso_meta`, `definir_meta`, conquistas, `v_mapa_calor`, `relatorio_mes`, `resumo_semana`, regra de comissão com faixas que emendam, `extrato_completo`, `mei_ano`, `sinais_insights`, `contexto_ia` sem nome nem telefone, `consumir_ia` com limite diário por plano). Edge Functions em `supabase/functions/` com o SDK oficial da Anthropic (`@anthropic-ai/sdk` 1.10.0): saída estruturada (`zodOutputFormat`) validada de novo com zod, `fallbacks: "default"` para recusa, chat em streaming, nomes trocados por "Cliente N" e de volta só na tela; **o número de cada insight é o do banco, nunca o da IA**. `LLM_PROVIDER=mock` (padrão) escreve textos a partir dos números, sem custo; `LLM_PROVIDER=anthropic` + `LLM_API_KEY` usa a IA de verdade. **Modelo:** `LLM_MODEL` vem `claude-opus-5-5` (o padrão da skill da API); para caber no custo-alvo de R$ 0,50 a R$ 2 por barbeiro/mês, a troca para `claude-haiku-5-5` é decisão do Daniel (seção 12). Gráficos com cores validadas pela skill `dataviz` (`src/theme/grafico.ts`), uma série por eixo, legenda, toque para ver o valor e "Ver em tabela". Testes: pgTAP (15 novos), Deno das funções (6, `npm run test:funcoes`) e E2E do plano Pago (insights, relatórios, meta com celebração de 50%, comissão, extrato, clientes, entrevista, chat, coach, MEI, financeiro, ofertas na cadeira) e do bloqueio no Grátis.
 
 ### Fase 4 — Premium (telas 16–19)
-- [ ] Expediente e lista de espera (estratégia V1)
-- [ ] WhatsApp oficial conectado; IA responde e agenda; "assumir conversa"
-- [ ] Automações das estratégias com `automatizavel = true`, todas passando por `pode_enviar`
-- [ ] Contador das 100 mensagens e tela de permissões
-- [ ] Cron de `gerar_followups` 1×/dia
+- [x] Expediente e lista de espera (estratégia V1)
+- [x] WhatsApp oficial conectado; IA responde e agenda; "assumir conversa" · testado no modo simulado; o número real precisa das credenciais da Meta (seção 12)
+- [x] Automações das estratégias com `automatizavel = true`, todas passando por `pode_enviar`
+- [x] Contador das 100 mensagens e tela de permissões
+- [x] Cron de `gerar_followups` 1×/dia
+
+**Como ficou (20/11/2026):** migration `0005` (`expediente`, `horarios_livres`, `canais` + `canais_segredos` sem acesso pelo app, `conversas`, `mensagens`, `mensagens_fila` com 1 mensagem por cliente/estratégia/dia, `uso_mensagens_mes`, `planejar_automacoes` para R4, A15, R6, R9 e R12, gatilho da lista de espera V1, `registrar_envio`, `rotina_diaria`). Tudo que sai automático passa por `pode_enviar` antes de entrar na fila e de novo na hora de enviar. Edge Functions `whatsapp-webhook` (verificação da Meta e assinatura `X-Hub-Signature-256`), `canal-enviar` (texto livre só na janela de 24 h; fora dela, modelo aprovado), `canal-conectar` e `enviar-fila`; a IA atendente oferece só horários de `horarios_livres` e agenda pelo banco. `CANAIS_MODO=simulado` (padrão) grava a mensagem sem mandar para a Meta. Cron (pg_cron + pg_net + Vault): insights às 6 h, rotina diária às 8 h (follow-ups e automações) e fila a cada hora, no horário de Brasília. Telas 16 a 19 com E2E (conversa da IA, assumir e devolver, automações).
 
 ### Fase 5 — Premium Plus (telas 20–23)
-- [ ] Instagram oficial; respostas privadas só para quem levantou a mão
-- [ ] Funil de prospecção com origem por palavra-código
-- [ ] Personalidade da IA
+- [x] Instagram oficial; respostas privadas só para quem levantou a mão · testado no modo simulado; a conta real precisa das credenciais da Meta
+- [x] Funil de prospecção com origem por palavra-código
+- [x] Personalidade da IA
+
+**Como ficou (20/11/2026):** `instagram-webhook` guarda comentários e directs; `pode_responder_instagram` libera 1 resposta privada por comentário, até 7 dias, só quando a pessoa pediu (palavra-código ou pergunta). `v_funil_prospeccao` (chamaram → agendaram → vieram → voltaram, com custo por cliente) e `v_origem_clientes`; a palavra-código ("REELS") manda a origem para a ficha do cliente. `barbeiros.ia_personalidade` entra no prompt do atendente. Telas 20 a 23 com E2E.
 
 ### Fase 6 — Barbearias (telas 24–27)
 - [ ] Papel "dono" e "barbeiro" com RLS próprio (nova migration)

@@ -90,14 +90,14 @@ export function SecondaryButton({
 const styles = StyleSheet.create({
   base: {
     minHeight: 52,
-    borderRadius: radius.lg,
+    borderRadius: radius.pill,
     borderWidth: 1,
-    backgroundColor: color.bg,
+    backgroundColor: color.surface,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: space[5],
   },
-  compacto: { minHeight: 44, paddingHorizontal: space[4], borderRadius: radius.md },
-  desativado: { backgroundColor: color.surface },
+  compacto: { minHeight: 44, paddingHorizontal: space[4] },
+  desativado: { opacity: 0.5 },
   foco: { outlineColor: color.brand, outlineStyle: 'solid', outlineWidth: 2, outlineOffset: 2 },
 });

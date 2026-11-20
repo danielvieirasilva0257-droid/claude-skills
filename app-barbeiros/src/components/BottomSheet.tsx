@@ -10,6 +10,7 @@ import { curva, useMovimentoReduzido } from '@/theme/motion';
 import { color, motion, radius, space } from '@/theme/tokens';
 
 import { Texto } from './Texto';
+import { Vidro } from './Vidro';
 
 type Props = {
   aberto: boolean;
@@ -41,7 +42,7 @@ export function BottomSheet({ aberto, onFechar, titulo, children, testID }: Prop
     }
   }, [aberto, reduzido, montado, veu, y]);
 
-  const estiloVeu = useAnimatedStyle(() => ({ opacity: veu.value * 0.4 }));
+  const estiloVeu = useAnimatedStyle(() => ({ opacity: veu.value }));
   const estiloGaveta = useAnimatedStyle(() => ({
     opacity: reduzido ? veu.value : 1,
     transform: [{ translateY: y.value }],
@@ -58,6 +59,7 @@ export function BottomSheet({ aberto, onFechar, titulo, children, testID }: Prop
           accessibilityViewIsModal
           style={[styles.gaveta, { paddingBottom: space[4] + insets.bottom }, estiloGaveta]}
         >
+          <Vidro tom="forte" raio={0} style={StyleSheet.absoluteFill as never} />
           <View style={styles.alca} />
           <View style={styles.cabecalho}>
             <Texto variante="h2" accessibilityRole="header" style={styles.titulo}>
@@ -80,9 +82,9 @@ export function BottomSheet({ aberto, onFechar, titulo, children, testID }: Prop
 
 const styles = StyleSheet.create({
   raiz: { flex: 1, justifyContent: 'flex-end' },
-  veu: { backgroundColor: color.text },
+  veu: { backgroundColor: color.overlay },
   gaveta: {
-    backgroundColor: color.bg,
+    overflow: 'hidden',
     borderTopLeftRadius: radius.lg,
     borderTopRightRadius: radius.lg,
     borderWidth: 1,

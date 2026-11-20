@@ -1,9 +1,11 @@
 import type { ReactNode } from 'react';
+import { useSegments } from 'expo-router';
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { color, space } from '@/theme/tokens';
 
+import { Aurora } from './Aurora';
 import { Texto } from './Texto';
 
 type Props = {
@@ -17,15 +19,22 @@ type Props = {
   atualizando?: boolean;
   /** Stack screens already have a header with the title. */
   semTitulo?: boolean;
+  /** Strong aurora (home); the other screens get a soft one. */
+  auroraForte?: boolean;
   children?: ReactNode;
 };
 
+/** Space left at the bottom of tab screens for the floating tab bar. */
+export const ESPACO_ABAS = 112;
+
 /** Screen shell: safe area, white background, title, pull to refresh. */
-export function TelaBase({ titulo, subtitulo, direita, flutuante, onAtualizar, atualizando = false, semTitulo = false, children }: Props) {
+export function TelaBase({ titulo, subtitulo, direita, flutuante, onAtualizar, atualizando = false, semTitulo = false, auroraForte = false, children }: Props) {
+  const emAbas = (useSegments() as string[]).includes('(tabs)');
   return (
     <SafeAreaView style={styles.safe} edges={semTitulo ? [] : ['top']}>
+      <Aurora forte={auroraForte} />
       <ScrollView
-        contentContainerStyle={[styles.conteudo, flutuante ? styles.espacoFlutuante : null]}
+        contentContainerStyle={[styles.conteudo, emAbas ? styles.espacoAbas : flutuante ? styles.espacoFlutuante : null]}
         keyboardShouldPersistTaps="handled"
         refreshControl={onAtualizar ? <RefreshControl refreshing={atualizando} onRefresh={onAtualizar} tintColor={color.brand} /> : undefined}
       >
@@ -46,7 +55,7 @@ export function TelaBase({ titulo, subtitulo, direita, flutuante, onAtualizar, a
         )}
         {children}
       </ScrollView>
-      {flutuante ? <View style={styles.flutuante}>{flutuante}</View> : null}
+      {flutuante ? <View style={[styles.flutuante, emAbas ? styles.flutuanteAbas : null]}>{flutuante}</View> : null}
     </SafeAreaView>
   );
 }
@@ -64,7 +73,9 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: color.bg },
   conteudo: { padding: space[4], gap: space[4] },
   espacoFlutuante: { paddingBottom: 96 },
+  espacoAbas: { paddingBottom: ESPACO_ABAS + 24 },
   topo: { flexDirection: 'row', alignItems: 'center', gap: space[3] },
   titulos: { flex: 1, gap: space[1] },
   flutuante: { position: 'absolute', right: space[4], bottom: space[4] },
+  flutuanteAbas: { bottom: ESPACO_ABAS },
 });

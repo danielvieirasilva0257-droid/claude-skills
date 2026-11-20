@@ -1,47 +1,35 @@
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, View, type ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, type ViewStyle } from 'react-native';
 
-import { color, radius, space } from '@/theme/tokens';
+import { color, space } from '@/theme/tokens';
+
+import { Vidro } from './Vidro';
 
 type Props = {
   children: ReactNode;
-  /** Only when the whole card is tappable (DESIGN.md: card only if interactive or grouping). */
+  /** Only when the whole card is tappable. */
   onPress?: () => void;
   accessibilityLabel?: string;
   testID?: string;
   style?: ViewStyle;
+  tom?: 'normal' | 'ia';
 };
 
-/** Grouped area: surface + 1 px border, no shadow. */
-export function Cartao({ children, onPress, accessibilityLabel, testID, style }: Props) {
-  if (onPress) {
-    return (
-      <Pressable
-        onPress={onPress}
-        accessibilityRole="button"
-        accessibilityLabel={accessibilityLabel}
-        testID={testID}
-        style={({ pressed }) => [styles.cartao, pressed ? styles.pressionado : null, style]}
-      >
-        {children}
-      </Pressable>
-    );
-  }
+/** Glass card (DESIGN.md v2). Inside it, use plain surfaces, never another Vidro. */
+export function Cartao({ children, onPress, accessibilityLabel, testID, style, tom = 'normal' }: Props) {
+  const corpo = <Vidro tom={tom} style={[styles.cartao, style ?? {}]}>{children}</Vidro>;
+  if (!onPress) return <Vidro tom={tom} style={[styles.cartao, style ?? {}]} testID={testID}>{children}</Vidro>;
   return (
-    <View style={[styles.cartao, style]} testID={testID}>
-      {children}
-    </View>
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={accessibilityLabel} testID={testID}
+      style={({ pressed }) => (pressed ? styles.pressionado : null)}>
+      {corpo}
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  cartao: {
-    backgroundColor: color.surface,
-    borderColor: color.border,
-    borderWidth: 1,
-    borderRadius: radius.lg,
-    padding: space[4],
-    gap: space[2],
-  },
-  pressionado: { borderColor: color.textMuted },
+  cartao: { padding: space[4], gap: space[2] },
+  pressionado: { opacity: 0.8, transform: [{ scale: 0.99 }] },
 });
+
+void color;

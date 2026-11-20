@@ -56,12 +56,12 @@ export function Chip({ rotulo, detalhe, selecionado, onPress, desativado = false
         animado,
       ]}
     >
-      <Texto variante="bodySm" peso={selecionado ? 'semibold' : 'medium'} cor={selecionado ? 'brandLip' : desativado ? 'textMuted' : 'text'}>
+      <Texto variante="bodySm" peso={selecionado ? 'semibold' : 'medium'} cor={selecionado ? 'onLight' : desativado ? 'textMuted' : 'text'}>
         {selecionado ? '✓ ' : ''}
         {rotulo}
       </Texto>
       {detalhe ? (
-        <Texto variante="caption" cor={selecionado ? 'brandLip' : 'textMuted'} numero>
+        <Texto variante="caption" cor={selecionado ? 'onLight' : 'textMuted'} numero>
           {detalhe}
         </Texto>
       ) : null}
@@ -77,12 +77,12 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     borderWidth: 1,
     borderColor: color.border,
-    backgroundColor: color.bg,
+    backgroundColor: color.surface,
     flexDirection: 'row',
     alignItems: 'center',
     gap: space[2],
   },
-  selecionado: { backgroundColor: color.brandSoft, borderColor: color.brand },
-  desativado: { backgroundColor: color.surface },
+  selecionado: { backgroundColor: color.text, borderColor: color.text },
+  desativado: { opacity: 0.5 },
   foco: { outlineColor: color.brand, outlineStyle: 'solid', outlineWidth: 2, outlineOffset: 2 },
 });

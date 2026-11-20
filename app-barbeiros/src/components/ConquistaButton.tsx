@@ -214,7 +214,7 @@ export function ConquistaButton({ rotulo, onPress, onFim, giro3d = false, desati
 const styles = StyleSheet.create({
   raiz: { height: ALTURA },
   origem: { position: 'absolute', left: '50%', top: ALTURA / 2, width: 0, height: 0 },
-  botao: { height: ALTURA, borderRadius: radius.lg },
+  botao: { height: ALTURA, borderRadius: radius.pill },
   foco: { outlineColor: color.brand, outlineStyle: 'solid', outlineWidth: 2, outlineOffset: 2 },
   labio: {
     position: 'absolute',
@@ -222,13 +222,13 @@ const styles = StyleSheet.create({
     right: 0,
     top: LABIO,
     height: ALTURA - LABIO,
-    borderRadius: radius.lg,
+    borderRadius: radius.pill,
     backgroundColor: color.brandLip,
   },
   labioDesativado: { backgroundColor: color.border },
   face: {
     height: ALTURA - LABIO,
-    borderRadius: radius.lg,
+    borderRadius: radius.pill,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: space[5],

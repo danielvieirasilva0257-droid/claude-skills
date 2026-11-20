@@ -40,7 +40,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
-          <StatusBar style="dark" />
+          <StatusBar style="light" />
           <Stack screenOptions={{ headerShown: false, contentStyle: styles.root }}>
             <Stack.Protected guard={logado}>
               <Stack.Screen name="(app)" />

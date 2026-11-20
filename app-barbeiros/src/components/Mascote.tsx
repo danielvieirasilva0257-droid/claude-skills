@@ -14,7 +14,7 @@ import Animated, {
 import Svg, { Circle, Ellipse, G, Path, Rect, Text as SvgText } from 'react-native-svg';
 
 import { curva, useMovimentoReduzido } from '@/theme/motion';
-import { color } from '@/theme/tokens';
+import { mascote as arte } from '@/theme/tokens';
 
 export type EstadoMascote = 'parado' | 'comemorando' | 'pensando' | 'preocupado';
 
@@ -35,14 +35,14 @@ function Asa({ lado }: { lado: 'esq' | 'dir' }) {
   const d = lado === 'esq' ? 'M30 4 C12 0 0 14 4 26 C12 22 22 22 30 18 Z' : 'M2 4 C20 0 32 14 28 26 C20 22 10 22 2 18 Z';
   return (
     <Svg width={32} height={30} viewBox="0 0 32 30">
-      <Path d={d} fill={color.bg} stroke={color.brandLip} strokeWidth={2} strokeLinejoin="round" />
-      <Path d={lado === 'esq' ? 'M26 10 C18 9 11 13 8 19' : 'M6 10 C14 9 21 13 24 19'} stroke={color.border} strokeWidth={2} fill="none" />
+      <Path d={d} fill={arte.asa} stroke={arte.borda} strokeWidth={2} strokeLinejoin="round" />
+      <Path d={lado === 'esq' ? 'M26 10 C18 9 11 13 8 19' : 'M6 10 C14 9 21 13 24 19'} stroke={arte.rosto} strokeWidth={2} fill="none" />
     </Svg>
   );
 }
 
 function Rosto({ estado }: { estado: EstadoMascote }) {
-  const olho = color.text;
+  const olho = arte.olho;
   switch (estado) {
     case 'comemorando':
       return (
@@ -137,18 +137,18 @@ export function Mascote({ estado = 'parado', tamanho = 120, accessibilityLabel }
         </Animated.View>
         <View style={{ position: 'absolute', left: tamanho * 0.2, top: tamanho * 0.08 }}>
           <Svg width={tamanho} height={tamanho * 0.6} viewBox="0 0 104 62">
-            <Rect x={2} y={2} width={100} height={58} rx={10} fill={color.bill} stroke={color.brandLip} strokeWidth={3} />
-            <Rect x={10} y={10} width={84} height={42} rx={6} fill="none" stroke={color.brandLip} strokeWidth={1.5} strokeDasharray="3 3" />
-            <Ellipse cx={52} cy={38} rx={22} ry={18} fill={color.brandSoft} />
+            <Rect x={2} y={2} width={100} height={58} rx={10} fill={arte.nota} stroke={arte.borda} strokeWidth={3} />
+            <Rect x={10} y={10} width={84} height={42} rx={6} fill="none" stroke={arte.borda} strokeWidth={1.5} strokeDasharray="3 3" />
+            <Ellipse cx={52} cy={38} rx={22} ry={18} fill={arte.rosto} />
             <Rosto estado={estado} />
-            <SvgText x={14} y={22} fontSize={10} fontWeight="700" fill={color.brandLip}>
+            <SvgText x={14} y={22} fontSize={10} fontWeight="700" fill={arte.borda}>
               R$
             </SvgText>
             {estado === 'pensando' ? (
               <G>
-                <Circle cx={86} cy={14} r={2} fill={color.ai} />
-                <Circle cx={92} cy={10} r={2} fill={color.ai} />
-                <Circle cx={98} cy={6} r={2} fill={color.ai} />
+                <Circle cx={86} cy={14} r={2} fill={arte.pensando} />
+                <Circle cx={92} cy={10} r={2} fill={arte.pensando} />
+                <Circle cx={98} cy={6} r={2} fill={arte.pensando} />
               </G>
             ) : null}
           </Svg>

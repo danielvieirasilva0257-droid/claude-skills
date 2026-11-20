@@ -1,63 +1,33 @@
 import { Tabs } from 'expo-router';
-import { SymbolView, type SymbolViewProps } from 'expo-symbols';
-import { StyleSheet, Text, type ColorValue } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useState } from 'react';
 
-import { inter } from '@/theme/fonts';
-import { color, size } from '@/theme/tokens';
+import { BarraAbas, type IconeAba } from '@/components/BarraAbas';
+import { LancarSheet } from '@/features/agenda/LancarSheet';
+import { color } from '@/theme/tokens';
 
-type IconeProps = { color: ColorValue; focused: boolean };
-
-function icone(name: SymbolViewProps['name']) {
-  return function TabIcon({ color: tint }: IconeProps) {
-    return <SymbolView name={name} tintColor={tint} size={24} />;
-  };
-}
-
-// Active tab = brand color AND semibold label (never color alone).
-function RotuloAba({ focused, color: tint, children }: { focused: boolean; color: ColorValue; children: string }) {
-  return <Text style={[styles.rotulo, focused ? styles.rotuloAtivo : null, { color: tint }]}>{children}</Text>;
-}
-
-const icones = {
-  inicio: icone({ ios: 'house', android: 'home', web: 'home' }),
-  agenda: icone({ ios: 'calendar', android: 'calendar_month', web: 'calendar_month' }),
-  relatorios: icone({ ios: 'chart.bar', android: 'bar_chart', web: 'bar_chart' }),
-  clientes: icone({ ios: 'person.2', android: 'group', web: 'group' }),
-  mais: icone({ ios: 'line.3.horizontal', android: 'menu', web: 'menu' }),
+const ICONES: Record<string, IconeAba> = {
+  index: { ios: 'house', android: 'home', web: 'home' },
+  agenda: { ios: 'calendar', android: 'calendar_month', web: 'calendar_month' },
+  relatorios: { ios: 'chart.bar', android: 'bar_chart', web: 'bar_chart' },
+  clientes: { ios: 'person.2', android: 'group', web: 'group' },
+  mais: { ios: 'line.3.horizontal', android: 'menu', web: 'menu' },
 };
 
-// The default bar (49 px) is sized for 10 px labels; ours are 12 px Inter.
-const ALTURA_ABAS = 58;
-
 export default function TabsLayout() {
-  const insets = useSafeAreaInsets();
+  const [lancando, setLancando] = useState(false);
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: color.brand,
-        tabBarInactiveTintColor: color.textMuted,
-        tabBarStyle: {
-          backgroundColor: color.bg,
-          borderTopColor: color.border,
-          borderTopWidth: 1,
-          height: ALTURA_ABAS + insets.bottom,
-        },
-        tabBarLabel: RotuloAba,
-        sceneStyle: { backgroundColor: color.bg },
-      }}
-    >
-      <Tabs.Screen name="index" options={{ title: 'Início', tabBarIcon: icones.inicio }} />
-      <Tabs.Screen name="agenda" options={{ title: 'Agenda', tabBarIcon: icones.agenda }} />
-      <Tabs.Screen name="relatorios" options={{ title: 'Relatórios', tabBarIcon: icones.relatorios }} />
-      <Tabs.Screen name="clientes" options={{ title: 'Clientes', tabBarIcon: icones.clientes }} />
-      <Tabs.Screen name="mais" options={{ title: 'Mais', tabBarIcon: icones.mais }} />
-    </Tabs>
+    <>
+      <Tabs
+        tabBar={(props) => <BarraAbas {...props} icones={ICONES} onMais={() => setLancando(true)} />}
+        screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: color.bg } }}
+      >
+        <Tabs.Screen name="index" options={{ title: 'Início' }} />
+        <Tabs.Screen name="agenda" options={{ title: 'Agenda' }} />
+        <Tabs.Screen name="relatorios" options={{ title: 'Relatórios' }} />
+        <Tabs.Screen name="clientes" options={{ title: 'Clientes' }} />
+        <Tabs.Screen name="mais" options={{ title: 'Mais' }} />
+      </Tabs>
+      <LancarSheet aberto={lancando} onFechar={() => setLancando(false)} />
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  rotulo: { ...inter('regular'), fontSize: size.tiny },
-  rotuloAtivo: { ...inter('semibold') },
-});

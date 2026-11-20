@@ -99,7 +99,7 @@ export const fluxos = {
     await entrar(page, 'barbeiro.teste@example.com');
     await page.getByTestId('hoje-valor').waitFor({ timeout: 20_000 });
     await print(page, 'f2-10-inicio');
-    await page.getByTestId('inicio-atendimento').click();
+    await page.getByTestId('mais-atendimento').click();
     await page.getByTestId('atalho-Corte').waitFor();
     await print(page, 'f2-11-lancar');
     await page.getByTestId('atalho-Corte').click();
@@ -222,6 +222,61 @@ export const fluxos = {
       await page.getByTestId('tela-bloqueada').waitFor({ timeout: 20_000 });
     }
     await print(page, 'f3-20-relatorios-bloqueado');
+  },
+  // Fases 4 e 5: Premium e Premium Plus (canais em modo simulado, IA simulada).
+  async premium_e_plus(page) {
+    await entrar(page, 'barbeiro.teste@example.com');
+    await page.getByTestId('hoje-valor').waitFor({ timeout: 20_000 });
+    await fecharCelebracoes(page);
+
+    await page.goto(`${BASE}/expediente`);
+    await page.getByTestId('dia-2').waitFor({ timeout: 20_000 });
+    await page.getByTestId('expediente-salvar').click();
+    await page.getByText('✓ Salvo').waitFor({ timeout: 10_000 });
+    await print(page, 'f4-01-expediente');
+
+    await page.goto(`${BASE}/whatsapp`);
+    await page.getByTestId('canal-whatsapp').waitFor({ timeout: 20_000 });
+    await page.getByTestId('simular-enviar').click();
+    await page.waitForTimeout(1500);
+    await page.getByTestId('simular-texto').fill('Sim, pode ser esse');
+    await page.getByTestId('simular-enviar').click();
+    await page.waitForTimeout(1500);
+    await print(page, 'f4-02-whatsapp');
+    await page.getByText('Cliente de teste').first().click();
+    await page.getByText(/Marquei/).waitFor({ timeout: 20_000 });
+    await print(page, 'f4-03-conversa-ia-marcou');
+    await page.getByTestId('assumir').click();
+    await page.getByText('Você está atendendo').waitFor({ timeout: 10_000 });
+    await page.getByTestId('resposta').fill('Te espero, abraço!');
+    await page.getByTestId('responder').click();
+    await page.getByTestId('msg-barbeiro').first().waitFor({ timeout: 10_000 });
+    await print(page, 'f4-04-barbeiro-assumiu');
+
+    await page.goto(`${BASE}/automacoes`);
+    await page.getByTestId('planejar').click();
+    await page.getByTestId('fila-R4').first().waitFor({ timeout: 20_000 });
+    await print(page, 'f4-05-automacoes');
+
+    await page.goto(`${BASE}/mensagens`);
+    await page.getByTestId('uso-mensagens').waitFor({ timeout: 20_000 });
+    await print(page, 'f4-06-mensagens');
+
+    await page.goto(`${BASE}/instagram`);
+    await page.getByTestId('canal-instagram').waitFor({ timeout: 20_000 });
+    await page.getByTestId('ig-caixa').click();
+    await page.getByTestId('evento-ig').first().waitFor({ timeout: 20_000 });
+    await print(page, 'f5-01-instagram-caixa');
+
+    await page.goto(`${BASE}/prospeccao`);
+    await page.getByTestId('funil-REELS').waitFor({ timeout: 20_000 });
+    await print(page, 'f5-02-prospeccao');
+
+    await page.goto(`${BASE}/ia/personalidade`);
+    await page.getByTestId('tom-descontraido').click();
+    await page.getByTestId('personalidade-salvar').click();
+    await page.getByText('✓ Salvo').waitFor({ timeout: 10_000 });
+    await print(page, 'f5-03-personalidade');
   },
 };
 

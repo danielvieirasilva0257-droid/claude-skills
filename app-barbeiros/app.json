@@ -6,14 +6,14 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "appbarbeiros",
-    "userInterfaceStyle": "light",
-    "backgroundColor": "#FFFFFF",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#050506",
     "ios": {
       "supportsTablet": false
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#FFFFFF",
+        "backgroundColor": "#050506",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -32,7 +32,7 @@
         {
           "image": "./assets/images/splash-icon.png",
           "resizeMode": "contain",
-          "backgroundColor": "#FFFFFF"
+          "backgroundColor": "#050506"
         }
       ],
       "expo-sharing"

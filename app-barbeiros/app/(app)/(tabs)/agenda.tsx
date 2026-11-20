@@ -55,7 +55,6 @@ export default function Agenda() {
         agenda.refetch();
         resumo.refetch();
       }}
-      flutuante={ehHoje && !caixaFechado ? <DuoButton testID="mais-atendimento" rotulo="+ Atendimento" onPress={() => setLancando(true)} /> : undefined}
     >
       <View style={styles.dia}>
         <BotaoIcone icone={{ ios: 'chevron.left', android: 'chevron_left', web: 'chevron_left' }} rotulo="Dia anterior" onPress={() => setDia(somarDias(dia, -1))} />
@@ -101,7 +100,7 @@ export default function Agenda() {
                   <Texto variante="caption" numberOfLines={1} style={styles.flex}
                     cor={a.status === 'concluido' ? 'brandLip' : a.status === 'agendado' ? 'text' : 'textMuted'}>
                     {NOME_STATUS[a.status]}
-                    <Texto variante="caption" cor="textMuted">{caixaFechado ? ' · Caixa fechado' : ' · ✓✓ Sincronizado'}</Texto>
+                    <Texto variante="caption" cor="textMuted">{caixaFechado ? ' · caixa fechado' : ' · ✓✓'}</Texto>
                   </Texto>
                 </View>
               </View>
