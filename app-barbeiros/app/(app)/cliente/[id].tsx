@@ -1,5 +1,6 @@
 // Ficha do cliente: atender sempre como se fosse a primeira vez.
-// Técnica, bebida, assunto, datas, recorrência por serviço e se pode receber oferta.
+// Observações livres (o barbeiro escreve do jeito dele), técnica do cabelo e
+// da barba, recorrência por serviço e se pode receber oferta.
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -16,13 +17,15 @@ import { PortaPlano } from '@/features/planos/PortaPlano';
 import { formatDiaLongo, formatMoeda, formatPorcentagem } from '@/lib/format';
 import { space } from '@/theme/tokens';
 
+// Contact first, then one free-text field instead of one question per topic
+// (Daniel, 20/11/2026), then the techniques for hair and beard.
 const CAMPOS = [
-  ['apelido', 'Como gosta de ser chamado'],
-  ['tecnica_ultimo_corte', 'Técnica do último corte'],
-  ['bebida_preferida', 'Bebida preferida'],
-  ['ultimo_assunto', 'Último assunto'],
-  ['preferencias', 'Preferências'],
-  ['telefone', 'Telefone'],
+  { k: 'apelido', rotulo: 'Como gosta de ser chamado' },
+  { k: 'telefone', rotulo: 'Telefone', teclado: 'phone-pad' },
+  { k: 'observacoes', rotulo: 'Observações', multilinha: true,
+    exemplo: 'Do jeito que quiser: bebida, assunto, se gosta de conversar, se tem pressa…' },
+  { k: 'tecnica_cabelo', rotulo: 'Técnica do corte de cabelo', exemplo: 'Degradê na 1, tesoura em cima' },
+  { k: 'tecnica_barba', rotulo: 'Técnica da barba', exemplo: 'Desenhada, contorno na navalha' },
 ] as const;
 
 function Ficha({ id }: { id: string }) {
@@ -34,7 +37,7 @@ function Ficha({ id }: { id: string }) {
   useEffect(() => {
     if (!ficha.data) return;
     const c = ficha.data.cliente;
-    setForm(Object.fromEntries(CAMPOS.map(([k]) => [k, String(c[k] ?? '')])));
+    setForm(Object.fromEntries(CAMPOS.map(({ k }) => [k, String(c[k] ?? '')])));
     setPodeOferta(Boolean(c.pode_receber_oferta));
   }, [ficha.data]);
 
@@ -64,10 +67,12 @@ function Ficha({ id }: { id: string }) {
         </View>
       ))}
 
-      <Texto variante="h3" accessibilityRole="header">Ficha</Texto>
-      {CAMPOS.map(([k, rotulo]) => (
-        <Campo key={k} rotulo={rotulo} value={form[k] ?? ''} onChangeText={(t) => setForm((f) => ({ ...f, [k]: t }))}
-          keyboardType={k === 'telefone' ? 'phone-pad' : 'default'} />
+      <Texto variante="h3" accessibilityRole="header">Cadastro</Texto>
+      {CAMPOS.map((campo) => (
+        <Campo key={campo.k} testID={`ficha-${campo.k}`} rotulo={campo.rotulo} value={form[campo.k] ?? ''}
+          onChangeText={(t) => setForm((f) => ({ ...f, [campo.k]: t }))}
+          keyboardType={'teclado' in campo ? campo.teclado : 'default'}
+          multiline={'multilinha' in campo} placeholder={'exemplo' in campo ? campo.exemplo : undefined} />
       ))}
       <Texto variante="bodySm" peso="medium">Pode receber oferta de extra?</Texto>
       <View style={styles.chips}>
@@ -94,7 +99,7 @@ function Ficha({ id }: { id: string }) {
 export default function FichaCliente() {
   const { id } = useLocalSearchParams<{ id: string }>();
   return (
-    <PortaPlano recurso="clientes" titulo="Ficha do cliente" descricao="Técnica, preferências e o que oferecer na próxima visita."
+    <PortaPlano recurso="clientes" titulo="Ficha do cliente" descricao="Observações, técnica do cabelo e da barba e o que oferecer na próxima visita."
       previa={<Texto variante="title">Ficha</Texto>}>
       <Ficha id={id} />
     </PortaPlano>

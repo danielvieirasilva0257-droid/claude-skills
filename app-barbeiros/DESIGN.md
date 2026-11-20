@@ -151,7 +151,11 @@ Estados obrigatórios: normal, foco, pressionado, desativado, carregando, vazio,
 | `MetaRing` | Trilho translúcido, arco limão (âmbar em risco, com "⚠ Em risco"). |
 | `LockedScreen` | Prévia real borrada + véu + cartão de vidro com cadeado na cor do plano. |
 | `Aurora` | Manchas de cor desfocadas atrás do topo da tela (atmosfera, não decoração de conteúdo). |
-| Barra de abas | Cápsula de vidro com 5 abas; a ativa ganha bolha `surfaceStrong`, ícone limão e rótulo em negrito. |
+| Barra de abas | Cápsula de vidro com 5 abas; a ativa ganha bolha `surfaceStrong`, ícone limão e rótulo em negrito. **A bolha desliza** da aba anterior até a tocada (20/11): 220 ms + 40 ms por aba de distância (máx. 380 ms), `easeOut` forte, sem quique, interrompível; as abas alargam e estreitam enquanto ela passa; o rótulo aparece quando a bolha chega. "Reduzir movimento": pula direto. |
+| Calendário (Agenda) | Mês com domingo primeiro; dia escolhido na pílula branca (`text`/`onLight`), hoje com anel limão, ponto embaixo do dia com horário (limão: agendado; cinza: só feitos ou faltas). Células de 44 px com rótulo falado ("sexta, 21 de novembro, 1 horário"). |
+| Grade do dia (Agenda) | Do horário de entrada ao de saída (expediente do dia; sem cadastro, 9h às 19h), 72 px por hora, pausa em faixa `surface`, fora do expediente com véu. Horário = bloco com borda esquerda de 4 px (limão: agendado; `brandLip`: feito; `warning`: faltou), hora, cliente, serviços e valor. Linha "agora" limão. Meia hora vazia é tocável e abre "Agendar" com a hora preenchida. Horários juntos dividem a largura. |
+| CRM do agendamento | No topo da gaveta do horário: cliente (link limão com "›" para o cadastro), data, horário, profissional, serviços com preço e duração, e o valor; as ações (concluir, faltou, cancelar, ofertas) ficam embaixo. |
+| Orbe da IA ("Fale com a IA") | Bolha lavanda (cor da IA) desenhada como um caminho SVG que se move: parado = respira; ouvindo = a borda segue o volume do microfone; pensando = ondula girando; falando = pulsa no ritmo da fala. Sempre com o estado escrito embaixo. "Reduzir movimento": círculo parado. Microfone lavanda redondo de 80 px; teclado e som em botões de 52 px. |
 
 ### ConquistaButton ("pulo com dinheiro", aprovado em 19/11)
 
@@ -183,6 +187,10 @@ Contrastes conferidos acima (todos ≥ 6:1). Toque ≥ 44 × 44 (botões 52, aba
 | Lavanda `#9AA8FF` só para a IA | Regra do plano (IA com cor própria), ajustada ao escuro | título e balão da IA | separa "o que eu fiz" de "o que a IA sugere" |
 | Pílula branca = selecionado | Referências (filtros "Conexões / Cartão") | `Chip` selecionado | contraste máximo e leitura imediata |
 | Barra de abas em cápsula + "+" redondo | Referências | "+ Atendimento" em todas as abas | ação principal sempre ao alcance do polegar |
+| Bolha que desliza na barra de abas | Daniel (20/11) | troca de aba sem animação | ele quer ver a seleção ir até a aba tocada; fica rápida e sem quique porque é usada dezenas de vezes por dia |
+| Agenda com calendário e grade do dia | Daniel (20/11), estilo Booksy/AVEC | lista simples do dia | barbeiro pensa em horários; o expediente desenha a grade |
+| Ficha com "Observações" livres | Daniel (20/11) | uma pergunta por assunto (bebida, assunto, preferências) | cada barbeiro anota do seu jeito; técnicas do cabelo e da barba ficam em campos próprios |
+| Sem mascote | Daniel (20/11) | nota de dinheiro com asinhas | conquista mostra o ícone dela (bandeira, troféu, seta, selo) |
 | Liquid Glass nativo no iOS 26 | `expo-glass-effect` (SDK 58) | `Vidro` | efeito real da Apple; desfoque no resto |
 | Aurora em vez de ilustração | `ui-ux-pro-max` (gradiente só como atmosfera de hero) | atrás do topo | dá cor para o vidro refratar sem foto de terceiro |
 | Paleta dos gráficos no escuro | Validador da skill `dataviz` (20/11): par `#6E8F1F` + `#C5F23A` ALL PASS | `src/theme/grafico.ts` | verde em dois tons, legível para daltônicos |

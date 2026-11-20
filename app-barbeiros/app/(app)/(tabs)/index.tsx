@@ -22,6 +22,7 @@ import { MODO_DEMO } from '@/features/demo/config';
 import { useBarbeiro, usePlano } from '@/features/conta/barbeiro';
 import { alternarOcultarValores, usePreferencias } from '@/features/conta/preferencias';
 import { Celebracao } from '@/features/conquistas/Celebracao';
+import { FaleComIA } from '@/features/ia/FaleComIA';
 import { useFinanceiro, useInsights } from '@/features/pago/api';
 import { diaCurto, useMinhaAssinatura } from '@/features/planos/assinatura';
 import { diaISO, formatDiaLongo, formatHora, formatMes, formatMoeda, inicioDoMes } from '@/lib/format';
@@ -147,14 +148,7 @@ export default function Inicio() {
         </Cartao>
       ) : null}
 
-      {comIA ? (
-        <Pressable onPress={() => router.push('/ia/chat')} accessibilityRole="button" accessibilityLabel="Perguntar para a IA" testID="pergunte-ia">
-          <Vidro tom="ia" raio={radius.pill} style={styles.pergunte}>
-            <Texto cor="textMuted" style={styles.flex}>Pergunte à IA</Texto>
-            <SymbolView name={{ ios: 'sparkles', android: 'auto_awesome', web: 'auto_awesome' }} tintColor={color.ai} size={20} />
-          </Vidro>
-        </Pressable>
-      ) : null}
+      {comIA ? <FaleComIA testID="pergunte-ia" /> : null}
 
       {primeiro ? (
         <InsightCard testID="inicio-insight" titulo={primeiro.titulo} numero={primeiro.numero} porque={primeiro.porque}

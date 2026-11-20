@@ -6,7 +6,7 @@ import { chaveDaRequisicao, deslocarDatas, hojeBrasilia } from './chave';
 import gravacao from './gravacao.json';
 
 type Gravada = { s: number; t?: string; r?: string; b: string };
-type Gravacao = { gravadoEm: string; usuarios: Record<string, Record<string, Gravada>>; chat: Record<string, string> };
+type Gravacao = { gravadoEm: string; usuarios: Record<string, Record<string, Gravada>>; chat: Record<string, string>; agente?: Record<string, unknown> };
 const G = gravacao as unknown as Gravacao;
 
 const ANO = 365 * 24 * 3600;
@@ -90,6 +90,17 @@ export function respostaDoChat(pergunta: string): string {
   return `Na demonstração, a IA responde às perguntas de exemplo${exemplo ? ` (como "${exemplo}")` : ''}. Com o app ligado ao servidor, ela responde qualquer pergunta com os seus números.`;
 }
 
+const normalFrase = (t: string) => t.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+
+/** "Fale com a IA" in the demo: recorded answers for the examples; changes are never saved. */
+function agenteDemo(corpo: string): Response {
+  const pedido = JSON.parse(corpo || '{}') as { mensagem?: string; confirmar?: unknown };
+  if (pedido.confirmar) return resposta(JSON.stringify({ ok: true, texto: 'Pronto! Na demonstração nada é salvo de verdade.' }));
+  const gravada = G.agente?.[normalFrase(pedido.mensagem ?? '')];
+  if (gravada) return resposta(deslocarDatas(JSON.stringify(gravada), G.gravadoEm, hojeBrasilia()));
+  return resposta(JSON.stringify({ ok: true, texto: 'Na demonstração eu respondo aos exemplos, como "quanto eu faturei hoje?" ou "marca o Bruno amanhã às 10 pra corte". Com o servidor ligado, eu entendo qualquer pedido e mexo no app.' }));
+}
+
 export async function fetchDemo(entrada: RequestInfo | URL, init?: RequestInit): Promise<Response> {
   const url = new URL(typeof entrada === 'string' ? entrada : entrada instanceof URL ? entrada.href : entrada.url);
   const metodo = (init?.method ?? 'GET').toUpperCase();
@@ -111,6 +122,8 @@ export async function fetchDemo(entrada: RequestInfo | URL, init?: RequestInit):
     if (gravada.r) extra['Content-Range'] = gravada.r;
     return resposta(deslocarDatas(gravada.b, G.gravadoEm, hoje), gravada.s, extra);
   }
+
+  if (url.pathname.endsWith('/functions/v1/ia-agente')) return agenteDemo(corpo);
 
   // Not recorded: reads come back empty, writes "work" without saving.
   if (url.pathname.startsWith('/functions/v1/')) return resposta(JSON.stringify({ ok: true, demonstracao: true }));

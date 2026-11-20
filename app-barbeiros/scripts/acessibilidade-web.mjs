@@ -18,7 +18,7 @@ const PORTA = 8084;
 const BASE = `http://127.0.0.1:${PORTA}`;
 
 const TELAS = {
-  'barbeiro.teste@example.com': ['/', '/agenda', '/relatorios', '/clientes', '/mais', '/meta', '/extrato', '/insights', '/ia/chat', '/whatsapp', '/automacoes', '/planos', '/legal/termos'],
+  'barbeiro.teste@example.com': ['/', '/agenda', '/relatorios', '/clientes', '/mais', '/meta', '/extrato', '/insights', '/ia/chat', '/whatsapp', '/automacoes', '/planos', '/legal/termos', '/ia/voz', '/cliente/c0000000-0000-4000-8000-000000000002'],
   'dono.teste@example.com': ['/barbearia', '/barbearia/equipe', '/barbearia/agenda'],
 };
 

@@ -14,24 +14,26 @@ import { space } from '@/theme/tokens';
 
 import { useLancar } from './api';
 
-type Props = { aberto: boolean; onFechar: () => void; diaInicial: string };
+type Props = { aberto: boolean; onFechar: () => void; diaInicial: string; /** Tapped free slot on the day grid (HH:MM). */ horaInicial?: string };
 
 const HORA = /^([01]?\d|2[0-3])[:h]?([0-5]\d)$/;
 
-export function AgendarSheet({ aberto, onFechar, diaInicial }: Props) {
+export function AgendarSheet({ aberto, onFechar, diaInicial, horaInicial }: Props) {
   const servicos = useServicos();
   const clientes = useClientesResumo();
   const criarCliente = useCriarCliente();
   const lancar = useLancar();
   const hoje = diaISO();
   const [dia, setDia] = useState(diaInicial < hoje ? hoje : diaInicial);
-  const [hora, setHora] = useState('');
+  const [hora, setHora] = useState(horaInicial ?? '');
   const [busca, setBusca] = useState('');
   const [cliente, setCliente] = useState<{ id: string | null; nome: string } | null>(null);
   const [escolhidos, setEscolhidos] = useState<string[]>([]);
   const [erro, setErro] = useState<string | null>(null);
 
-  const dias = [hoje, somarDias(hoje, 1), somarDias(hoje, 2), somarDias(hoje, 3)];
+  const proximos = [hoje, somarDias(hoje, 1), somarDias(hoje, 2), somarDias(hoje, 3)];
+  // The day chosen on the calendar shows up even when it is further ahead.
+  const dias = diaInicial > proximos[3]! ? [...proximos, diaInicial] : proximos;
   const sugestoes = useMemo(() => {
     const t = busca.trim().toLowerCase();
     if (!t) return [];
@@ -39,7 +41,7 @@ export function AgendarSheet({ aberto, onFechar, diaInicial }: Props) {
   }, [busca, clientes.data]);
 
   function fechar() {
-    setHora('');
+    setHora(horaInicial ?? '');
     setBusca('');
     setCliente(null);
     setEscolhidos([]);
@@ -74,7 +76,7 @@ export function AgendarSheet({ aberto, onFechar, diaInicial }: Props) {
       <Texto variante="bodySm" peso="medium">Dia</Texto>
       <View style={styles.chips}>
         {dias.map((d, i) => (
-          <Chip key={d} rotulo={i === 0 ? 'Hoje' : i === 1 ? 'Amanhã' : formatDiaLongo(d).split(',')[0]!} selecionado={dia === d} onPress={() => setDia(d)} />
+          <Chip key={d} rotulo={i === 0 ? 'Hoje' : i === 1 ? 'Amanhã' : i < 4 ? formatDiaLongo(d).split(',')[0]! : formatDiaLongo(d).split(', ')[1]!} selecionado={dia === d} onPress={() => setDia(d)} />
         ))}
       </View>
       <Campo testID="agendar-hora" rotulo="Hora" value={hora} onChangeText={setHora} placeholder="14:30"

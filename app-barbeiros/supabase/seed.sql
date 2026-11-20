@@ -376,3 +376,14 @@ insert into barbearias (id, nome) values ('ba000000-0000-4000-8000-000000000001'
 insert into barbearia_membros (barbearia_id, barbeiro_id, papel, entrou_em) values
   ('ba000000-0000-4000-8000-000000000001', 'b0b0b0b0-0000-4000-8000-000000000003', 'dono', now() - interval '90 days'),
   ('ba000000-0000-4000-8000-000000000001', 'b0b0b0b0-0000-4000-8000-000000000001', 'barbeiro', now() - interval '90 days');
+
+-- ---------- Ficha do cliente (0008): observações livres e técnicas ----------
+update clientes set observacoes = E'Gosta de conversar sobre futebol.\nCafé sem açúcar.\nÚltimo assunto: viagem para a praia.',
+       tecnica_cabelo = 'Degradê na 1, tesoura em cima', tecnica_barba = null
+ where id = 'c0000000-0000-4000-8000-000000000001';
+update clientes set observacoes = E'Sempre com pressa no fim do dia.\nPrefere água.\nO filho começou na escola.',
+       tecnica_cabelo = 'Social na tesoura', tecnica_barba = 'Barba desenhada, contorno na navalha'
+ where id = 'c0000000-0000-4000-8000-000000000002';
+update clientes set observacoes = 'Faltou no último horário; mandar lembrete na véspera.',
+       tecnica_cabelo = 'Máquina 2 nas laterais', tecnica_barba = null
+ where id = 'c0000000-0000-4000-8000-000000000003';

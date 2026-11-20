@@ -1,43 +1,52 @@
-// Agenda do dia: launch in 2 taps, schedule, act on each appointment,
-// close the day's cash (ConquistaButton). Ticks: ✓ salvo (still sending),
-// ✓✓ sincronizado (in the database), cadeado = caixa fechado.
+// Agenda (salon style, Booksy/AVEC like): the month calendar on top; tapping a
+// day opens its grid from the barber's start to end time. Tap a booking for
+// the booking "CRM" (client, date, time, services, professional, value; the
+// client's name opens the profile); tap a free half hour to book it. The
+// day's cash closes with the ConquistaButton. Numbers from the database
+// (agenda_mes, agenda_grade, resumo_dia).
 import { useIsMutating } from '@tanstack/react-query';
-import { SymbolView } from 'expo-symbols';
 import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { BotaoIcone } from '@/components/BotaoIcone';
+import { Cartao } from '@/components/Cartao';
 import { ConquistaButton } from '@/components/ConquistaButton';
 import { Dinheiro } from '@/components/Dinheiro';
-import { DuoButton } from '@/components/DuoButton';
-import { Carregando, EstadoErro, EstadoVazio } from '@/components/Estado';
+import { Carregando, EstadoErro } from '@/components/Estado';
 import { SecondaryButton } from '@/components/SecondaryButton';
 import { TelaBase } from '@/components/TelaBase';
 import { Texto } from '@/components/Texto';
 import { AgendarSheet } from '@/features/agenda/AgendarSheet';
-import { useAgendaDia, useFecharCaixa, useReabrirCaixa, useResumoDia, type ItemAgenda } from '@/features/agenda/api';
-import { AtendimentoSheet, NOME_STATUS } from '@/features/agenda/AtendimentoSheet';
-import { LancarSheet } from '@/features/agenda/LancarSheet';
+import { useAgendaGrade, useAgendaMes, useFecharCaixa, useReabrirCaixa, useResumoDia, type ItemAgenda } from '@/features/agenda/api';
+import { AtendimentoSheet } from '@/features/agenda/AtendimentoSheet';
+import { Calendario } from '@/features/agenda/Calendario';
+import { GradeDia } from '@/features/agenda/GradeDia';
 import { OfertasNaCadeira } from '@/features/agenda/OfertasNaCadeira';
-import { diaISO, formatDiaLongo, formatHora, somarDias } from '@/lib/format';
+import { diaISO, formatDiaLongo, inicioDoMes } from '@/lib/format';
 import { color, radius, space } from '@/theme/tokens';
 
 export default function Agenda() {
   const hoje = diaISO();
   const [dia, setDia] = useState(hoje);
-  const agenda = useAgendaDia(dia);
+  const [mes, setMes] = useState(inicioDoMes());
+  const grade = useAgendaGrade(dia);
+  const doMes = useAgendaMes(mes);
   const resumo = useResumoDia(dia);
   const fechar = useFecharCaixa();
   const reabrir = useReabrirCaixa();
   const enviando = useIsMutating() > 0;
-  const [lancando, setLancando] = useState(false);
   const [agendando, setAgendando] = useState(false);
+  const [hora, setHora] = useState<string | undefined>(undefined);
   const [aberto, setAberto] = useState<ItemAgenda | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
-  const caixaFechado = resumo.data?.caixa_fechado ?? false;
-  const concluidos = (agenda.data ?? []).filter((a) => a.status === 'concluido').length;
+  const caixaFechado = grade.data?.caixa_fechado ?? false;
+  const concluidos = (grade.data?.itens ?? []).filter((a) => a.status === 'concluido').length;
   const ehHoje = dia === hoje;
+
+  function escolherDia(d: string) {
+    setDia(d);
+    if (d.slice(0, 7) !== mes.slice(0, 7)) setMes(`${d.slice(0, 8)}01`);
+  }
 
   async function fecharCaixa() {
     setErro(null);
@@ -49,68 +58,34 @@ export default function Agenda() {
   }
 
   return (
-    <TelaBase
-      titulo="Agenda"
-      onAtualizar={() => {
-        agenda.refetch();
-        resumo.refetch();
-      }}
-    >
-      <View style={styles.dia}>
-        <BotaoIcone icone={{ ios: 'chevron.left', android: 'chevron_left', web: 'chevron_left' }} rotulo="Dia anterior" onPress={() => setDia(somarDias(dia, -1))} />
-        <View style={styles.diaTexto}>
-          <Texto peso="semibold" centro testID="agenda-dia">{ehHoje ? `Hoje, ${formatDiaLongo(dia).split(', ')[1]}` : formatDiaLongo(dia)}</Texto>
+    <TelaBase titulo="Agenda" onAtualizar={() => { grade.refetch(); doMes.refetch(); resumo.refetch(); }}>
+      <Cartao>
+        <Calendario mes={mes} selecionado={dia} dias={doMes.data ?? []} onSelecionar={escolherDia} onMudarMes={setMes} />
+      </Cartao>
+
+      <View style={styles.cabecalho}>
+        <View style={styles.flex}>
+          <Texto variante="h3" accessibilityRole="header" testID="agenda-dia">
+            {ehHoje ? `Hoje, ${formatDiaLongo(dia).split(', ')[1]}` : formatDiaLongo(dia).replace(/^./, (c) => c.toUpperCase())}
+          </Texto>
           {resumo.data ? (
             <View style={styles.resumo}>
-              <Texto variante="caption" cor="textMuted" numero>{resumo.data.atendimentos} atendimento(s) · </Texto>
+              <Texto variante="caption" cor="textMuted" numero>
+                {resumo.data.atendimentos} atendimento(s) · {resumo.data.agendados} agendado(s) ·{' '}
+              </Texto>
               <Dinheiro variante="caption" cor="textMuted" valor={resumo.data.faturamento} testID="agenda-faturamento" />
             </View>
           ) : null}
         </View>
-        <BotaoIcone icone={{ ios: 'chevron.right', android: 'chevron_right', web: 'chevron_right' }} rotulo="Próximo dia" onPress={() => setDia(somarDias(dia, 1))} />
+        {ehHoje ? null : <SecondaryButton rotulo="Hoje" compacto onPress={() => escolherDia(hoje)} />}
       </View>
-      {ehHoje ? null : <SecondaryButton rotulo="Voltar para hoje" compacto onPress={() => setDia(hoje)} />}
+      {enviando ? <Texto variante="caption" cor="textMuted">✓ Salvo no celular, enviando…</Texto> : null}
 
-      {agenda.isPending ? (
-        <Carregando />
-      ) : agenda.isError ? (
-        <EstadoErro onTentar={() => agenda.refetch()} />
-      ) : agenda.data.length === 0 ? (
-        <EstadoVazio titulo={ehHoje ? 'Nenhum atendimento hoje ainda' : 'Nada neste dia'}
-          texto={ehHoje ? 'Toque em "+ Atendimento" quando terminar um cliente.' : undefined} />
-      ) : (
-        <View style={styles.lista} testID="agenda-lista">
-          {enviando ? (
-            <View style={[styles.linha, styles.enviando]}>
-              <Texto variante="bodySm" cor="textMuted">✓ Salvo no celular, enviando…</Texto>
-            </View>
-          ) : null}
-          {agenda.data.map((a) => (
-            <Pressable key={a.id} onPress={() => setAberto(a)} accessibilityRole="button"
-              accessibilityLabel={`${formatHora(a.inicio)}, ${a.cliente ?? 'sem cliente'}, ${a.servicos ?? ''}, ${NOME_STATUS[a.status]}`}
-              style={({ pressed }) => [styles.linha, pressed ? styles.pressionado : null]} testID="agenda-item">
-              <Texto variante="h3" numero style={styles.hora}>{formatHora(a.inicio)}</Texto>
-              <View style={styles.meio}>
-                <Texto peso="medium" numberOfLines={1}>{a.cliente ?? 'Sem cliente'}</Texto>
-                <Texto variante="bodySm" cor="textMuted" numberOfLines={1}>{a.servicos ?? '—'}</Texto>
-                <View style={styles.ticks}>
-                  {caixaFechado ? (
-                    <SymbolView name={{ ios: 'lock.fill', android: 'lock', web: 'lock' }} tintColor={color.textMuted} size={12} />
-                  ) : null}
-                  <Texto variante="caption" numberOfLines={1} style={styles.flex}
-                    cor={a.status === 'concluido' ? 'brandLip' : a.status === 'agendado' ? 'text' : 'textMuted'}>
-                    {NOME_STATUS[a.status]}
-                    <Texto variante="caption" cor="textMuted">{caixaFechado ? ' · caixa fechado' : ' · ✓✓'}</Texto>
-                  </Texto>
-                </View>
-              </View>
-              <Dinheiro valor={a.valor} variante="body" peso="semibold" cor={a.status === 'concluido' ? 'text' : 'textMuted'} />
-            </Pressable>
-          ))}
-        </View>
+      {grade.isPending ? <Carregando /> : grade.isError ? <EstadoErro onTentar={() => grade.refetch()} /> : (
+        <GradeDia grade={grade.data} onItem={setAberto} onVazio={(h) => { setHora(h); setAgendando(true); }} />
       )}
 
-      <SecondaryButton testID="agendar" rotulo="+ Agendar horário" onPress={() => setAgendando(true)} />
+      <SecondaryButton testID="agendar" rotulo="+ Agendar horário" onPress={() => { setHora(undefined); setAgendando(true); }} />
 
       {dia <= hoje && concluidos > 0 ? (
         caixaFechado ? (
@@ -126,36 +101,17 @@ export default function Agenda() {
       ) : null}
       {erro ? <Texto cor="danger" peso="medium">⚠ {erro}</Texto> : null}
 
-      <LancarSheet aberto={lancando} onFechar={() => setLancando(false)} />
-      <AgendarSheet key={dia} aberto={agendando} onFechar={() => setAgendando(false)} diaInicial={dia} />
-      <AtendimentoSheet item={aberto} caixaFechado={caixaFechado} onFechar={() => setAberto(null)}
+      <AgendarSheet key={`${dia}-${hora ?? ''}`} aberto={agendando} onFechar={() => setAgendando(false)} diaInicial={dia} horaInicial={hora} />
+      <AtendimentoSheet item={aberto} caixaFechado={caixaFechado} profissional={grade.data?.profissional} onFechar={() => setAberto(null)}
         extraAgendado={(item) => <OfertasNaCadeira atendimentoId={item.id} />} />
     </TelaBase>
   );
 }
 
 const styles = StyleSheet.create({
-  dia: { flexDirection: 'row', alignItems: 'center', gap: space[2] },
-  diaTexto: { flex: 1, alignItems: 'center', gap: space[1] },
-  resumo: { flexDirection: 'row', alignItems: 'center' },
-  lista: { gap: space[2] },
-  linha: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space[3],
-    padding: space[3],
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: color.border,
-    backgroundColor: color.bg,
-    minHeight: 64,
-  },
-  enviando: { backgroundColor: color.surface },
-  pressionado: { backgroundColor: color.surface },
-  hora: { width: 58 },
-  meio: { flex: 1, gap: 2 },
-  ticks: { flexDirection: 'row', gap: 4, alignItems: 'center' },
+  cabecalho: { flexDirection: 'row', alignItems: 'center', gap: space[3] },
   flex: { flex: 1 },
+  resumo: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' },
   fechado: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: space[3],
     borderRadius: radius.md, backgroundColor: color.surface, borderWidth: 1, borderColor: color.border },
   palco: { paddingTop: space[6] },

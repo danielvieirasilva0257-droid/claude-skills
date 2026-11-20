@@ -29,7 +29,7 @@ const ROTEIRO = {
     email: 'barbeiro.teste@example.com',
     rotas: ['/', '/agenda', '/relatorios', '/clientes', '/mais', '/servicos', '/planos', '/gastos', '/financeiro', '/meta',
       '/comissao', '/extrato', '/mei', '/insights', '/ia/chat', '/coach', '/expediente', '/whatsapp', '/automacoes',
-      '/mensagens', '/instagram', '/instagram/caixa', '/prospeccao', '/ia/personalidade', '/barbearia',
+      '/mensagens', '/instagram', '/instagram/caixa', '/prospeccao', '/ia/personalidade', '/barbearia', '/ia/voz',
       cliente('01'), cliente('02'), cliente('03'), '/conversa/d0000000-0000-4000-8000-000000000001', '/legal/termos'],
   },
   [DONO]: {
@@ -113,7 +113,20 @@ try {
         await esperar(page);
         await page.keyboard.press('Escape');
       }
-      if (rota === '/agenda' || rota === '/barbearia/agenda') {
+      if (rota === '/agenda') {
+        // Calendar: the days around today and the months on each side.
+        for (let d = -3; d <= 7; d++) {
+          const dia = new Date(Date.parse(`${HOJE}T12:00:00Z`) + d * 86_400_000).toISOString().slice(0, 10);
+          if (await page.getByTestId(`dia-${dia}`).isVisible().catch(() => false)) {
+            await page.getByTestId(`dia-${dia}`).click();
+            await page.waitForTimeout(700);
+          }
+        }
+        await tocarVarias(page, 'Próximo mês', 1);
+        await tocarVarias(page, 'Mês anterior', 2);
+        await esperar(page);
+      }
+      if (rota === '/barbearia/agenda') {
         await tocarVarias(page, 'Dia anterior', 3);
         await tocarVarias(page, 'Próximo dia', 7);
         await esperar(page);
@@ -145,7 +158,20 @@ for (const pergunta of PERGUNTAS) {
   if (texto) chat[pergunta.toLowerCase()] = texto;
 }
 
+// "Fale com a IA": answers of the simulated agent for the examples on the voice screen.
+const EXEMPLOS = ['quanto eu faturei hoje?', 'quanto eu faturei no mês?', 'qual a minha agenda de amanhã?',
+  'marca o Bruno amanhã às 10 pra corte', 'anota no Rafael que prefere degradê baixo', 'abre o financeiro'];
+const normalFrase = (t) => t.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+const agente = {};
+for (const mensagem of EXEMPLOS) {
+  const r = await fetch(`${env.EXPO_PUBLIC_FUNCTIONS_URL}/ia-agente`, {
+    method: 'POST', headers: { Authorization: `Bearer ${login.access_token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mensagem, historico: [] }),
+  });
+  if (r.ok) agente[normalFrase(mensagem)] = await r.json();
+}
+
 const saida = join(root, 'src', 'features', 'demo', 'gravacao.json');
-writeFileSync(saida, `${JSON.stringify({ gravadoEm: HOJE, usuarios, chat })}\n`);
+writeFileSync(saida, `${JSON.stringify({ gravadoEm: HOJE, usuarios, chat, agente })}\n`);
 const n = Object.values(usuarios).reduce((t, u) => t + Object.keys(u).length, 0);
-console.log(`gravação: ${n} respostas, ${Object.keys(chat).length} perguntas do chat · ${saida}`);
+console.log(`gravação: ${n} respostas, ${Object.keys(chat).length} perguntas do chat, ${Object.keys(agente).length} exemplos da IA · ${saida}`);

@@ -389,6 +389,15 @@ Skills: `../skills/design/review-animations`, `../skills/design/web-design-guide
 - [x] Fluxos E2E: lançar atendimento, fechar caixa, bater meta, configurar comissão · 8 fluxos no navegador (Playwright) e 4 do Maestro escritos em `.maestro/` (rodam num build de desenvolvimento; o container não tem emulador)
 - [x] Revisão de animação e acessibilidade ✋ aprovação final · registro em `REVISAO-FINAL.md`; axe sem problema nas 16 telas; aprovação dentro do "eu aprovo tudo" de 19/11 (os prints foram enviados ao Daniel)
 
+### Melhorias pedidas pelo Daniel (20/11/2026)
+- [x] Agenda com calendário; tocar no dia abre a grade do expediente (entrada à saída) estilo Booksy/AVEC; tocar no horário abre o CRM do agendamento (data, horário, serviços, profissional, valor); o nome do cliente abre o cadastro
+- [x] Cadastro do cliente com "Observações" livres no lugar das perguntas, e técnica do cabelo e da barba
+- [x] Barra de abas com a bolinha que desliza até a aba tocada
+- [x] Centro da aba Mais (três risquinhos): clientes atendidos no dia e o botão "Fale com a IA" (o resto da tela o Daniel ainda vai detalhar)
+- [x] "Fale com a IA": fala e resposta em voz, bolinha animada (estilo ChatGPT) e a IA mexendo no app pelo que o barbeiro pedir, sempre com confirmação antes de mudar
+
+**Como ficou:** migration `0008` (`clientes.observacoes`, `tecnica_cabelo`, `tecnica_barba`, com o texto das perguntas antigas levado para as observações; `agenda_mes` para o calendário e `agenda_grade` para a grade, com expediente, pausa, folga, fim previsto de cada horário pela duração dos serviços, serviços com preço e duração, profissional e valor). Telas: Agenda refeita (`Calendario`, `GradeDia`, CRM no topo da gaveta do horário, meia hora vazia abre "Agendar" com a hora), ficha nova, `BarraAbas` com a bolha deslizando, `AtendidosHoje` e `FaleComIA` no Mais (e no Início, no lugar de "Pergunte à IA"), tela `ia/voz`. **Agente** (`supabase/functions/_shared/agente.ts` + função `ia-agente`): Claude pela API de mensagens com ferramentas que leem (resumo do dia, agenda, horários livres, ficha, números do mês, serviços), navegam (abrir tela) e preparam mudanças (agendar, lançar, concluir, falta, cancelar, anotar na ficha, preço, gasto, meta, fechar caixa); toda mudança volta como pendente e só é gravada quando o barbeiro confirma (botão ou "sim"); números só das ferramentas; nomes de clientes trocados por "Cliente N" antes da IA, inclusive no que ele fala. Voz no próprio celular: `expo-speech-recognition` (fala → texto) e `expo-speech` (texto → fala); o áudio não sai do celular. `LLM_PROVIDER=mock` responde com regras que usam as mesmas ferramentas (testes e desenvolvimento sem custo). Pendências com o Daniel: o nome do botão ("Fale com a IA" é provisório), as duas IAs (texto e voz) que ele vai integrar (a troca fica em `src/features/ia/voz.ts` e em `_shared/agente.ts`) e o modelo (`claude-opus-5-5` por padrão; esforço baixo para responder rápido).
+
 ### Depois do app
 - Site de venda: `../skills/combos/combo-site-premium`.
 - Vídeos e tutoriais: `../skills/combos/combo-video-explicativo`, `../skills/video/motion-video`, `../skills/video/blender-ia`.

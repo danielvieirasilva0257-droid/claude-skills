@@ -22,7 +22,7 @@ export function Campo({ rotulo, erro, ajuda, prefixo, testID, ...input }: Props)
       <Texto variante="bodySm" peso="medium" nativeID={`${id}-rotulo`}>
         {rotulo}
       </Texto>
-      <View style={[styles.caixa, foco ? styles.caixaFoco : null, erro ? styles.caixaErro : null]}>
+      <View style={[styles.caixa, input.multiline ? styles.caixaMulti : null, foco ? styles.caixaFoco : null, erro ? styles.caixaErro : null]}>
         {prefixo ? (
           <Texto variante="body" cor="textMuted">
             {prefixo}
@@ -42,7 +42,7 @@ export function Campo({ rotulo, erro, ajuda, prefixo, testID, ...input }: Props)
             input.onBlur?.(e);
           }}
           {...input}
-          style={styles.input}
+          style={[styles.input, input.multiline ? styles.multilinha : null]}
         />
       </View>
       {erro ? (
@@ -73,5 +73,7 @@ const styles = StyleSheet.create({
   },
   caixaFoco: { borderColor: color.brand, borderWidth: 2, paddingHorizontal: space[4] - 1 },
   caixaErro: { borderColor: color.danger, borderWidth: 2, paddingHorizontal: space[4] - 1 },
+  caixaMulti: { alignItems: 'flex-start', paddingVertical: space[2] },
+  multilinha: { minHeight: 120, textAlignVertical: 'top', paddingTop: space[2] },
   input: { ...inter('regular'), flex: 1, fontSize: size.body, color: color.text, minHeight: 48, outlineStyle: 'none' } as never,
 });

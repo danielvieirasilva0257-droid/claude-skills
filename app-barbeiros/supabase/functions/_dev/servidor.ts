@@ -11,6 +11,7 @@ import { handler as enviarFila } from '../enviar-fila/handler.ts';
 import { handler as instagram } from '../instagram-webhook/handler.ts';
 import { handler as whatsapp } from '../whatsapp-webhook/handler.ts';
 import { handler as assinatura } from '../assinatura-webhook/handler.ts';
+import { handler as agente } from '../ia-agente/handler.ts';
 
 const rotas: Record<string, (req: Request) => Promise<Response>> = {
   'ia-chat': chat,
@@ -23,6 +24,7 @@ const rotas: Record<string, (req: Request) => Promise<Response>> = {
   'instagram-webhook': instagram,
   'whatsapp-webhook': whatsapp,
   'assinatura-webhook': assinatura,
+  'ia-agente': agente,
 };
 
 const porta = Number(Deno.env.get('PORTA_FUNCOES') ?? 54329);

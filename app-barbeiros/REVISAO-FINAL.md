@@ -57,3 +57,15 @@ Conferido o que vale para um app React Native (a lista é escrita para sites):
 | Acessibilidade (axe) | `npm run a11y` | 16 telas sem problema |
 | Celular (Maestro) | `maestro test .maestro/` | 4 fluxos escritos; rodam num build de desenvolvimento (o container não tem emulador) |
 | Android | `EXPO_OFFLINE=1 npx expo export --platform android` | compila (inclui a loja) |
+
+## Adendo: melhorias de 20/11/2026 (agenda, abas, Fale com a IA)
+
+Movimento novo, conferido contra os mesmos 10 padrões:
+
+| Antes | Depois | Por quê |
+| --- | --- | --- |
+| Troca de aba sem animação | Bolha desliza: 220 ms + 40 ms por aba (máx. 380 ms), `easeOut` forte, sem mola, interrompível | Pedido do Daniel; ação frequente, então rápida e sem quique; acima de 300 ms só quando a distância é grande (4 abas) |
+| — | Orbe da IA em movimento contínuo enquanto a tela está aberta | Mostra o estado (ouvindo, pensando, falando) e é a tela inteira desse momento; parado só respira; "reduzir movimento" deixa um círculo parado, com o estado sempre escrito |
+| Grade do dia | Sem animação | Tela de trabalho; a linha "agora" só muda de lugar uma vez por minuto |
+
+Bug achado e corrigido na revisão por prints: na web, o rótulo da aba congelava no meio do caminho ("Relat…") e ficava por cima do ícone. Causa: dependência lida por função auxiliar e altura perdida ao misturar layout fixo e largura animada no mesmo elemento.

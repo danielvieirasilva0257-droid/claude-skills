@@ -2,7 +2,7 @@
   "expo": {
     "name": "App Barbeiros",
     "slug": "app-barbeiros",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "appbarbeiros",
@@ -21,7 +21,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "br.com.appbarbeiros",
-      "versionCode": 2
+      "versionCode": 3
     },
     "web": {
       "bundler": "metro",
@@ -38,7 +38,17 @@
           "backgroundColor": "#050506"
         }
       ],
-      "expo-sharing"
+      "expo-sharing",
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "O app usa o microfone quando você toca para falar com a IA.",
+          "speechRecognitionPermission": "O app transforma a sua fala em texto, no próprio celular, para a IA entender o pedido.",
+          "androidSpeechServicePackages": [
+            "com.google.android.googlequicksearchbox"
+          ]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

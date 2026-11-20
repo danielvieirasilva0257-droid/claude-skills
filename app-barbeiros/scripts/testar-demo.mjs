@@ -17,7 +17,7 @@ const PORTA = 8086;
 const BASE = `http://127.0.0.1:${PORTA}`;
 
 const CONTAS = {
-  'barbeiro.teste@example.com': ['/', '/agenda', '/relatorios', '/clientes', '/meta', '/extrato', '/insights', '/whatsapp', '/automacoes', '/prospeccao', '/mais'],
+  'barbeiro.teste@example.com': ['/', '/agenda', '/relatorios', '/clientes', '/meta', '/extrato', '/insights', '/whatsapp', '/automacoes', '/prospeccao', '/mais', '/cliente/c0000000-0000-4000-8000-000000000002'],
   'dono.teste@example.com': ['/', '/barbearia', '/barbearia/equipe', '/barbearia/agenda'],
 };
 
@@ -46,6 +46,17 @@ try {
       const erro = await page.getByText('Não deu para carregar').isVisible().catch(() => false);
       if (erro) { falhas++; console.log(`✕ ${email} ${rota}: estado de erro`); } else console.log(`ok ${email} ${rota}`);
       await page.screenshot({ path: join(saida, `${nome}${rota.replace(/\//g, '_') || '_'}.png`) });
+    }
+    if (email.startsWith('barbeiro')) {
+      // "Fale com a IA" in the demo answers the examples from the recording.
+      await page.goto(`${BASE}/ia/voz`);
+      await page.getByTestId('orbe-ia').waitFor({ timeout: 20_000 });
+      if (!(await page.getByTestId('voz-texto').isVisible().catch(() => false))) await page.getByTestId('voz-teclado').click();
+      await page.getByTestId('voz-texto').fill('Marca o Bruno amanhã às 10 pra corte');
+      await page.getByTestId('voz-enviar').click();
+      const ok = await page.getByTestId('voz-pendente').waitFor({ timeout: 15_000 }).then(() => true).catch(() => false);
+      if (ok) console.log('ok barbeiro /ia/voz (exemplo gravado)'); else { falhas++; console.log('✕ /ia/voz: exemplo sem resposta gravada'); }
+      await page.screenshot({ path: join(saida, `${nome}_ia_voz.png`) });
     }
     if (bloqueadas.length) { falhas++; console.log(`✕ tentou falar com o servidor local: ${bloqueadas.slice(0, 3).join(', ')}`); }
     if (erros.length) { falhas++; console.log(`✕ erros na página: ${erros.slice(0, 3).join(' | ')}`); }

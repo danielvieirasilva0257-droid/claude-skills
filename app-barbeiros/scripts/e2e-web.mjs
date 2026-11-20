@@ -228,7 +228,7 @@ export const fluxos = {
     await print(page, 'f3-15-financeiro');
 
     await page.goto(`${BASE}/agenda`);
-    await page.getByLabel('Próximo dia').click();
+    await page.getByTestId(`dia-${new Date(Date.now() + 86_400_000).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })}`).click();
     await page.getByTestId('agenda-item').first().click();
     await page.getByTestId('ofertas-cadeira').waitFor({ timeout: 20_000 });
     await page.getByTestId('cadeira-aceitou-Sobrancelha').click();
@@ -438,6 +438,56 @@ export const fluxos = {
     const anel = normalizar(await page.getByTestId('meta-anel').innerText());
     esperar(anel.includes('100%'), `anel da meta: ${anel}`);
     await print(page, 'f8-02-meta-100');
+  },
+  // Melhorias de 20/11: calendário e grade, CRM do agendamento, cadastro com observações, Mais e Fale com a IA.
+  async agenda_e_voz(page) {
+    const amanha = new Date(Date.now() + 86_400_000).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+    await entrar(page, 'barbeiro.teste@example.com');
+    await page.getByTestId('hoje-valor').waitFor({ timeout: 20_000 });
+    await fecharCelebracoes(page);
+    await aba(page, 'Agenda');
+    await page.getByTestId('calendario').waitFor({ timeout: 20_000 });
+    await page.getByTestId(`dia-${amanha}`).click();
+    await page.getByTestId('agenda-item').filter({ hasText: 'Bruno' }).click();
+    await page.getByTestId('crm-agendamento').waitFor({ timeout: 10_000 });
+    const crm = normalizar(await page.getByTestId('crm-agendamento').innerText());
+    esperar(crm.includes('Barbeiro Teste') && crm.includes('18:30') && crm.includes('R$ 35,00'), `CRM: ${crm}`);
+    await print(page, 'm-01-crm-agendamento');
+    await page.getByTestId('crm-cliente').click();
+    await page.getByTestId('ficha-observacoes').waitFor({ timeout: 20_000 });
+    esperar((await page.getByTestId('ficha-observacoes').inputValue()).includes('pressa'), 'observações do Bruno');
+    await page.getByTestId('ficha-tecnica_barba').fill('Desenhada, contorno na navalha, pezinho reto');
+    await page.getByTestId('ficha-salvar').click();
+    await page.getByText('✓ Salvo').waitFor({ timeout: 10_000 });
+    await print(page, 'm-02-cadastro');
+
+    // Free half hour on the grid: the booking sheet comes with the time.
+    await page.goto(`${BASE}/agenda`);
+    await page.getByTestId(`dia-${amanha}`).click();
+    await page.getByTestId('vazio-10:00').click();
+    await page.getByTestId('agendar-sheet').waitFor({ timeout: 10_000 });
+    esperar((await page.getByTestId('agendar-hora').inputValue()) === '10:00', 'hora do horário vazio');
+    await page.keyboard.press('Escape');
+    await page.getByTestId('agendar-sheet').waitFor({ state: 'detached', timeout: 10_000 });
+
+    // Mais: today's clients and "Fale com a IA"; the AI books, the barber says "sim".
+    await page.goto(`${BASE}/mais`);
+    await page.getByTestId('mais-hoje').waitFor({ timeout: 20_000 });
+    await page.getByTestId('fale-com-ia').click();
+    await page.getByTestId('orbe-ia').waitFor({ timeout: 20_000 });
+    if (!(await page.getByTestId('voz-texto').isVisible().catch(() => false))) await page.getByTestId('voz-teclado').click();
+    await page.getByTestId('voz-texto').fill('Marca o Rafael amanhã às 15 pra corte');
+    await page.getByTestId('voz-enviar').click();
+    await page.getByTestId('voz-pendente').waitFor({ timeout: 20_000 });
+    esperar((await page.getByTestId('voz-pendente').innerText()).includes('15:00'), 'resumo com a hora');
+    await print(page, 'm-03-voz-pendente');
+    await page.getByTestId('voz-texto').fill('sim');
+    await page.getByTestId('voz-enviar').click();
+    await page.getByText('Pronto, horário agendado.').waitFor({ timeout: 20_000 });
+    await page.goto(`${BASE}/agenda`);
+    await page.getByTestId(`dia-${amanha}`).click();
+    await page.getByTestId('agenda-item').filter({ hasText: 'Rafael' }).waitFor({ timeout: 20_000 });
+    await print(page, 'm-04-agenda-com-o-horario-da-ia');
   },
 };
 

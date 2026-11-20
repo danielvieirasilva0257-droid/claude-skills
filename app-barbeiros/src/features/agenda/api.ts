@@ -21,7 +21,21 @@ export type ItemAgenda = {
   valor: number | string;
   forma_pagamento: FormaPagamento | null;
   ofertas: number;
+  /** Services with price and duration (agenda_grade): the booking "CRM". */
+  itens?: { nome: string; valor: number | string; duracao: number | null; extra: boolean }[];
 };
+
+/** One day of the calendar grid (agenda_grade, migration 0008). */
+export type GradeDia = {
+  dia: string;
+  profissional: string;
+  expediente: { inicio: string; fim: string; pausa_inicio: string | null; pausa_fim: string | null; definido: boolean };
+  folga: boolean;
+  caixa_fechado: boolean;
+  itens: (ItemAgenda & { fim: string })[];
+};
+
+export type DiaDoMes = { dia: string; agendados: number; concluidos: number; faltas: number };
 
 export type ResumoDia = {
   dia: string;
@@ -76,12 +90,30 @@ export function useAgendaDia(dia: string) {
   });
 }
 
+export function useAgendaGrade(dia: string) {
+  const uid = useUsuarioId();
+  return useQuery({
+    queryKey: ['agenda_grade', uid, dia],
+    enabled: uid !== null,
+    queryFn: () => rpc<GradeDia>('agenda_grade', { p_dia: dia }),
+  });
+}
+
+export function useAgendaMes(mes: string) {
+  const uid = useUsuarioId();
+  return useQuery({
+    queryKey: ['agenda_mes', uid, mes],
+    enabled: uid !== null,
+    queryFn: () => rpc<DiaDoMes[]>('agenda_mes', { p_mes: mes }),
+  });
+}
+
 /** Refresh everything that depends on appointments. */
 export function useInvalidarAgenda() {
   const qc = useQueryClient();
   return () =>
     Promise.all(
-      ['agenda_dia', 'resumo_dia', 'v_metricas_mes', 'proximos', 'metricas', 'financeiro', 'meta'].map((k) =>
+      ['agenda_dia', 'agenda_grade', 'agenda_mes', 'atendidos_hoje', 'resumo_dia', 'v_metricas_mes', 'proximos', 'metricas', 'financeiro', 'meta'].map((k) =>
         qc.invalidateQueries({ queryKey: [k] }),
       ),
     );

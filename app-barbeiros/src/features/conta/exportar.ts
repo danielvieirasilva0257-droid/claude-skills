@@ -20,7 +20,7 @@ type Linha = Record<string, unknown>;
 
 const COLUNAS: Record<TipoExportacao, string[]> = {
   atendimentos: ['data', 'hora', 'status', 'cliente', 'itens', 'valor_total', 'taxa_cartao', 'forma_pagamento'],
-  clientes: ['nome', 'telefone', 'status', 'origem', 'aniversario', 'aceita_contato', 'preferencias', 'criado_em'],
+  clientes: ['nome', 'apelido', 'telefone', 'status', 'origem', 'aniversario', 'aceita_contato', 'observacoes', 'tecnica_cabelo', 'tecnica_barba', 'criado_em'],
   gastos: ['data', 'categoria', 'valor', 'recorrente', 'descricao'],
   servicos: ['nome', 'categoria', 'preco', 'duracao_min', 'custo_insumo', 'intervalo_recomendado_dias', 'ativo'],
 };

@@ -1,5 +1,6 @@
-// Mais: account, plan, work settings, export data (every plan), cancel
-// plan (always visible, no guilt), sign out.
+// Mais: in the centre, today's clients and "Fale com a IA"; then account,
+// plan, work settings, export data (every plan), cancel plan (always
+// visible, no guilt), sign out.
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -7,6 +8,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { BottomSheet } from '@/components/BottomSheet';
 import { Campo } from '@/components/Campo';
+import { Cartao } from '@/components/Cartao';
 import { Chip } from '@/components/Chip';
 import { DuoButton } from '@/components/DuoButton';
 import { LinhaMenu } from '@/components/LinhaMenu';
@@ -17,6 +19,8 @@ import { Texto } from '@/components/Texto';
 import { sair, useSessao } from '@/features/auth/sessao';
 import { useMinhaBarbearia } from '@/features/barbearia/api';
 import { MODO_DEMO } from '@/features/demo/config';
+import { AtendidosHoje } from '@/features/ia/AtendidosHoje';
+import { FaleComIA } from '@/features/ia/FaleComIA';
 import { diaCurto, useMinhaAssinatura } from '@/features/planos/assinatura';
 import { gerenciarAssinatura } from '@/lib/loja';
 import { ONDE_CANCELAR } from '@/lib/loja-links';
@@ -75,6 +79,13 @@ export default function Mais() {
 
   return (
     <TelaBase titulo="Mais">
+      {/* Centre of the tab (Daniel, 20/11/2026): today's clients and the AI. The rest of this screen comes later. */}
+      <Cartao testID="mais-hoje">
+        <Texto variante="h3" accessibilityRole="header">Atendidos hoje</Texto>
+        <AtendidosHoje />
+        <FaleComIA grande />
+      </Cartao>
+
       <View style={styles.bloco}>
         <Texto variante="caption" cor="textMuted">Conta</Texto>
         <Texto peso="semibold">{barbeiro.data?.nome ?? '—'}</Texto>
