@@ -5,14 +5,14 @@ App mobile para o barbeiro individual controlar o resultado da própria cadeira 
 - Plano de Negócio completo (fonte da verdade): https://claude.ai/artifact/S6HbgHKHwANXCssPUsmQAn
 - Estratégias em detalhe: https://claude.ai/artifact/JbrpEkhSzYdt9dfVnwJFEP
 - IA (formatos de entrada e saída): https://claude.ai/artifact/QQPZw4MEBAjgEKCeQaicGk
-- **Código:** branch `app-barbeiros`, pasta `app-barbeiros/`. Lá estão `CLAUDE.md` (regras), `ESPECIFICACAO.md` (especificação completa para o Claude Code, com fases, skills e critérios de pronto) e o banco em `supabase/migrations/0001_banco_app_barbeiros_para_ia.sql` (versão 2).
+- **Código:** branch `app-barbeiros`, pasta `app-barbeiros/`. Lá estão `CLAUDE.md` (regras), `ESPECIFICACAO.md` (especificação completa, com fases, skills e critérios de pronto), `DESIGN.md` (visual v2), `REVISAO-FINAL.md` e o banco em `supabase/migrations/` (0001 a 0007).
 - **Para construir:** no Claude Code, abra a branch `app-barbeiros` e peça: "Leia app-barbeiros/CLAUDE.md e app-barbeiros/ESPECIFICACAO.md e faça a fase atual."
 
 ## Decisões travadas (18/11/2026)
 
 - Público do app: barbeiro individual; plano Barbearias à parte.
 - Planos: Grátis, Pago R$ 19,90 (anual R$ 179), Premium R$ 59,90, Premium Plus R$ 119,90, Barbearias R$ 179 + R$ 39 por barbeiro.
-- Visual: base branca, verde #15803D (dinheiro, ação), azul #1D4ED8 (IA). Mascote: nota de dinheiro com asinhas. Estilo Duolingo só em metas e resultados.
+- Visual: ~~base branca, verde #15803D, azul #1D4ED8~~ → **versão 2 (20/11/2026, pelas referências do Daniel):** escuro com vidro líquido (Liquid Glass), verde-limão #C5F23A no dinheiro e na ação, lavanda #9AA8FF só na IA, pílula branca no item selecionado. Mascote: nota de dinheiro com asinhas. Estilo Duolingo só em metas e resultados.
 - Regra da IA: o banco calcula, a IA interpreta. Nunca inventa número.
 - Comissão fixa ou escalonada (sobre o total ou por faixa), configurável.
 - 67 estratégias aprovadas, gravadas no banco (T, V, A, R, P).
@@ -25,14 +25,14 @@ App mobile para o barbeiro individual controlar o resultado da própria cadeira 
 | 2 | Mapa de telas e fluxo | `skills/design/ui-ux-pro-max` (etapas 1–3); `skills/sites/site-architecture` adaptada | feito (27 telas) |
 | 3 | Cores e identidade | `skills/design/ui-ux-pro-max` (tokens), `skills/design/estilos-premium`, `skills/design/frontend-design`, `skills/design/taste-skill`; externas: color-expert, design-color-psychology, fintech-ux | feito |
 | 4 | Persuasão e gamificação | externas: hooked-ux (filtro de ética), laws-of-ux, fogg-behavior-model, duo-gamification, gamification-marketing | definido no plano |
-| 5 | Design das telas | `skills/design/ui-ux-pro-max`, `skills/design/estilos-premium`, `skills/design/frontend-design`, `skills/design/image-to-code`; tipo Design do Claude; artifact-design | próximo |
-| 6 | Gráficos e relatórios | dataviz (Claude); externa: financial-design-systems | próximo |
-| 7 | Textos do app | `skills/combos/combo-copy-humanizada` (copywriting → humanizer), `skills/sites/cro` | próximo |
-| 8 | Animações | `skills/design/motion-oficial`, `skills/design/button-animation` (receita 12, status-button, hold-to-confirm), `skills/design/animation-vocabulary`, `skills/design/review-animations`; externas RN: animations (Software Mansion), animating-react-native-expo, animation-principles | botão 3D especificado |
-| 9 | Mascote | Rive (app); `skills/video/blender-ia` (versão 3D de comercial); conectores Open Art / Higgsfield (rascunhos) | próximo |
-| 10 | Código | externas RN; `skills/sites/vercel-react-best-practices`; banco no Supabase | Fase 0 pronta (19/11); Fase 1 é a próxima |
-| 11 | IA do app | seção 6 do plano + banco; product-self-knowledge (Claude) se usar a API da Anthropic | em conversa |
-| 12 | Testes | `skills/sites/webapp-testing`, `skills/sites/playwright-cli`, `skills/sites/web-quality/accessibility`, `skills/design/web-design-guidelines`, `skills/design/review-animations` | depois |
+| 5 | Design das telas | `skills/design/ui-ux-pro-max`, `skills/design/estilos-premium`, `skills/design/frontend-design`, `skills/design/image-to-code`; tipo Design do Claude; artifact-design | feito (v2 vidro líquido, 20/11) |
+| 6 | Gráficos e relatórios | dataviz (Claude); externa: financial-design-systems | feito |
+| 7 | Textos do app | `skills/combos/combo-copy-humanizada` (copywriting → humanizer), `skills/sites/cro` | feito (rascunhos legais aguardam revisão jurídica) |
+| 8 | Animações | `skills/design/motion-oficial`, `skills/design/button-animation` (receita 12, status-button, hold-to-confirm), `skills/design/animation-vocabulary`, `skills/design/review-animations`; externas RN: animations (Software Mansion), animating-react-native-expo, animation-principles | feito e revisado |
+| 9 | Mascote | Rive (app); `skills/video/blender-ia` (versão 3D de comercial); conectores Open Art / Higgsfield (rascunhos) | provisório em SVG; arte final no Rive pendente |
+| 10 | Código | externas RN; `skills/sites/vercel-react-best-practices`; banco no Supabase | Fases 0 a 8 prontas (20/11) |
+| 11 | IA do app | seção 6 do plano + banco; claude-api (Claude) | feito (modo simulado; chave e modelo a decidir) |
+| 12 | Testes | `skills/sites/webapp-testing`, `skills/sites/playwright-cli`, `skills/sites/web-quality/accessibility`, `skills/design/web-design-guidelines`, `skills/design/review-animations` | feito (Fase 8) |
 | 13 | Site de venda | `skills/combos/combo-site-premium` | depois |
 | 14 | Vídeos e tutoriais | `skills/combos/combo-video-explicativo`, `skills/video/motion-video`, `skills/video/motion-video-director`, `skills/video/blender-ia`, motion-effectcraft (Claude), conector MotionSmith | depois |
 | 15 | Documentação | docs (Claude); este passo a passo | contínuo |
@@ -52,9 +52,9 @@ Botão em ~0,72 s. Vibração leve no toque, média no pouso, "sucesso" no final
 
 Aprendizado: o Daniel preferiu subida e descida suaves (curva ease-in-out) e mais rápidas do que a mola com quique forte da primeira versão. A onda fica dentro do botão (não vaza para fora) e é amarela.
 
-## Combo proposto (aguardando aprovação do Daniel)
+## Combo criado: `combo-app-premium` (20/11/2026)
 
-`combo-app-premium`: ui-ux-pro-max (DESIGN.md, aprovação 1) → estilos-premium + frontend-design (telas, aprovação 2) → combo-copy-humanizada → motion-oficial + button-animation + animation-vocabulary (animações, aprovação 3 por frames) → código React Native → review-animations + web-design-guidelines + accessibility (aprovação 4).
+`skills/combos/combo-app-premium/SKILL.md`: ui-ux-pro-max + estilos-premium (DESIGN.md ✋) → combo-copy-humanizada → motion-oficial + button-animation + animation-vocabulary (frames ✋) → código RN (vercel-react-best-practices) → dataviz e claude-api → testes (webapp-testing, playwright-cli, accessibility; prints ✋) → review-animations + web-design-guidelines (✋ final). Tem os avisos aprendidos neste projeto.
 
 ## Skills externas a aprovar
 
@@ -68,7 +68,7 @@ fintech-ux (ravipalwe/design-skills), color-expert (meodai/skill.color-expert), 
 
 ## Fase 0: preparar o projeto (feita em 19/11/2026)
 
-**Onde está o código:** pasta `app-barbeiros/`, commit `05db9ed` na branch `ccr-d1519fd6-fxhwi4`, feita a partir da branch `app-barbeiros` (falta levar para a `app-barbeiros`). Todos os critérios da Fase 0 em `ESPECIFICACAO.md` estão marcados.
+**Onde está o código:** pasta `app-barbeiros/`, branch `app-barbeiros`. Todos os critérios da Fase 0 em `ESPECIFICACAO.md` estão marcados.
 
 **O que foi feito:**
 
@@ -119,8 +119,65 @@ Login de teste (só no banco local): `barbeiro.teste@example.com` / `senha-teste
 
 **Skills usadas:** `skills/sites/vercel-react-best-practices` (regras de re-render e de bundle aplicadas ao React Native; adendo no `APRENDIZADOS.md` dela). A externa *animating-react-native-expo não foi usada: a Fase 0 não tem animação.
 
+## Fases 1 a 8 (feitas de 19 a 20/11/2026)
+
+**Onde está o código:** pasta `app-barbeiros/` na branch `app-barbeiros` (commits do dia 19 e 20/11; o último registra a Fase 8). Cada fase tem os critérios marcados e um parágrafo "Como ficou" em `ESPECIFICACAO.md`. A revisão final está em `app-barbeiros/REVISAO-FINAL.md`.
+
+| Fase | O que entrou | Banco | Skills usadas (caminhos) |
+|---|---|---|---|
+| 1. Design e componentes | `DESIGN.md`, tokens, componentes da seção 7 (`Texto`, `Campo`, `DuoButton`, `StatusButton`, `HoldToConfirm`, `ConquistaButton` "pulo com dinheiro", `Chip`, `Cartao`, `BottomSheet`, `LockedScreen`, `InsightCard`, `MetaRing`, `Mascote`, gráficos) e a galeria `dev/componentes` | — | `skills/design/ui-ux-pro-max`, `skills/design/button-animation`, `skills/design/motion-oficial`, `skills/design/animation-vocabulary` |
+| 2. Grátis (telas 1–5) | entrar, primeiro uso, Início, Agenda (lançar em 2 toques, "Ofereceu algo?", fechar o caixa), Serviços, Mais (exportar CSV em todo plano, cancelar sem culpa) | `0003` | `skills/combos/combo-copy-humanizada`, `skills/sites/vercel-react-best-practices` |
+| 3. Pago (telas 6–15) e IA | clientes e ficha, gastos, financeiro, meta, relatórios, insights, chat, coach, comissão e extrato com PDF, MEI; Edge Functions de IA | `0004` | dataviz (Claude), claude-api (Claude), `skills/combos/combo-copy-humanizada` |
+| 4–5. Premium e Plus (telas 16–23) | expediente e lista de espera, WhatsApp com IA (assumir conversa), automações por `pode_enviar`, mensagens e LGPD, Instagram, prospecção por palavra-código, personalidade da IA | `0005` | claude-api (Claude) |
+| Visual v2 | escuro com vidro líquido pelas referências do Daniel: componentes `Vidro`, `Aurora` e `BarraAbas` flutuante com o botão redondo "+" | — | `skills/design/ui-ux-pro-max`, `skills/design/estilos-premium` |
+| 6. Barbearias (telas 24–27) | painel do dono, equipe com convite por código, agenda da equipe, relatório por barbeiro | `0006` | dataviz (Claude) |
+| 7. Assinaturas | loja pelo RevenueCat (só no celular), tela Planos com renovação e teste grátis, cancelar pela mesma loja; rascunhos de termos e privacidade | `0007` | `skills/combos/combo-copy-humanizada` |
+| 8. Qualidade | Jest (16), pgTAP (91), Deno (15), E2E (8 fluxos), axe em 16 telas, 4 fluxos do Maestro escritos, revisão de animação e de interface | — | `skills/design/review-animations`, `skills/design/web-design-guidelines`, `skills/sites/web-quality/accessibility`, `skills/sites/webapp-testing`, `skills/sites/playwright-cli` |
+
+**Comandos** (dentro de `app-barbeiros/`, depois dos da Fase 0):
+
+```bash
+npm run funcoes:dev    # funções de IA, canais e assinatura no Deno (porta 54329), modo simulado
+npm run test:db        # 91 testes do banco
+npm run db:reset && npm run test:funcoes   # 15 testes das funções (criam dados: banco novo antes)
+npm run typecheck && npm test              # TypeScript estrito e 16 testes Jest
+EXPO_OFFLINE=1 npm run web:export
+npm run e2e            # 8 fluxos no navegador (recria o banco antes de cada um)
+npm run a11y           # axe (WCAG 2.2 AA) em 16 telas
+npm run legal          # texto dos termos e da privacidade no app, a partir de legal/*.md
+EXPO_OFFLINE=1 npx expo export --platform android   # confere que o Android compila
+```
+
+Logins de teste (só no banco local, senha `senha-teste-123`): `barbeiro.teste@example.com` (Premium Plus, com dados), `gratis.teste@example.com` (Grátis, sem primeiro uso), `dono.teste@example.com` (Barbearias, dono da "Barbearia Navalha").
+
+**Aprendizados das Fases 1 a 8:**
+
+- **O banco calcula, a tela só formata:** até a soma de preços no lançamento saiu da tela ("R$ 45 + R$ 35" em vez do total). Plano, valor da equipe, variações e comissão vêm de funções SQL.
+- **Segurança no banco:**
+  - nunca "fingir ser outro usuário" com `set_config` dentro de função: passe o barbeiro de forma explícita e rode com as permissões de quem chama (quem pede o de outro recebe vazio);
+  - `revoke ... from anon` sozinho não tira o acesso, porque o `anon` herda do `PUBLIC`: use `from public, anon` (e `authenticated` quando for só do servidor);
+  - quem vê dados de outro (dono da equipe) lê só por funções que conferem o papel; as tabelas de cada barbeiro não ganharam política nova.
+- **Plano numa função só (`plano_efetivo`):** assinatura própria, Premium vindo da equipe do plano Barbearias e 3 horas de tolerância para a renovação da loja chegar. App, IA, cron e canais leem dela.
+- **Expo Router:** depois de criar rota nova, as rotas tipadas só atualizam com `EXPO_OFFLINE=1 CI=1 timeout 40 npx expo start --web --port 8099`. Redirecionamento do primeiro uso com `<Redirect>` explícito (o `Stack.Protected` mandava para `/planos`).
+- **Deno (Edge Functions):** versões de pacote com pelo menos 2 semanas; `deno.json` com `"nodeModulesDir": "none"` para não misturar com o `node_modules` do app; `DENO_CERT=/root/.ccr/ca-bundle.crt` por causa do proxy.
+- **SQL:** `generate_series` só em `timestamp` (não em `time`); apelido de tabela igual ao nome de variável do laço dá conflito no PL/pgSQL; `jsonb_build_object('lista', '["a"]')` vira texto, use `'["a"]'::jsonb`.
+- **Gráficos (dataviz):** o cinza para "mês anterior" reprovou no teste de daltonismo; ficou um par de verdes (`#6E8F1F` e `#C5F23A` no escuro).
+- **Visual v2:** vidro com `expo-glass-effect` só no iOS 26 (nos outros, translúcido + desfoque + brilho); face de botão sobre lábio colorido precisa de cor opaca (o lábio vermelho aparecia e escondia o texto).
+- **E2E:** banco recriado antes de cada fluxo; celebrações em sequência usam o mesmo painel; procurar texto dentro do `testID` da tela, porque a tela anterior continua montada e escondida.
+- **axe no React Native Web:** `aria-checked` em vez de `accessibilityState.checked`; `Pressable` com rótulo precisa de papel; área de rolagem com `tabIndex={0}` no navegador.
+
+## Pendências (fora do código)
+
+1. **Modelo da IA:** o padrão é `claude-opus-5-5` (regra da skill da API). Para o custo-alvo de R$ 0,50 a R$ 2 por barbeiro por mês, a troca para `claude-haiku-5-5` é decisão do Daniel (`LLM_MODEL`). Falta a chave da API nos secrets do Supabase.
+2. **Login com Google:** precisa das credenciais do Google Cloud.
+3. **WhatsApp e Instagram de verdade:** credenciais da Meta (app, número, tokens); hoje roda em modo simulado.
+4. **Assinaturas:** conta no RevenueCat, produtos nas lojas (entitlements `pago`, `premium`, `plus`, `barbearias`) e as chaves `EXPO_PUBLIC_REVENUECAT_*` e `REVENUECAT_WEBHOOK_AUTH`.
+5. **Revisão jurídica** de `legal/termos-de-uso.md` e `legal/politica-de-privacidade.md` (razão social, CNPJ, encarregado, prazos).
+6. **Nome, logo, `bundleIdentifier`/`package`** e a **arte final do mascote** no Rive.
+7. **MEI 2026:** limite de R$ 81 mil por ano e DAS de serviços R$ 86,05 (5% do salário mínimo de R$ 1.621 + R$ 5 de ISS), gravados em `parametros` por ano. Conferir quando sair o salário mínimo de 2027.
+
 ## Próximo passo
 
-1. Levar o commit da Fase 0 para a branch `app-barbeiros`.
-2. **Fase 1 (design e componentes):** começa pelo `DESIGN.md` do app, que precisa da aprovação 1 do Daniel ✋. Depois vêm os componentes da seção 7 e o `ConquistaButton`, com os frames enviados para a aprovação 2 ✋.
-3. Em paralelo, fechar as decisões pendentes da seção 12 da especificação: nome e logo, provedor de assinatura, provedor do LLM, arte do mascote, voz e skills externas.
+1. Daniel olha os prints, testa num build de desenvolvimento e decide as pendências acima.
+2. Rodar os fluxos do Maestro (`app-barbeiros/.maestro/`) no celular.
+3. Depois do app: site de venda (`skills/combos/combo-site-premium`) e vídeos (`skills/combos/combo-video-explicativo`).
