@@ -56,11 +56,11 @@ export async function receber(admin: SupabaseClient, e: Entrada) {
 
   // AI only when allowed: plan with channels, channel with AI on, conversation not taken over.
   const [{ data: plano }, { data: canal }] = await Promise.all([
-    admin.from('app_assinatura').select('plano, status').eq('barbeiro_id', e.barbeiro).maybeSingle(),
+    admin.rpc('plano_efetivo', { p_barbeiro: e.barbeiro }),
     admin.from('canais').select('ia_ativa').eq('barbeiro_id', e.barbeiro).eq('tipo', e.canal).maybeSingle(),
   ]);
-  const permitido = plano && PLANOS_COM_CANAIS.includes(plano.plano) && ['ativa', 'teste'].includes(plano.status)
-    && (e.canal === 'whatsapp' || plano.plano === 'plus');
+  // plano_efetivo already accounts for status, renewal and team membership (0006).
+  const permitido = typeof plano === 'string' && PLANOS_COM_CANAIS.includes(plano) && (e.canal === 'whatsapp' || plano === 'plus');
   if (!permitido || !canal?.ia_ativa || !conversa.ia_ativa) return { ok: true, conversa: conversa.id, respondeu: false };
 
   const { data: historico } = await admin.from('mensagens').select('autor, texto').eq('conversa_id', conversa.id)

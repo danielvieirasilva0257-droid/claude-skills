@@ -57,6 +57,19 @@ function esperar(condicao, msg) {
   if (!condicao) throw new Error(msg);
 }
 
+// HoldToConfirm: press and hold for 2 s.
+async function segurar(page, testID) {
+  const caixa = await page.getByTestId(testID).boundingBox();
+  await page.mouse.move(caixa.x + caixa.width / 2, caixa.y + caixa.height / 2);
+  await page.mouse.down();
+  await page.waitForTimeout(2400);
+  await page.mouse.up();
+}
+
+async function sairDaConta(page) {
+  await page.evaluate(() => localStorage.clear());
+}
+
 export const fluxos = {
   // Fase 2: primeiro uso no Grátis.
   async onboarding_e_bloqueios(page) {
@@ -79,7 +92,7 @@ export const fluxos = {
     await print(page, 'f2-04-clientes-bloqueado');
     await aba(page, 'Mais');
     await page.getByTestId('mais-exportar').click();
-    await page.getByText('Serviços', { exact: true }).last().click();
+    await page.getByTestId('exportar-sheet').getByText('Serviços', { exact: true }).click();
     const download = page.waitForEvent('download');
     await page.getByTestId('exportar-botao').click();
     const arquivo = await download;
@@ -277,6 +290,70 @@ export const fluxos = {
     await page.getByTestId('personalidade-salvar').click();
     await page.getByText('✓ Salvo').waitFor({ timeout: 10_000 });
     await print(page, 'f5-03-personalidade');
+  },
+  // Fase 6: dono do plano Barbearias, convite e barbeiro novo na equipe.
+  async barbearias(page) {
+    await entrar(page, 'dono.teste@example.com');
+    await page.getByTestId('inicio-barbearia').waitFor({ timeout: 20_000 });
+    await print(page, 'f6-01-inicio-dono');
+    await page.getByTestId('inicio-barbearia').click();
+    await page.getByTestId('painel-hoje-valor').waitFor({ timeout: 20_000 });
+    esperar(await page.getByTestId('painel-barbeiro').count() === 2, 'painel deveria mostrar 2 barbeiros');
+    await print(page, 'f6-02-painel');
+
+    await page.getByTestId('ir-agenda-equipe').click();
+    await page.getByTestId('agenda-equipe-grupo').first().waitFor({ timeout: 20_000 });
+    await page.getByRole('button', { name: 'Próximo dia' }).click();
+    await page.getByTestId('agenda-equipe-grupo').filter({ hasText: 'Barbeiro Teste' }).waitFor({ timeout: 20_000 });
+    await print(page, 'f6-03-agenda-equipe');
+
+    await page.goto(`${BASE}/barbearia/barbeiro/b0b0b0b0-0000-4000-8000-000000000001`);
+    await page.getByTestId('relatorio-barbeiro-nome').waitFor({ timeout: 20_000 });
+    await page.getByTestId('relatorio-comissao').waitFor();
+    await print(page, 'f6-04-relatorio-barbeiro');
+
+    await page.goto(`${BASE}/barbearia/equipe`);
+    await page.getByTestId('gerar-convite').waitFor({ timeout: 20_000 });
+    esperar((await page.getByTestId('valor-mensal').innerText()).includes('179'), 'com 2 barbeiros: R$ 179');
+    await page.getByTestId('gerar-convite').click();
+    await page.getByTestId('codigo-gerado').waitFor({ timeout: 10_000 });
+    const codigo = normalizar(await page.getByTestId('codigo-gerado').innerText());
+    esperar(/^[A-HJ-NP-Z2-9]{6}$/.test(codigo), `código estranho: ${codigo}`);
+    await print(page, 'f6-05-convite');
+
+    // O barbeiro novo (Grátis) entra com o código e passa a usar o app como Premium.
+    await sairDaConta(page);
+    await entrar(page, 'gratis.teste@example.com');
+    await page.getByTestId('onb-preco').waitFor({ timeout: 20_000 });
+    await page.getByTestId('onb-preco').fill('40');
+    for (let i = 0; i < 4; i++) await page.getByTestId('onb-continuar').click();
+    await page.getByTestId('hoje-valor').waitFor({ timeout: 20_000 });
+    await aba(page, 'Mais');
+    await page.getByTestId('mais-barbearia').click();
+    await page.getByTestId('codigo-convite').fill(codigo.toLowerCase());
+    await page.getByTestId('barbearia-entrar').click();
+    await page.getByTestId('na-equipe').waitFor({ timeout: 20_000 });
+    await page.getByText('Seu plano agora: Premium').waitFor({ timeout: 10_000 });
+    await print(page, 'f6-06-barbeiro-entrou');
+    await page.goto(`${BASE}/relatorios`);
+    await page.getByText('Ainda sem atendimentos neste mês').waitFor({ timeout: 20_000 });
+    esperar(!(await page.getByTestId('tela-bloqueada').isVisible().catch(() => false)), 'na equipe os relatórios abrem');
+
+    // O dono vê 3 barbeiros (R$ 179 + R$ 39) e remove o novo.
+    await sairDaConta(page);
+    await entrar(page, 'dono.teste@example.com');
+    await page.getByTestId('hoje-valor').waitFor({ timeout: 20_000 });
+    await page.goto(`${BASE}/barbearia/equipe`);
+    await page.getByTestId('valor-mensal').waitFor({ timeout: 20_000 });
+    esperar((await page.getByTestId('valor-mensal').innerText()).includes('218'), 'com 3 barbeiros: R$ 218');
+    esperar(await page.getByTestId('membro').count() === 3, 'equipe com 3');
+    await print(page, 'f6-07-equipe-3');
+    await page.getByTestId('remover-Novo Barbeiro').click();
+    await page.getByTestId('confirmar-remover').waitFor();
+    await print(page, 'f6-08-remover');
+    await segurar(page, 'confirmar-remover');
+    await page.getByTestId('folha-remover').waitFor({ state: 'detached', timeout: 10_000 });
+    await page.waitForFunction(() => document.querySelectorAll('[data-testid="membro"]').length === 2, null, { timeout: 10_000 });
   },
 };
 

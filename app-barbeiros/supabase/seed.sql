@@ -12,6 +12,8 @@
 -- Logins de teste (só no banco local, nunca em produção), senha senha-teste-123:
 --   barbeiro.teste@example.com  (Premium Plus, com 3 meses de dados)
 --   gratis.teste@example.com    (Grátis, sem onboarding)
+--   dono.teste@example.com      (Barbearias: dono da "Barbearia Navalha", com o
+--                                Barbeiro Teste na equipe)
 --
 -- Histórias que os dados contam (úteis para os testes da Fase 8):
 --   Rafael (C1): volta a cada 10 dias, faz corte; hidratação é recorrente
@@ -336,3 +338,41 @@ insert into mensagens (conversa_id, barbeiro_id, direcao, autor, texto, criado_e
 insert into instagram_eventos (barbeiro_id, tipo, autor_externo, autor_nome, texto, comentario_id, midia_id, recebido_em, codigo_detectado)
 values ('b0b0b0b0-0000-4000-8000-000000000001', 'comentario', 'ig-user-77', 'joao.silva', 'REELS quero esse corte!', 'c-1', 'm-1',
         now() - interval '1 day', 'REELS');
+
+-- ---------- Barbearias (Fase 6) ----------
+-- Dono no plano Barbearias, com 2 serviços, 1 cliente e um dia de trabalho;
+-- o Barbeiro Teste está na equipe (continua com o próprio plano, Premium Plus).
+select pg_temp.criar_usuario('b0b0b0b0-0000-4000-8000-000000000003', 'dono.teste@example.com', 'senha-teste-123', 'Dono Teste');
+update barbeiros set nome = 'Dono Teste', cidade = 'São Paulo', modelo_trabalho = 'dono', preco_corte = 50.00,
+       onboarding_concluido = true, criado_em = now() - interval '120 days'
+ where id = 'b0b0b0b0-0000-4000-8000-000000000003';
+update app_assinatura set plano = 'barbearias', status = 'ativa', periodo = 'mensal', provedor = 'manual',
+       renova_em = now() + interval '30 days'
+ where barbeiro_id = 'b0b0b0b0-0000-4000-8000-000000000003';
+
+insert into servicos (id, barbeiro_id, nome, categoria, preco, duracao_min, custo_insumo) values
+  ('5e000000-0000-4000-8000-000000000001', 'b0b0b0b0-0000-4000-8000-000000000003', 'Corte', 'principal', 50.00, 40, 1.50),
+  ('5e000000-0000-4000-8000-000000000002', 'b0b0b0b0-0000-4000-8000-000000000003', 'Barba', 'principal', 40.00, 30, 2.00);
+insert into clientes (id, barbeiro_id, nome, telefone, status, criado_em) values
+  ('c0000000-0000-4000-8000-000000000031', 'b0b0b0b0-0000-4000-8000-000000000003', 'Diego Alves', '5511911110031', 'ativo', now() - interval '60 days');
+
+-- Hoje: um corte feito às 9h e uma barba marcada às 18h; no começo do mês, corte + barba.
+insert into atendimentos (id, barbeiro_id, cliente_id, inicio, fim, status, forma_pagamento, criado_em) values
+  ('a0000000-0000-4000-8000-000000000031', 'b0b0b0b0-0000-4000-8000-000000000003', 'c0000000-0000-4000-8000-000000000031',
+   pg_temp.quando(0, '09:00'), pg_temp.quando(0, '09:40'), 'concluido', 'pix', pg_temp.quando(-2, '10:00')),
+  ('a0000000-0000-4000-8000-000000000032', 'b0b0b0b0-0000-4000-8000-000000000003', 'c0000000-0000-4000-8000-000000000031',
+   pg_temp.quando(0, '18:00'), null, 'agendado', null, pg_temp.quando(-1, '10:00')),
+  ('a0000000-0000-4000-8000-000000000033', 'b0b0b0b0-0000-4000-8000-000000000003', 'c0000000-0000-4000-8000-000000000031',
+   (date_trunc('month', pg_temp.hoje())::date + time '10:00') at time zone 'America/Sao_Paulo',
+   (date_trunc('month', pg_temp.hoje())::date + time '11:10') at time zone 'America/Sao_Paulo', 'concluido', 'pix',
+   (date_trunc('month', pg_temp.hoje())::date - 2 + time '10:00') at time zone 'America/Sao_Paulo');
+insert into atendimento_itens (atendimento_id, servico_id, valor) values
+  ('a0000000-0000-4000-8000-000000000031', '5e000000-0000-4000-8000-000000000001', 50.00),
+  ('a0000000-0000-4000-8000-000000000032', '5e000000-0000-4000-8000-000000000002', 40.00),
+  ('a0000000-0000-4000-8000-000000000033', '5e000000-0000-4000-8000-000000000001', 50.00),
+  ('a0000000-0000-4000-8000-000000000033', '5e000000-0000-4000-8000-000000000002', 40.00);
+
+insert into barbearias (id, nome) values ('ba000000-0000-4000-8000-000000000001', 'Barbearia Navalha');
+insert into barbearia_membros (barbearia_id, barbeiro_id, papel, entrou_em) values
+  ('ba000000-0000-4000-8000-000000000001', 'b0b0b0b0-0000-4000-8000-000000000003', 'dono', now() - interval '90 days'),
+  ('ba000000-0000-4000-8000-000000000001', 'b0b0b0b0-0000-4000-8000-000000000001', 'barbeiro', now() - interval '90 days');

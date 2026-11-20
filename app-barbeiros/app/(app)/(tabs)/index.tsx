@@ -17,6 +17,7 @@ import { TelaBase } from '@/components/TelaBase';
 import { Texto } from '@/components/Texto';
 import { Vidro } from '@/components/Vidro';
 import { useProximos, useResumoDia } from '@/features/agenda/api';
+import { useMinhaBarbearia, usePainel } from '@/features/barbearia/api';
 import { useBarbeiro, usePlano } from '@/features/conta/barbeiro';
 import { alternarOcultarValores, usePreferencias } from '@/features/conta/preferencias';
 import { Celebracao } from '@/features/conquistas/Celebracao';
@@ -27,6 +28,23 @@ import { grafico } from '@/theme/grafico';
 import { color, radius, space } from '@/theme/tokens';
 
 type Visao = 'hoje' | 'mes';
+
+// Owner on the Barbearias plan: the whole house today, one tap to the panel.
+function CartaoBarbearia({ nome }: { nome: string }) {
+  const painel = usePainel();
+  if (!painel.data) return null;
+  const h = painel.data.hoje;
+  return (
+    <Cartao onPress={() => router.push('/barbearia')} accessibilityLabel={`Abrir o painel da ${nome}`} testID="inicio-barbearia">
+      <View style={styles.linha}>
+        <Texto variante="caption" cor="textMuted" style={styles.flex}>{nome} hoje · equipe toda</Texto>
+        <SymbolView name={{ ios: 'chevron.right', android: 'chevron_right', web: 'chevron_right' }} tintColor={color.textMuted} size={16} />
+      </View>
+      <Dinheiro variante="h2" valor={h.faturamento} />
+      <Texto variante="caption" cor="textMuted" numero>{h.atendimentos} atendimento(s) · {h.agendados} agendado(s)</Texto>
+    </Cartao>
+  );
+}
 
 function DiasDoMes({ inicio, fim }: { inicio: string; fim: string }) {
   const dias = useFinanceiro(inicio, fim, 'day');
@@ -59,6 +77,8 @@ export default function Inicio() {
   const pago = libera(meuPlano, 'financeiro');
   const comIA = libera(meuPlano, 'insights');
   const insights = useInsights();
+  const minha = useMinhaBarbearia();
+  const dono = minha.data?.papel === 'dono' && meuPlano === 'barbearias';
   const totalMes = useFinanceiro(mes, hoje, 'total');
   const primeiro = comIA ? insights.data?.[0] : undefined;
   const primeiroNome = barbeiro.data?.nome.split(' ')[0] ?? '';
@@ -101,6 +121,8 @@ export default function Inicio() {
           </Cartao>
         </View>
       )}
+
+      {dono && minha.data ? <CartaoBarbearia nome={minha.data.nome} /> : null}
 
       {pago ? (
         <Cartao onPress={() => router.push('/financeiro')} accessibilityLabel="Abrir financeiro" testID="cartao-mes">

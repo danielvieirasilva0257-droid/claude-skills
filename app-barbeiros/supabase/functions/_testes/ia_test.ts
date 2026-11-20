@@ -86,3 +86,13 @@ Deno.test('ia-chat: responde em streaming e mostra o nome só na tela', async ()
   assertMatch(resposta, /faturou R\$/);
   assertMatch(resposta, /Rafael/); // "Cliente N" went out, "Rafael" came back on screen
 });
+
+Deno.test('plano em vigor vem do banco: o servidor lê, o app não', async () => {
+  const admin = createClient(URL_SB, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } });
+  const { data: pagos } = await admin.rpc('barbeiros_por_plano', { p_planos: ['pago', 'premium', 'plus', 'barbearias'] });
+  assert((pagos as string[]).includes('b0b0b0b0-0000-4000-8000-000000000003'), 'dono do plano Barbearias entra nos insights das 6h');
+  assert(!(pagos as string[]).includes('b0b0b0b0-0000-4000-8000-000000000002'), 'Grátis fora');
+  const { sb } = await token('gratis.teste@example.com');
+  const { error } = await sb.rpc('plano_efetivo', { p_barbeiro: 'b0b0b0b0-0000-4000-8000-000000000003' });
+  assert(error, 'o app não consulta o plano de outro barbeiro');
+});

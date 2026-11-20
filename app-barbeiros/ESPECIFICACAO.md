@@ -1,6 +1,6 @@
 # App Barbeiros — especificação para construir no Claude Code
 
-**Fase atual:** Fase 6 (Barbearias) · Fases 0 a 3 prontas em 19/11/2026; Fases 4 e 5 e o visual v2 (vidro líquido) prontos em 20/11/2026
+**Fase atual:** Fase 7 (Assinaturas) · Fases 0 a 3 prontas em 19/11/2026; Fases 4, 5 e 6 e o visual v2 (vidro líquido) prontos em 20/11/2026
 **Versão:** 1.1 · 19/11/2026
 **Fonte de negócio:** Plano de Negócio — App Barbeiros (https://claude.ai/artifact/S6HbgHKHwANXCssPUsmQAn). Se algo aqui contradizer o plano, pergunte ao Daniel.
 
@@ -373,8 +373,10 @@ Skills: dataviz (Claude) para os gráficos, *financial-design-systems, `../skill
 **Como ficou (20/11/2026):** `instagram-webhook` guarda comentários e directs; `pode_responder_instagram` libera 1 resposta privada por comentário, até 7 dias, só quando a pessoa pediu (palavra-código ou pergunta). `v_funil_prospeccao` (chamaram → agendaram → vieram → voltaram, com custo por cliente) e `v_origem_clientes`; a palavra-código ("REELS") manda a origem para a ficha do cliente. `barbeiros.ia_personalidade` entra no prompt do atendente. Telas 20 a 23 com E2E.
 
 ### Fase 6 — Barbearias (telas 24–27)
-- [ ] Papel "dono" e "barbeiro" com RLS próprio (nova migration)
-- [ ] Painel, equipe, agenda da equipe e relatório por barbeiro
+- [x] Papel "dono" e "barbeiro" com RLS próprio (nova migration)
+- [x] Painel, equipe, agenda da equipe e relatório por barbeiro
+
+**Como ficou (20/11/2026):** migration `0006` com `barbearias`, `barbearia_membros` (papel `dono` ou `barbeiro`; um barbeiro em uma barbearia por vez; um dono por barbearia) e `barbearia_convites` (código de 6 letras sem I, O, 0 e 1, uso único, vale 7 dias). RLS próprio: a equipe lê a barbearia e os nomes; só o dono lê os convites; entrar, sair, convidar e remover só por funções. **As tabelas de cada barbeiro não ganharam política nova:** o dono lê a equipe só por `painel_barbearia`, `agenda_equipe` e `relatorio_barbeiro`, que conferem o papel; ele vê números e agenda (só o primeiro nome do cliente), nunca telefone, gastos pessoais nem conversas. `plano_efetivo()` virou a fonte única do plano: quem está na equipe de um dono com plano Barbearias usa o app como Premium; `meu_plano`, `consumir_ia`, `uso_mensagens_mes`, a rotina diária e as funções de canais e insights passaram a usá-la. Valor do plano pela equipe calculado no banco (R$ 179 com até 2 barbeiros + R$ 39 por barbeiro a mais; parâmetros `barbearias_*`). `relatorio_mes` virou `relatorio_mes_de(barbeiro, mês)` com as permissões de quem chama; a tela 27 reusa o mesmo conteúdo da aba Relatórios (`ConteudoRelatorio`). Telas: `barbearia` (sem barbearia: entrar com código ou criar; barbeiro da equipe: o que o dono vê e "Sair"; dono: painel), `barbearia/equipe`, `barbearia/agenda`, `barbearia/barbeiro/[id]`, cartão da casa no Início do dono e "Barbearia" no Mais. Seed com `dono.teste@example.com` (Barbearia Navalha, com o Barbeiro Teste na equipe). Testes: pgTAP (26 novos), Deno (1 novo) e E2E `barbearias` (painel, agenda, relatório, convite, barbeiro Grátis entra e vira Premium, valor sobe para R$ 218, dono remove).
 
 ### Fase 7 — Assinaturas e lançamento ✋
 - [ ] Provedor de assinatura decidido pelo Daniel e integrado

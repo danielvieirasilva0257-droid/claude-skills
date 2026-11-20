@@ -55,10 +55,10 @@ export async function handler(req: Request): Promise<Response> {
   const corpo = await req.json().catch(() => ({})) as { todos?: boolean };
 
   if (ehServico(req) && corpo.todos) {
-    const { data } = await admin.from('app_assinatura').select('barbeiro_id')
-      .neq('plano', 'gratis').in('status', ['ativa', 'teste']);
+    // Paid plans in force, including barbers on a Barbearias team (0006).
+    const { data } = await admin.rpc('barbeiros_por_plano', { p_planos: ['pago', 'premium', 'plus', 'barbearias'] });
     const resultados = [];
-    for (const { barbeiro_id } of data ?? []) resultados.push(await gerarInsights(admin, barbeiro_id));
+    for (const barbeiro_id of (data ?? []) as string[]) resultados.push(await gerarInsights(admin, barbeiro_id));
     return json({ ok: true, resultados });
   }
 

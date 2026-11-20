@@ -29,8 +29,8 @@ export async function handler(req: Request): Promise<Response> {
     const { data: canal } = await admin.from('canais').select('barbeiro_id').eq('tipo', 'instagram').eq('conta_externa', entrada.id).maybeSingle();
     if (!canal) continue;
     const barbeiro = canal.barbeiro_id as string;
-    const { data: plano } = await admin.from('app_assinatura').select('plano').eq('barbeiro_id', barbeiro).maybeSingle();
-    const plus = plano?.plano === 'plus';
+    const { data: plano } = await admin.rpc('plano_efetivo', { p_barbeiro: barbeiro });
+    const plus = plano === 'plus';
 
     for (const mudanca of entrada.changes ?? []) {
       if (mudanca.field !== 'comments' || !mudanca.value.from) continue;

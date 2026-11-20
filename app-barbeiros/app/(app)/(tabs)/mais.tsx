@@ -14,6 +14,7 @@ import { StatusButton } from '@/components/StatusButton';
 import { TelaBase } from '@/components/TelaBase';
 import { Texto } from '@/components/Texto';
 import { sair, useSessao } from '@/features/auth/sessao';
+import { useMinhaBarbearia } from '@/features/barbearia/api';
 import { NOME_PAGAMENTO, useBarbeiro, usePlano, type FormaPagamento } from '@/features/conta/barbeiro';
 import { ATALHOS } from '@/features/conta/atalhos';
 import { exportarCSV, NOME_EXPORTACAO, type TipoExportacao } from '@/features/conta/exportar';
@@ -41,6 +42,7 @@ export default function Mais() {
   const [padrao, setPadrao] = useState<FormaPagamento>('pix');
   const [saindo, setSaindo] = useState(false);
   const meuPlano = plano.data ?? 'gratis';
+  const minha = useMinhaBarbearia();
 
   function abrirTaxas() {
     setDebito(pct(barbeiro.data?.taxa_debito));
@@ -78,6 +80,10 @@ export default function Mais() {
         <LinhaMenu testID="mais-servicos" rotulo="Serviços" detalhe="Preços, duração, recorrência e combos" onPress={() => router.push('/servicos')} />
         <LinhaMenu testID="mais-taxas" rotulo="Maquininha e pagamento"
           detalhe={`Débito ${pct(barbeiro.data?.taxa_debito)}% · Crédito ${pct(barbeiro.data?.taxa_credito)}%`} onPress={abrirTaxas} />
+        <LinhaMenu testID="mais-barbearia" rotulo={minha.data ? minha.data.nome : 'Barbearia'}
+          detalhe={minha.data ? (minha.data.papel === 'dono' ? 'Você é o dono · painel, equipe e agenda' : `Equipe de ${minha.data.dono}`)
+            : 'Entrar com o código do dono ou criar a sua'}
+          onPress={() => router.push('/barbearia')} />
         {ATALHOS.map((a) => (
           <LinhaMenu key={a.rotulo} testID={a.testID} rotulo={a.rotulo} detalhe={a.detalhe} bloqueado={!libera(meuPlano, a.recurso)} onPress={() => router.push(a.rota)} />
         ))}
