@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 
-import { formatDecimal, formatInteiro, formatMes, formatMoeda, formatPorcentagem, inicioDoMes } from '../format';
+import { diaISO, formatDecimal, formatDiaLongo, formatHora, formatInteiro, formatMes, formatMoeda, formatPorcentagem, horarioEm, inicioDoMes, somarDias } from '../format';
 
 // Intl uses a non-breaking space between "R$" and the number.
 const semNbsp = (t: string) => t.replace(/ /g, ' ');
@@ -32,5 +32,21 @@ describe('format', () => {
   it('nome do mês por extenso', () => {
     expect(formatMes('2026-11-01')).toBe('novembro de 2026');
     expect(formatMes('2026-01-01')).toBe('janeiro de 2026');
+  });
+
+  it('dia e hora no fuso do barbeiro (23h em Brasília já é o dia seguinte em UTC)', () => {
+    expect(diaISO(new Date('2026-11-21T01:30:00Z'))).toBe('2026-11-20');
+    expect(formatHora('2026-11-21T01:30:00Z')).toBe('22:30');
+  });
+
+  it('somar dias atravessa o mês e o ano sem depender do fuso', () => {
+    expect(somarDias('2026-11-30', 1)).toBe('2026-12-01');
+    expect(somarDias('2026-12-31', 1)).toBe('2027-01-01');
+    expect(somarDias('2026-03-01', -1)).toBe('2026-02-28');
+  });
+
+  it('dia por extenso sem "-feira" e horário marcado em −03:00', () => {
+    expect(formatDiaLongo('2026-11-20')).toBe('sexta, 20 de novembro');
+    expect(horarioEm('2026-11-20', '09:30')).toBe('2026-11-20T09:30:00-03:00');
   });
 });

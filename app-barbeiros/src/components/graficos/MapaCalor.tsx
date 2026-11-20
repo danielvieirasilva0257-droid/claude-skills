@@ -42,7 +42,7 @@ export function MapaCalor({ celulas, max, testID }: { celulas: CelulaCalor[]; ma
                   <Pressable key={h} style={[styles.celula, { backgroundColor: cor(v) }, v === 0 ? styles.vazia : null]}
                     onPress={() => setTocado({ dia_semana: i + 1, hora: h, atendimentos: v })}
                     onHoverIn={() => setTocado({ dia_semana: i + 1, hora: h, atendimentos: v })}
-                    accessibilityLabel={`${dia} ${h} horas: ${v} atendimentos`} />
+                    accessibilityRole="button" accessibilityLabel={`${dia} ${h} horas: ${v} atendimentos`} />
                 );
               })}
             </View>

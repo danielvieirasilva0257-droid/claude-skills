@@ -1,0 +1,26 @@
+# Configurar comissão escalonada e ver a próxima faixa no extrato.
+appId: ${APP_ID}
+---
+- launchApp:
+    clearState: true
+- tapOn: { id: "entrar-email" }
+- inputText: "barbeiro.teste@example.com"
+- tapOn: { id: "entrar-senha" }
+- inputText: "senha-teste-123"
+- tapOn: { id: "entrar-botao" }
+- extendedWaitUntil:
+    visible: { id: "hoje-valor" }
+    timeout: 20000
+- tapOn: { id: "aba-mais" }
+- scrollUntilVisible:
+    element: { id: "atalho-comissao" }
+- tapOn: { id: "atalho-comissao" }
+- tapOn: { id: "tipo-escalonada" }
+- tapOn: { id: "comissao-salvar" }
+- assertVisible: "✓ Salvo"
+- back
+- scrollUntilVisible:
+    element: { id: "atalho-extrato" }
+- tapOn: { id: "atalho-extrato" }
+- assertVisible: { id: "cascata" }
+- assertVisible: { id: "proxima-faixa" }

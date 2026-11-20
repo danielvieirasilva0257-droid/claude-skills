@@ -1,6 +1,6 @@
 # App Barbeiros — especificação para construir no Claude Code
 
-**Fase atual:** Fase 8 (Qualidade) · Fases 0 a 3 prontas em 19/11/2026; Fases 4 a 7 e o visual v2 (vidro líquido) prontos em 20/11/2026 (na Fase 7, falta só a revisão jurídica dos textos)
+**Fase atual:** todas as fases feitas (0 a 3 em 19/11/2026; 4 a 8 e o visual v2 com vidro líquido em 20/11/2026). Pendências fora do código: revisão jurídica dos textos, contas e chaves (seção 12). Depois do app: site e vídeos.
 **Versão:** 1.1 · 19/11/2026
 **Fonte de negócio:** Plano de Negócio — App Barbeiros (https://claude.ai/artifact/S6HbgHKHwANXCssPUsmQAn). Se algo aqui contradizer o plano, pergunte ao Daniel.
 
@@ -387,10 +387,10 @@ Skills: dataviz (Claude) para os gráficos, *financial-design-systems, `../skill
 
 ### Fase 8 — Qualidade (em todas as fases)
 Skills: `../skills/design/review-animations`, `../skills/design/web-design-guidelines`, `../skills/sites/web-quality/accessibility`, `../skills/sites/webapp-testing`, `../skills/sites/playwright-cli`.
-- [ ] Testes unitários dos formatadores e da lógica de planos
-- [x] Teste SQL das funções do banco com o seed (comissão total e marginal, ofertas, `pode_enviar`) · `supabase/tests/`, desde a Fase 0
-- [ ] Fluxos E2E: lançar atendimento, fechar caixa, bater meta, configurar comissão
-- [ ] Revisão de animação e acessibilidade ✋ aprovação final
+- [x] Testes unitários dos formatadores e da lógica de planos · Jest, 16 testes
+- [x] Teste SQL das funções do banco com o seed (comissão total e marginal, ofertas, `pode_enviar`) · `supabase/tests/`, desde a Fase 0 · 91 testes
+- [x] Fluxos E2E: lançar atendimento, fechar caixa, bater meta, configurar comissão · 8 fluxos no navegador (Playwright) e 4 do Maestro escritos em `.maestro/` (rodam num build de desenvolvimento; o container não tem emulador)
+- [x] Revisão de animação e acessibilidade ✋ aprovação final · registro em `REVISAO-FINAL.md`; axe sem problema nas 16 telas; aprovação dentro do "eu aprovo tudo" de 19/11 (os prints foram enviados ao Daniel)
 
 ### Depois do app
 - Site de venda: `../skills/combos/combo-site-premium`.

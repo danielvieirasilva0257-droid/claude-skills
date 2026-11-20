@@ -32,6 +32,11 @@ Rode dentro de `app-barbeiros/`. Detalhes e porquês em `../projetos/app-barbeir
 | `npm run test:db` | testes pgTAP do banco com o seed (`supabase/tests/`) |
 | `npm run typecheck` / `npm test` | TypeScript estrito / Jest |
 | `npm run web:export && npm run smoke` | teste de fumaça no navegador (abre, entra, lê `v_metricas_mes`) |
+| `npm run funcoes:dev` | funções (IA, canais, assinatura) no Deno, em `http://127.0.0.1:54329/functions/v1` |
+| `npm run test:funcoes` | testes das funções (rode `npm run db:reset` antes: eles criam dados) |
+| `npm run e2e` | E2E no navegador, 8 fluxos (recria o banco antes de cada um; precisa de `funcoes:dev` rodando) |
+| `npm run a11y` | acessibilidade (axe, WCAG 2.2 AA) em 16 telas |
+| `npm run legal` | gera o texto do app a partir de `legal/*.md` |
 
 - `.env` local: copie `.env.example` e use a URL e a `ANON_KEY` de `npm run db:status`.
 - **Container da nuvem:** o Docker não sobe sozinho (`nohup dockerd > /tmp/dockerd.log 2>&1 &`); as imagens vêm do Docker Hub (o script já faz isso); `npx expo install` e `npx expo export` precisam de `EXPO_OFFLINE=1`, porque o proxy bloqueia a API da Expo.

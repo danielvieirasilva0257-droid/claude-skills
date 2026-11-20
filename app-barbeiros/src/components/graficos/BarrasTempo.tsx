@@ -34,7 +34,7 @@ export function BarrasTempo({ titulo, pontos, rotuloValor, testID }: { titulo: s
           const negativo = x.valor < 0;
           return (
             <Pressable key={`${x.rotulo}-${i}`} style={styles.coluna} onPress={() => setTocado(i)} onHoverIn={() => setTocado(i)}
-              accessibilityLabel={`${x.rotulo}: ${negativo ? 'negativo ' : ''}${x.texto}`}>
+              accessibilityRole="button" accessibilityLabel={`${x.rotulo}: ${negativo ? 'negativo ' : ''}${x.texto}`}>
               <View style={[styles.barra, negativo ? styles.barraNegativa : styles.barraPositiva,
                 { height: Math.max(altura, x.valor === 0 ? 0 : 2), backgroundColor: negativo ? grafico.negativo : grafico.atual },
                 negativo ? { top: base } : { bottom: ALTURA - base },

@@ -46,11 +46,13 @@ function SemBarbearia() {
         <Texto variante="h3" accessibilityRole="header">Entrar na equipe de uma barbearia</Texto>
         <Texto variante="bodySm" cor="textMuted">Peça o código de 6 letras ao dono. Seus clientes, gastos e conversas continuam só seus.</Texto>
         <Campo rotulo="Código do convite" value={codigo} onChangeText={(t) => setCodigo(t.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6))}
-          autoCapitalize="characters" autoCorrect={false} placeholder="ABC234" testID="codigo-convite" />
+          autoCapitalize="characters" autoCorrect={false} spellCheck={false} autoComplete="off" placeholder="ABC234" testID="codigo-convite" />
         <StatusButton testID="barbearia-entrar" rotulo="Entrar" rotuloCarregando="Entrando…" rotuloSucesso="Entrou"
           acao={async () => {
             if (!CODIGO.test(codigo)) throw new Error('São 6 letras e números');
-            await entrar.mutateAsync(codigo);
+            await entrar.mutateAsync(codigo).catch((e: Error) => {
+              throw new Error(/inválido|vencido/i.test(e.message) ? 'Código inválido ou vencido: peça outro ao dono' : e.message);
+            });
           }} />
       </Cartao>
 

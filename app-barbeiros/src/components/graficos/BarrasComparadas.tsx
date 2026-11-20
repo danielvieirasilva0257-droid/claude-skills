@@ -35,7 +35,7 @@ export function BarrasComparadas({ titulo, itens, formatar = String, testID }: P
       <View style={styles.lista}>
         {itens.map((i, idx) => (
           <Pressable key={i.nome} onPress={() => setTocado(idx)} onHoverIn={() => setTocado(idx)}
-            accessibilityLabel={`${i.nome}: ${formatar(i.atual)} este mês, ${formatar(i.anterior)} no mês anterior`} style={styles.linha}>
+            accessibilityRole="button" accessibilityLabel={`${i.nome}: ${formatar(i.atual)} este mês, ${formatar(i.anterior)} no mês anterior`} style={styles.linha}>
             <Texto variante="bodySm" peso="medium">{i.nome}</Texto>
             <View style={styles.barraLinha}>
               <View style={[styles.barra, { width: `${(i.atual / max) * 88}%`, backgroundColor: grafico.atual }]} />

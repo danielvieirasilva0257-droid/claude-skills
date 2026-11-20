@@ -70,7 +70,8 @@
     "e2e": "node scripts/e2e-web.mjs",
     "funcoes:dev": "bash scripts/funcoes-env.sh deno run --config supabase/functions/deno.json --allow-net --allow-env --allow-read supabase/functions/_dev/servidor.ts",
     "test:funcoes": "bash scripts/funcoes-env.sh deno test --config supabase/functions/deno.json --allow-net --allow-env --allow-read supabase/functions/_testes/",
-    "legal": "node scripts/gerar-legal.mjs"
+    "legal": "node scripts/gerar-legal.mjs",
+    "a11y": "node scripts/acessibilidade-web.mjs"
   },
   "private": true,
   "jest": {

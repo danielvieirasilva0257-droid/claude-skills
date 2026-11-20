@@ -44,7 +44,7 @@ export function Cascata({ titulo, degraus, testID }: { titulo: string; degraus: 
           const cor = b.tipo === 'menos' ? grafico.deducao : b.tipo === 'total' && b.valor < 0 ? grafico.negativo : grafico.atual;
           return (
             <Pressable key={b.rotulo} style={styles.coluna} onPress={() => setTocado(i)} onHoverIn={() => setTocado(i)}
-              accessibilityLabel={`${b.rotulo}: ${sinal(b)}${b.texto}`}>
+              accessibilityRole="button" accessibilityLabel={`${b.rotulo}: ${sinal(b)}${b.texto}`}>
               <View style={[styles.barra, { top: topo, height: altura, backgroundColor: cor }]} />
             </Pressable>
           );

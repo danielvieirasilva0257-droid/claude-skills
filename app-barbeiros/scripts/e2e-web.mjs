@@ -70,6 +70,21 @@ async function sairDaConta(page) {
   await page.evaluate(() => localStorage.clear());
 }
 
+// Server-side stand-in for RevenueCat: posts a webhook event with the local secret.
+let eventoN = 0;
+async function eventoDaLoja(tipo, extra = {}) {
+  const url = `${env.EXPO_PUBLIC_FUNCTIONS_URL}/assinatura-webhook`;
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: { Authorization: process.env.REVENUECAT_WEBHOOK_AUTH ?? 'teste-local-rc', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ event: { id: `e2e-${Date.now()}-${eventoN++}`, type: tipo, app_user_id: 'b0b0b0b0-0000-4000-8000-000000000002',
+      entitlement_ids: ['pago'], product_id: 'barbeiros_pago_mensal', store: 'APP_STORE', period_type: 'NORMAL',
+      expiration_at_ms: Date.now() + 30 * 86_400_000, ...extra } }),
+  });
+  if (!r.ok) throw new Error(`webhook ${tipo}: ${r.status}`);
+  return r.json();
+}
+
 export const fluxos = {
   // Fase 2: primeiro uso no Grátis.
   async onboarding_e_bloqueios(page) {
@@ -354,6 +369,75 @@ export const fluxos = {
     await segurar(page, 'confirmar-remover');
     await page.getByTestId('folha-remover').waitFor({ state: 'detached', timeout: 10_000 });
     await page.waitForFunction(() => document.querySelectorAll('[data-testid="membro"]').length === 2, null, { timeout: 10_000 });
+  },
+  // Fase 7: a loja avisa (webhook do RevenueCat simulado) e o app segue o banco.
+  async assinaturas(page) {
+    await entrar(page, 'gratis.teste@example.com');
+    await page.getByTestId('onb-preco').waitFor({ timeout: 20_000 });
+    await page.getByTestId('onb-preco').fill('40');
+    for (let i = 0; i < 4; i++) await page.getByTestId('onb-continuar').click();
+    await page.getByTestId('hoje-valor').waitFor({ timeout: 20_000 });
+
+    await page.goto(`${BASE}/planos`);
+    await page.getByTestId('sem-loja').waitFor({ timeout: 20_000 });
+    await print(page, 'f7-01-planos-web');
+
+    // Teste grátis de 7 dias do Pago.
+    await eventoDaLoja('INITIAL_PURCHASE', { period_type: 'TRIAL', expiration_at_ms: Date.now() + 7 * 86_400_000 });
+    await page.goto(`${BASE}/`);
+    await page.getByTestId('aviso-teste').waitFor({ timeout: 20_000 });
+    await print(page, 'f7-02-inicio-teste');
+    await page.goto(`${BASE}/relatorios`);
+    await page.getByText('Ainda sem atendimentos neste mês').waitFor({ timeout: 20_000 });
+    await page.goto(`${BASE}/planos`);
+    await page.getByTestId('situacao-assinatura').getByText(/Teste grátis até/).waitFor({ timeout: 20_000 });
+    await print(page, 'f7-03-planos-teste');
+
+    await page.goto(`${BASE}/`);
+    await aba(page, 'Mais');
+    await page.getByTestId('mais-cancelar').click();
+    await page.getByTestId('cancelar-na-loja').waitFor({ timeout: 10_000 });
+    await page.getByText(/Ajustes do iPhone/).waitFor();
+    await print(page, 'f7-04-cancelar-na-loja');
+
+    // Desligou a renovação na loja: o plano vale até o fim do período.
+    await eventoDaLoja('CANCELLATION', { period_type: 'TRIAL', expiration_at_ms: Date.now() + 7 * 86_400_000 });
+    await page.goto(`${BASE}/planos`);
+    await page.getByTestId('situacao-assinatura').getByText(/Renovação desligada/).waitFor({ timeout: 20_000 });
+
+    // Fim do período: volta para o Grátis, dados continuam.
+    await eventoDaLoja('EXPIRATION');
+    await page.goto(`${BASE}/relatorios`);
+    await page.getByTestId('tela-bloqueada').waitFor({ timeout: 20_000 });
+
+    await page.goto(`${BASE}/legal/privacidade`);
+    await page.getByTestId('legal-rascunho').waitFor({ timeout: 20_000 });
+    await print(page, 'f7-05-privacidade');
+  },
+  // Fase 8: bater a meta do mês (100%) e ver a celebração.
+  async bater_meta(page) {
+    await entrar(page, 'barbeiro.teste@example.com');
+    await page.getByTestId('hoje-valor').waitFor({ timeout: 20_000 });
+    await fecharCelebracoes(page);
+    await page.goto(`${BASE}/meta`);
+    await page.getByTestId('meta-valor').waitFor({ timeout: 20_000 });
+    await page.getByTestId('meta-valor').fill('90');
+    await page.getByText('Salvar minha meta').click();
+    // 50% and 100% may follow each other in the same sheet: tap through until "Meta batida!".
+    let batida = false;
+    for (let i = 0; i < 5 && !batida; i++) {
+      await page.getByTestId('comemorar').waitFor({ timeout: 10_000 });
+      batida = await page.getByText('Meta batida!').isVisible();
+      if (batida) break;
+      await page.getByTestId('comemorar').click();
+      await page.waitForTimeout(900);
+    }
+    esperar(batida, 'faltou a celebração de meta batida');
+    await print(page, 'f8-01-meta-batida');
+    await fecharCelebracoes(page);
+    const anel = normalizar(await page.getByTestId('meta-anel').innerText());
+    esperar(anel.includes('100%'), `anel da meta: ${anel}`);
+    await print(page, 'f8-02-meta-100');
   },
 };
 

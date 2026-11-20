@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useSegments } from 'expo-router';
-import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { color, space } from '@/theme/tokens';
@@ -27,13 +27,15 @@ type Props = {
 /** Space left at the bottom of tab screens for the floating tab bar. */
 export const ESPACO_ABAS = 112;
 
-/** Screen shell: safe area, white background, title, pull to refresh. */
+/** Screen shell: safe area, dark background with the aurora, title, pull to refresh. */
 export function TelaBase({ titulo, subtitulo, direita, flutuante, onAtualizar, atualizando = false, semTitulo = false, auroraForte = false, children }: Props) {
   const emAbas = (useSegments() as string[]).includes('(tabs)');
   return (
     <SafeAreaView style={styles.safe} edges={semTitulo ? [] : ['top']}>
       <Aurora forte={auroraForte} />
       <ScrollView
+        // Web: a scroll area must be reachable by keyboard (axe scrollable-region-focusable).
+        tabIndex={Platform.OS === 'web' ? 0 : undefined}
         contentContainerStyle={[styles.conteudo, emAbas ? styles.espacoAbas : flutuante ? styles.espacoFlutuante : null]}
         keyboardShouldPersistTaps="handled"
         refreshControl={onAtualizar ? <RefreshControl refreshing={atualizando} onRefresh={onAtualizar} tintColor={color.brand} /> : undefined}

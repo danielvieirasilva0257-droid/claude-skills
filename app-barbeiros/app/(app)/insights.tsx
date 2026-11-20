@@ -1,7 +1,7 @@
 // Insights da IA: up to 3 cards (database signals, AI wording) + this
 // week's summary as a carousel. The numbers in the cards are the database's.
 import { Stack, router, type Href } from 'expo-router';
-import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { Cartao } from '@/components/Cartao';
 import { Dinheiro } from '@/components/Dinheiro';
@@ -55,7 +55,7 @@ function Semana() {
   return (
     <View style={styles.bloco}>
       <Texto variante="h3" accessibilityRole="header">Resumo da semana</Texto>
-      <ScrollView horizontal snapToInterval={largura + space[3]} decelerationRate="fast" showsHorizontalScrollIndicator={false}
+      <ScrollView tabIndex={Platform.OS === 'web' ? 0 : undefined} accessibilityLabel="Resumo da semana" horizontal snapToInterval={largura + space[3]} decelerationRate="fast" showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.carrossel} testID="carrossel-semana">
         {cartoes}
       </ScrollView>

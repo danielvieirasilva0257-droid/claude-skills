@@ -47,7 +47,8 @@ export function Chip({ rotulo, detalhe, selecionado, onPress, desativado = false
       onBlur={onBlur}
       accessibilityRole="checkbox"
       accessibilityLabel={detalhe ? `${rotulo}, ${detalhe}` : rotulo}
-      accessibilityState={{ checked: selecionado, disabled: desativado }}
+      aria-checked={selecionado}
+      aria-disabled={desativado}
       style={[
         styles.base,
         selecionado ? styles.selecionado : null,
