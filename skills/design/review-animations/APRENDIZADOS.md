@@ -28,3 +28,9 @@ A skill incorpora os aprendizados até 12/10/2026 (entrada na base).
 - Os 10 padrões viraram checklist de folhas de quadros (a cada 5 ou 6 quadros), junto com as 4 regras do editor e a regra do celular. A tabela "UI < 300 ms" valeu só dentro da tela do app.
 - Funcionou em três rodadas: silhueta antes do 3D, rascunho por terços durante o render do Blender e conferências finais (LUFS, transcrição, tremido). Achou 5 problemas, 3 deles só com o celular real.
 - Detalhes: `projetos/rotina/PASSO-A-PASSO.md` (item 6) e `reports/Vídeo Rotina v3, skills e combos usados (2026-10-12).md`.
+
+## 20/11/2026: revisão final de um app React Native (App Barbeiros)
+
+- Funcionou como checklist do app inteiro: listar todo `withTiming`/`withSpring`/`withRepeat` (`grep`) e passar cada um pelos 10 padrões. Saída no formato da skill (tabela + veredito) em `app-barbeiros/REVISAO-FINAL.md`.
+- Exceções aceitas com justificativa: anel da meta com mola de 900 ms (tela aberta poucas vezes por semana, explica o progresso) e o botão de conquista de ~0,72 s (momentos raros, aprovado por frames).
+- O único problema real não era de tempo nem de curva: era a face translúcida do botão deixando o lábio aparecer. Olhar os prints junto com o código achou o que o `grep` não acha.

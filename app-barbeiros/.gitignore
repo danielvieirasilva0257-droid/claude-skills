@@ -1,0 +1,36 @@
+# dependências
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+.metro-health-check*
+*.tsbuildinfo
+
+# pastas nativas geradas (Continuous Native Generation): nunca editar à mão
+/ios
+/android
+.kotlin/
+*.orig.*
+
+# chaves e certificados (nunca no git)
+.env
+.env.*
+!.env.example
+*.jks
+*.p8
+*.p12
+*.key
+*.pem
+*.mobileprovision
+
+# Supabase
+supabase/.temp/
+
+# outros
+*.log
+npm-debug.*
+.DS_Store
+/dist-demo

@@ -79,3 +79,6 @@ Este repositório existe para o Claude usar e ir melhorando. Ele guarda as habil
 - **Kit motion-video:** veja `skills/video/motion-video/APRENDIZADOS.md`. Ele precisa de um script que roda o Chrome com `--no-sandbox`, porque o container roda como root.
 - **Proxy:** o HTTPS de saída passa por um proxy que intercepta TLS, então ferramentas em Python podem precisar do certificado em `/root/.ccr/ca-bundle.crt`.
 - **Desempenho:** a máquina tem só 4 CPUs. Evite rodar vários renders ao mesmo tempo, porque eles disputam a CPU e podem travar.
+- **Docker:** está instalado, mas não sobe sozinho. Rode `nohup dockerd > /tmp/dockerd.log 2>&1 &`.
+  - O registro `public.ecr.aws` responde "Data limit exceeded"; puxe do Docker Hub (no Supabase: `SUPABASE_INTERNAL_IMAGE_REGISTRY=docker.io`).
+- **Expo:** o proxy bloqueia a API da Expo. Use `EXPO_OFFLINE=1` em `npx expo install` e `npx expo export`.

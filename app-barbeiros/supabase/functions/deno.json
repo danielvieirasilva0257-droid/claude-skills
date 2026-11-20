@@ -1,0 +1,5 @@
+{
+  "nodeModulesDir": "none",
+  "compilerOptions": { "strict": true, "noUncheckedIndexedAccess": true },
+  "lint": { "rules": { "exclude": ["no-unused-vars"] } }
+}

@@ -36,3 +36,10 @@ Adendos datados. O mais novo fica embaixo. O `SKILL.md` já incorpora os aprendi
 ## 13/10/2026: arquétipo do vídeo do Rotina
 
 - O "Palco escuro" (um fundo escuro o vídeo todo) deixou o v3 monótono. No v4 voltou o sistema do v2: papel com grade, vermelho e tinta alternando por seção, com o vermelho da marca como acento e como fundo nas viradas. Para vídeo, a variação de fundo entre seções conta mais que a paleta mínima. Detalhes: `projetos/rotina/PASSO-A-PASSO.md` (item 7).
+
+## 20/11/2026: App Barbeiros (React Native), do branco ao escuro com vidro líquido
+
+- O fluxo de 6 etapas virou o `DESIGN.md` do app (Fase 1) e funcionou bem em React Native: tokens num arquivo só (`src/theme/tokens.ts`) e componente nunca recebe cor direta. Por isso a troca inteira de visual (v1 branco → v2 escuro, pelas referências do Daniel) mexeu só nos tokens e em uns 15 componentes, sem tocar nas telas.
+- Com prints de referência, trave primeiro o que copiar (fundo preto, cartões de vidro com canto grande, uma cor de destaque, pílula branca no selecionado, barra de abas flutuante) e o que não copiar (marca e textos do app de referência).
+- No escuro, guarde superfícies translúcidas (`surface` 6%, `surfaceStrong` 12%) **e** gêmeas opacas: face de botão sobre lábio colorido com cor translúcida deixa o lábio aparecer e esconde o texto.
+- Código: branch `app-barbeiros`, `app-barbeiros/DESIGN.md`. Detalhes em `projetos/app-barbeiros/PASSO-A-PASSO.md`.

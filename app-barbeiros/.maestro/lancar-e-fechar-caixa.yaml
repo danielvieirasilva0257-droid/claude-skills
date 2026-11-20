@@ -1,0 +1,24 @@
+# Lançar um corte em 2 toques, registrar a oferta aceita e fechar o caixa.
+appId: ${APP_ID}
+---
+- launchApp:
+    clearState: true
+- tapOn: { id: "entrar-email" }
+- inputText: "barbeiro.teste@example.com"
+- tapOn: { id: "entrar-senha" }
+- inputText: "senha-teste-123"
+- tapOn: { id: "entrar-botao" }
+- extendedWaitUntil:
+    visible: { id: "hoje-valor" }
+    timeout: 20000
+- tapOn: { id: "mais-atendimento" }
+- tapOn: { id: "atalho-Corte" }
+- assertVisible: { id: "lancado-ok" }
+- tapOn: { id: "aceitou-Hidratação" }
+- tapOn: { id: "oferta-pronto" }
+- assertVisible:
+    id: "hoje-valor"
+    text: "R\\$ 70,00"
+- tapOn: { id: "aba-agenda" }
+- tapOn: { id: "fechar-caixa" }
+- assertVisible: { id: "caixa-fechado" }
