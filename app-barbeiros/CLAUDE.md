@@ -37,6 +37,10 @@ Rode dentro de `app-barbeiros/`. Detalhes e porquês em `../projetos/app-barbeir
 | `npm run e2e` | E2E no navegador, 8 fluxos (recria o banco antes de cada um; precisa de `funcoes:dev` rodando) |
 | `npm run a11y` | acessibilidade (axe, WCAG 2.2 AA) em 16 telas |
 | `npm run legal` | gera o texto do app a partir de `legal/*.md` |
+| `npm run marca` | gera a logo (SVG em `assets/marca/`) e os ícones do app |
+| `npm run demo:gravar` | grava o modo demonstração com o banco local (rode `db:reset` e `funcoes:dev` antes) |
+| `npm run demo:web && npm run demo:testar` | build de demonstração no navegador, testado com o servidor bloqueado |
+| `npm run apk` | gera o APK de Android (demonstração por padrão; `EXPO_PUBLIC_DEMO=0` usa o servidor do `.env`). SDK: `bash scripts/apk/instalar-sdk.sh` |
 
 - `.env` local: copie `.env.example` e use a URL e a `ANON_KEY` de `npm run db:status`.
 - **Container da nuvem:** o Docker não sobe sozinho (`nohup dockerd > /tmp/dockerd.log 2>&1 &`); as imagens vêm do Docker Hub (o script já faz isso); `npx expo install` e `npx expo export` precisam de `EXPO_OFFLINE=1`, porque o proxy bloqueia a API da Expo.

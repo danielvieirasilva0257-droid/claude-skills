@@ -400,7 +400,7 @@ Skills: `../skills/design/review-animations`, `../skills/design/web-design-guide
 
 ## 12. Decisões pendentes (perguntar ao Daniel)
 
-1. Nome do app e logo.
+1. Nome do app e logo. · Logo feita em 20/11/2026: poste de barbearia em verde-limão com as listras subindo (`assets/marca/`); nome ainda provisório ("App Barbeiros", pacote `br.com.appbarbeiros`).
 2. Provedor de assinatura (RevenueCat ou gateway próprio). · RevenueCat implementado na Fase 7; falta criar a conta, os produtos nas lojas e as chaves.
 3. Provedor e modelo do LLM.
 4. Arte final do mascote (nota de dinheiro com asinhas) no Rive.
