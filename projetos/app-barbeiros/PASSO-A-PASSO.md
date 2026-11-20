@@ -12,7 +12,7 @@ App mobile para o barbeiro individual controlar o resultado da própria cadeira 
 
 - Público do app: barbeiro individual; plano Barbearias à parte.
 - Planos: Grátis, Pago R$ 19,90 (anual R$ 179), Premium R$ 59,90, Premium Plus R$ 119,90, Barbearias R$ 179 + R$ 39 por barbeiro.
-- Visual: ~~base branca, verde #15803D, azul #1D4ED8~~ → **versão 2 (20/11/2026, pelas referências do Daniel):** escuro com vidro líquido (Liquid Glass), verde-limão #C5F23A no dinheiro e na ação, lavanda #9AA8FF só na IA, pílula branca no item selecionado. Mascote: nota de dinheiro com asinhas. Estilo Duolingo só em metas e resultados.
+- Visual: ~~base branca, verde #15803D, azul #1D4ED8~~ → **versão 2 (20/11/2026, pelas referências do Daniel):** escuro com vidro líquido (Liquid Glass), verde-limão #C5F23A no dinheiro e na ação, lavanda #9AA8FF só na IA, pílula branca no item selecionado. **Sem mascote** (decisão do Daniel, 20/11/2026). Estilo Duolingo só em metas e resultados.
 - Regra da IA: o banco calcula, a IA interpreta. Nunca inventa número.
 - Comissão fixa ou escalonada (sobre o total ou por faixa), configurável.
 - 67 estratégias aprovadas, gravadas no banco (T, V, A, R, P).
@@ -29,7 +29,7 @@ App mobile para o barbeiro individual controlar o resultado da própria cadeira 
 | 6 | Gráficos e relatórios | dataviz (Claude); externa: financial-design-systems | feito |
 | 7 | Textos do app | `skills/combos/combo-copy-humanizada` (copywriting → humanizer), `skills/sites/cro` | feito (rascunhos legais aguardam revisão jurídica) |
 | 8 | Animações | `skills/design/motion-oficial`, `skills/design/button-animation` (receita 12, status-button, hold-to-confirm), `skills/design/animation-vocabulary`, `skills/design/review-animations`; externas RN: animations (Software Mansion), animating-react-native-expo, animation-principles | feito e revisado |
-| 9 | Mascote | Rive (app); `skills/video/blender-ia` (versão 3D de comercial); conectores Open Art / Higgsfield (rascunhos) | provisório em SVG; arte final no Rive pendente |
+| 9 | ~~Mascote~~ | — | removido: o Daniel não quer mascote (20/11/2026); a celebração mostra o ícone da conquista |
 | 10 | Código | externas RN; `skills/sites/vercel-react-best-practices`; banco no Supabase | Fases 0 a 8 prontas (20/11) |
 | 11 | IA do app | seção 6 do plano + banco; claude-api (Claude) | feito (modo simulado; chave e modelo a decidir) |
 | 12 | Testes | `skills/sites/webapp-testing`, `skills/sites/playwright-cli`, `skills/sites/web-quality/accessibility`, `skills/design/web-design-guidelines`, `skills/design/review-animations` | feito (Fase 8) |
@@ -125,7 +125,7 @@ Login de teste (só no banco local): `barbeiro.teste@example.com` / `senha-teste
 
 | Fase | O que entrou | Banco | Skills usadas (caminhos) |
 |---|---|---|---|
-| 1. Design e componentes | `DESIGN.md`, tokens, componentes da seção 7 (`Texto`, `Campo`, `DuoButton`, `StatusButton`, `HoldToConfirm`, `ConquistaButton` "pulo com dinheiro", `Chip`, `Cartao`, `BottomSheet`, `LockedScreen`, `InsightCard`, `MetaRing`, `Mascote`, gráficos) e a galeria `dev/componentes` | — | `skills/design/ui-ux-pro-max`, `skills/design/button-animation`, `skills/design/motion-oficial`, `skills/design/animation-vocabulary` |
+| 1. Design e componentes | `DESIGN.md`, tokens, componentes da seção 7 (`Texto`, `Campo`, `DuoButton`, `StatusButton`, `HoldToConfirm`, `ConquistaButton` "pulo com dinheiro", `Chip`, `Cartao`, `BottomSheet`, `LockedScreen`, `InsightCard`, `MetaRing`, gráficos; o `Mascote` saiu em 20/11) e a galeria `dev/componentes` | — | `skills/design/ui-ux-pro-max`, `skills/design/button-animation`, `skills/design/motion-oficial`, `skills/design/animation-vocabulary` |
 | 2. Grátis (telas 1–5) | entrar, primeiro uso, Início, Agenda (lançar em 2 toques, "Ofereceu algo?", fechar o caixa), Serviços, Mais (exportar CSV em todo plano, cancelar sem culpa) | `0003` | `skills/combos/combo-copy-humanizada`, `skills/sites/vercel-react-best-practices` |
 | 3. Pago (telas 6–15) e IA | clientes e ficha, gastos, financeiro, meta, relatórios, insights, chat, coach, comissão e extrato com PDF, MEI; Edge Functions de IA | `0004` | dataviz (Claude), claude-api (Claude), `skills/combos/combo-copy-humanizada` |
 | 4–5. Premium e Plus (telas 16–23) | expediente e lista de espera, WhatsApp com IA (assumir conversa), automações por `pode_enviar`, mensagens e LGPD, Instagram, prospecção por palavra-código, personalidade da IA | `0005` | claude-api (Claude) |
@@ -173,7 +173,7 @@ Pedido do Daniel: "Termine o protótipo, crie uma logo e faça o APK".
 1. **Logo:** poste de barbearia em verde-limão, com as listras subindo para a direita (o resultado da cadeira crescendo), sobre o preto do app.
    - A primeira ideia (três barras de gráfico com o topo inclinado) parecia o ícone de sinal do celular e foi descartada.
    - A segunda (poste com uma bola em cima) formava um "i" ao lado da palavra ("ibarbeiros"). A versão final tem pino, tampas largas em cima e embaixo e o corpo listrado.
-   - Tudo em vetor, gerado por script: `scripts/gerar_marca.py` escreve os SVGs em `assets/marca/` (com a palavra "barbeiros" em curvas da Inter ExtraBold) e `scripts/renderizar-marca.mjs` gera os ícones do app (`npm run marca`). Alternativa guardada: a nota com asinhas (`alternativa-nota.svg`).
+   - Tudo em vetor, gerado por script: `scripts/gerar_marca.py` escreve os SVGs em `assets/marca/` (com a palavra "barbeiros" em curvas da Inter ExtraBold) e `scripts/renderizar-marca.mjs` gera os ícones do app (`npm run marca`). A alternativa da nota com asinhas foi descartada junto com o mascote.
    - No app: componente `Marca` (mesma geometria em `react-native-svg`) na tela de entrar.
 2. **Modo demonstração** (`EXPO_PUBLIC_DEMO=1`): o app funciona no celular sem servidor.
    - `npm run demo:gravar` abre todas as telas no navegador com as contas de teste (banco local e funções locais) e grava cada resposta em `src/features/demo/gravacao.json` (cerca de 120 respostas e 4 perguntas do chat).
@@ -202,7 +202,7 @@ Pedido do Daniel: "Termine o protótipo, crie uma logo e faça o APK".
 3. **WhatsApp e Instagram de verdade:** credenciais da Meta (app, número, tokens); hoje roda em modo simulado.
 4. **Assinaturas:** conta no RevenueCat, produtos nas lojas (entitlements `pago`, `premium`, `plus`, `barbearias`) e as chaves `EXPO_PUBLIC_REVENUECAT_*` e `REVENUECAT_WEBHOOK_AUTH`.
 5. **Revisão jurídica** de `legal/termos-de-uso.md` e `legal/politica-de-privacidade.md` (razão social, CNPJ, encarregado, prazos).
-6. **Nome** (a logo já existe; o pacote `br.com.appbarbeiros` é provisório) e a **arte final do mascote** no Rive.
+6. **Nome** (a logo já existe; o pacote `br.com.appbarbeiros` é provisório).
 7. **MEI 2026:** limite de R$ 81 mil por ano e DAS de serviços R$ 86,05 (5% do salário mínimo de R$ 1.621 + R$ 5 de ISS), gravados em `parametros` por ano. Conferir quando sair o salário mínimo de 2027.
 
 ## Próximo passo
