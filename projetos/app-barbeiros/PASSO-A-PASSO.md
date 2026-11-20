@@ -195,6 +195,36 @@ Pedido do Daniel: "Termine o protótipo, crie uma logo e faça o APK".
 
 **Pendente:** o token do Supabase colado duas vezes não é um token pessoal (a API responde "JWT could not be decoded"). Com um token `sbp_…` (Account › Access Tokens), dá para criar o projeto na nuvem (região São Paulo), aplicar as migrations e o seed, publicar as funções e gerar o APK com servidor de verdade (`EXPO_PUBLIC_DEMO=0`).
 
+## Melhorias pedidas pelo Daniel (20/11/2026)
+
+Pedido (por áudio): agenda com calendário no estilo Booksy/AVEC, cadastro do cliente com observações livres, bolinha que desliza na barra de abas, atendidos do dia e "Fale com a IA" no centro da aba dos três risquinhos, e uma IA de voz que mexe no app.
+
+1. **Agenda:** calendário do mês (pontinho limão nos dias com horário marcado) e, embaixo, a grade do dia escolhido, da entrada à saída do expediente, com a pausa marcada e a linha "agora".
+   - Tocar num horário abre o "CRM do agendamento": cliente, data, horário, profissional, serviços com preço, valor. O nome do cliente leva ao cadastro.
+   - Tocar numa meia hora vazia abre "Agendar" já com a hora.
+   - No banco: `agenda_mes` e `agenda_grade` (migration 0008). O fim de cada horário sai da duração dos serviços.
+2. **Cadastro:** "Observações" (texto livre) no lugar das perguntas, mais "Técnica do corte de cabelo" e "Técnica da barba". O que estava escrito nas perguntas antigas foi para as observações.
+3. **Barra de abas:** uma bolha só, que desliza da aba atual até a tocada. As abas alargam e estreitam no caminho. Rápida, sem quique, e respeita "reduzir movimento".
+4. **Mais (três risquinhos):** no centro, os clientes atendidos hoje e o botão grande "Fale com a IA". O resto da tela continua igual até o Daniel detalhar.
+5. **Fale com a IA:**
+   - tela com a bolinha lavanda animada (respira, segue o microfone, ondula pensando, pulsa falando);
+   - microfone (fala vira texto no próprio celular), teclado e botão de som; a resposta sai em voz pelo celular;
+   - o agente usa Claude com ferramentas: lê agenda, números, ficha e horários livres, abre telas e **prepara** mudanças. A mudança só é gravada quando o barbeiro confirma (botão ou "sim");
+   - nomes de clientes viram "Cliente N" antes da IA, até no que o barbeiro fala.
+
+**Testes:** pgTAP 100 (9 novos), Deno 20 (5 do agente), Jest 23 (3 da confirmação falada), E2E 9 fluxos (novo `agenda_e_voz`: CRM, cadastro, meia hora vazia, a IA marca e o barbeiro confirma dizendo "sim"), axe nas telas novas.
+
+**Aprendizados:**
+
+- **Reanimated na web (bolha das abas):**
+  - um estilo animado que lê o valor por uma função auxiliar não é atualizado na web, porque a dependência não é vista; leia `pos.value` direto dentro de cada `useAnimatedStyle`;
+  - estilo fixo (altura, centralização) e largura animada no mesmo elemento fizeram a web perder a altura de 52 px. Separe: largura animada no botão (`Animated.createAnimatedComponent(Pressable)`) e o layout num `View` interno.
+- **Agente com confirmação:** as ferramentas de mudança não gravam; devolvem uma ação pendente que o app mostra num cartão. Com voz isso evita erro de entendimento ("marca às 10" virar "às 2"), e o barbeiro confirma falando "sim".
+- **Privacidade com voz:** o reconhecimento de fala roda no celular (o áudio não sai). O texto passa pelo mesmo anonimizador das outras funções antes da IA. Se o Daniel trocar por uma IA de voz na nuvem, o áudio com nomes vai para esse provedor: decidir com ele.
+- **Simulado testável:** o modo `mock` do agente usa regras simples, mas chama as mesmas ferramentas e a mesma confirmação, então os testes cobrem o caminho real até o banco.
+
+**Pendências:** nome do botão ("Fale com a IA" provisório), as IAs de texto e voz que o Daniel vai integrar e o modelo (padrão `claude-opus-5-5` com esforço baixo; trocar para `claude-haiku-5-5` deixa mais barato e rápido, decisão dele).
+
 ## Pendências (fora do código)
 
 1. **Modelo da IA:** o padrão é `claude-opus-5-5` (regra da skill da API). Para o custo-alvo de R$ 0,50 a R$ 2 por barbeiro por mês, a troca para `claude-haiku-5-5` é decisão do Daniel (`LLM_MODEL`). Falta a chave da API nos secrets do Supabase.
