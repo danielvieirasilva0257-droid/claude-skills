@@ -30,3 +30,11 @@ Adendos datados. O mais novo fica embaixo. O `SKILL.md` já incorpora os aprendi
 - **O nome `motion-oficial` fica como está.** Renomear para `animacao-ui` mexeria em caminhos de manual, índice, README, combos e fichas, sem ganho prático; o nome já aparece no índice com a descrição certa. Se o Daniel pedir a troca, ela passa pelo procedimento de "mover skill" do manual.
 - **`review-animations` e `animation-vocabulary` do Emil Kowalski foram instaladas como skills separadas e intactas** em `skills/design/` (MIT, commit `e8a175d`). Elas não substituem esta skill: a `motion-oficial` continua sendo o método (quando animar, curvas, molas, acessibilidade, ponte para o Remotion); a `review-animations` serve para a revisão final em tabela e a `animation-vocabulary` para dar nome a um efeito.
 
+
+## 20/11/2026: indicador que desliza na barra de abas (React Native, Reanimated 4)
+
+- Pedido do Daniel: a bolha da aba ativa vai deslizando até a aba tocada. Um valor só (`pos`, posição em "abas") anima do índice antigo ao novo; a largura de cada aba, a posição e a largura da bolha e a opacidade do rótulo saem dele, então as abas alargam e estreitam enquanto a bolha passa. Tempo pela distância: 220 ms + 40 ms por aba (máx. 380 ms), `easeOut` forte, sem mola, interrompível (`withTiming` reaponta do valor atual). "Reduzir movimento": pula.
+- Duas armadilhas do Reanimated **na web**:
+  - leia `pos.value` direto em cada `useAnimatedStyle`; por uma função auxiliar, a dependência não é vista e o estilo congela no meio;
+  - não misture layout fixo (altura) e largura animada no mesmo elemento: a web perdeu a altura. Largura no elemento de fora, layout num `View` de dentro.
+- Projeto: `projetos/app-barbeiros/PASSO-A-PASSO.md` (seção "Melhorias pedidas pelo Daniel").
