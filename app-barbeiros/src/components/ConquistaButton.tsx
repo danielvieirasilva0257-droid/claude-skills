@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: space[5],
     overflow: 'hidden', // the waves never leave the button
   },
-  faceDesativada: { backgroundColor: color.surface, borderWidth: 1, borderColor: color.border },
+  faceDesativada: { backgroundColor: color.surfaceSolid, borderWidth: 1, borderColor: color.border },
   onda: {
     position: 'absolute',
     width: 420,

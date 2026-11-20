@@ -1,16 +1,24 @@
 // Everything behind login. A new barber goes to onboarding first; after it,
 // the tabs and the stack screens (servicos, gastos, …) with a plain header.
 import { Redirect, Stack, useSegments } from 'expo-router';
+import { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Carregando, EstadoErro } from '@/components/Estado';
 import { useBarbeiro } from '@/features/conta/barbeiro';
+import { iniciarLoja } from '@/lib/loja';
 import { inter } from '@/theme/fonts';
 import { color, size } from '@/theme/tokens';
 
 export default function AppLayout() {
   const { data: barbeiro, isPending, isError, refetch } = useBarbeiro();
   const segmentos = useSegments() as string[];
+  const uid = barbeiro?.id;
+
+  // Store purchases tied to the barber id (RevenueCat app_user_id = barbeiros.id).
+  useEffect(() => {
+    if (uid) iniciarLoja(uid).catch(() => undefined);
+  }, [uid]);
 
   if (isPending || isError) {
     return (

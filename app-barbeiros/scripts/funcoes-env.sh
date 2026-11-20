@@ -8,5 +8,7 @@ export SUPABASE_URL=$(echo "$STATUS" | sed -n 's/^API_URL="\(.*\)"/\1/p')
 export SUPABASE_ANON_KEY=$(echo "$STATUS" | sed -n 's/^ANON_KEY="\(.*\)"/\1/p')
 export SUPABASE_SERVICE_ROLE_KEY=$(echo "$STATUS" | sed -n 's/^SERVICE_ROLE_KEY="\(.*\)"/\1/p')
 export LLM_PROVIDER="${LLM_PROVIDER:-mock}"
+# Local-only value of the RevenueCat webhook header (the real one is a Supabase secret).
+export REVENUECAT_WEBHOOK_AUTH="${REVENUECAT_WEBHOOK_AUTH:-teste-local-rc}"
 [ -f /root/.ccr/ca-bundle.crt ] && export DENO_CERT=/root/.ccr/ca-bundle.crt
 exec "$@"

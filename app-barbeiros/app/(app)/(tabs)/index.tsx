@@ -22,6 +22,7 @@ import { useBarbeiro, usePlano } from '@/features/conta/barbeiro';
 import { alternarOcultarValores, usePreferencias } from '@/features/conta/preferencias';
 import { Celebracao } from '@/features/conquistas/Celebracao';
 import { useFinanceiro, useInsights } from '@/features/pago/api';
+import { diaCurto, useMinhaAssinatura } from '@/features/planos/assinatura';
 import { diaISO, formatDiaLongo, formatHora, formatMes, formatMoeda, inicioDoMes } from '@/lib/format';
 import { libera, NOME_PLANO } from '@/lib/plano';
 import { grafico } from '@/theme/grafico';
@@ -78,6 +79,8 @@ export default function Inicio() {
   const comIA = libera(meuPlano, 'insights');
   const insights = useInsights();
   const minha = useMinhaBarbearia();
+  const assinatura = useMinhaAssinatura();
+  const teste = assinatura.data?.status === 'teste' ? assinatura.data.teste_ate : null;
   const dono = minha.data?.papel === 'dono' && meuPlano === 'barbearias';
   const totalMes = useFinanceiro(mes, hoje, 'total');
   const primeiro = comIA ? insights.data?.[0] : undefined;
@@ -99,6 +102,14 @@ export default function Inicio() {
         <Chip testID="ver-mes" rotulo={formatMes(mes).split(' ')[0]!.replace(/^./, (c) => c.toUpperCase())} selecionado={visao === 'mes'}
           onPress={() => setVisao('mes')} desativado={!pago} />
       </View>
+
+      {teste ? (
+        <Cartao testID="aviso-teste" onPress={() => router.push('/planos')} accessibilityLabel="Ver o plano e o teste grátis">
+          <Texto variante="bodySm">
+            Teste grátis do plano {NOME_PLANO[meuPlano]} até {diaCurto(teste)}. Se não quiser continuar, cancele até lá em Mais › Cancelar plano e não paga nada.
+          </Texto>
+        </Cartao>
+      ) : null}
 
       {resumo.isPending ? <Carregando /> : resumo.isError || !r ? <EstadoErro onTentar={() => resumo.refetch()} /> : (
         <View style={styles.dupla}>

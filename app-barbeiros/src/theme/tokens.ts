@@ -6,6 +6,10 @@ export const color = {
   bg: '#050506',
   surface: 'rgba(255,255,255,0.06)',        // glass fill / grouped areas
   surfaceStrong: 'rgba(255,255,255,0.12)',  // active item (tab bubble, pressed row)
+  // Opaque twins of surface/surfaceStrong over bg: for faces that sit on a
+  // coloured lip (DuoButton), where a translucent face would show the lip.
+  surfaceSolid: '#141415',
+  surfaceStrongSolid: '#232324',
   border: 'rgba(255,255,255,0.10)',         // 1 px glass border
   highlight: 'rgba(255,255,255,0.22)',      // top edge shine of the glass
   overlay: 'rgba(0,0,0,0.62)',              // veil behind sheets and locks

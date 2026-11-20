@@ -96,6 +96,7 @@ Tese visual: fundo quase preto com uma **aurora** de cor (limão, lavanda, laran
 | `bg` | `#050506` | Fundo de todas as telas. |
 | `surface` | branco 6% | Preenchimento do vidro e de áreas agrupadas. |
 | `surfaceStrong` | branco 12% | Item ativo (bolha da aba ativa, linha pressionada). |
+| `surfaceSolid`, `surfaceStrongSolid` | `#141415`, `#232324` | As mesmas superfícies, opacas: face de botão que fica sobre um lábio colorido (`DuoButton` de erro e de sucesso, botão desativado). Com a face translúcida, o lábio vermelho ou verde aparecia através e escondia o texto (achado na Fase 7). |
 | `border` | branco 10% | Borda de 1 px do vidro, divisórias. |
 | `highlight` | branco 22% | Brilho da borda de cima do vidro. |
 | `overlay` | preto 62% | Véu atrás de gaveta e de tela bloqueada. |

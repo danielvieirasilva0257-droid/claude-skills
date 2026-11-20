@@ -5,6 +5,7 @@ import { Platform } from 'react-native';
 import { create } from 'zustand';
 
 import { supabase } from '@/lib/supabase';
+import { sairDaLoja } from '@/lib/loja';
 
 type SessaoState = {
   session: Session | null;
@@ -61,6 +62,7 @@ export async function entrarComGoogle(): Promise<string | null> {
 }
 
 export async function sair() {
+  await sairDaLoja();
   await supabase.auth.signOut();
 }
 

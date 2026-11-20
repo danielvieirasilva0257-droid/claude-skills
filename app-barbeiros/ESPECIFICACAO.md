@@ -1,6 +1,6 @@
 # App Barbeiros — especificação para construir no Claude Code
 
-**Fase atual:** Fase 7 (Assinaturas) · Fases 0 a 3 prontas em 19/11/2026; Fases 4, 5 e 6 e o visual v2 (vidro líquido) prontos em 20/11/2026
+**Fase atual:** Fase 8 (Qualidade) · Fases 0 a 3 prontas em 19/11/2026; Fases 4 a 7 e o visual v2 (vidro líquido) prontos em 20/11/2026 (na Fase 7, falta só a revisão jurídica dos textos)
 **Versão:** 1.1 · 19/11/2026
 **Fonte de negócio:** Plano de Negócio — App Barbeiros (https://claude.ai/artifact/S6HbgHKHwANXCssPUsmQAn). Se algo aqui contradizer o plano, pergunte ao Daniel.
 
@@ -379,9 +379,11 @@ Skills: dataviz (Claude) para os gráficos, *financial-design-systems, `../skill
 **Como ficou (20/11/2026):** migration `0006` com `barbearias`, `barbearia_membros` (papel `dono` ou `barbeiro`; um barbeiro em uma barbearia por vez; um dono por barbearia) e `barbearia_convites` (código de 6 letras sem I, O, 0 e 1, uso único, vale 7 dias). RLS próprio: a equipe lê a barbearia e os nomes; só o dono lê os convites; entrar, sair, convidar e remover só por funções. **As tabelas de cada barbeiro não ganharam política nova:** o dono lê a equipe só por `painel_barbearia`, `agenda_equipe` e `relatorio_barbeiro`, que conferem o papel; ele vê números e agenda (só o primeiro nome do cliente), nunca telefone, gastos pessoais nem conversas. `plano_efetivo()` virou a fonte única do plano: quem está na equipe de um dono com plano Barbearias usa o app como Premium; `meu_plano`, `consumir_ia`, `uso_mensagens_mes`, a rotina diária e as funções de canais e insights passaram a usá-la. Valor do plano pela equipe calculado no banco (R$ 179 com até 2 barbeiros + R$ 39 por barbeiro a mais; parâmetros `barbearias_*`). `relatorio_mes` virou `relatorio_mes_de(barbeiro, mês)` com as permissões de quem chama; a tela 27 reusa o mesmo conteúdo da aba Relatórios (`ConteudoRelatorio`). Telas: `barbearia` (sem barbearia: entrar com código ou criar; barbeiro da equipe: o que o dono vê e "Sair"; dono: painel), `barbearia/equipe`, `barbearia/agenda`, `barbearia/barbeiro/[id]`, cartão da casa no Início do dono e "Barbearia" no Mais. Seed com `dono.teste@example.com` (Barbearia Navalha, com o Barbeiro Teste na equipe). Testes: pgTAP (26 novos), Deno (1 novo) e E2E `barbearias` (painel, agenda, relatório, convite, barbeiro Grátis entra e vira Premium, valor sobe para R$ 218, dono remove).
 
 ### Fase 7 — Assinaturas e lançamento ✋
-- [ ] Provedor de assinatura decidido pelo Daniel e integrado
-- [ ] Preço de renovação claro, teste grátis com aviso, cancelamento pelo mesmo canal
-- [ ] Termos de uso e política de privacidade (revisão jurídica)
+- [x] Provedor de assinatura decidido pelo Daniel e integrado · RevenueCat (App Store e Google Play), escolhido dentro do "eu aprovo tudo" de 19/11; trocar de provedor é mexer só em `src/lib/loja.native.ts` e na função `assinatura-webhook`
+- [x] Preço de renovação claro, teste grátis com aviso, cancelamento pelo mesmo canal
+- [ ] Termos de uso e política de privacidade (revisão jurídica) · rascunhos prontos em `legal/` e no app (Mais e Planos), marcados como rascunho; falta a revisão jurídica e preencher razão social, CNPJ, encarregado (DPO) e prazos
+
+**Como ficou (20/11/2026):** migration `0007`: `app_assinatura` ganhou `loja`, `teste_ate` e `problema_cobranca`; `assinatura_eventos` guarda cada evento uma vez (o RevenueCat reenvia); `aplicar_evento_assinatura` (só o servidor) trata compra, renovação, teste grátis, cancelamento (vale até o fim do período), problema de cobrança e fim (volta para o Grátis, dados ficam); `plano_efetivo` dá 3 horas de tolerância para a renovação da loja chegar; `minha_assinatura` alimenta as telas. Função `assinatura-webhook` confere o cabeçalho `Authorization` com o segredo `REVENUECAT_WEBHOOK_AUTH` (nunca aceita sem ele) e as funções de webhook ficaram com `verify_jwt = false` no `config.toml`. App: `react-native-purchases` 11.0.1 só no celular (`loja.native.ts`; no navegador `loja.ts` explica onde assinar), `logIn` com o id do barbeiro, uma oferta por plano com pacotes mensal e anual; a tela Planos mostra o preço da loja, "Renova sozinho por R$ X por mês até você cancelar" logo acima do botão, o teste grátis com a data até a qual dá para cancelar sem pagar, "Restaurar compras" e os links de Termos e Privacidade; o Início avisa enquanto o teste grátis corre; "Cancelar plano" no Mais diz em que loja foi a assinatura, o caminho para cancelar e abre a loja. Testes: pgTAP (9 novos), Deno (3 novos) e E2E `assinaturas` (teste grátis, cancelamento e fim simulados pelo webhook). Para vender de verdade faltam a conta no RevenueCat, os produtos nas lojas e as chaves (seção 12).
 
 ### Fase 8 — Qualidade (em todas as fases)
 Skills: `../skills/design/review-animations`, `../skills/design/web-design-guidelines`, `../skills/sites/web-quality/accessibility`, `../skills/sites/webapp-testing`, `../skills/sites/playwright-cli`.
@@ -399,7 +401,7 @@ Skills: `../skills/design/review-animations`, `../skills/design/web-design-guide
 ## 12. Decisões pendentes (perguntar ao Daniel)
 
 1. Nome do app e logo.
-2. Provedor de assinatura (RevenueCat ou gateway próprio).
+2. Provedor de assinatura (RevenueCat ou gateway próprio). · RevenueCat implementado na Fase 7; falta criar a conta, os produtos nas lojas e as chaves.
 3. Provedor e modelo do LLM.
 4. Arte final do mascote (nota de dinheiro com asinhas) no Rive.
 5. Voz no Premium (ElevenLabs) entra no lançamento ou depois.

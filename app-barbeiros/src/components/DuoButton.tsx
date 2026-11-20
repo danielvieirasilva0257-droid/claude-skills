@@ -34,8 +34,8 @@ const LABIO = 4;
 
 const faces: Record<Aparencia, { face: string; labio: string; texto: keyof typeof color; borda?: string }> = {
   normal: { face: color.brand, labio: color.brandLip, texto: 'onBrand' },
-  sucesso: { face: color.surfaceStrong, labio: color.brandLip, texto: 'brand' },
-  erro: { face: color.surface, labio: color.danger, texto: 'danger', borda: color.danger },
+  sucesso: { face: color.surfaceStrongSolid, labio: color.brandLip, texto: 'brand' },
+  erro: { face: color.surfaceSolid, labio: color.danger, texto: 'danger', borda: color.danger },
 };
 
 export function DuoButton({
@@ -87,7 +87,7 @@ export function DuoButton({
       <Animated.View
         style={[
           styles.face,
-          { backgroundColor: desativado ? color.surface : visual.face },
+          { backgroundColor: desativado ? color.surfaceSolid : visual.face },
           visual.borda && !desativado ? { borderWidth: 1, borderColor: visual.borda } : null,
           desativado ? styles.faceDesativada : null,
           faceAnimada,

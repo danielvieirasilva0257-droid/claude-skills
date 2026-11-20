@@ -8,6 +8,7 @@ import { StyleSheet, View } from 'react-native';
 import { BottomSheet } from '@/components/BottomSheet';
 import { Campo } from '@/components/Campo';
 import { Chip } from '@/components/Chip';
+import { DuoButton } from '@/components/DuoButton';
 import { LinhaMenu } from '@/components/LinhaMenu';
 import { SecondaryButton } from '@/components/SecondaryButton';
 import { StatusButton } from '@/components/StatusButton';
@@ -15,6 +16,9 @@ import { TelaBase } from '@/components/TelaBase';
 import { Texto } from '@/components/Texto';
 import { sair, useSessao } from '@/features/auth/sessao';
 import { useMinhaBarbearia } from '@/features/barbearia/api';
+import { diaCurto, useMinhaAssinatura } from '@/features/planos/assinatura';
+import { gerenciarAssinatura } from '@/lib/loja';
+import { ONDE_CANCELAR } from '@/lib/loja-links';
 import { NOME_PAGAMENTO, useBarbeiro, usePlano, type FormaPagamento } from '@/features/conta/barbeiro';
 import { ATALHOS } from '@/features/conta/atalhos';
 import { exportarCSV, NOME_EXPORTACAO, type TipoExportacao } from '@/features/conta/exportar';
@@ -43,6 +47,7 @@ export default function Mais() {
   const [saindo, setSaindo] = useState(false);
   const meuPlano = plano.data ?? 'gratis';
   const minha = useMinhaBarbearia();
+  const assinatura = useMinhaAssinatura();
 
   function abrirTaxas() {
     setDebito(pct(barbeiro.data?.taxa_debito));
@@ -94,6 +99,8 @@ export default function Mais() {
         <LinhaMenu testID="mais-exportar" rotulo="Exportar meus dados" detalhe="Planilha CSV, em qualquer plano" onPress={() => setFolha('exportar')} />
         <LinhaMenu testID="mais-cancelar" rotulo="Cancelar plano" detalhe={meuPlano === 'gratis' ? 'Você está no Grátis' : `Plano ${NOME_PLANO[meuPlano]}`}
           onPress={() => setFolha('cancelar')} />
+        <LinhaMenu testID="mais-termos" rotulo="Termos de uso" onPress={() => router.push({ pathname: '/legal/[doc]', params: { doc: 'termos' } })} />
+        <LinhaMenu testID="mais-privacidade" rotulo="Política de privacidade" onPress={() => router.push({ pathname: '/legal/[doc]', params: { doc: 'privacidade' } })} />
       </View>
 
       <SecondaryButton testID="mais-sair" rotulo="Sair" tom="perigo" carregando={saindo}
@@ -117,14 +124,28 @@ export default function Mais() {
       <BottomSheet aberto={folha === 'cancelar'} onFechar={() => setFolha(null)} titulo="Cancelar plano" testID="cancelar-sheet">
         {meuPlano === 'gratis' ? (
           <Texto>Você está no plano Grátis. Não há nada para cancelar nem cobrança nenhuma.</Texto>
-        ) : (
+        ) : assinatura.data?.pela_equipe ? (
+          <Texto testID="cancelar-equipe">
+            Seu Premium vem da equipe da barbearia: não há cobrança sua. Para sair da equipe, vá em Mais › {minha.data?.nome ?? 'Barbearia'}.
+          </Texto>
+        ) : assinatura.data?.provedor === 'revenuecat' && assinatura.data.loja ? (
           <>
             <Texto>
-              Você pode cancelar quando quiser, pelo mesmo lugar onde assinou. O plano continua até o fim do período já pago e
-              depois volta para o Grátis. Seus dados continuam aqui e você pode exportar tudo.
+              {assinatura.data.cancela_no_fim && assinatura.data.renova_em
+                ? `A renovação já está desligada: o plano vale até ${diaCurto(assinatura.data.renova_em)} e depois volta para o Grátis.`
+                : `Você assinou pela ${assinatura.data.loja === 'app_store' ? 'App Store' : assinatura.data.loja === 'play_store' ? 'Google Play' : 'loja'}. `
+                  + 'Cancelando, o plano continua até o fim do período já pago e depois volta para o Grátis. Seus dados continuam aqui.'}
             </Texto>
-            <Texto variante="bodySm" cor="textMuted">O botão de cancelar da loja entra junto com as assinaturas (Fase 7).</Texto>
+            <Texto variante="bodySm" cor="textMuted">Onde cancelar: {ONDE_CANCELAR[assinatura.data.loja]}.</Texto>
+            {assinatura.data.cancela_no_fim ? null : (
+              <DuoButton testID="cancelar-na-loja" rotulo="Cancelar na loja" aparencia="erro"
+                onPress={() => gerenciarAssinatura(assinatura.data!.loja).catch((e: Error) => setAviso(e.message))} />
+            )}
           </>
+        ) : (
+          <Texto testID="cancelar-manual">
+            Este plano foi liberado sem cobrança (conta de teste). Não há nada para cancelar na loja; se quiser voltar para o Grátis, fale com o suporte.
+          </Texto>
         )}
         <SecondaryButton rotulo="Fechar" onPress={() => setFolha(null)} />
       </BottomSheet>

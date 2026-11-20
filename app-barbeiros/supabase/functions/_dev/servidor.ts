@@ -1,4 +1,4 @@
-// Local stand-in for the Edge Runtime: serves every AI function at
+// Local stand-in for the Edge Runtime: serves every function at
 // http://127.0.0.1:54329/functions/v1/<name>. Used in development and in the
 // browser E2E tests (the cloud container cannot run the edge-runtime image).
 import { handler as chat } from '../ia-chat/handler.ts';
@@ -10,6 +10,7 @@ import { handler as canalEnviar } from '../canal-enviar/handler.ts';
 import { handler as enviarFila } from '../enviar-fila/handler.ts';
 import { handler as instagram } from '../instagram-webhook/handler.ts';
 import { handler as whatsapp } from '../whatsapp-webhook/handler.ts';
+import { handler as assinatura } from '../assinatura-webhook/handler.ts';
 
 const rotas: Record<string, (req: Request) => Promise<Response>> = {
   'ia-chat': chat,
@@ -21,6 +22,7 @@ const rotas: Record<string, (req: Request) => Promise<Response>> = {
   'enviar-fila': enviarFila,
   'instagram-webhook': instagram,
   'whatsapp-webhook': whatsapp,
+  'assinatura-webhook': assinatura,
 };
 
 const porta = Number(Deno.env.get('PORTA_FUNCOES') ?? 54329);
