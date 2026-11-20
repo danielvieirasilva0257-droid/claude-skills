@@ -166,6 +166,35 @@ Logins de teste (só no banco local, senha `senha-teste-123`): `barbeiro.teste@e
 - **E2E:** banco recriado antes de cada fluxo; celebrações em sequência usam o mesmo painel; procurar texto dentro do `testID` da tela, porque a tela anterior continua montada e escondida.
 - **axe no React Native Web:** `aria-checked` em vez de `accessibilityState.checked`; `Pressable` com rótulo precisa de papel; área de rolagem com `tabIndex={0}` no navegador.
 
+## Logo, modo demonstração e APK (20/11/2026)
+
+Pedido do Daniel: "Termine o protótipo, crie uma logo e faça o APK".
+
+1. **Logo:** poste de barbearia em verde-limão, com as listras subindo para a direita (o resultado da cadeira crescendo), sobre o preto do app.
+   - A primeira ideia (três barras de gráfico com o topo inclinado) parecia o ícone de sinal do celular e foi descartada.
+   - A segunda (poste com uma bola em cima) formava um "i" ao lado da palavra ("ibarbeiros"). A versão final tem pino, tampas largas em cima e embaixo e o corpo listrado.
+   - Tudo em vetor, gerado por script: `scripts/gerar_marca.py` escreve os SVGs em `assets/marca/` (com a palavra "barbeiros" em curvas da Inter ExtraBold) e `scripts/renderizar-marca.mjs` gera os ícones do app (`npm run marca`). Alternativa guardada: a nota com asinhas (`alternativa-nota.svg`).
+   - No app: componente `Marca` (mesma geometria em `react-native-svg`) na tela de entrar.
+2. **Modo demonstração** (`EXPO_PUBLIC_DEMO=1`): o app funciona no celular sem servidor.
+   - `npm run demo:gravar` abre todas as telas no navegador com as contas de teste (banco local e funções locais) e grava cada resposta em `src/features/demo/gravacao.json` (cerca de 120 respostas e 4 perguntas do chat).
+   - No celular, `fetchDemo` responde o Supabase (login, tabelas e funções do banco) e as funções a partir da gravação. As datas da pergunta viram relativas a hoje (D-3, M-1, sem a hora) e as da resposta andam com o calendário, então "hoje" continua hoje.
+   - Na tela de entrar há um botão para cada conta (barbeiro e dono). Nada é salvo, e o Início e o Mais avisam isso.
+   - A gravação só entra no build de demonstração: o `require` fica atrás de `process.env.EXPO_PUBLIC_DEMO === '1'`, que o Metro troca por um valor fixo e corta.
+   - Testes: `src/features/demo/__tests__/chave.test.ts` (Jest) e `npm run demo:web && npm run demo:testar` (navegador com o servidor local **bloqueado**).
+3. **APK** (`npm run apk`): Android, pacote provisório `br.com.appbarbeiros`, só arm64 (quase todos os celulares atuais; metade do tempo de build), assinado com a chave de debug (serve para instalar direto, não para a loja).
+
+**Aprendizados do APK no container da nuvem:**
+
+- **Rede:** o Android SDK vem de `dl.google.com` e o Supabase na nuvem de `api.supabase.com`. Os dois foram liberados no ambiente novo `claude-skills` (criado nesta sessão, com o script de preparo `npm ci`).
+- **`jitpack.io` bloqueado:** o `expo-blur` do Android depende de uma biblioteca de lá. Ele ficou fora do Android (`expo.autolinking.android.exclude`), com o componente `Desfoque` por plataforma: no Android, véu escuro no lugar do desfoque.
+- **Maven Central responde 429 (muitos pedidos)** ao proxy compartilhado, inclusive pelos redirecionamentos do portal de plugins do Gradle. A solução foi o espelho público do Google (`maven-central.storage-download.googleapis.com`) primeiro em todas as listas, por um `--init-script` só deste build (`scripts/apk/espelho-maven.gradle`). Um init script global em `~/.gradle` foi barrado pelo sistema de permissões.
+  - Ao declarar repositório de plugin no init script, o portal padrão some: é preciso pôr `gradlePluginPortal()` e `google()` de volta.
+- **Java:** o plugin do React Native pede Java 17 (o container tem 21) e o download automático (foojay) é bloqueado. Instale `openjdk-17-jdk-headless` e passe `-Porg.gradle.java.installations.paths=...`.
+- **SDK novo:** o `sdkmanager` virou "Android CLI" e não tem mais `--licenses`; `yes |` com `pipefail` sai com 141 (SIGPIPE). As licenças são aceitas na própria instalação.
+- **Versões do RN 0.88:** compileSdk 37, build-tools 37.0.0, NDK 27.1.12297006, AGP 9.2.1, Gradle 9.4.1.
+
+**Pendente:** o token do Supabase colado duas vezes não é um token pessoal (a API responde "JWT could not be decoded"). Com um token `sbp_…` (Account › Access Tokens), dá para criar o projeto na nuvem (região São Paulo), aplicar as migrations e o seed, publicar as funções e gerar o APK com servidor de verdade (`EXPO_PUBLIC_DEMO=0`).
+
 ## Pendências (fora do código)
 
 1. **Modelo da IA:** o padrão é `claude-opus-5-5` (regra da skill da API). Para o custo-alvo de R$ 0,50 a R$ 2 por barbeiro por mês, a troca para `claude-haiku-5-5` é decisão do Daniel (`LLM_MODEL`). Falta a chave da API nos secrets do Supabase.
@@ -173,11 +202,11 @@ Logins de teste (só no banco local, senha `senha-teste-123`): `barbeiro.teste@e
 3. **WhatsApp e Instagram de verdade:** credenciais da Meta (app, número, tokens); hoje roda em modo simulado.
 4. **Assinaturas:** conta no RevenueCat, produtos nas lojas (entitlements `pago`, `premium`, `plus`, `barbearias`) e as chaves `EXPO_PUBLIC_REVENUECAT_*` e `REVENUECAT_WEBHOOK_AUTH`.
 5. **Revisão jurídica** de `legal/termos-de-uso.md` e `legal/politica-de-privacidade.md` (razão social, CNPJ, encarregado, prazos).
-6. **Nome, logo, `bundleIdentifier`/`package`** e a **arte final do mascote** no Rive.
+6. **Nome** (a logo já existe; o pacote `br.com.appbarbeiros` é provisório) e a **arte final do mascote** no Rive.
 7. **MEI 2026:** limite de R$ 81 mil por ano e DAS de serviços R$ 86,05 (5% do salário mínimo de R$ 1.621 + R$ 5 de ISS), gravados em `parametros` por ano. Conferir quando sair o salário mínimo de 2027.
 
 ## Próximo passo
 
-1. Daniel olha os prints, testa num build de desenvolvimento e decide as pendências acima.
+1. Daniel instala o APK de demonstração, olha a logo e decide as pendências acima (o token do Supabase destrava o APK com servidor).
 2. Rodar os fluxos do Maestro (`app-barbeiros/.maestro/`) no celular.
 3. Depois do app: site de venda (`skills/combos/combo-site-premium`) e vídeos (`skills/combos/combo-video-explicativo`).
