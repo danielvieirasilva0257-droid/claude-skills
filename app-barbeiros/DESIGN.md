@@ -112,7 +112,7 @@ Tese visual: fundo quase preto com uma **aurora** de cor (limão, lavanda, laran
 | `gold` | `#F5C451` | Premium Plus, moedas da conquista. |
 | `wave` / `bill` | `#FACC15` / `#22C55E` | Só a onda do `ConquistaButton` e as notinhas. |
 
-Cores dos planos (cadeado e selo): Grátis `#8A8F98`, Pago `#C5F23A`, Premium `#9AA8FF`, Plus `#F5C451`, Barbearias `#F4F4F0`. Mascote com cores próprias (`mascote` nos tokens), iguais em qualquer tema.
+Cores dos planos (cadeado e selo): Grátis `#8A8F98`, Pago `#C5F23A`, Premium `#9AA8FF`, Plus `#F5C451`, Barbearias `#F4F4F0`.
 
 ## Typography
 
@@ -191,5 +191,5 @@ Contrastes conferidos acima (todos ≥ 6:1). Toque ≥ 44 × 44 (botões 52, aba
 ## Decisões em aberto
 
 - Nome do app e logo (seção 12 da especificação).
-- Arte final do mascote no Rive (o SVG mostra a forma e os 4 estados).
+- ~~Arte final do mascote no Rive.~~ Sem mascote (decisão do Daniel, 20/11/2026): a celebração mostra o ícone da conquista (bandeira, troféu, seta subindo, selo).
 - Tema claro: fora do escopo (o app é escuro, como nas referências).

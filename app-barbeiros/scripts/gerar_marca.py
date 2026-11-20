@@ -1,6 +1,6 @@
 """App Barbeiros brand: a barber pole in lime whose stripes rise to the right
-(the result going up), the app icon, the horizontal logo and an alternative
-(the winged banknote mascot).
+(the result going up), the app icon and the horizontal logo. No mascot
+(Daniel's decision, 20/11/2026).
 Writes SVGs to assets/marca/. Colours from src/theme/tokens.ts.
 Run: python3 scripts/gerar_marca.py   (then node scripts/renderizar-marca.mjs)
 """
@@ -17,7 +17,6 @@ FONTE = RAIZ / "node_modules/@expo-google-fonts/inter/800ExtraBold/Inter_800Extr
 BG = "#050506"      # color.bg
 LIMA = "#C5F23A"    # color.brand
 TEXTO = "#F4F4F0"   # color.text
-ESCURO = "#0B0F02"  # color.onBrand
 
 # ---- Mark: a barber pole drawn in lime, its stripes rising to the right
 # (the result going up). On a 1024 grid; the stripes are cut-outs, so the
@@ -73,18 +72,6 @@ def texto_em_curvas(texto: str, tamanho: float, x: float, y_base: float, cor: st
     return f'<path d="{" ".join(caminhos)}" fill="{cor}"/>', largura
 
 
-def nota_com_asas() -> str:
-    """Alternative B: the mascot as a mark (banknote with little wings)."""
-    asa = (f'<path d="M232 470 C150 430 96 470 92 540 C150 520 196 540 232 590 Z" fill="{TEXTO}"/>'
-           f'<path d="M792 470 C874 430 928 470 932 540 C874 520 828 540 792 590 Z" fill="{TEXTO}"/>')
-    nota = (f'<rect x="232" y="352" width="560" height="320" rx="56" fill="{LIMA}"/>'
-            f'<rect x="276" y="396" width="472" height="232" rx="28" fill="none" stroke="{ESCURO}" '
-            f'stroke-width="10" stroke-dasharray="22 16" opacity="0.55"/>')
-    rs, largura = texto_em_curvas("R$", 168, 0, 0, ESCURO, 0)
-    rs = f'<g transform="translate({512 - largura / 2} {578})">{rs}</g>'
-    return asa + nota + rs
-
-
 def main() -> None:
     SAIDA.mkdir(parents=True, exist_ok=True)
     fundo = f'<rect width="1024" height="1024" fill="{BG}"/>'
@@ -112,8 +99,6 @@ def main() -> None:
     (SAIDA / "logo-horizontal-fundo.svg").write_text(svg(
         f'<rect x="-80" y="-80" width="{round(total) + 160}" height="{round(altura_marca) + 160}" fill="{BG}"/>' + marca + texto_g,
         round(total) + 160, round(altura_marca) + 160, f"-80 -80 {round(total) + 160} {round(altura_marca) + 160}"))
-    # Alternative B.
-    (SAIDA / "alternativa-nota.svg").write_text(svg(fundo + nota_com_asas(), 1024, 1024))
     print("ok", sorted(p.name for p in SAIDA.glob("*.svg")))
 
 

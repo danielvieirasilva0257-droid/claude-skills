@@ -7,7 +7,6 @@ import { Cartao } from '@/components/Cartao';
 import { Dinheiro } from '@/components/Dinheiro';
 import { Carregando, EstadoErro, EstadoVazio } from '@/components/Estado';
 import { InsightCard } from '@/components/InsightCard';
-import { Mascote } from '@/components/Mascote';
 import { SecondaryButton } from '@/components/SecondaryButton';
 import { TelaBase } from '@/components/TelaBase';
 import { Texto } from '@/components/Texto';
@@ -72,10 +71,7 @@ function Insights() {
       <Texto variante="bodySm" cor="textMuted">Os números vêm do app. A IA só explica e sugere o que fazer hoje.</Texto>
       {insights.isPending ? <Carregando /> : insights.isError ? <EstadoErro onTentar={() => insights.refetch()} /> :
         insights.data.length === 0 ? (
-          <View style={styles.vazio}>
-            <Mascote estado="pensando" tamanho={90} />
-            <EstadoVazio titulo="Nenhum insight hoje ainda" texto="Eles chegam toda manhã e quando você fecha o caixa." />
-          </View>
+          <EstadoVazio titulo="Nenhum insight hoje ainda" texto="Eles chegam toda manhã e quando você fecha o caixa." />
         ) : insights.data.map((i) => (
           <InsightCard key={i.id} testID="insight" titulo={i.titulo} numero={i.numero} porque={i.porque} acao={i.acao} botao={i.botao}
             onPress={i.botao && DESTINO[i.botao] ? () => router.push(DESTINO[i.botao!]!) : undefined} />
@@ -99,5 +95,4 @@ export default function TelaInsights() {
 const styles = StyleSheet.create({
   bloco: { gap: space[2] },
   carrossel: { gap: space[3] },
-  vazio: { alignItems: 'center' },
 });

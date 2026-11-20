@@ -39,7 +39,6 @@ Diferencial: registro de oferta → narrativa → aceitação; comissão escalon
 | App | Expo (SDK estável mais recente, mínimo 53 por causa do Rive) + React Native + TypeScript estrito |
 | Navegação | Expo Router (abas + stacks) |
 | Animação | react-native-reanimated 4 + react-native-gesture-handler |
-| Mascote | @rive-app/react-native (exige dev build, não roda no Expo Go) |
 | Confete / partículas | react-native-fast-confetti ou @shopify/react-native-skia |
 | Vibração / som | expo-haptics / expo-audio (som desligado por padrão) |
 | Gráficos | @shopify/react-native-skia (ou victory-native, que usa Skia) |
@@ -85,7 +84,6 @@ app-barbeiros/
 │   ├── functions/ia-narrativa/
 │   ├── functions/ia-entrevista/
 │   └── seed.sql                 # dados de exemplo para desenvolvimento
-└── assets/rive/mascote.riv      # nota de dinheiro com asinhas (Fase 2)
 ```
 
 ---
@@ -172,7 +170,6 @@ Regras: números com `fontVariant: ['tabular-nums']`; um botão principal por te
 | `Chip` | serviços e formas de pagamento; pop 0,96 → 1 ao escolher |
 | `BottomSheet` | sobe com `motion.springCalm` |
 | `LockedScreen` | cadeado no metal do plano + prévia borrada com dados reais + "Conhecer o plano" |
-| `Mascote` | Rive com estados: parado, comemorando, pensando, preocupado leve |
 
 ### ConquistaButton ("pulo com dinheiro") — aprovado em 19/11
 
@@ -330,7 +327,7 @@ Skills: `../skills/design/ui-ux-pro-max` (DESIGN.md), `../skills/design/estilos-
 - [x] `ConquistaButton` igual à tabela; frames de início, meio e fim enviados ao Daniel ✋ aprovação 2 (aprovado em 19/11)
 - [x] Reduzir movimento funcionando em todos os componentes
 
-**Como ficou (19/11/2026):** `DESIGN.md` na pasta do app; componentes em `src/components/` (mais `Texto`, `Cartao` e `Estado` para vazio, carregando e erro); curvas e "reduzir movimento" em `src/theme/motion.ts` (`useMovimentoReduzido` lê o sistema e ouve a mudança); anel de foco só com teclado (`useFocoVisivel`). Galeria em `/dev/componentes` (só com `EXPO_PUBLIC_GALERIA=1`) e `npm run galeria` tira os prints e os frames do `ConquistaButton` com o relógio do navegador parado (0, 60, 180, 300, 420, 540, 720, 900 e 1.210 ms). Decisões: notas e moedas com Reanimated (12 `Animated.View`, sem Skia); gráficos com `react-native-svg`; mascote em SVG com os 4 estados até a arte final do Rive.
+**Como ficou (19/11/2026):** `DESIGN.md` na pasta do app; componentes em `src/components/` (mais `Texto`, `Cartao` e `Estado` para vazio, carregando e erro); curvas e "reduzir movimento" em `src/theme/motion.ts` (`useMovimentoReduzido` lê o sistema e ouve a mudança); anel de foco só com teclado (`useFocoVisivel`). Galeria em `/dev/componentes` (só com `EXPO_PUBLIC_GALERIA=1`) e `npm run galeria` tira os prints e os frames do `ConquistaButton` com o relógio do navegador parado (0, 60, 180, 300, 420, 540, 720, 900 e 1.210 ms). Decisões: notas e moedas com Reanimated (12 `Animated.View`, sem Skia); gráficos com `react-native-svg`; o mascote em SVG que havia aqui saiu em 20/11/2026 (sem mascote, decisão do Daniel).
 
 ### Fase 2 — Plano Grátis (telas 1–5) ✋
 Skills: `../skills/design/ui-ux-pro-max`, `../skills/combos/combo-copy-humanizada` (textos), `../skills/sites/cro` (onboarding).
@@ -351,7 +348,7 @@ Skills: dataviz (Claude) para os gráficos, *financial-design-systems, `../skill
 - [x] MEI com alerta em 80% e 100%
 - [x] `sugerir_ofertas` mostrado quando o cliente senta, com narrativa
 - [x] Edge Functions `ia-insights`, `ia-chat`, `ia-narrativa`, `ia-entrevista` com saída validada
-- [x] Celebrações com `ConquistaButton` e mascote em 50%/100% da meta
+- [x] Celebrações com `ConquistaButton` em 50%/100% da meta · com o ícone da conquista; o mascote saiu em 20/11/2026 (o Daniel não quer mascote)
 - [x] `LockedScreen` com prévia borrada para quem está no Grátis
 
 **Como ficou (19/11/2026):** migration `0004` (parâmetros por ano com MEI 2026: limite R$ 81 mil, DAS serviços R$ 86,05; `v_clientes_lista`, `financeiro`, `progresso_meta`, `definir_meta`, conquistas, `v_mapa_calor`, `relatorio_mes`, `resumo_semana`, regra de comissão com faixas que emendam, `extrato_completo`, `mei_ano`, `sinais_insights`, `contexto_ia` sem nome nem telefone, `consumir_ia` com limite diário por plano). Edge Functions em `supabase/functions/` com o SDK oficial da Anthropic (`@anthropic-ai/sdk` 1.10.0): saída estruturada (`zodOutputFormat`) validada de novo com zod, `fallbacks: "default"` para recusa, chat em streaming, nomes trocados por "Cliente N" e de volta só na tela; **o número de cada insight é o do banco, nunca o da IA**. `LLM_PROVIDER=mock` (padrão) escreve textos a partir dos números, sem custo; `LLM_PROVIDER=anthropic` + `LLM_API_KEY` usa a IA de verdade. **Modelo:** `LLM_MODEL` vem `claude-opus-5-5` (o padrão da skill da API); para caber no custo-alvo de R$ 0,50 a R$ 2 por barbeiro/mês, a troca para `claude-haiku-5-5` é decisão do Daniel (seção 12). Gráficos com cores validadas pela skill `dataviz` (`src/theme/grafico.ts`), uma série por eixo, legenda, toque para ver o valor e "Ver em tabela". Testes: pgTAP (15 novos), Deno das funções (6, `npm run test:funcoes`) e E2E do plano Pago (insights, relatórios, meta com celebração de 50%, comissão, extrato, clientes, entrevista, chat, coach, MEI, financeiro, ofertas na cadeira) e do bloqueio no Grátis.
@@ -403,7 +400,7 @@ Skills: `../skills/design/review-animations`, `../skills/design/web-design-guide
 1. Nome do app e logo. · Logo feita em 20/11/2026: poste de barbearia em verde-limão com as listras subindo (`assets/marca/`); nome ainda provisório ("App Barbeiros", pacote `br.com.appbarbeiros`).
 2. Provedor de assinatura (RevenueCat ou gateway próprio). · RevenueCat implementado na Fase 7; falta criar a conta, os produtos nas lojas e as chaves.
 3. Provedor e modelo do LLM.
-4. Arte final do mascote (nota de dinheiro com asinhas) no Rive.
+4. ~~Arte final do mascote no Rive.~~ Decidido em 20/11/2026: sem mascote.
 5. Voz no Premium (ElevenLabs) entra no lançamento ou depois.
 6. Aprovação do combo-app-premium e das 11 skills externas.
 

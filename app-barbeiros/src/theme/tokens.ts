@@ -27,8 +27,6 @@ export const color = {
 
 export const plano = { gratis: '#8A8F98', pago: '#C5F23A', premium: '#9AA8FF', plus: '#F5C451', barbearias: '#F4F4F0' } as const;
 
-// Mascot art colors: the same in any theme (art, not UI).
-export const mascote = { nota: '#22C55E', borda: '#0F5F2D', rosto: '#DCFCE7', olho: '#0F1A14', asa: '#FFFFFF', pensando: '#1D4ED8' } as const;
 
 // Aurora behind the top of the screens (atmosphere for the glass to refract).
 export const aurora = { lima: '#C5F23A', lavanda: '#7C6CFF', laranja: '#FF6A3D' } as const;

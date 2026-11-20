@@ -15,7 +15,7 @@ Esta pasta é o código do App Barbeiros. Antes de qualquer tarefa:
 - **Chaves de API** ficam em `.env` (ignorado pelo git) e nos secrets do Supabase. Nunca no repositório.
 - **Visual (versão 2, 20/11/2026):** escuro com vidro líquido (Liquid Glass), verde-limão #C5F23A no dinheiro e na ação, lavanda #9AA8FF só na IA, pílula branca no selecionado. Nada do Rotina. Tokens em `src/theme/tokens.ts`; componente nunca recebe hex direto; vidro sempre pelo componente `Vidro`.
 - **Antes de mudar qualquer UI, leia `DESIGN.md`.** Cores, tipografia e espaço vêm dele; campos, textos, estados e comportamento vêm da especificação. Use os componentes de `src/components/` (`Texto`, `DuoButton`, `Cartao`, `Estado`…) em vez de estilos soltos.
-- **Animação:** o que se usa dezenas de vezes por dia é rápido e sem quique. Encanto (confete de dinheiro, pulo, mascote) só em metas e conquistas. Sempre respeite "reduzir movimento".
+- **Animação:** o que se usa dezenas de vezes por dia é rápido e sem quique. Encanto (confete de dinheiro, pulo) só em metas e conquistas. **Sem mascote** (decisão do Daniel, 20/11/2026): conquista mostra o ícone dela. Sempre respeite "reduzir movimento".
 - **Acessibilidade:** toque mínimo 44×44, contraste conferido, nada informado só por cor (sempre sinal, seta ou rótulo).
 - **Sem dark patterns:** cancelamento visível, sem culpa, sem contagem regressiva falsa, exportação de dados em todos os planos.
 - **Peça aprovação do Daniel** nos pontos marcados com ✋ na especificação (DESIGN.md, telas, animações por frames, revisão final).

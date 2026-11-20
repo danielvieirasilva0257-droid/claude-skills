@@ -52,9 +52,7 @@ try {
   const resultado = await page.getByTestId('segurar-resultado').innerText();
   if (!resultado.includes('Apagado')) throw new Error(`HoldToConfirm não confirmou: ${resultado}`);
 
-  // Mascot celebrating, bottom sheet open.
-  await page.getByTestId('mascote-btn-comemorando').click();
-  await page.waitForTimeout(1200);
+  // Bottom sheet open.
   await page.getByTestId('abrir-gaveta').click();
   await page.waitForTimeout(700);
   await page.screenshot({ path: join(saida, 'gaveta.png'), clip: { x: 0, y: 0, width: 390, height: 844 } });

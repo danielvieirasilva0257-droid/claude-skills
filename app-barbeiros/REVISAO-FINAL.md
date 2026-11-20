@@ -18,7 +18,7 @@ Tudo o que se mexe no app foi conferido contra os 10 padrões da skill. Não fic
 | `BottomSheet`: entra com mola calma, sai em 200 ms `easeOut` | Mantido | Saída mais rápida que a entrada; véu só em opacidade |
 | `StatusButton`: tremida de 4 px, 5 × 40 ms, só no erro | Mantido | Raro, 200 ms no total, desligado com "reduzir movimento" |
 | `MetaRing`: mola de 900 ms | Mantido, com justificativa | Tela aberta poucas vezes por semana; o anel enchendo explica o progresso. Com "reduzir movimento" vai direto ao valor |
-| `ConquistaButton` (ondas de 520 ms e dinheiro) e mascote | Mantido | Só em momentos raros (fechar o caixa, metas); aprovado por frames na Fase 1; com "reduzir movimento" vira só troca de cor de 150 ms |
+| `ConquistaButton` (ondas de 520 ms e dinheiro) | Mantido | Só em momentos raros (fechar o caixa, metas); aprovado por frames na Fase 1; com "reduzir movimento" vira só troca de cor de 150 ms. O mascote saiu depois desta revisão (20/11/2026): a celebração mostra o ícone da conquista, parado |
 | Aurora do fundo | Mantido | Parada: não há laço decorativo rodando |
 
 Veredito: **aprovado**. Nada anima em ação de alta frequência, nenhuma curva `ease-in` em interface, só `transform` e `opacity`, e "reduzir movimento" é respeitado em todos os componentes (`useMovimentoReduzido`).

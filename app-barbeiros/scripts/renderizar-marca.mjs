@@ -35,7 +35,7 @@ await page.setViewportSize({ width: 512, height: 512 });
 await page.setContent('<html><body style="margin:0;background:#050506"></body></html>');
 await page.screenshot({ path: join(root, 'assets/images/android-icon-background.png') });
 
-// Preview sheet: icon on a phone grid (rounded), adaptive circle, horizontal logo, alternative.
+// Preview sheet: icon (rounded), adaptive circle, small sizes, horizontal logo.
 const b64 = (f) => `data:image/svg+xml;base64,${Buffer.from(marca(f)).toString('base64')}`;
 await page.setViewportSize({ width: 1500, height: 900 });
 await page.setContent(`<html><body style="margin:0;background:#1c1c1f;font-family:sans-serif;color:#ddd">
@@ -43,7 +43,6 @@ await page.setContent(`<html><body style="margin:0;background:#1c1c1f;font-famil
   <figure style="margin:0;text-align:center"><img src="${b64('icone.svg')}" width="300" style="border-radius:68px"><figcaption>Ícone (iPhone)</figcaption></figure>
   <figure style="margin:0;text-align:center"><div style="width:300px;height:300px;border-radius:50%;background:#050506;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="${b64('android-frente.svg')}" width="440"></div><figcaption>Ícone adaptável (Android)</figcaption></figure>
   <figure style="margin:0;text-align:center"><img src="${b64('icone.svg')}" width="96" style="border-radius:22px"><img src="${b64('icone.svg')}" width="60" style="border-radius:14px;margin-left:20px"><figcaption>Tamanhos pequenos</figcaption></figure>
-  <figure style="margin:0;text-align:center"><img src="${b64('alternativa-nota.svg')}" width="300" style="border-radius:68px"><figcaption>Alternativa: nota com asas</figcaption></figure>
 </div>
 <div style="padding:0 56px"><img src="${b64('logo-horizontal-fundo.svg')}" height="200" style="border-radius:24px"></div>
 </body></html>`);

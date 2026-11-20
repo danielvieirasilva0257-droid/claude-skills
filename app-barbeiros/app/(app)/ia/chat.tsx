@@ -1,13 +1,13 @@
 // Chat com a IA (streaming) + first-use interview (8 questions). Answers use
 // only the numbers the app calculated; client names never leave the phone.
 import { Stack } from 'expo-router';
+import { SymbolView } from 'expo-symbols';
 import { useRef, useState, type ComponentRef } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { Campo } from '@/components/Campo';
 import { Cartao } from '@/components/Cartao';
 import { DuoButton } from '@/components/DuoButton';
-import { Mascote } from '@/components/Mascote';
 import { SecondaryButton } from '@/components/SecondaryButton';
 import { TelaBase } from '@/components/TelaBase';
 import { Texto } from '@/components/Texto';
@@ -97,7 +97,7 @@ function Chat() {
       <ScrollView ref={rolagem} contentContainerStyle={styles.lista} onContentSizeChange={() => rolagem.current?.scrollToEnd({ animated: false })}>
         {mensagens.length === 0 ? (
           <View style={styles.inicio}>
-            <Mascote estado="pensando" tamanho={90} />
+            <SymbolView name={{ ios: 'sparkles', android: 'auto_awesome', web: 'auto_awesome' }} tintColor={color.ai} size={40} />
             <Texto centro cor="textMuted">Pergunte sobre os seus números. Eu respondo com o que o app calculou.</Texto>
             {(jornada.data ?? []).slice(0, 2).map((j) => (
               <Cartao key={j.id}><Texto variante="caption" cor="ai" peso="semibold">Dica da sua jornada · {j.etapa}</Texto><Texto variante="bodySm">{j.sugestao_ia}</Texto></Cartao>

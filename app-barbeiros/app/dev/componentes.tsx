@@ -13,7 +13,6 @@ import { Carregando, EstadoErro, EstadoVazio } from '@/components/Estado';
 import { HoldToConfirm } from '@/components/HoldToConfirm';
 import { InsightCard } from '@/components/InsightCard';
 import { LockedScreen } from '@/components/LockedScreen';
-import { Mascote, type EstadoMascote } from '@/components/Mascote';
 import { MetaRing } from '@/components/MetaRing';
 import { SecondaryButton } from '@/components/SecondaryButton';
 import { StatusButton } from '@/components/StatusButton';
@@ -37,7 +36,6 @@ export default function Galeria() {
   const [chips, setChips] = useState<Record<string, boolean>>({ Corte: true, Barba: false });
   const [gaveta, setGaveta] = useState(false);
   const [apagado, setApagado] = useState(false);
-  const [mascote, setMascote] = useState<EstadoMascote>('parado');
   const [conquistas, setConquistas] = useState(0);
 
   if (process.env.EXPO_PUBLIC_GALERIA !== '1') {
@@ -154,14 +152,6 @@ export default function Galeria() {
           </BottomSheet>
         </Secao>
 
-        <Secao titulo="Mascote">
-          <Mascote estado={mascote} />
-          <View style={styles.linha}>
-            {(['parado', 'comemorando', 'pensando', 'preocupado'] as const).map((e) => (
-              <Chip key={e} rotulo={e} selecionado={mascote === e} onPress={() => setMascote(e)} testID={`mascote-btn-${e}`} />
-            ))}
-          </View>
-        </Secao>
 
         <Secao titulo="LockedScreen">
           <View style={styles.bloqueada}>
