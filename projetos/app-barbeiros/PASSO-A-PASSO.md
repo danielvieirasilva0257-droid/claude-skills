@@ -221,6 +221,7 @@ Pedido (por áudio): agenda com calendário no estilo Booksy/AVEC, cadastro do c
   - estilo fixo (altura, centralização) e largura animada no mesmo elemento fizeram a web perder a altura de 52 px. Separe: largura animada no botão (`Animated.createAnimatedComponent(Pressable)`) e o layout num `View` interno.
 - **Agente com confirmação:** as ferramentas de mudança não gravam; devolvem uma ação pendente que o app mostra num cartão. Com voz isso evita erro de entendimento ("marca às 10" virar "às 2"), e o barbeiro confirma falando "sim".
 - **Privacidade com voz:** o reconhecimento de fala roda no celular (o áudio não sai). O texto passa pelo mesmo anonimizador das outras funções antes da IA. Se o Daniel trocar por uma IA de voz na nuvem, o áudio com nomes vai para esse provedor: decidir com ele.
+- **Não troque de branch com um build rodando:** o `git checkout` da branch do PR tirou arquivos do app por alguns segundos e o build do APK falhou. Para levar o registro ao PR, use `git worktree add` (uma cópia separada) em vez de trocar de branch na pasta principal.
 - **Simulado testável:** o modo `mock` do agente usa regras simples, mas chama as mesmas ferramentas e a mesma confirmação, então os testes cobrem o caminho real até o banco.
 
 **Pendências:** nome do botão ("Fale com a IA" provisório), as IAs de texto e voz que o Daniel vai integrar e o modelo (padrão `claude-opus-5-5` com esforço baixo; trocar para `claude-haiku-5-5` deixa mais barato e rápido, decisão dele).
