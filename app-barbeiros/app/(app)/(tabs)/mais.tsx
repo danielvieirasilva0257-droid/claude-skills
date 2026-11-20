@@ -16,6 +16,7 @@ import { TelaBase } from '@/components/TelaBase';
 import { Texto } from '@/components/Texto';
 import { sair, useSessao } from '@/features/auth/sessao';
 import { useMinhaBarbearia } from '@/features/barbearia/api';
+import { MODO_DEMO } from '@/features/demo/config';
 import { diaCurto, useMinhaAssinatura } from '@/features/planos/assinatura';
 import { gerenciarAssinatura } from '@/lib/loja';
 import { ONDE_CANCELAR } from '@/lib/loja-links';
@@ -78,6 +79,9 @@ export default function Mais() {
         <Texto variante="caption" cor="textMuted">Conta</Texto>
         <Texto peso="semibold">{barbeiro.data?.nome ?? '—'}</Texto>
         <Texto variante="bodySm" cor="textMuted" testID="mais-email">{email ?? '—'}</Texto>
+        {MODO_DEMO ? (
+          <Texto variante="bodySm" cor="warning" testID="mais-demo">Modo demonstração: dados de exemplo, nada do que você muda é salvo.</Texto>
+        ) : null}
       </View>
 
       <View>

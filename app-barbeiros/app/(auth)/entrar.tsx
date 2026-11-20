@@ -8,10 +8,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
 
 import { Campo } from '@/components/Campo';
+import { Marca } from '@/components/Marca';
 import { DuoButton } from '@/components/DuoButton';
 import { SecondaryButton } from '@/components/SecondaryButton';
 import { Texto } from '@/components/Texto';
 import { cadastrar, entrarComEmail, entrarComGoogle } from '@/features/auth/sessao';
+import { CONTAS_DEMO, MODO_DEMO } from '@/features/demo/config';
 import { color, space } from '@/theme/tokens';
 
 const schema = z.object({
@@ -23,7 +25,40 @@ const schema = z.object({
 type Campos = z.infer<typeof schema>;
 type Modo = 'entrar' | 'criar';
 
+// Demo build: no sign-up, one tap per test account (nothing is saved).
+function EntrarDemonstracao() {
+  const [entrando, setEntrando] = useState<string | null>(null);
+  const [erro, setErro] = useState<string | null>(null);
+  return (
+    <SafeAreaView style={styles.safe}>
+      <ScrollView contentContainerStyle={styles.conteudo}>
+        <Marca altura={88} />
+        <Texto variante="display" accessibilityRole="header">Demonstração</Texto>
+        <Texto cor="textMuted">Veja o app com dados de exemplo, que acompanham a data de hoje. Nada do que você fizer aqui é salvo.</Texto>
+        {CONTAS_DEMO.map((c) => (
+          <View key={c.id} style={styles.conta}>
+            <DuoButton testID={`demo-${c.email}`} rotulo={c.rotulo} carregando={entrando === c.id} desativado={entrando !== null}
+              onPress={async () => {
+                setErro(null);
+                setEntrando(c.id);
+                const mensagem = await entrarComEmail(c.email, 'demonstracao');
+                setEntrando(null);
+                if (mensagem) setErro(mensagem);
+              }} />
+            <Texto variante="caption" cor="textMuted" centro>{c.detalhe}</Texto>
+          </View>
+        ))}
+        {erro ? <Texto peso="medium" cor="danger" accessibilityRole="alert">⚠ {erro}</Texto> : null}
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
 export default function Entrar() {
+  return MODO_DEMO ? <EntrarDemonstracao /> : <EntrarComConta />;
+}
+
+function EntrarComConta() {
   const [modo, setModo] = useState<Modo>('entrar');
   const [erro, setErro] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
@@ -66,6 +101,7 @@ export default function Entrar() {
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.conteudo} keyboardShouldPersistTaps="handled">
+          <Marca altura={72} />
           <Texto variante="display" accessibilityRole="header">
             {criando ? 'Criar conta' : 'Entrar'}
           </Texto>
@@ -129,4 +165,5 @@ const styles = StyleSheet.create({
   conteudo: { flexGrow: 1, justifyContent: 'center', padding: space[5], gap: space[4] },
   ou: { flexDirection: 'row', alignItems: 'center', gap: space[3] },
   linha: { flex: 1, height: 1, backgroundColor: color.border },
+  conta: { gap: space[2] },
 });

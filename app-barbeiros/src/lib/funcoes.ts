@@ -2,9 +2,18 @@
 // default (<supabase>/functions/v1), e.g. the local Deno server in tests.
 import { fetch as expoFetch } from 'expo/fetch';
 
+import { MODO_DEMO, URL_DEMO } from '@/features/demo/config';
+
 import { supabase } from './supabase';
 
-const base = process.env.EXPO_PUBLIC_FUNCTIONS_URL || `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1`;
+// Same build-time switch as in supabase.ts (the recording only ships in demo builds).
+const demo = process.env.EXPO_PUBLIC_DEMO === '1'
+  ? (require('@/features/demo/fetchDemo') as typeof import('@/features/demo/fetchDemo'))
+  : null;
+
+const base = MODO_DEMO
+  ? `${URL_DEMO}/functions/v1`
+  : process.env.EXPO_PUBLIC_FUNCTIONS_URL || `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1`;
 
 const MENSAGEM: Record<string, string> = {
   plano: 'A IA faz parte do plano Pago.',
@@ -22,7 +31,7 @@ async function cabecalhos() {
 export async function chamarFuncao<T>(nome: string, corpo: unknown = {}): Promise<T> {
   let resposta: Response;
   try {
-    resposta = await fetch(`${base}/${nome}`, { method: 'POST', headers: await cabecalhos(), body: JSON.stringify(corpo) });
+    resposta = await (demo ? demo.fetchDemo : fetch)(`${base}/${nome}`, { method: 'POST', headers: await cabecalhos(), body: JSON.stringify(corpo) });
   } catch {
     throw new Error('Sem conexão. Tente de novo.');
   }
@@ -37,6 +46,14 @@ export async function perguntarIA(
   historico: { role: 'user' | 'assistant'; content: string }[],
   onTexto: (pedaco: string) => void,
 ): Promise<void> {
+  if (demo) {
+    // Recorded answer, delivered in pieces like the real stream.
+    for (const pedaco of demo.respostaDoChat(pergunta).match(/\S+\s*/g) ?? []) {
+      onTexto(pedaco);
+      await new Promise((r) => setTimeout(r, 25));
+    }
+    return;
+  }
   const resposta = await expoFetch(`${base}/ia-chat`, {
     method: 'POST',
     headers: await cabecalhos(),

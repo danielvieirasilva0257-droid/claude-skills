@@ -1,0 +1,26 @@
+// Used only by build-apk.sh (--init-script). Maven Central answers HTTP 429 to
+// this shared proxy (also behind plugins.gradle.org redirects), so Google's
+// public mirror of Maven Central goes first in every repository list and
+// replaces Maven Central where it is declared.
+def espelho = 'https://maven-central.storage-download.googleapis.com/maven2/'
+def preparar = { repos ->
+    repos.withType(MavenArtifactRepository).configureEach { r ->
+        if (r.url.toString().contains('repo.maven.apache.org') || r.url.toString().contains('repo1.maven.org')) r.url = espelho
+    }
+    if (repos.findByName('espelhoCentral') == null) {
+        def r = repos.maven { name = 'espelhoCentral'; url = espelho }
+        repos.remove(r)
+        repos.addFirst(r)
+    }
+}
+beforeSettings { settings ->
+    // Declaring any plugin repository turns off the default portal: add it back after the mirror.
+    preparar(settings.pluginManagement.repositories)
+    settings.pluginManagement.repositories.gradlePluginPortal()
+    settings.pluginManagement.repositories.google()
+}
+settingsEvaluated { settings -> preparar(settings.dependencyResolutionManagement.repositories) }
+allprojects {
+    preparar(buildscript.repositories)
+    preparar(repositories)
+}

@@ -1,6 +1,5 @@
 // Screen of a higher plan: the barber's real data, blurred, behind a lock in
 // the plan's metal color, and "Conhecer o plano". No countdown, no guilt.
-import { BlurView } from 'expo-blur';
 import { SymbolView } from 'expo-symbols';
 import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -8,6 +7,7 @@ import { StyleSheet, View } from 'react-native';
 import { NOME_PLANO, type Plano } from '@/lib/plano';
 import { color, plano as corPlano, radius, space } from '@/theme/tokens';
 
+import { Desfoque } from './Desfoque';
 import { DuoButton } from './DuoButton';
 import { Texto } from './Texto';
 import { Vidro } from './Vidro';
@@ -27,7 +27,7 @@ export function LockedScreen({ plano, titulo, descricao, previa, onConhecer }: P
       <View style={styles.previa} pointerEvents="none" importantForAccessibility="no-hide-descendants" aria-hidden>
         {previa}
       </View>
-      <BlurView intensity={28} tint="dark" experimentalBlurMethod="dimezisBlurView" style={StyleSheet.absoluteFill} />
+      <Desfoque intensidade={28} style={StyleSheet.absoluteFill} />
       <View style={[StyleSheet.absoluteFill, styles.veu]} />
       <Vidro tom="forte" style={styles.cartao}>
         <View style={[styles.cadeado, { borderColor: corPlano[plano] }]}>

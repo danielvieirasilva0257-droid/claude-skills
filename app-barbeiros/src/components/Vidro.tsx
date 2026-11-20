@@ -2,13 +2,14 @@
 // Elsewhere: blur of what is behind (web, older iOS) or a translucent veil
 // (Android, cheaper), plus a soft top sheen and a 1 px light border.
 // Never put Vidro inside Vidro (glass on glass).
-import { BlurView } from 'expo-blur';
 import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { ReactNode } from 'react';
 import { Platform, StyleSheet, View, type ViewProps, type ViewStyle } from 'react-native';
 
 import { color, radius } from '@/theme/tokens';
+
+import { Desfoque } from './Desfoque';
 
 type Props = ViewProps & {
   children?: ReactNode;
@@ -33,7 +34,7 @@ export function Vidro({ children, style, tom = 'normal', raio = radius.lg, ...pr
   return (
     <View style={[styles.base, styles.borda, forma, tom === 'forte' ? styles.forte : tom === 'ia' ? styles.ia : styles.normal, style]} {...props}>
       {Platform.OS !== 'android' ? (
-        <BlurView intensity={tom === 'forte' ? 40 : 24} tint="dark" style={[StyleSheet.absoluteFill, forma]} pointerEvents="none" />
+        <Desfoque intensidade={tom === 'forte' ? 40 : 24} style={[StyleSheet.absoluteFill, forma]} pointerEvents="none" />
       ) : null}
       <LinearGradient pointerEvents="none" colors={[color.highlight, 'transparent']} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 0.45 }}
         style={[StyleSheet.absoluteFill, forma, styles.brilho]} />

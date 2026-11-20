@@ -4,8 +4,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import { AppState, Platform } from 'react-native';
 
-const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const anonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+import { MODO_DEMO, URL_DEMO } from '@/features/demo/config';
+
+// Demo mode answers from a recording (no server); see src/features/demo.
+// The env var is inlined at build time, so a normal build drops this require
+// (and the recording) through Metro's constant folding.
+const demo = process.env.EXPO_PUBLIC_DEMO === '1'
+  ? (require('@/features/demo/fetchDemo') as typeof import('@/features/demo/fetchDemo'))
+  : null;
+const url = MODO_DEMO ? URL_DEMO : process.env.EXPO_PUBLIC_SUPABASE_URL;
+const anonKey = MODO_DEMO ? 'demonstracao' : process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!url || !anonKey) {
   throw new Error(
@@ -21,6 +29,7 @@ export const supabase = createClient(url, anonKey, {
     detectSessionInUrl: Platform.OS === 'web',
     flowType: 'pkce',
   },
+  ...(demo ? { global: { fetch: demo.fetchDemo } } : {}),
 });
 
 // On native, refresh the session only while the app is in the foreground.

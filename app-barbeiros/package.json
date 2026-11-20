@@ -24,6 +24,7 @@
     "expo-splash-screen": "~58.0.14",
     "expo-status-bar": "~58.0.5",
     "expo-symbols": "~58.0.5",
+    "expo-system-ui": "~58.0.7",
     "expo-web-browser": "~58.1.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -54,8 +55,8 @@
   },
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "test": "jest",
@@ -71,7 +72,12 @@
     "funcoes:dev": "bash scripts/funcoes-env.sh deno run --config supabase/functions/deno.json --allow-net --allow-env --allow-read supabase/functions/_dev/servidor.ts",
     "test:funcoes": "bash scripts/funcoes-env.sh deno test --config supabase/functions/deno.json --allow-net --allow-env --allow-read supabase/functions/_testes/",
     "legal": "node scripts/gerar-legal.mjs",
-    "a11y": "node scripts/acessibilidade-web.mjs"
+    "a11y": "node scripts/acessibilidade-web.mjs",
+    "marca": "python3 scripts/gerar_marca.py && node scripts/renderizar-marca.mjs",
+    "demo:gravar": "node --experimental-strip-types scripts/gravar-demo.mjs",
+    "demo:web": "EXPO_PUBLIC_DEMO=1 EXPO_PUBLIC_GALERIA=0 EXPO_OFFLINE=1 expo export --platform web --output-dir dist-demo",
+    "demo:testar": "node scripts/testar-demo.mjs",
+    "apk": "bash scripts/apk/gerar-apk.sh"
   },
   "private": true,
   "jest": {
@@ -79,7 +85,17 @@
     "testPathIgnorePatterns": [
       "/node_modules/",
       "/dist/",
-      "/supabase/"
+      "/supabase/",
+      "/dist-demo/"
     ]
+  },
+  "expo": {
+    "autolinking": {
+      "android": {
+        "exclude": [
+          "expo-blur"
+        ]
+      }
+    }
   }
 }

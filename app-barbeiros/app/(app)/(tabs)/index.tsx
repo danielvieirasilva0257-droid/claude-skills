@@ -18,6 +18,7 @@ import { Texto } from '@/components/Texto';
 import { Vidro } from '@/components/Vidro';
 import { useProximos, useResumoDia } from '@/features/agenda/api';
 import { useMinhaBarbearia, usePainel } from '@/features/barbearia/api';
+import { MODO_DEMO } from '@/features/demo/config';
 import { useBarbeiro, usePlano } from '@/features/conta/barbeiro';
 import { alternarOcultarValores, usePreferencias } from '@/features/conta/preferencias';
 import { Celebracao } from '@/features/conquistas/Celebracao';
@@ -90,7 +91,7 @@ export default function Inicio() {
   const negativo = (v: unknown) => Number(v) < 0;
 
   return (
-    <TelaBase titulo={primeiroNome ? `Olá, ${primeiroNome}` : 'Início'} subtitulo={`Plano ${NOME_PLANO[meuPlano]} · ${formatDiaLongo(hoje)}`}
+    <TelaBase titulo={primeiroNome ? `Olá, ${primeiroNome}` : 'Início'} subtitulo={`${MODO_DEMO ? 'Demonstração · ' : ''}Plano ${NOME_PLANO[meuPlano]} · ${formatDiaLongo(hoje)}`}
       auroraForte
       onAtualizar={() => { resumo.refetch(); proximos.refetch(); totalMes.refetch(); }}
       direita={
