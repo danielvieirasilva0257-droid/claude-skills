@@ -260,6 +260,17 @@ Pedido (por áudio): "75% menor que o mês passado" no começo do mês desanima.
 - **Seed que bate um valor exato com datas relativas:** como as datas mudam a cada dia, o gerador mede o que já existe no período e preenche até o alvo, guiando a escolha das combinações pelo valor que falta por visita; os centavos vão na última. Com `setseed` o resultado é o mesmo em cada reset.
 - **Testes presos ao dia:** dois testes de "pausa do almoço" usavam "amanhã" e falharam no sábado (domingo não tem pausa). Escolha o próximo dia útil (terça a sábado) em vez de "amanhã". Testes que contavam atendimentos fixos (16, meta de R$ 90) passaram a ler o número do banco.
 
+## Pesquisa: IA e voz dentro do celular (21/11/2026)
+
+O Daniel quer uma IA aberta rodando no celular (como a Google AI Edge Gallery), mexendo nas funções do app, com voz. Anotações e amostras em `research_notes/Voz no celular 2026-11/`.
+
+- **IA:** Gemma 4 E2B (Apache 2.0, ~2,6 GB, chama funções) pela biblioteca `react-native-litert-lm` (o mesmo motor da Edge Gallery). Reserva: a IA da nuvem atual.
+- **O Gemma 4 ouve, mas não fala:** entende e transcreve áudio de até 30 s; a resposta é sempre texto. A voz precisa de outro modelo.
+- **ElevenLabs:** os modelos não podem ser baixados (rodam só nos servidores deles). Os repositórios de "engenharia reversa" usam o serviço sem pagar (contas automáticas, API privada do app Reader), contra os termos; não servem para um app vendido e não foram testados. Dá para usar a API oficial paga como "voz premium" opcional (precisa de internet e manda o texto falado para eles).
+- **Voz no celular:** Kokoro-82M (Apache 2.0), vozes pt-BR Dora (feminina), Alex e Santa (masculinas), ~330 MB, pela `react-native-executorch` (compatível com as versões do app; fala em pedaços enquanto gera). Amostras com frases da IA do app geradas aqui.
+- **Fluxo proposto:** reconhecimento de voz do celular (texto ao vivo) → Gemma 4 com as funções e a confirmação → Kokoro falando frase por frase → a voz para se o barbeiro voltar a falar.
+- **Falta decidir (Daniel):** a voz (Dora, Alex ou Santa) e se faz o protótipo. Velocidade e acerto só dá para medir no celular dele.
+
 ## Pendências (fora do código)
 
 1. **Modelo da IA:** o padrão é `claude-opus-5-5` (regra da skill da API). Para o custo-alvo de R$ 0,50 a R$ 2 por barbeiro por mês, a troca para `claude-haiku-5-5` é decisão do Daniel (`LLM_MODEL`). Falta a chave da API nos secrets do Supabase.
