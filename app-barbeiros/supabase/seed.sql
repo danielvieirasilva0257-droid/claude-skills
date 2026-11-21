@@ -438,7 +438,8 @@ create temp sequence t_visita;
 -- pedidos (contando o que já existe nele). Ter a sáb, 9h às 19h, fora do
 -- almoço e sem encavalar horários; hoje, só o que já terminou. A última visita
 -- do período recebe o ajuste dos centavos (um desconto no serviço mais caro).
-create function pg_temp.encher(p_ini timestamptz, p_fim timestamptz, p_alvo numeric, p_qtd int) returns void
+-- p_rampa: mais visitas nos dias mais recentes (o mês vai crescendo aos poucos).
+create function pg_temp.encher(p_ini timestamptz, p_fim timestamptz, p_alvo numeric, p_qtd int, p_rampa boolean default false) returns void
 language plpgsql as $$
 declare
   v_bar constant uuid := 'b0b0b0b0-0000-4000-8000-000000000001';
@@ -456,6 +457,7 @@ declare
   v_h time;
   v_dia date;
   v_try int;
+  v_pos int;
   v_ok boolean;
   v_id uuid;
   v_pag forma_pagamento;
@@ -466,7 +468,8 @@ begin
     from v_atendimento_resumo r
    where r.barbeiro_id = v_bar and r.inicio >= p_ini and r.inicio < p_fim;
   v_dias := array(select d::date from generate_series((p_ini at time zone 'America/Sao_Paulo')::date,
-                                                      least(((p_fim - interval '1 second') at time zone 'America/Sao_Paulo')::date, pg_temp.hoje()),
+                                                      least(((p_fim - interval '1 second') at time zone 'America/Sao_Paulo')::date,
+                                                            pg_temp.hoje() - case when p_rampa then 1 else 0 end),
                                                       interval '1 day') d
                    where extract(isodow from d) between 2 and 6 order by d);
   if v_n <= 0 or v_rest <= 0 or cardinality(v_dias) = 0 then return; end if;
@@ -490,11 +493,17 @@ begin
     v_total := v_c.total + v_prod_preco;
     v_ajuste := case when i = v_n then v_rest - v_total else 0 end;
 
-    -- Horário livre: começa no dia da vez e anda para o próximo se o dia estiver cheio.
+    -- Dia da vez: espalhado por igual, ou com rampa (densidade crescendo até hoje).
+    v_pos := case when p_rampa then least(cardinality(v_dias), 1 + floor(cardinality(v_dias) * sqrt((i - 0.5) / v_n))::int)
+                  else 1 + ((i - 1) * cardinality(v_dias)) / v_n end;
+    -- Horário livre: se o dia estiver cheio, tenta os dias anteriores e depois os seguintes.
     v_ok := false; v_try := 0;
     while not v_ok and v_try < cardinality(v_dias) loop
-      v_dia := v_dias[1 + ((((i - 1) * cardinality(v_dias)) / v_n + v_try) % cardinality(v_dias))];
-      for v_h in select time '09:00' + make_interval(mins => 30 * g) from generate_series(0, 19) g order by random() loop
+      v_dia := v_dias[case when v_try < v_pos then v_pos - v_try else v_try + 1 end];
+      -- Encaixa em sequência (da manhã para a tarde, ou da tarde para a manhã): cabe mais gente por dia.
+      v_r := random();
+      for v_h in select time '09:00' + make_interval(mins => 30 * g) from generate_series(0, 19) g
+                  order by case when v_r < 0.5 then g else -g end loop
         v_ini := (v_dia + v_h) at time zone 'America/Sao_Paulo';
         v_fim := v_ini + make_interval(mins => v_c.dur);
         continue when extract(epoch from v_h) / 60 + v_c.dur > 19 * 60;
@@ -558,6 +567,6 @@ begin
     end if;
     v_soma := v_soma + v_alvo; v_qtd_soma := v_qtd_soma + v_qtd;
   end loop;
-  -- Este mês: 9% acima da média do mesmo pedaço dos 3 meses.
-  perform pg_temp.encher(inicio_mes_br(v_m0), now(), round(v_soma / 3 * 1.09, 2), round(v_qtd_soma / 3.0 * 1.06)::int);
+  -- Este mês: 9% acima da média do mesmo pedaço dos 3 meses, crescendo semana a semana.
+  perform pg_temp.encher(inicio_mes_br(v_m0), now(), round(v_soma / 3 * 1.09, 2), round(v_qtd_soma / 3.0 * 1.06)::int, true);
 end $$;
