@@ -19,6 +19,10 @@ create function pg_temp.proximo_domingo() returns timestamptz language sql stabl
                        (now() at time zone 'America/Sao_Paulo')::date + 7, interval '1 day') d
   where extract(isodow from d) = 7
 $$;
+-- Quantos atendimentos concluídos o barbeiro do seed tem (histórias + histórico de teste).
+create temp table concluidos as
+select count(*)::int as n from atendimentos where barbeiro_id = 'b0b0b0b0-0000-4000-8000-000000000001' and status = 'concluido';
+grant select on concluidos to authenticated;
 
 -- ---------- Comissão ----------
 select is(calcular_comissao('b0b0b0b0-0000-4000-8000-000000000001', 16000), 4640.00::numeric,
@@ -64,7 +68,8 @@ set local role authenticated;
 select set_config('request.jwt.claims', '{"sub": "00000000-0000-4000-8000-0000000000ff", "role": "authenticated"}', true);
 select is((select count(*) from atendimentos)::int, 0, 'outro barbeiro não vê os atendimentos do seed');
 select set_config('request.jwt.claims', '{"sub": "b0b0b0b0-0000-4000-8000-000000000001", "role": "authenticated"}', true);
-select is((select sum(atendimentos) from v_metricas_mes)::int, 16, 'o barbeiro do seed vê os 16 atendimentos concluídos');
+select is((select sum(atendimentos) from v_metricas_mes)::int, (select n from pg_temp.concluidos),
+          'o barbeiro do seed vê todos os atendimentos concluídos dele');
 reset role;
 
 set local role anon;

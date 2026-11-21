@@ -16,7 +16,7 @@ select is((select coalesce(sum(concluidos), 0) from agenda_mes())::int,
 
 create temp table g as select agenda_grade(hoje_br() + 1) as j;
 select is((select j->'expediente'->>'inicio' from g), '09:00', 'grade: entrada do expediente');
-select is((select j->'expediente'->>'pausa_inicio' from g), '12:00', 'grade: pausa do almoço');
+select is(agenda_grade((select min(d)::date from generate_series(hoje_br() + 1, hoje_br() + 7, interval '1 day') d where extract(isodow from d) between 2 and 6))->'expediente'->>'pausa_inicio', '12:00', 'grade: pausa do almoço (terça a sábado)');
 select is((select j->>'profissional' from g), 'Barbeiro Teste', 'grade: profissional');
 select is((select (j->'itens'->0->>'valor')::numeric from g), 35.00::numeric, 'CRM: valor do horário vem do banco');
 select ok((select (j->'itens'->0->>'fim')::timestamptz - (j->'itens'->0->>'inicio')::timestamptz = interval '30 minutes' from g),

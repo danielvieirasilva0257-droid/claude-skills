@@ -13,10 +13,13 @@ select is((select faturamento from financeiro(date_trunc('month', hoje_br())::da
           'financeiro do mês = v_metricas_mes');
 select is((select count(*)::int from financeiro(hoje_br() - 6, hoje_br(), 'day')), 7, 'financeiro por dia devolve os 7 dias, mesmo sem movimento');
 
--- Meta: R$ 90 de R$ 150 = 60%, faltam R$ 60 = 2 cortes de R$ 45.
-select definir_meta(date_trunc('month', hoje_br())::date, 150);
-select is((progresso_meta()->>'pct')::numeric, 0.600, 'meta: 60% feita');
-select is((progresso_meta()->>'cortes_faltando')::int, 2, 'meta: faltam 2 cortes');
+-- Meta: o faturamento do mês é 62,5% de uma meta 1,6 vez maior; o que falta,
+-- em cortes de R$ 45, é arredondado para cima.
+create temp table fat as select coalesce((select faturamento from v_metricas_mes where barbeiro_id = auth.uid()
+                                           and mes = date_trunc('month', hoje_br())::date), 0) as v;
+select definir_meta(date_trunc('month', hoje_br())::date, (select v * 1.6 from fat));
+select is((progresso_meta()->>'pct')::numeric, 0.625, 'meta: 62,5% feita');
+select is((progresso_meta()->>'cortes_faltando')::int, (select ceil((round(v * 1.6, 2) - v) / 45)::int from fat), 'meta: cortes que faltam');
 select ok(exists (select 1 from verificar_conquistas() where tipo = 'meta_50'), 'passou de 50%: conquista meta_50');
 select celebrar_conquista('meta_50', to_char(hoje_br(), 'YYYY-MM'));
 select ok(not exists (select 1 from verificar_conquistas() where tipo = 'meta_50'), 'depois de comemorar, não aparece de novo');

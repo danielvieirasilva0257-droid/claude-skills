@@ -4,7 +4,8 @@
 --
 -- 1 barbeiro (com login de teste), 7 serviços, 2 produtos, combos padrão,
 -- 6 narrativas, 3 clientes, 3 meses de atendimentos e ofertas, comissão
--- escalonada, vale, gastos, permissões e 1 mensagem enviada.
+-- escalonada, vale, gastos, permissões e 1 mensagem enviada. No fim, o
+-- histórico de teste: 24 clientes e 4 meses de atendimentos (out = R$ 10.150,82).
 --
 -- As datas são relativas a HOJE (horário de Brasília): o seed sempre tem
 -- "este mês" e "3 meses para trás", não importa quando rodar.
@@ -387,3 +388,173 @@ update clientes set observacoes = E'Sempre com pressa no fim do dia.\nPrefere á
 update clientes set observacoes = 'Faltou no último horário; mandar lembrete na véspera.',
        tecnica_cabelo = 'Máquina 2 nas laterais', tecnica_barba = null
  where id = 'c0000000-0000-4000-8000-000000000003';
+
+-- =====================================================================
+-- Histórico de teste: 4 meses para conferir as comparações (pedido do
+-- Daniel, 20/11/2026). Números do mês inteiro:
+--   3 meses atrás: R$ 8.432,40 em 44 atendimentos   → abaixo da média
+--   2 meses atrás: R$ 11.650,00 em 57 atendimentos  → acima da média
+--   mês passado:   R$ 10.150,82 em 51 atendimentos  → na média (ticket ≈ R$ 199)
+--   este mês:      até hoje, 9% acima da média do mesmo pedaço (verde)
+-- Cada mês fechado é dividido em "até o dia de hoje" e "o resto", na mesma
+-- proporção, para a comparação até o mesmo dia contar a mesma história.
+-- As visitas do Rafael, do Bruno e do Carlos entram na conta. Os 24 clientes
+-- de teste e os serviços de cada visita são sorteados com semente fixa.
+-- =====================================================================
+
+-- Serviços de química, para o ticket chegar perto de R$ 200.
+insert into servicos (barbeiro_id, nome, categoria, preco, duracao_min, custo_insumo) values
+  ('b0b0b0b0-0000-4000-8000-000000000001', 'Luzes',       'adicional', 150.00, 90, 18.00),
+  ('b0b0b0b0-0000-4000-8000-000000000001', 'Platinado',   'adicional', 220.00, 120, 30.00),
+  ('b0b0b0b0-0000-4000-8000-000000000001', 'Selagem',     'adicional', 120.00, 60, 15.00),
+  ('b0b0b0b0-0000-4000-8000-000000000001', 'Pigmentação', 'adicional', 60.00, 30, 6.00);
+
+-- 24 clientes de teste (nomes e telefones fictícios; ids depois dos 3 da história).
+insert into clientes (id, barbeiro_id, nome, telefone, status, origem, aceita_contato, criado_em, observacoes, tecnica_cabelo)
+select ('c0000000-0000-4000-8000-0000000001' || lpad(n::text, 2, '0'))::uuid, 'b0b0b0b0-0000-4000-8000-000000000001',
+       nome, '119000001' || lpad(n::text, 2, '0'), 'ativo',
+       (array['indicacao', 'instagram', 'whatsapp', 'passante', 'google']::origem_cliente[])[1 + n % 5],
+       true, now() - interval '130 days', 'Cliente de teste (histórico gerado).',
+       (array['Degradê navalhado', 'Social na tesoura', 'Low fade', 'Corte americano'])[1 + n % 4]
+from unnest(array['Thiago Ramos', 'Lucas Ferreira', 'Gustavo Almeida', 'Felipe Costa', 'Matheus Rocha', 'André Barbosa',
+                  'Vinícius Prado', 'Eduardo Nunes', 'Leonardo Dias', 'Henrique Moura', 'Caio Barros', 'Igor Teixeira',
+                  'Marcelo Pinto', 'Ricardo Azevedo', 'Fernando Gomes', 'Rodrigo Campos', 'Gabriel Freitas', 'Otávio Cardoso',
+                  'Renato Vieira', 'Samuel Duarte', 'Wesley Martins', 'Júlio Lopes', 'Murilo Santana', 'Paulo Reis'])
+     with ordinality as t(nome, n);
+
+-- Combinações sorteadas em cada visita (preço e duração saem da tabela de serviços).
+create temp table t_combo as
+select c.id, c.servicos,
+       (select sum(s.preco) from servicos s where s.barbeiro_id = 'b0b0b0b0-0000-4000-8000-000000000001' and s.nome = any (c.servicos)) as total,
+       (select sum(s.duracao_min) from servicos s where s.barbeiro_id = 'b0b0b0b0-0000-4000-8000-000000000001' and s.nome = any (c.servicos))::int as dur
+from (values (1, '{Corte,Barba}'::text[]), (2, '{Corte,Barba,Hidratação,Sobrancelha}'), (3, '{Corte,Luzes}'),
+             (4, '{Corte,Platinado}'), (5, '{Corte,Barba,Selagem}'), (6, '{Corte,Selagem}'), (7, '{Corte,Barba,Pigmentação}'),
+             (8, '{Corte,Barba,Luzes}'), (9, '{Corte,Barba,Barboterapia,Limpeza de pele}'), (10, '{Corte,Barba,Platinado}'),
+             (11, '{Corte,Hidratação,Selagem}'), (12, '{Corte,Barba,Selagem,Sobrancelha}'),
+             (13, '{Corte,Barba,Pigmentação,Barboterapia}')) as c(id, servicos);
+create temp sequence t_visita;
+
+-- Enche um período até o faturamento e o número de atendimentos pedidos
+-- (contando o que já existe nele). Ter a sáb, 9h às 19h, fora do almoço e sem
+-- encavalar horários; hoje, só o que já terminou. A última visita do período
+-- recebe o ajuste dos centavos (um desconto no serviço mais caro).
+create function pg_temp.encher(p_ini date, p_fim date, p_alvo numeric, p_qtd int) returns void
+language plpgsql as $$
+declare
+  v_bar constant uuid := 'b0b0b0b0-0000-4000-8000-000000000001';
+  v_clientes uuid[] := array(select id from clientes where barbeiro_id = v_bar and nome <> all ('{Rafael Souza,Bruno Lima,Carlos Mendes}') order by id);
+  v_dias date[];
+  v_rest numeric;
+  v_n int;
+  v_c t_combo%rowtype;
+  v_total numeric;
+  v_need numeric;
+  v_prod uuid;
+  v_prod_preco numeric;
+  v_ini timestamptz;
+  v_fim timestamptz;
+  v_h time;
+  v_dia date;
+  v_try int;
+  v_ok boolean;
+  v_id uuid;
+  v_pag forma_pagamento;
+  v_r float8;
+  v_ajuste numeric;
+begin
+  select p_alvo - coalesce(sum(r.valor_total), 0), p_qtd - count(*) into v_rest, v_n
+    from v_atendimento_resumo r
+   where r.barbeiro_id = v_bar and (r.inicio at time zone 'America/Sao_Paulo')::date between p_ini and p_fim;
+  v_dias := array(select d::date from generate_series(p_ini, least(p_fim, pg_temp.hoje()), interval '1 day') d
+                   where extract(isodow from d) between 2 and 6 order by d);
+  if v_n <= 0 or v_rest <= 0 or cardinality(v_dias) = 0 then return; end if;
+
+  for i in 1..v_n loop
+    v_need := v_rest / (v_n - i + 1);
+    v_prod := null; v_prod_preco := 0;
+    if i < v_n then
+      select * into v_c from t_combo where total between v_need - 50 and v_need + 50 order by random() limit 1;
+      if not found then select * into v_c from t_combo order by abs(total - v_need) limit 1; end if;
+      if random() < 0.3 then
+        select id, preco into v_prod, v_prod_preco from produtos where barbeiro_id = v_bar order by random() limit 1;
+      end if;
+    else
+      select * into v_c from t_combo where total >= v_rest order by total limit 1;
+      if not found then
+        select * into v_c from t_combo order by total desc limit 1;
+        select id, preco into v_prod, v_prod_preco from produtos where barbeiro_id = v_bar order by preco desc limit 1;
+      end if;
+    end if;
+    v_total := v_c.total + v_prod_preco;
+    v_ajuste := case when i = v_n then v_rest - v_total else 0 end;
+
+    -- Horário livre: começa no dia da vez e anda para o próximo se o dia estiver cheio.
+    v_ok := false; v_try := 0;
+    while not v_ok and v_try < cardinality(v_dias) loop
+      v_dia := v_dias[1 + ((((i - 1) * cardinality(v_dias)) / v_n + v_try) % cardinality(v_dias))];
+      for v_h in select time '09:00' + make_interval(mins => 30 * g) from generate_series(0, 19) g order by random() loop
+        v_ini := (v_dia + v_h) at time zone 'America/Sao_Paulo';
+        v_fim := v_ini + make_interval(mins => v_c.dur);
+        continue when extract(epoch from v_h) / 60 + v_c.dur > 19 * 60;
+        continue when v_h < time '13:00' and extract(epoch from v_h) / 60 + v_c.dur > 12 * 60;
+        continue when v_fim > now();
+        continue when exists (select 1 from atendimentos a where a.barbeiro_id = v_bar and a.status <> 'cancelado'
+                                and tstzrange(a.inicio, coalesce(nullif(a.fim, a.inicio), a.inicio + interval '40 minutes')) && tstzrange(v_ini, v_fim));
+        v_ok := true;
+        exit;
+      end loop;
+      v_try := v_try + 1;
+    end loop;
+    continue when not v_ok;
+
+    v_r := random();
+    v_pag := case when v_r < 0.5 then 'pix' when v_r < 0.75 then 'credito' when v_r < 0.9 then 'debito' else 'dinheiro' end;
+    v_id := gen_random_uuid();
+    insert into atendimentos (id, barbeiro_id, cliente_id, inicio, fim, status, forma_pagamento, taxa_cartao, criado_em)
+    values (v_id, v_bar, v_clientes[1 + (nextval('t_visita') % cardinality(v_clientes))], v_ini, v_fim, 'concluido', v_pag,
+            round((v_total + v_ajuste) * case v_pag when 'debito' then 0.0150 when 'credito' then 0.0320 else 0 end, 2),
+            v_ini - interval '2 days');
+    insert into atendimento_itens (atendimento_id, servico_id, valor)
+    select v_id, s.id, s.preco + case when s.nome = (select s2.nome from servicos s2 where s2.barbeiro_id = v_bar
+                                                       and s2.nome = any (v_c.servicos) order by s2.preco desc limit 1)
+                                      then v_ajuste else 0 end
+      from servicos s where s.barbeiro_id = v_bar and s.nome = any (v_c.servicos);
+    if v_prod is not null then
+      insert into atendimento_itens (atendimento_id, produto_id, valor) values (v_id, v_prod, v_prod_preco);
+    end if;
+    v_rest := v_rest - (v_total + v_ajuste);
+  end loop;
+end $$;
+
+do $$
+declare
+  v_n int := extract(day from pg_temp.hoje())::int;
+  v_m0 date := date_trunc('month', pg_temp.hoje())::date;
+  v_f numeric := least(v_n, 30) / 30.0;
+  r record;
+  v_mes date;
+  v_fim_mes date;
+  v_fim_td date;
+  v_alvo numeric;
+  v_qtd int;
+  v_soma numeric := 0;
+  v_qtd_soma int := 0;
+begin
+  perform setseed(0.2611);
+  for r in select * from (values (3, 8432.40, 44), (2, 11650.00, 57), (1, 10150.82, 51)) v(k, total, qtd) order by k desc loop
+    v_mes := (v_m0 - make_interval(months => r.k))::date;
+    v_fim_mes := (v_mes + interval '1 month - 1 day')::date;
+    v_fim_td := least(v_mes + v_n - 1, v_fim_mes);
+    if v_fim_td >= v_fim_mes then
+      v_alvo := r.total; v_qtd := r.qtd;
+      perform pg_temp.encher(v_mes, v_fim_mes, r.total, r.qtd);
+    else
+      v_alvo := round(r.total * v_f, 2); v_qtd := round(r.qtd * v_f)::int;
+      perform pg_temp.encher(v_mes, v_fim_td, v_alvo, v_qtd);
+      perform pg_temp.encher(v_fim_td + 1, v_fim_mes, r.total - v_alvo, r.qtd - v_qtd);
+    end if;
+    v_soma := v_soma + v_alvo; v_qtd_soma := v_qtd_soma + v_qtd;
+  end loop;
+  -- Este mês: 9% acima da média do mesmo pedaço dos 3 meses.
+  perform pg_temp.encher(v_m0, pg_temp.hoje(), round(v_soma / 3 * 1.09, 2), round(v_qtd_soma / 3.0 * 1.06)::int);
+end $$;

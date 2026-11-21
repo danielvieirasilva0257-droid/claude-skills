@@ -12,7 +12,8 @@ select set_config('request.jwt.claims', '{"sub": "b0b0b0b0-0000-4000-8000-000000
 select ok(not exists (select 1 from horarios_livres(auth.uid(), (now() at time zone 'America/Sao_Paulo')::date + 1, 30) h
                       where (h.inicio at time zone 'America/Sao_Paulo')::time = '18:30'),
           'horário do Bruno (amanhã 18h30) não aparece como livre');
-select ok(not exists (select 1 from horarios_livres(auth.uid(), (now() at time zone 'America/Sao_Paulo')::date + 1, 30) h
+-- A pausa é de terça a sábado (domingo é só de manhã): o próximo dia útil.
+select ok(not exists (select 1 from horarios_livres(auth.uid(), (select min(d)::date from generate_series(hoje_br() + 1, hoje_br() + 7, interval '1 day') d where extract(isodow from d) between 2 and 6), 30) h
                       where (h.inicio at time zone 'America/Sao_Paulo')::time between '12:00' and '12:45'),
           'a pausa do almoço não vira horário');
 
