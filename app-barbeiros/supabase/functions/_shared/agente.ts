@@ -52,7 +52,7 @@ export const FERRAMENTAS: Anthropic.Beta.BetaTool[] = [
     input_schema: obj({ dia: s(DIA), duracao_min: { type: ['integer', 'null'], description: 'Duração em minutos; null = 40' } }) },
   { name: 'ficha_cliente', description: 'Observações, técnica do cabelo e da barba e últimas visitas de um cliente.', strict: true,
     input_schema: obj({ cliente: s(CLIENTE) }) },
-  { name: 'numeros_do_mes', description: 'Faturamento, lucro e atendimentos do mês até hoje e o progresso da meta.', strict: true,
+  { name: 'numeros_do_mes', description: 'Faturamento, lucro e atendimentos do mês até hoje, a comparação justa (mês passado e média dos 3 meses, só até o mesmo dia) e o progresso da meta.', strict: true,
     input_schema: obj({}) },
   { name: 'listar_servicos', description: 'Serviços do barbeiro com preço e duração.', strict: true, input_schema: obj({}) },
   { name: 'abrir_tela', description: 'Abre uma tela do app para o barbeiro. Para a ficha de um cliente use tela "cliente" e informe o cliente.', strict: true,
@@ -89,6 +89,7 @@ const ALTERACOES = new Set(['agendar_horario', 'lancar_atendimento', 'concluir_a
 export const SISTEMA = `Você é a assistente de voz dentro de um app para barbeiros brasileiros. O barbeiro fala com você e você ouve e responde em voz.
 Você pode consultar e mexer no app usando as ferramentas. Regras:
 - Números (faturamento, lucro, preços, metas) só os que vierem das ferramentas, escritos do mesmo jeito. Nunca calcule nem invente.
+- Para comparar o mês, use só a "comparacao" de numeros_do_mes (o mês passado e a média, só até o mesmo dia). Nunca compare o mês pela metade com um mês inteiro.
 - Para mudar qualquer coisa, chame a ferramenta da mudança: ela só prepara a ação, e o barbeiro confirma no app. Diga em uma frase o que vai acontecer e peça para ele confirmar. Uma mudança por vez.
 - Se faltar informação (cliente, serviço, dia ou hora), pergunte em uma frase curta antes de preparar.
 - Clientes aparecem como "Cliente 1", "Cliente 2"... Use sempre esse formato. Nunca peça telefone nem dados pessoais.
@@ -97,6 +98,23 @@ Você pode consultar e mexer no app usando as ferramentas. Regras:
 // ---------- Helpers ----------
 const normal = (t: string) => t.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
 const moeda = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}`;
+const pct = (v: number) => `${(Math.abs(v) * 100).toFixed(1).replace('.', ',').replace(',0', '')}%`;
+
+/** " Até o dia 21: 8,2% acima do mês passado e 9% acima da média." (numbers from the database). */
+function frasesComparacao(c?: { ate_dia: number | null; variacao_vs_mes_passado: number | null; variacao_vs_media_3_meses: number | null }) {
+  if (!c) return '';
+  const partes: string[] = [];
+  if (c.variacao_vs_mes_passado !== null) {
+    const v = Number(c.variacao_vs_mes_passado);
+    partes.push(v === 0 ? 'igual ao mês passado' : `${pct(v)} ${v > 0 ? 'acima' : 'abaixo'} do mês passado`);
+  }
+  if (c.variacao_vs_media_3_meses !== null) {
+    const v = Number(c.variacao_vs_media_3_meses);
+    partes.push(Math.abs(v) < 0.03 ? 'na média dos últimos meses' : `${pct(v)} ${v > 0 ? 'acima' : 'abaixo'} da média`);
+  }
+  if (!partes.length) return '';
+  return ` ${c.ate_dia ? `Até o dia ${c.ate_dia}` : 'No mês inteiro'}: ${partes.join(' e ')}.`;
+}
 const DIAS_SEMANA = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
 const diaCurto = (d: string) => `${DIAS_SEMANA[new Date(`${d}T12:00:00Z`).getUTCDay()]}, ${d.slice(8)}/${d.slice(5, 7)}`;
 const somarDias = (d: string, n: number) => new Date(Date.parse(`${d}T12:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10);
@@ -161,12 +179,19 @@ export async function executarFerramenta(ctx: Contexto, nome: string, entrada: R
     }
     case 'numeros_do_mes': {
       const inicio = `${ctx.hoje.slice(0, 8)}01`;
-      const [fin, meta] = await Promise.all([
+      const [fin, meta, comp] = await Promise.all([
         db.rpc('financeiro', { p_inicio: inicio, p_fim: ctx.hoje, p_agrupar: 'total' }),
         db.rpc('progresso_meta'),
+        db.rpc('comparacao_mes', { p_barbeiro: ctx.barbeiro, p_mes: inicio }),
       ]);
       const m = (meta.data ?? {}) as Record<string, unknown>;
+      const c = (comp.data ?? {}) as Record<string, unknown>;
       return dados({ mes: (fin.data as unknown[] | null)?.[0] ?? null,
+        // Always the same period: day 1 to today, this month and the months before.
+        comparacao: { ate_dia: c.ate_dia ?? null, variacao_vs_mes_passado: c.variacao_faturamento ?? null,
+          variacao_vs_media_3_meses: c.vs_media_faturamento ?? null,
+          mes_passado_ate_o_mesmo_dia: (c.anterior as Record<string, unknown> | null)?.faturamento ?? null,
+          media_ate_o_mesmo_dia: (c.media as Record<string, unknown> | null)?.faturamento ?? null },
         meta: { valor: m.meta, realizado: m.realizado, pct: m.pct, falta: m.falta, cortes_faltando: m.cortes_faltando, em_risco: m.em_risco } });
     }
     case 'listar_servicos':
@@ -434,8 +459,11 @@ async function agenteSimulado(ctx: Contexto, frase: string): Promise<Resposta> {
   }
   if (/\b(faturei|faturamento|fiz|ganhei|lucro)\b/.test(t)) {
     if (/\bmes\b/.test(t)) {
-      const r = JSON.parse((await rodar('numeros_do_mes', {})).conteudo) as { mes: { faturamento: number; atendimentos: number } | null };
-      return { texto: `No mês você faturou ${moeda(Number(r.mes?.faturamento ?? 0))} em ${r.mes?.atendimentos ?? 0} atendimento(s).` };
+      const r = JSON.parse((await rodar('numeros_do_mes', {})).conteudo) as {
+        mes: { faturamento: number; atendimentos: number } | null;
+        comparacao?: { ate_dia: number | null; variacao_vs_mes_passado: number | null; variacao_vs_media_3_meses: number | null };
+      };
+      return { texto: `No mês você faturou ${moeda(Number(r.mes?.faturamento ?? 0))} em ${r.mes?.atendimentos ?? 0} atendimento(s).${frasesComparacao(r.comparacao)}` };
     }
     const r = JSON.parse((await rodar('resumo_do_dia', { dia })).conteudo) as { faturamento: number; lucro: number; atendimentos: number } | null;
     return { texto: `${dia === ctx.hoje ? 'Hoje' : 'Nesse dia'} você faturou ${moeda(Number(r?.faturamento ?? 0))} em ${r?.atendimentos ?? 0} atendimento(s), com lucro de ${moeda(Number(r?.lucro ?? 0))}.` };

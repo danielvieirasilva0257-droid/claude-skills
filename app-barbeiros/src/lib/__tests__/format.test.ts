@@ -1,6 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 
-import { diaISO, formatDecimal, formatDiaLongo, formatHora, formatInteiro, formatMes, formatMoeda, formatPorcentagem, horarioEm, inicioDoMes, somarDias } from '../format';
+import { posicaoNaMedia } from '../../components/Variacao';
+import { diaISO, formatDecimal, formatDiaLongo, formatHora, formatInteiro, formatMes, formatMesCurto, formatMoeda, formatMoedaCurta, formatPorcentagem, horarioEm, inicioDoMes, somarDias } from '../format';
 
 // Intl uses a non-breaking space between "R$" and the number.
 const semNbsp = (t: string) => t.replace(/ /g, ' ');
@@ -48,5 +49,19 @@ describe('format', () => {
   it('dia por extenso sem "-feira" e horário marcado em −03:00', () => {
     expect(formatDiaLongo('2026-11-20')).toBe('sexta, 20 de novembro');
     expect(horarioEm('2026-11-20', '09:30')).toBe('2026-11-20T09:30:00-03:00');
+  });
+
+  it('gráfico dos meses: mês curto e dinheiro curto', () => {
+    expect(formatMesCurto('2026-08-01')).toBe('ago');
+    expect(formatMoedaCurta(7105.57)).toBe('R$ 7,1 mil');
+    expect(formatMoedaCurta('850')).toBe('R$ 850');
+  });
+
+  it('acima, abaixo ou na média (faixa de 3%)', () => {
+    expect(posicaoNaMedia(0.09)).toBe('acima');
+    expect(posicaoNaMedia('-0.163')).toBe('abaixo');
+    expect(posicaoNaMedia(0.011)).toBe('na_media');
+    expect(posicaoNaMedia(null)).toBeNull();
+    expect(posicaoNaMedia(0.32, 'diferenca')).toBe('acima');
   });
 });

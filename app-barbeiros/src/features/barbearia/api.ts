@@ -36,7 +36,10 @@ export type Painel = {
   barbearia: { id: string; nome: string };
   mes: string;
   hoje: { faturamento: N; atendimentos: number; agendados: number };
-  total: { faturamento: N; faturamento_anterior: N; atendimentos: number; ticket_medio: N | null; variacao_faturamento: N | null };
+  /** Last month and the average only up to the same day of the month (day 1 to today). */
+  comparacao: { ate_dia: number | null; meses_media: number };
+  total: { faturamento: N; faturamento_anterior: N; atendimentos: number; ticket_medio: N | null; variacao_faturamento: N | null;
+    media_faturamento: N | null; vs_media_faturamento: N | null };
   equipe: LinhaPainel[];
 };
 

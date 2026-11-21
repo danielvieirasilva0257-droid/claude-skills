@@ -184,7 +184,14 @@ export type Relatorio = {
   mes: string;
   atual: Record<string, N> | null;
   anterior: Record<string, N> | null;
+  /** vs the same period of last month (day 1 to today; whole month for closed months). */
   variacao: { faturamento: N | null; ticket_medio: N | null; atendimentos: N | null; ratio: N | null };
+  /** Average of the 3 previous months, each in the same period. */
+  media: { meses: number; faturamento: N; atendimentos: N; ticket_medio: N; ratio_servicos_por_cliente: N } | null;
+  vs_media: { faturamento: N | null; ticket_medio: N | null; atendimentos: N | null; ratio: N | null };
+  comparacao: { ate_dia: number | null; meses_media: number };
+  /** The 4 months side by side (3 before + this one), same period, for the chart. */
+  meses: { mes: string; fim: string; atual: boolean; faturamento: N; atendimentos: number; vs_media: N | null }[];
   saude: { taxa_segunda_visita: N | null; taxa_reagendamento: N | null; taxa_faltas: N | null; ocupacao: N | null;
     clientes_sumidos: number; pct_com_extra: N | null; pct_com_produto: N | null } | null;
   mix_servicos: { nome: string; qtd: number; qtd_mes_anterior: number; faturamento: N }[];
@@ -204,7 +211,9 @@ export function useRelatorio(mes?: string) {
 }
 
 export type ResumoSemana = {
-  inicio: string; faturamento: N; faturamento_anterior: N; variacao: N | null; atendimentos: number;
+  /** Monday to today vs Monday to the same weekday of last week; average of the 4 weeks before. */
+  inicio: string; ate_dia_semana: number; faturamento: N; faturamento_anterior: N; variacao: N | null;
+  media: N | null; semanas_media: number; vs_media: N | null; atendimentos: number;
   atendimentos_anterior: number; lucro: N; melhor_dia: { dia: string; faturamento: N } | null; ofertas: number; ofertas_aceitas: number;
 };
 

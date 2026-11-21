@@ -1,4 +1,5 @@
 // Horizontal bars, this month vs last month per item (service or product).
+// Last month counts only up to the same day ("Mês passado até o dia 21").
 // Ordinal pair (same green, two steps). Value of this month labeled at the
 // bar end; the rest on touch and in the table.
 import { useState } from 'react';
@@ -17,10 +18,12 @@ type Props = {
   itens: ItemComparado[];
   /** How a value is written (quantities by default; money on the owner's panel). */
   formatar?: (v: number) => string;
+  /** Legend of the second series, e.g. "Mês passado até o dia 21". */
+  rotuloAnterior?: string;
   testID?: string;
 };
 
-export function BarrasComparadas({ titulo, itens, formatar = String, testID }: Props) {
+export function BarrasComparadas({ titulo, itens, formatar = String, rotuloAnterior = 'Mês passado', testID }: Props) {
   const [tocado, setTocado] = useState<number | null>(null);
   const max = Math.max(1, ...itens.flatMap((i) => [i.atual, i.anterior]));
   const item = tocado !== null ? itens[tocado] : null;
@@ -28,14 +31,14 @@ export function BarrasComparadas({ titulo, itens, formatar = String, testID }: P
     <BlocoGrafico
       testID={testID}
       titulo={titulo}
-      legenda={[{ rotulo: 'Este mês', cor: grafico.atual }, { rotulo: 'Mês anterior', cor: grafico.anterior }]}
-      destaque={item ? `${item.nome}: ${formatar(item.atual)} este mês · ${formatar(item.anterior)} no anterior` : null}
-      tabela={{ colunas: ['Item', 'Este mês', 'Anterior'], linhas: itens.map((i) => [i.nome, formatar(i.atual), formatar(i.anterior)]) }}
+      legenda={[{ rotulo: 'Este mês', cor: grafico.atual }, { rotulo: rotuloAnterior, cor: grafico.anterior }]}
+      destaque={item ? `${item.nome}: ${formatar(item.atual)} este mês · ${formatar(item.anterior)} no mês passado` : null}
+      tabela={{ colunas: ['Item', 'Este mês', rotuloAnterior], linhas: itens.map((i) => [i.nome, formatar(i.atual), formatar(i.anterior)]) }}
     >
       <View style={styles.lista}>
         {itens.map((i, idx) => (
           <Pressable key={i.nome} onPress={() => setTocado(idx)} onHoverIn={() => setTocado(idx)}
-            accessibilityRole="button" accessibilityLabel={`${i.nome}: ${formatar(i.atual)} este mês, ${formatar(i.anterior)} no mês anterior`} style={styles.linha}>
+            accessibilityRole="button" accessibilityLabel={`${i.nome}: ${formatar(i.atual)} este mês, ${formatar(i.anterior)} no mês passado`} style={styles.linha}>
             <Texto variante="bodySm" peso="medium">{i.nome}</Texto>
             <View style={styles.barraLinha}>
               <View style={[styles.barra, { width: `${(i.atual / max) * 88}%`, backgroundColor: grafico.atual }]} />

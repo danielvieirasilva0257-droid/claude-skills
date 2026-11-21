@@ -138,6 +138,8 @@ Arquivo: `supabase/migrations/0001_banco_app_barbeiros_para_ia.sql` (versão 2, 
 | `sugerir_estrategias(barbeiro, limite)` | estratégias do catálogo para o público e os problemas |
 | `pode_enviar(cliente, categoria, quando)` | libera ou bloqueia mensagem (LGPD, limites, horário) com o motivo |
 
+**Comparações (regra fixa, pedido do Daniel em 20/11/2026):** o mês que está correndo é sempre comparado com o **mesmo pedaço** dos outros meses: do dia 1 até o dia de hoje (hoje é dia 10 → o mês passado conta do dia 1 ao dia 10). Embaixo de "vs mês passado" vem "vs média": a média dos 3 meses anteriores, cada um no mesmo pedaço, só com os meses que tiveram atendimento. Até 3% de distância da média vale "na média". Mês fechado compara o mês inteiro; a semana compara segunda até hoje com segunda até o mesmo dia da semana passada (e a média das 4 semanas). O banco faz tudo: `comparacao_mes(barbeiro, mes)`, `metricas_periodo`, `relatorio_mes` (`anterior`, `variacao`, `media`, `vs_media`, `comparacao`, `meses`), `painel_barbearia`, `resumo_semana` e `contexto_ia` (migration `0009`). A IA recebe a comparação pronta e não pode comparar o mês pela metade com um mês inteiro.
+
 **Mudanças no banco:** sempre em nova migration (`0002_...sql`), nunca editando a 0001 depois de aplicada. Funções que o app chama via RPC e que leem dados de outros barbeiros não podem existir: todas devem respeitar RLS (as views usam `security_invoker`).
 
 **Conferências já feitas:** cliente agendado só para barba recebeu hidratação (recorrente, 29 dias), depilação (22 dias) e sobrancelha (cliente deitado), com a narrativa que fecha 67%; comissão de R$ 16 mil = R$ 4.640 (total) e R$ 4.140 (marginal); `pode_enviar` bloqueou sem permissão, no domingo e após o limite semanal.
@@ -226,7 +228,7 @@ Abas: **Início · Agenda · Relatórios · Clientes · Mais**. O resto abre com
 | 7 | Gastos | Pago | `gastos` |
 | 8 | Financeiro: faturamento, gastos, lucro por dia/semana/mês | Pago | `financeiro` |
 | 9 | Meta do mês: meta sugerida, `MetaRing`, "faltam R$ X, uns N cortes" | Pago | `meta` |
-| 10 | Relatórios e gráficos: ratio, ticket, barras por serviço e produto vs mês anterior, aceitação, ocupação, faltas, retorno, mapa de calor | Pago | `(tabs)/relatorios` |
+| 10 | Relatórios e gráficos: ratio, ticket, barras por serviço e produto vs mês passado (até o mesmo dia) e vs média dos 3 meses, gráfico dos meses com a linha da média, aceitação, ocupação, faltas, retorno, mapa de calor | Pago | `(tabs)/relatorios` |
 | 11 | Insights da IA: até 3 cards + resumo semanal em carrossel | Pago | `insights` |
 | 12 | Chat com a IA + entrevista inicial | Pago | `ia/chat` |
 | 13 | Coach de vendas e narrativas (até 4 por serviço), mensagens prontas | Pago | `coach` |
@@ -397,6 +399,13 @@ Skills: `../skills/design/review-animations`, `../skills/design/web-design-guide
 - [x] "Fale com a IA": fala e resposta em voz, bolinha animada (estilo ChatGPT) e a IA mexendo no app pelo que o barbeiro pedir, sempre com confirmação antes de mudar
 
 **Como ficou:** migration `0008` (`clientes.observacoes`, `tecnica_cabelo`, `tecnica_barba`, com o texto das perguntas antigas levado para as observações; `agenda_mes` para o calendário e `agenda_grade` para a grade, com expediente, pausa, folga, fim previsto de cada horário pela duração dos serviços, serviços com preço e duração, profissional e valor). Telas: Agenda refeita (`Calendario`, `GradeDia`, CRM no topo da gaveta do horário, meia hora vazia abre "Agendar" com a hora), ficha nova, `BarraAbas` com a bolha deslizando, `AtendidosHoje` e `FaleComIA` no Mais (e no Início, no lugar de "Pergunte à IA"), tela `ia/voz`. **Agente** (`supabase/functions/_shared/agente.ts` + função `ia-agente`): Claude pela API de mensagens com ferramentas que leem (resumo do dia, agenda, horários livres, ficha, números do mês, serviços), navegam (abrir tela) e preparam mudanças (agendar, lançar, concluir, falta, cancelar, anotar na ficha, preço, gasto, meta, fechar caixa); toda mudança volta como pendente e só é gravada quando o barbeiro confirma (botão ou "sim"); números só das ferramentas; nomes de clientes trocados por "Cliente N" antes da IA, inclusive no que ele fala. Voz no próprio celular: `expo-speech-recognition` (fala → texto) e `expo-speech` (texto → fala); o áudio não sai do celular. `LLM_PROVIDER=mock` responde com regras que usam as mesmas ferramentas (testes e desenvolvimento sem custo). Pendências com o Daniel: o nome do botão ("Fale com a IA" é provisório), as duas IAs (texto e voz) que ele vai integrar (a troca fica em `src/features/ia/voz.ts` e em `_shared/agente.ts`) e o modelo (`claude-opus-5-5` por padrão; esforço baixo para responder rápido).
+
+### Comparações justas e dados de teste (pedido do Daniel, 20/11/2026)
+- [x] "vs mês passado" até o mesmo dia do mês (dia 1 até hoje contra dia 1 até o mesmo dia do mês passado), para o começo do mês não ficar sempre no vermelho
+- [x] Embaixo, "vs média": "X% acima da média", "X% abaixo da média" ou "na média", com a média dos 3 meses anteriores no mesmo pedaço
+- [x] Gráfico "Faturamento até o dia N" com os 4 meses e a linha tracejada da média; cada mês diz se ficou acima, abaixo ou na média
+- [x] Mesma regra no painel do dono, na semana dos Insights e no que a IA recebe
+- [x] Dados de teste no seed: 24 clientes e 4 meses com serviços sorteados (3 meses atrás abaixo da média, 2 meses atrás acima, mês passado na média com R$ 10.150,82 e ticket de R$ 199,04, e este mês uns 9% acima da média)
 
 ### Depois do app
 - Site de venda: `../skills/combos/combo-site-premium`.

@@ -59,6 +59,22 @@ export function formatMes(mes: string): string {
   return new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(date);
 }
 
+const MESES_CURTOS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+
+/** "2026-08-01" → "ago". */
+export function formatMesCurto(mes: string): string {
+  const month = Number(mes.split('-')[1]);
+  return MESES_CURTOS[month - 1] ?? mes;
+}
+
+/** Short money for chart labels: 7105.57 → "R$ 7,1 mil" · 850 → "R$ 850". */
+export function formatMoedaCurta(value: Numeric): string {
+  const n = toNumber(value);
+  if (n === null) return '—';
+  if (Math.abs(n) < 1000) return `R$ ${inteiro.format(n)}`;
+  return `R$ ${new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 1 }).format(n / 1000)} mil`;
+}
+
 /** "2026-11-19" for a date in the barber's time zone. */
 export function diaISO(date: Date = new Date(), timeZone: string = FUSO): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);

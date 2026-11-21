@@ -1,6 +1,7 @@
-// Body of a month report (relatorio_mes / relatorio_barbeiro): indicators,
-// chair health, services and products vs last month, offer acceptance and
-// the heatmap. Shared by the Relatórios tab and the owner's per-barber report.
+// Body of a month report (relatorio_mes / relatorio_barbeiro): indicators
+// vs the same period of last month and vs the 3-month average, the months
+// chart with the average line, chair health, services and products vs last
+// month (same period), offer acceptance and the heatmap. Shared by the Relatórios tab and the owner's per-barber report.
 import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 
@@ -10,8 +11,9 @@ import { EstadoVazio } from '@/components/Estado';
 import { BarrasComparadas } from '@/components/graficos/BarrasComparadas';
 import { BlocoGrafico } from '@/components/graficos/BlocoGrafico';
 import { MapaCalor } from '@/components/graficos/MapaCalor';
+import { MesesComMedia } from '@/components/graficos/MesesComMedia';
 import { Texto } from '@/components/Texto';
-import { Variacao } from '@/components/Variacao';
+import { Comparacoes } from '@/components/Variacao';
 import type { Relatorio } from '@/features/pago/api';
 import { formatDecimal, formatPorcentagem } from '@/lib/format';
 import { grafico } from '@/theme/grafico';
@@ -27,30 +29,45 @@ export function Indicador({ rotulo, children, detalhe }: { rotulo: string; child
   );
 }
 
+/** "Do dia 1 ao dia 21, comparado ao mesmo período" (current month) or the whole month (closed month). */
+export function textoPeriodo(ateDia: number | null | undefined, mesesMedia: number) {
+  const media = mesesMedia > 0 ? ` e à média de ${mesesMedia === 1 ? '1 mês' : `${mesesMedia} meses`}` : '';
+  return ateDia
+    ? `Do dia 1 ao dia ${ateDia}, comparado ao mesmo período do mês passado${media}.`
+    : `Mês inteiro, comparado ao mês passado${media}.`;
+}
+
 export function ConteudoRelatorio({ d }: { d: Relatorio }) {
   const a = d.atual;
   const s = d.saude;
+  const ateDia = d.comparacao?.ate_dia ?? null;
+  const comDados = (d.meses ?? []).filter((m) => Number(m.faturamento) > 0).length;
   return (
     <>
       {!a ? <EstadoVazio titulo="Ainda sem atendimentos neste mês" /> : (
         <Cartao testID="indicadores">
+          <Texto variante="caption" cor="textMuted" testID="periodo-comparado">{textoPeriodo(ateDia, d.comparacao?.meses_media ?? 0)}</Texto>
           <View style={styles.grade}>
-            <Indicador rotulo="Faturamento" detalhe={<Variacao valor={d.variacao.faturamento} />}>
+            <Indicador rotulo="Faturamento" detalhe={<Comparacoes testID="comparacao-faturamento" anterior={d.variacao.faturamento} media={d.vs_media?.faturamento} />}>
               <Dinheiro variante="h3" valor={a.faturamento} />
             </Indicador>
-            <Indicador rotulo="Ticket médio" detalhe={<Variacao valor={d.variacao.ticket_medio} />}>
+            <Indicador rotulo="Ticket médio" detalhe={<Comparacoes anterior={d.variacao.ticket_medio} media={d.vs_media?.ticket_medio} />}>
               <Dinheiro variante="h3" valor={a.ticket_medio} />
             </Indicador>
             <Indicador rotulo="Serviços por cliente (ratio)"
-              detalhe={<Texto variante="caption" cor="textMuted" numero>{d.variacao.ratio !== null ? `${Number(d.variacao.ratio) >= 0 ? '▲' : '▼'} ${formatDecimal(Math.abs(Number(d.variacao.ratio)))} vs mês anterior` : 'sem comparação'}</Texto>}>
+              detalhe={<Comparacoes formato="diferenca" anterior={d.variacao.ratio} media={d.vs_media?.ratio} />}>
               <Texto variante="h3" numero>{formatDecimal(a.ratio_servicos_por_cliente)}</Texto>
             </Indicador>
-            <Indicador rotulo="Atendimentos" detalhe={<Variacao valor={d.variacao.atendimentos} />}>
+            <Indicador rotulo="Atendimentos" detalhe={<Comparacoes anterior={d.variacao.atendimentos} media={d.vs_media?.atendimentos} />}>
               <Texto variante="h3" numero>{a.atendimentos}</Texto>
             </Indicador>
           </View>
         </Cartao>
       )}
+
+      {a && comDados >= 2 ? (
+        <MesesComMedia testID="grafico-meses" meses={d.meses} media={d.media?.faturamento} ateDia={ateDia} />
+      ) : null}
 
       {s ? (
         <Cartao testID="saude">
@@ -65,11 +82,11 @@ export function ConteudoRelatorio({ d }: { d: Relatorio }) {
       ) : null}
 
       {d.mix_servicos.length ? (
-        <BarrasComparadas testID="grafico-servicos" titulo="Serviços feitos"
+        <BarrasComparadas testID="grafico-servicos" titulo="Serviços feitos" rotuloAnterior={ateDia ? `Mês passado até o dia ${ateDia}` : 'Mês passado'}
           itens={d.mix_servicos.map((x) => ({ nome: x.nome, atual: x.qtd, anterior: x.qtd_mes_anterior }))} />
       ) : null}
       {d.mix_produtos.length ? (
-        <BarrasComparadas titulo="Produtos vendidos"
+        <BarrasComparadas titulo="Produtos vendidos" rotuloAnterior={ateDia ? `Mês passado até o dia ${ateDia}` : 'Mês passado'}
           itens={d.mix_produtos.map((x) => ({ nome: x.nome, atual: x.qtd, anterior: x.qtd_mes_anterior }))} />
       ) : null}
 

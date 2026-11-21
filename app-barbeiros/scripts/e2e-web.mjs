@@ -57,6 +57,16 @@ function esperar(condicao, msg) {
   if (!condicao) throw new Error(msg);
 }
 
+// Reads a value straight from the local database (the seed's history is generated relative to today).
+function sql(consulta) {
+  return execSync('docker exec -i supabase_db_app-barbeiros psql -U postgres -tA', { input: consulta }).toString().trim();
+}
+const SEED = 'b0b0b0b0-0000-4000-8000-000000000001';
+const faturamentoDoMes = () => Number(sql(`select coalesce((select faturamento from v_metricas_mes where barbeiro_id = '${SEED}'
+  and mes = date_trunc('month', hoje_br())::date), 0)`));
+const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+const paraNumero = (t) => Number(normalizar(t).replace(/[^\d,]/g, '').replace(',', '.'));
+
 // HoldToConfirm: press and hold for 2 s.
 async function segurar(page, testID) {
   const caixa = await page.getByTestId(testID).boundingBox();
@@ -126,6 +136,8 @@ export const fluxos = {
   async lancar_e_fechar_caixa(page) {
     await entrar(page, 'barbeiro.teste@example.com');
     await page.getByTestId('hoje-valor').waitFor({ timeout: 20_000 });
+    await page.waitForTimeout(600);
+    const antes = paraNumero(await page.getByTestId('hoje-valor').innerText());
     await print(page, 'f2-10-inicio');
     await page.getByTestId('mais-atendimento').click();
     await page.getByTestId('atalho-Corte').waitFor();
@@ -138,7 +150,8 @@ export const fluxos = {
     await page.getByTestId('oferta-pronto').click();
     await page.waitForTimeout(600);
     const valor = normalizar(await page.getByTestId('hoje-valor').innerText());
-    esperar(valor === 'R$ 70,00', `Início deveria mostrar R$ 70,00 (corte + hidratação), mostrou ${valor}`);
+    const esperado = normalizar(brl.format(antes + 70));
+    esperar(valor === esperado, `Início deveria mostrar ${esperado} (o de antes + corte + hidratação), mostrou ${valor}`);
     await print(page, 'f2-13-inicio-depois');
     await aba(page, 'Agenda');
     await page.getByTestId('agenda-item').first().waitFor();
@@ -170,7 +183,10 @@ export const fluxos = {
     await page.goto(`${BASE}/meta`);
     await page.getByTestId('meta-sugerida').waitFor({ timeout: 20_000 });
     await print(page, 'f3-04-meta-sugerida');
-    await page.getByTestId('meta-valor').fill('150');
+    // Meta 1,6 vez o faturamento do mês: passa da metade, mas não bate.
+    const fat = faturamentoDoMes();
+    const metaValor = Math.ceil(fat * 1.6);
+    await page.getByTestId('meta-valor').fill(String(metaValor));
     await page.getByText('Salvar minha meta').click();
     await page.getByTestId('meta-anel').waitFor();
     await page.getByText('Metade da meta!').waitFor({ timeout: 10_000 });
@@ -178,7 +194,18 @@ export const fluxos = {
     await page.getByTestId('comemorar').click();
     await page.getByTestId('celebracao').waitFor({ state: 'detached', timeout: 10_000 });
     const falta = normalizar(await page.getByTestId('meta-falta').innerText());
-    esperar(falta.includes('R$ 60,00') && falta.includes('2 cortes'), `meta: ${falta}`);
+    const faltaValor = Math.round((metaValor - fat) * 100) / 100;
+    esperar(falta.includes(normalizar(brl.format(faltaValor))) && falta.includes(`${Math.ceil(faltaValor / 45)} cortes`), `meta: ${falta}`);
+
+    // Relatórios: o mês até hoje x o mesmo pedaço do mês passado e da média.
+    await page.goto(`${BASE}/relatorios`);
+    await page.getByTestId('periodo-comparado').waitFor({ timeout: 20_000 });
+    const periodo = normalizar(await page.getByTestId('periodo-comparado').innerText());
+    esperar(/Do dia 1 ao dia \d+, comparado ao mesmo período do mês passado e à média de 3 meses/.test(periodo), `período: ${periodo}`);
+    const comp = normalizar(await page.getByTestId('comparacao-faturamento').innerText());
+    esperar(/vs mês passado/.test(comp) && /(acima|abaixo) da média|na média/.test(comp), `comparação: ${comp}`);
+    await page.getByTestId('grafico-meses').scrollIntoViewIfNeeded();
+    await print(page, 'f3-08-relatorio-meses-media');
     await print(page, 'f3-06-meta');
 
     await page.goto(`${BASE}/comissao`);
@@ -421,7 +448,7 @@ export const fluxos = {
     await fecharCelebracoes(page);
     await page.goto(`${BASE}/meta`);
     await page.getByTestId('meta-valor').waitFor({ timeout: 20_000 });
-    await page.getByTestId('meta-valor').fill('90');
+    await page.getByTestId('meta-valor').fill(String(Math.floor(faturamentoDoMes())));
     await page.getByText('Salvar minha meta').click();
     // 50% and 100% may follow each other in the same sheet: tap through until "Meta batida!".
     let batida = false;

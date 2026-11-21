@@ -10,7 +10,7 @@ import { InsightCard } from '@/components/InsightCard';
 import { SecondaryButton } from '@/components/SecondaryButton';
 import { TelaBase } from '@/components/TelaBase';
 import { Texto } from '@/components/Texto';
-import { Variacao } from '@/components/Variacao';
+import { Comparacoes } from '@/components/Variacao';
 import { useGerarInsights, useInsights, useResumoSemana } from '@/features/pago/api';
 import { PortaPlano } from '@/features/planos/PortaPlano';
 import { formatDiaLongo } from '@/lib/format';
@@ -21,22 +21,26 @@ const DESTINO: Record<string, Href> = {
   'Ver meta': '/meta', 'Ver relatórios': '/relatorios',
 };
 
+const DIAS_SEMANA = ['segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado', 'domingo'];
+
 function Semana() {
   const s = useResumoSemana();
   const { width } = useWindowDimensions();
   const largura = Math.min(width, 520) - 32;
   if (!s.data) return null;
   const d = s.data;
+  // Monday to today vs Monday to the same weekday of last week (from the database).
+  const ateDia = d.ate_dia_semana && d.ate_dia_semana > 1 ? DIAS_SEMANA[d.ate_dia_semana - 1] : null;
   const cartoes = [
     <Cartao key="fat" style={{ width: largura }}>
-      <Texto variante="caption" cor="textMuted">Faturamento da semana</Texto>
+      <Texto variante="caption" cor="textMuted">Faturamento da semana{ateDia ? `, de segunda até ${ateDia}` : ''}</Texto>
       <Dinheiro variante="h2" valor={d.faturamento} />
-      <Variacao valor={d.variacao} sufixo="vs semana passada" />
+      <Comparacoes anterior={d.variacao} media={d.vs_media} sufixo="vs semana passada" />
     </Cartao>,
     <Cartao key="atend" style={{ width: largura }}>
       <Texto variante="caption" cor="textMuted">Atendimentos</Texto>
       <Texto variante="h2" numero>{d.atendimentos}</Texto>
-      <Texto variante="caption" cor="textMuted" numero>{d.atendimentos_anterior} na semana passada</Texto>
+      <Texto variante="caption" cor="textMuted" numero>{d.atendimentos_anterior} na semana passada, até o mesmo dia</Texto>
     </Cartao>,
     <Cartao key="ofertas" style={{ width: largura }}>
       <Texto variante="caption" cor="textMuted">Ofertas</Texto>

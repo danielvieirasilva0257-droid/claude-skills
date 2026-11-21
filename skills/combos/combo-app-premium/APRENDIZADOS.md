@@ -14,3 +14,10 @@ Adendos datados, o mais novo embaixo.
 - **Voz no aparelho:** `expo-speech-recognition` (fala → texto, também na web) e `expo-speech` (texto → fala). O áudio não sai do celular, e o texto passa pelo anonimizador ("Cliente N") antes da IA. Isso deixa espaço para trocar por uma IA de voz na nuvem depois (decisão de privacidade do dono do app).
 - **Orbe estilo ChatGPT:** um `Path` SVG reconstruído a cada quadro na thread de UI (`useFrameCallback` + `useAnimatedProps`), com 12 pontos e spline fechada. A amplitude depende do estado (volume do microfone ao ouvir, pulso sintético ao falar). Com "reduzir movimento", vira um círculo parado.
 - **Modo simulado com as mesmas ferramentas:** permite E2E de ponta a ponta (pedido → cartão → "sim" → horário na agenda) sem chave de API.
+
+## 20/11/2026: comparações justas e dados de teste (App Barbeiros)
+
+- **Compare no mesmo pedaço do período:** no começo do mês, "mês até hoje x mês passado inteiro" deixa tudo vermelho e desanima. Calcule no banco a janela "dia 1 até hoje" e use a mesma nos meses anteriores, na média de 3 meses e nos gráficos; mês fechado compara inteiro. Mostre as duas linhas: "vs mês passado" e, embaixo, "acima/abaixo da média", com uma faixa de "na média" (3%).
+- **Dados de teste com valores exatos e datas relativas:** gerador no seed que mede o que já existe no período e enche até o alvo (faturamento e quantidade), com `setseed` para repetir igual; os centavos vão como desconto na última visita.
+- **Não amarre teste a "amanhã":** escolha o próximo dia útil; e leia do banco os totais que mudam com o seed.
+

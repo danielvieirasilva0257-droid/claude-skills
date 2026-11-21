@@ -226,6 +226,35 @@ Pedido (por áudio): agenda com calendário no estilo Booksy/AVEC, cadastro do c
 
 **Pendências:** nome do botão ("Fale com a IA" provisório), as IAs de texto e voz que o Daniel vai integrar e o modelo (padrão `claude-opus-5-5` com esforço baixo; trocar para `claude-haiku-5-5` deixa mais barato e rápido, decisão dele).
 
+## Comparações justas e dados de teste (20/11/2026)
+
+Pedido (por áudio): "75% menor que o mês passado" no começo do mês desanima. Compare sempre **até o mesmo dia** (hoje é dia 4 → o mês passado até o dia 4) e, embaixo, **comparado à média** ("X% acima da média" / "X% abaixo da média"). E colocar dados de teste: 4 meses (um abaixo da média, um acima, um na média e o atual), com o mês passado em R$ 10.150,82 e ticket perto de R$ 200.
+
+1. **Banco (migration `0009_comparacao_mesmo_periodo.sql`):**
+   - `dia_comparavel(mes)`: o dia de hoje no mês corrente; mês fechado = mês inteiro.
+   - `metricas_periodo(barbeiro, inicio, fim)` e `comparacao_mes(barbeiro, mes)`: o mês até hoje, o mesmo pedaço do mês passado, a média dos 3 meses anteriores (só os que tiveram atendimento nesse pedaço) e os 4 meses lado a lado com o "vs média" de cada um.
+   - `relatorio_mes` passa a mandar `anterior` (mesmo pedaço), `variacao`, `media`, `vs_media`, `comparacao` e `meses`; o mix de serviços e produtos compara com o mesmo pedaço.
+   - `painel_barbearia` (dono), `resumo_semana` (segunda até hoje x segunda até o mesmo dia da semana passada, e a média de 4 semanas) e `contexto_ia` com a mesma regra.
+2. **Telas:** `Comparacoes` (duas linhas: "▲ 8,2% vs mês passado" e "▲ 9% acima da média"; até 3% = "≈ na média"), o período escrito no cartão ("Do dia 1 ao dia 21, comparado ao mesmo período do mês passado e à média de 3 meses"), gráfico novo `MesesComMedia` (4 meses até o mesmo dia, linha tracejada da média, cada mês dizendo acima/abaixo/na média), legendas "Mês passado até o dia N" nas barras, painel do dono e cartão da semana nos Insights.
+3. **IA:** o agente de voz recebe a comparação pronta em "números do mês" e responde "Até o dia 21: 8,2% acima do mês passado e 9% acima da média". Os prompts proíbem comparar o mês pela metade com um mês inteiro.
+4. **Dados de teste (fim do `supabase/seed.sql`):** 4 serviços de química (Luzes, Platinado, Selagem, Pigmentação) para o ticket chegar a R$ 200, 24 clientes de teste e um gerador com semente fixa que enche cada período até o valor pedido (contando as visitas do Rafael, Bruno e Carlos), de terça a sábado, sem encavalar horários e fora do almoço. A última visita do período leva o ajuste dos centavos (desconto no serviço mais caro). Cada mês fechado é dividido em "até o dia de hoje" e "o resto" na mesma proporção, para a comparação até o mesmo dia contar a mesma história:
+
+   | Mês | Mês inteiro | Atendimentos | Ticket | Até o dia 21 |
+   |---|---|---|---|---|
+   | 3 meses atrás | R$ 8.432,40 | 44 | R$ 191,65 | 16,3% abaixo da média |
+   | 2 meses atrás | R$ 11.650,00 | 57 | R$ 204,39 | 15,6% acima |
+   | mês passado | R$ 10.150,82 | 51 | R$ 199,04 | na média (+0,7%) |
+   | este mês (até o dia 21) | R$ 7.689,31 | 38 | R$ 202,35 | +8,2% vs mês passado, +9% vs média |
+
+**Testes:** pgTAP 116 (16 novos em `comparacao_mesmo_periodo.test.sql`), Deno 21 (resposta do agente com a comparação), Jest 25.
+
+**Aprendizados:**
+
+- **Comparação justa:** número parcial contra número inteiro sempre parece queda. Defina a janela no banco (dia 1 até o dia de hoje, cortada no fim de meses mais curtos) e use a mesma janela no mês passado, na média e no mix. Mês fechado compara inteiro.
+- **"Na média" precisa de faixa:** sem ela, 0,7% acima vira "acima da média" e confunde. Até 3% de distância = "na média" (cor neutra, com o número entre parênteses).
+- **Seed que bate um valor exato com datas relativas:** como as datas mudam a cada dia, o gerador mede o que já existe no período e preenche até o alvo, guiando a escolha das combinações pelo valor que falta por visita; os centavos vão na última. Com `setseed` o resultado é o mesmo em cada reset.
+- **Testes presos ao dia:** dois testes de "pausa do almoço" usavam "amanhã" e falharam no sábado (domingo não tem pausa). Escolha o próximo dia útil (terça a sábado) em vez de "amanhã". Testes que contavam atendimentos fixos (16, meta de R$ 90) passaram a ler o número do banco.
+
 ## Pendências (fora do código)
 
 1. **Modelo da IA:** o padrão é `claude-opus-5-5` (regra da skill da API). Para o custo-alvo de R$ 0,50 a R$ 2 por barbeiro por mês, a troca para `claude-haiku-5-5` é decisão do Daniel (`LLM_MODEL`). Falta a chave da API nos secrets do Supabase.

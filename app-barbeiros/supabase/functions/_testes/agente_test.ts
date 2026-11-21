@@ -61,3 +61,10 @@ Deno.test('abrir uma tela do app', async () => {
   const r = await falar({ mensagem: 'Abre os relatórios' });
   assertEquals(r.navegar, '/relatorios');
 });
+
+Deno.test('números do mês: compara só até o mesmo dia, com o mês passado e a média', async () => {
+  const r = await falar({ mensagem: 'Quanto eu faturei esse mês?' });
+  assertMatch(r.texto, /No mês você faturou R\$ [\d.,]+ em \d+ atendimento/);
+  const dia = Number(new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' }).slice(8));
+  assertMatch(r.texto, new RegExp(`Até o dia ${dia}: [\\d,]+% (acima|abaixo) do mês passado e ([\\d,]+% (acima|abaixo) da média|na média)`));
+});

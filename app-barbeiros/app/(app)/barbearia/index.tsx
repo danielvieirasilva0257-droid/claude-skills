@@ -18,7 +18,7 @@ import { SecondaryButton } from '@/components/SecondaryButton';
 import { StatusButton } from '@/components/StatusButton';
 import { TelaBase } from '@/components/TelaBase';
 import { Texto } from '@/components/Texto';
-import { Variacao } from '@/components/Variacao';
+import { Comparacoes } from '@/components/Variacao';
 import {
   useCriarBarbearia, useEntrarNaBarbearia, useEquipe, useMinhaBarbearia, usePainel, useSairDaBarbearia,
   type MinhaBarbearia,
@@ -130,9 +130,9 @@ function PainelDono() {
           <Texto variante="caption" cor="textMuted" numero>{p.hoje.atendimentos} atendimento(s) · {p.hoje.agendados} agendado(s)</Texto>
         </Cartao>
         <Cartao style={styles.meio} testID="painel-mes">
-          <Texto variante="caption" cor="textMuted">No mês</Texto>
+          <Texto variante="caption" cor="textMuted">{p.comparacao?.ate_dia ? `No mês, até o dia ${p.comparacao.ate_dia}` : 'No mês'}</Texto>
           <Dinheiro variante="h2" valor={p.total.faturamento} testID="painel-mes-valor" />
-          <Variacao valor={p.total.variacao_faturamento} />
+          <Comparacoes anterior={p.total.variacao_faturamento} media={p.total.vs_media_faturamento} />
         </Cartao>
       </View>
       <Cartao>
@@ -155,6 +155,7 @@ function PainelDono() {
 
       {p.equipe.length > 1 ? (
         <BarrasComparadas testID="grafico-equipe" titulo="Faturamento por barbeiro" formatar={formatMoeda}
+          rotuloAnterior={p.comparacao?.ate_dia ? `Mês passado até o dia ${p.comparacao.ate_dia}` : 'Mês passado'}
           itens={p.equipe.map((l) => ({ nome: l.barbeiro_id === uid ? `${l.nome} (você)` : l.nome, atual: Number(l.faturamento), anterior: Number(l.faturamento_anterior) }))} />
       ) : null}
 

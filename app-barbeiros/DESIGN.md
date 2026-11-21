@@ -155,6 +155,8 @@ Estados obrigatórios: normal, foco, pressionado, desativado, carregando, vazio,
 | Calendário (Agenda) | Mês com domingo primeiro; dia escolhido na pílula branca (`text`/`onLight`), hoje com anel limão, ponto embaixo do dia com horário (limão: agendado; cinza: só feitos ou faltas). Células de 44 px com rótulo falado ("sexta, 21 de novembro, 1 horário"). |
 | Grade do dia (Agenda) | Do horário de entrada ao de saída (expediente do dia; sem cadastro, 9h às 19h), 72 px por hora, pausa em faixa `surface`, fora do expediente com véu. Horário = bloco com borda esquerda de 4 px (limão: agendado; `brandLip`: feito; `warning`: faltou), hora, cliente, serviços e valor. Linha "agora" limão. Meia hora vazia é tocável e abre "Agendar" com a hora preenchida. Horários juntos dividem a largura. |
 | CRM do agendamento | No topo da gaveta do horário: cliente (link limão com "›" para o cadastro), data, horário, profissional, serviços com preço e duração, e o valor; as ações (concluir, faltou, cancelar, ofertas) ficam embaixo. |
+| Comparação (`Comparacoes`) | Duas linhas embaixo do número: "▲ 8,2% vs mês passado" e "▲ 9% acima da média" (limão acima, `danger` abaixo, `textMuted` e "≈ na média" até 3% da média). Sempre seta + texto. Em cima do cartão, o período: "Do dia 1 ao dia 21, comparado ao mesmo período do mês passado e à média de 3 meses". |
+| Gráfico dos meses (`MesesComMedia`) | Barras verticais dos 4 meses no mesmo pedaço (dia 1 até hoje): este mês limão, os anteriores no verde escuro, valor curto em cima ("R$ 7,1 mil"), linha tracejada `textMuted` da média com o rótulo "média", e embaixo de cada mês "▲ 15,6% acima", "▼ 16,3% abaixo" ou "na média". Tocar mostra o valor completo; "Ver em tabela" lista tudo. |
 | Orbe da IA ("Fale com a IA") | Bolha lavanda (cor da IA) desenhada como um caminho SVG que se move: parado = respira; ouvindo = a borda segue o volume do microfone; pensando = ondula girando; falando = pulsa no ritmo da fala. Sempre com o estado escrito embaixo. "Reduzir movimento": círculo parado. Microfone lavanda redondo de 80 px; teclado e som em botões de 52 px. |
 
 ### ConquistaButton ("pulo com dinheiro", aprovado em 19/11)
@@ -194,6 +196,7 @@ Contrastes conferidos acima (todos ≥ 6:1). Toque ≥ 44 × 44 (botões 52, aba
 | Liquid Glass nativo no iOS 26 | `expo-glass-effect` (SDK 58) | `Vidro` | efeito real da Apple; desfoque no resto |
 | Aurora em vez de ilustração | `ui-ux-pro-max` (gradiente só como atmosfera de hero) | atrás do topo | dá cor para o vidro refratar sem foto de terceiro |
 | Paleta dos gráficos no escuro | Validador da skill `dataviz` (20/11): par `#6E8F1F` + `#C5F23A` ALL PASS | `src/theme/grafico.ts` | verde em dois tons, legível para daltônicos |
+| Comparar até o mesmo dia, com a média embaixo | Daniel (20/11) | mês até hoje x mês passado inteiro | no começo do mês tudo ficava vermelho; no mesmo pedaço o barbeiro vê o número crescer e fica motivado |
 | Lábio do botão e "pulo com dinheiro" mantidos | Aprovados em 19/11 | `DuoButton`, `ConquistaButton` | o encanto continua só nas conquistas |
 
 ## Decisões em aberto

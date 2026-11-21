@@ -74,11 +74,15 @@ returns jsonb language sql stable as $$
     'atual', (select v from met where k = 0),
     'anterior', (select v from met where k = 1),
     'media', (select case when meses = 0 then null else to_jsonb(media) end from media),
+    'variacao_faturamento', (select variacao_sobre((a.v->>'faturamento')::numeric, (b.v->>'faturamento')::numeric)
+                               from met a, met b where a.k = 0 and b.k = 1),
+    'vs_media_faturamento', (select variacao_sobre((a.v->>'faturamento')::numeric, media.faturamento) from met a, media where a.k = 0),
     'meses', (select jsonb_agg(jsonb_build_object(
                 'mes', mes, 'fim', fim, 'atual', k = 0,
                 'faturamento', coalesce((v->>'faturamento')::numeric, 0),
-                'atendimentos', coalesce((v->>'atendimentos')::int, 0)) order by mes)
-              from met)
+                'atendimentos', coalesce((v->>'atendimentos')::int, 0),
+                'vs_media', case when v is not null then variacao_sobre((v->>'faturamento')::numeric, media.faturamento) end) order by mes)
+              from met, media)
   )
 $$;
 
@@ -273,8 +277,8 @@ language sql stable as $$
                          'ate_dia', c->'ate_dia',
                          'mes_passado_mesmo_periodo', c->'anterior',
                          'media_3_meses_mesmo_periodo', c->'media',
-                         'variacao_faturamento', variacao_sobre((c->'atual'->>'faturamento')::numeric, (c->'anterior'->>'faturamento')::numeric),
-                         'vs_media_faturamento', variacao_sobre((c->'atual'->>'faturamento')::numeric, (c->'media'->>'faturamento')::numeric))
+                         'variacao_faturamento', c->'variacao_faturamento',
+                         'vs_media_faturamento', c->'vs_media_faturamento')
                        from (select comparacao_mes(b.id) as c) x),
     'saude', (select to_jsonb(s) - 'barbeiro_id' from v_saude_cadeira s where s.barbeiro_id = b.id),
     'servicos', (select jsonb_agg(jsonb_build_object('nome', nome, 'preco', preco, 'categoria', categoria, 'duracao_min', duracao_min))
