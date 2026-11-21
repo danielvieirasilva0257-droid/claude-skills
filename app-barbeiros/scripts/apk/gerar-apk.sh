@@ -8,6 +8,10 @@ cd "$(dirname "$0")/../.."
 export ANDROID_HOME="${ANDROID_HOME:-/root/android-sdk}" JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-21-openjdk-amd64}"
 export EXPO_PUBLIC_GALERIA=0 NODE_ENV=production EXPO_PUBLIC_DEMO="${EXPO_PUBLIC_DEMO:-1}"
 [ -d android ] || EXPO_OFFLINE=1 CI=1 npx expo prebuild --platform android --no-install
+# prebuild runs only once: keep the native version in sync with app.json on every build.
+VERSAO=$(node -p "require('./app.json').expo.version")
+CODIGO=$(node -p "require('./app.json').expo.android.versionCode")
+sed -i -E "s/versionCode [0-9]+/versionCode $CODIGO/; s/versionName \"[^\"]+\"/versionName \"$VERSAO\"/" android/app/build.gradle
 echo "sdk.dir=$ANDROID_HOME" > android/local.properties
 sed -i 's/^reactNativeArchitectures=.*/reactNativeArchitectures=arm64-v8a/' android/gradle.properties
 sed -i 's/^org.gradle.jvmargs=.*/org.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=1024m/' android/gradle.properties
