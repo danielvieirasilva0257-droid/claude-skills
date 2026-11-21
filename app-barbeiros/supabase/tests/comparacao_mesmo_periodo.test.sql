@@ -1,6 +1,6 @@
--- Comparações justas (0009): o mês corrente x o mesmo pedaço do mês passado
--- e a média dos 3 meses anteriores; mês fechado x mês inteiro; semana até o
--- mesmo dia; e o histórico de teste do seed (pgTAP).
+-- Comparações justas (0009): o mês corrente x o mesmo pedaço (dia e hora) do
+-- mês passado e a média dos 3 meses anteriores; mês fechado x mês inteiro;
+-- semana até o mesmo momento; e o histórico de teste do seed (pgTAP).
 begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
@@ -8,25 +8,31 @@ select plan(16);
 
 -- Referências calculadas direto em v_atendimento_resumo (como postgres, sem RLS).
 create temp table ref as
-with p as (select date_trunc('month', hoje_br())::date as m0, extract(day from hoje_br())::int as n),
+with p as (select date_trunc('month', hoje_br())::date as m0,
+                  (now() at time zone 'America/Sao_Paulo') - (date_trunc('month', hoje_br())::date)::timestamp as decorrido),
 jan as (
-  select k, (p.m0 - make_interval(months => k))::date as ini,
-         least((p.m0 - make_interval(months => k))::date + p.n - 1,
-               ((p.m0 - make_interval(months => k)) + interval '1 month - 1 day')::date) as fim
+  select k, ((p.m0 - make_interval(months => k))::date)::timestamp at time zone 'America/Sao_Paulo' as ini,
+         least((((p.m0 - make_interval(months => k))::date)::timestamp + p.decorrido) at time zone 'America/Sao_Paulo',
+               (((p.m0 - make_interval(months => k))::date + interval '1 month')::timestamp) at time zone 'America/Sao_Paulo') as fim
   from p, generate_series(0, 3) k
 )
 select k, ini, fim,
        (select sum(valor_total) from v_atendimento_resumo r
-         where r.barbeiro_id = 'b0b0b0b0-0000-4000-8000-000000000001'
-           and (r.inicio at time zone 'America/Sao_Paulo')::date between jan.ini and jan.fim) as fat,
+         where r.barbeiro_id = 'b0b0b0b0-0000-4000-8000-000000000001' and r.inicio >= jan.ini and r.inicio < jan.fim) as fat,
        (select count(*) from atendimento_itens i join atendimentos a on a.id = i.atendimento_id join servicos s on s.id = i.servico_id
          where a.barbeiro_id = 'b0b0b0b0-0000-4000-8000-000000000001' and a.status = 'concluido' and s.nome = 'Corte'
-           and (a.inicio at time zone 'America/Sao_Paulo')::date between jan.ini and jan.fim) as cortes
+           and a.inicio >= jan.ini and a.inicio < jan.fim) as cortes
 from jan;
+-- Semana passada de segunda até o mesmo dia e hora.
+create temp table ref_semana as
+select (select coalesce(sum(valor_total), 0) from v_atendimento_resumo r
+         where r.barbeiro_id = 'b0b0b0b0-0000-4000-8000-000000000001'
+           and r.inicio >= ((date_trunc('week', hoje_br())::date - 7)::timestamp at time zone 'America/Sao_Paulo')
+           and r.inicio < (now() - interval '7 days')) as fat;
 create temp table mensal as
 select mes, faturamento, atendimentos, ticket_medio from v_metricas_mes
  where barbeiro_id = 'b0b0b0b0-0000-4000-8000-000000000001';
-grant select on ref, mensal to authenticated;
+grant select on ref, ref_semana, mensal to authenticated;
 
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub": "b0b0b0b0-0000-4000-8000-000000000001", "role": "authenticated"}', true);
@@ -35,7 +41,7 @@ create temp table r_fechado as select relatorio_mes((date_trunc('month', hoje_br
 
 -- ---------- Mês corrente: até o mesmo dia ----------
 select is((select (j->'comparacao'->>'ate_dia')::int from r), extract(day from hoje_br())::int, 'compara até o dia de hoje');
-select is((select (j->'anterior'->>'fim')::date from r), (select fim from ref where k = 1), 'mês passado só até o mesmo dia');
+select is((select (j->'anterior'->>'fim')::timestamptz from r), (select fim from ref where k = 1), 'mês passado só até o mesmo dia e hora');
 select is((select (j->'anterior'->>'faturamento')::numeric from r), (select fat from ref where k = 1),
           'faturamento do mês passado até o mesmo dia');
 select is((select (j->'variacao'->>'faturamento')::numeric from r),
@@ -52,9 +58,9 @@ select is((select jsonb_array_length(j->'meses') from r), 4, 'gráfico: os 4 mes
 
 -- ---------- Mês fechado: o mês inteiro ----------
 select ok((select j->'comparacao'->'ate_dia' = 'null'::jsonb from r_fechado), 'mês fechado compara o mês inteiro');
-select is((select (j->'anterior'->>'fim')::date from r_fechado),
-          (date_trunc('month', hoje_br()) - interval '1 month' - interval '1 day')::date,
-          'mês fechado: o anterior vai até o último dia');
+select is((select (j->'anterior'->>'fim')::timestamptz from r_fechado),
+          ((date_trunc('month', hoje_br()) - interval '1 month')::date)::timestamp at time zone 'America/Sao_Paulo',
+          'mês fechado: o anterior vai até o fim do mês');
 
 -- ---------- Histórico de teste do seed ----------
 select results_eq(
@@ -72,9 +78,8 @@ select ok((select (j->'variacao'->>'faturamento')::numeric > 0 and (j->'vs_media
           'este mês está no verde nas duas comparações');
 
 -- ---------- Semana até o mesmo dia ----------
-select is((resumo_semana()->>'faturamento_anterior')::numeric,
-          (select faturamento from financeiro(date_trunc('week', hoje_br())::date - 7, hoje_br() - 7, 'total')),
-          'semana passada só até o mesmo dia da semana');
+select is((resumo_semana()->>'faturamento_anterior')::numeric, (select fat from ref_semana),
+          'semana passada só até o mesmo dia e hora');
 
 -- ---------- IA recebe a comparação pronta, sem nomes ----------
 select ok(contexto_ia(auth.uid())->'comparacao_mes' ? 'vs_media_faturamento'

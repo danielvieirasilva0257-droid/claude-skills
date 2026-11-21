@@ -97,7 +97,8 @@ Você pode consultar e mexer no app usando as ferramentas. Regras:
 
 // ---------- Helpers ----------
 const normal = (t: string) => t.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
-const moeda = (v: number) => `R$ ${v.toFixed(2).replace('.', ',')}`;
+const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+const moeda = (v: number) => brl.format(v).replace(/\s/g, ' ');
 const pct = (v: number) => `${(Math.abs(v) * 100).toFixed(1).replace('.', ',').replace(',0', '')}%`;
 
 /** " Até o dia 21: 8,2% acima do mês passado e 9% acima da média." (numbers from the database). */

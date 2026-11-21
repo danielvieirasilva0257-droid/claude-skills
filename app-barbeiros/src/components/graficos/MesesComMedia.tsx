@@ -21,7 +21,7 @@ export type MesComparado = {
   vs_media: number | string | null;
 };
 
-const ALTURA = 150;
+const ALTURA = 140;
 
 function situacao(m: MesComparado) {
   const p = posicaoNaMedia(m.vs_media);
@@ -37,14 +37,15 @@ export function MesesComMedia({ meses, media, ateDia, testID }: {
   const [tocado, setTocado] = useState<number | null>(null);
   const valores = meses.map((m) => Number(m.faturamento));
   const nMedia = media === null || media === undefined ? null : Number(media);
-  const max = Math.max(1, ...valores, nMedia ?? 0) * 1.12;
+  const max = Math.max(1, ...valores, nMedia ?? 0) * 1.05;
   const m = tocado !== null ? meses[tocado] : null;
   const periodo = ateDia ? `do dia 1 ao dia ${ateDia}` : 'mês inteiro';
   return (
     <BlocoGrafico
       testID={testID}
       titulo={ateDia ? `Faturamento até o dia ${ateDia}` : 'Faturamento por mês'}
-      legenda={[{ rotulo: 'Este mês', cor: grafico.atual }, { rotulo: 'Meses anteriores', cor: grafico.anterior }]}
+      legenda={[{ rotulo: 'Este mês', cor: grafico.atual }, { rotulo: 'Meses anteriores', cor: grafico.anterior },
+        ...(nMedia !== null ? [{ rotulo: 'Média dos 3 meses', cor: color.textMuted, tracejado: true }] : [])]}
       destaque={m ? `${formatMesCurto(m.mes)} (${periodo}): ${formatMoeda(m.faturamento)} · ${m.atendimentos} atendimentos · ${situacao(m)}${posicaoNaMedia(m.vs_media) && posicaoNaMedia(m.vs_media) !== 'na_media' ? ' da média' : ''}`
         : nMedia !== null ? `Média dos 3 meses (${periodo}): ${formatMoeda(nMedia)}` : null}
       tabela={{
@@ -55,9 +56,7 @@ export function MesesComMedia({ meses, media, ateDia, testID }: {
       <View style={[styles.area, { height: ALTURA }]}>
         {nMedia !== null ? (
           <View pointerEvents="none" style={[styles.media, { bottom: (nMedia / max) * ALTURA }]}
-            accessibilityRole="image" accessibilityLabel={`Linha da média: ${formatMoeda(nMedia)}`}>
-            <Texto variante="tiny" cor="textMuted" style={styles.mediaRotulo}>média</Texto>
-          </View>
+            accessibilityRole="image" accessibilityLabel={`Linha da média: ${formatMoeda(nMedia)}`} />
         ) : null}
         {meses.map((x, i) => {
           const v = Number(x.faturamento);
@@ -65,8 +64,7 @@ export function MesesComMedia({ meses, media, ateDia, testID }: {
             <Pressable key={x.mes} style={styles.coluna} onPress={() => setTocado(i)} onHoverIn={() => setTocado(i)}
               accessibilityRole="button"
               accessibilityLabel={`${formatMesCurto(x.mes)}${x.atual ? ', este mês' : ''}: ${formatMoeda(v)}, ${situacao(x)}${posicaoNaMedia(x.vs_media) && posicaoNaMedia(x.vs_media) !== 'na_media' ? ' da média' : ''}`}>
-              <Texto variante="tiny" cor={x.atual ? 'text' : 'textMuted'} numero style={styles.valor}>{formatMoedaCurta(v)}</Texto>
-              <View style={[styles.barra, { height: Math.max(2, (v / max) * (ALTURA - 18)),
+              <View style={[styles.barra, { height: Math.max(2, (v / max) * ALTURA),
                 backgroundColor: x.atual ? grafico.atual : grafico.anterior }, tocado === i ? styles.tocada : null]} />
             </Pressable>
           );
@@ -78,7 +76,8 @@ export function MesesComMedia({ meses, media, ateDia, testID }: {
             <Texto variante="caption" peso={x.atual ? 'semibold' : 'regular'} cor={x.atual ? 'text' : 'textMuted'}>
               {x.atual ? 'este mês' : formatMesCurto(x.mes)}
             </Texto>
-            <Texto variante="tiny" cor={posicaoNaMedia(x.vs_media) === 'acima' ? 'brandLip' : 'textMuted'} numero>
+            <Texto variante="caption" peso="semibold" cor={x.atual ? 'text' : 'textMuted'} numero>{formatMoedaCurta(x.faturamento)}</Texto>
+            <Texto variante="tiny" cor={posicaoNaMedia(x.vs_media) === 'acima' ? 'brandLip' : 'textMuted'} numero style={styles.centro}>
               {posicaoNaMedia(x.vs_media) === 'acima' ? '▲ ' : posicaoNaMedia(x.vs_media) === 'abaixo' ? '▼ ' : ''}{situacao(x)}
             </Texto>
           </View>
@@ -91,11 +90,10 @@ export function MesesComMedia({ meses, media, ateDia, testID }: {
 const styles = StyleSheet.create({
   area: { flexDirection: 'row', alignItems: 'flex-end', gap: space[3] },
   coluna: { flex: 1, height: '100%', justifyContent: 'flex-end', alignItems: 'stretch' },
-  valor: { textAlign: 'center', marginBottom: 2 },
   barra: { borderTopLeftRadius: radius.sm, borderTopRightRadius: radius.sm },
   tocada: { opacity: 0.75 },
   media: { position: 'absolute', left: 0, right: 0, borderTopWidth: 1, borderStyle: 'dashed', borderColor: color.textMuted, zIndex: 1 },
-  mediaRotulo: { position: 'absolute', right: 0, top: -16 },
   eixo: { flexDirection: 'row', gap: space[3], marginTop: space[1] },
   rotulo: { flex: 1, alignItems: 'center' },
+  centro: { textAlign: 'center' },
 });

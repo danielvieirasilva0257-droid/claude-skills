@@ -396,8 +396,8 @@ update clientes set observacoes = 'Faltou no último horário; mandar lembrete n
 --   2 meses atrás: R$ 11.650,00 em 57 atendimentos  → acima da média
 --   mês passado:   R$ 10.150,82 em 51 atendimentos  → na média (ticket ≈ R$ 199)
 --   este mês:      até hoje, 9% acima da média do mesmo pedaço (verde)
--- Cada mês fechado é dividido em "até o dia de hoje" e "o resto", na mesma
--- proporção, para a comparação até o mesmo dia contar a mesma história.
+-- Cada mês fechado é dividido em "até este momento do mês" e "o resto", na
+-- mesma proporção, para a comparação até o mesmo momento contar a mesma história.
 -- As visitas do Rafael, do Bruno e do Carlos entram na conta. Os 24 clientes
 -- de teste e os serviços de cada visita são sorteados com semente fixa.
 -- =====================================================================
@@ -434,11 +434,11 @@ from (values (1, '{Corte,Barba}'::text[]), (2, '{Corte,Barba,Hidratação,Sobran
              (13, '{Corte,Barba,Pigmentação,Barboterapia}')) as c(id, servicos);
 create temp sequence t_visita;
 
--- Enche um período até o faturamento e o número de atendimentos pedidos
--- (contando o que já existe nele). Ter a sáb, 9h às 19h, fora do almoço e sem
--- encavalar horários; hoje, só o que já terminou. A última visita do período
--- recebe o ajuste dos centavos (um desconto no serviço mais caro).
-create function pg_temp.encher(p_ini date, p_fim date, p_alvo numeric, p_qtd int) returns void
+-- Enche o período [p_ini, p_fim) até o faturamento e o número de atendimentos
+-- pedidos (contando o que já existe nele). Ter a sáb, 9h às 19h, fora do
+-- almoço e sem encavalar horários; hoje, só o que já terminou. A última visita
+-- do período recebe o ajuste dos centavos (um desconto no serviço mais caro).
+create function pg_temp.encher(p_ini timestamptz, p_fim timestamptz, p_alvo numeric, p_qtd int) returns void
 language plpgsql as $$
 declare
   v_bar constant uuid := 'b0b0b0b0-0000-4000-8000-000000000001';
@@ -464,8 +464,10 @@ declare
 begin
   select p_alvo - coalesce(sum(r.valor_total), 0), p_qtd - count(*) into v_rest, v_n
     from v_atendimento_resumo r
-   where r.barbeiro_id = v_bar and (r.inicio at time zone 'America/Sao_Paulo')::date between p_ini and p_fim;
-  v_dias := array(select d::date from generate_series(p_ini, least(p_fim, pg_temp.hoje()), interval '1 day') d
+   where r.barbeiro_id = v_bar and r.inicio >= p_ini and r.inicio < p_fim;
+  v_dias := array(select d::date from generate_series((p_ini at time zone 'America/Sao_Paulo')::date,
+                                                      least(((p_fim - interval '1 second') at time zone 'America/Sao_Paulo')::date, pg_temp.hoje()),
+                                                      interval '1 day') d
                    where extract(isodow from d) between 2 and 6 order by d);
   if v_n <= 0 or v_rest <= 0 or cardinality(v_dias) = 0 then return; end if;
 
@@ -497,7 +499,7 @@ begin
         v_fim := v_ini + make_interval(mins => v_c.dur);
         continue when extract(epoch from v_h) / 60 + v_c.dur > 19 * 60;
         continue when v_h < time '13:00' and extract(epoch from v_h) / 60 + v_c.dur > 12 * 60;
-        continue when v_fim > now();
+        continue when v_fim > now() or v_ini < p_ini or v_fim > p_fim;
         continue when exists (select 1 from atendimentos a where a.barbeiro_id = v_bar and a.status <> 'cancelado'
                                 and tstzrange(a.inicio, coalesce(nullif(a.fim, a.inicio), a.inicio + interval '40 minutes')) && tstzrange(v_ini, v_fim));
         v_ok := true;
@@ -526,15 +528,16 @@ begin
   end loop;
 end $$;
 
+-- Cada mês fechado é dividido no mesmo momento do mês (corte_mes, da 0009):
+-- até o dia e a hora de agora, e o resto.
 do $$
 declare
-  v_n int := extract(day from pg_temp.hoje())::int;
   v_m0 date := date_trunc('month', pg_temp.hoje())::date;
-  v_f numeric := least(v_n, 30) / 30.0;
+  v_f numeric := least(extract(epoch from now() - inicio_mes_br(v_m0)) / 86400 / 30, 1);
   r record;
   v_mes date;
-  v_fim_mes date;
-  v_fim_td date;
+  v_fim_mes timestamptz;
+  v_fim_td timestamptz;
   v_alvo numeric;
   v_qtd int;
   v_soma numeric := 0;
@@ -543,18 +546,18 @@ begin
   perform setseed(0.2611);
   for r in select * from (values (3, 8432.40, 44), (2, 11650.00, 57), (1, 10150.82, 51)) v(k, total, qtd) order by k desc loop
     v_mes := (v_m0 - make_interval(months => r.k))::date;
-    v_fim_mes := (v_mes + interval '1 month - 1 day')::date;
-    v_fim_td := least(v_mes + v_n - 1, v_fim_mes);
+    v_fim_mes := inicio_mes_br((v_mes + interval '1 month')::date);
+    v_fim_td := corte_mes(v_mes, v_m0);
     if v_fim_td >= v_fim_mes then
       v_alvo := r.total; v_qtd := r.qtd;
-      perform pg_temp.encher(v_mes, v_fim_mes, r.total, r.qtd);
+      perform pg_temp.encher(inicio_mes_br(v_mes), v_fim_mes, r.total, r.qtd);
     else
       v_alvo := round(r.total * v_f, 2); v_qtd := round(r.qtd * v_f)::int;
-      perform pg_temp.encher(v_mes, v_fim_td, v_alvo, v_qtd);
-      perform pg_temp.encher(v_fim_td + 1, v_fim_mes, r.total - v_alvo, r.qtd - v_qtd);
+      perform pg_temp.encher(inicio_mes_br(v_mes), v_fim_td, v_alvo, v_qtd);
+      perform pg_temp.encher(v_fim_td, v_fim_mes, r.total - v_alvo, r.qtd - v_qtd);
     end if;
     v_soma := v_soma + v_alvo; v_qtd_soma := v_qtd_soma + v_qtd;
   end loop;
   -- Este mês: 9% acima da média do mesmo pedaço dos 3 meses.
-  perform pg_temp.encher(v_m0, pg_temp.hoje(), round(v_soma / 3 * 1.09, 2), round(v_qtd_soma / 3.0 * 1.06)::int);
+  perform pg_temp.encher(inicio_mes_br(v_m0), now(), round(v_soma / 3 * 1.09, 2), round(v_qtd_soma / 3.0 * 1.06)::int);
 end $$;

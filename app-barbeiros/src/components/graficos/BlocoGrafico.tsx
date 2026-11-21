@@ -9,7 +9,7 @@ import { Cartao } from '../Cartao';
 import { Texto } from '../Texto';
 import { Tabela } from './Tabela';
 
-export type ItemLegenda = { rotulo: string; cor: string };
+export type ItemLegenda = { rotulo: string; cor: string; /** a dashed line instead of a swatch (e.g. the average) */ tracejado?: boolean };
 
 type Props = {
   titulo: string;
@@ -29,7 +29,7 @@ export function BlocoGrafico({ titulo, legenda, destaque, tabela, children, test
         <View style={styles.legenda}>
           {legenda.map((l) => (
             <View key={l.rotulo} style={styles.itemLegenda}>
-              <View style={[styles.amostra, { backgroundColor: l.cor }]} />
+              <View style={l.tracejado ? [styles.tracejado, { borderColor: l.cor }] : [styles.amostra, { backgroundColor: l.cor }]} />
               <Texto variante="caption" cor="textMuted">{l.rotulo}</Texto>
             </View>
           ))}
@@ -50,6 +50,7 @@ const styles = StyleSheet.create({
   legenda: { flexDirection: 'row', gap: space[4], flexWrap: 'wrap' },
   itemLegenda: { flexDirection: 'row', alignItems: 'center', gap: space[1] },
   amostra: { width: 12, height: 12, borderRadius: radius.sm / 2 },
+  tracejado: { width: 18, height: 0, borderTopWidth: 2, borderStyle: 'dashed' },
   destaque: { minHeight: 20 },
   alternar: { alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' },
 });

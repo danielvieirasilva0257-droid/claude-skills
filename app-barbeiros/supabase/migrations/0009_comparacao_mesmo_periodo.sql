@@ -2,17 +2,18 @@
 -- Comparações justas (pedido do Daniel, 20/11/2026)
 --
 -- O mês que está correndo é comparado com o mesmo pedaço dos outros meses:
--- do dia 1 até o dia de hoje. Se hoje é dia 10, o mês passado conta do dia 1
--- ao dia 10 (e não o mês inteiro). Assim o começo do mês não fica sempre no
--- vermelho, e o barbeiro vê os números crescendo aos poucos.
+-- do dia 1 até este momento. Se hoje é dia 10, às 15h, o mês passado conta
+-- do dia 1 até o dia 10 às 15h (e não o mês inteiro). Assim o começo do mês
+-- (e o começo do dia) não fica sempre no vermelho, e o barbeiro vê os
+-- números crescendo aos poucos.
 --
 --   vs mês passado: o mesmo pedaço do mês anterior
 --   vs média:       a média dos 3 meses anteriores, no mesmo pedaço, só com
 --                   os meses que tiveram atendimento nesse pedaço
 --
 -- Mês fechado compara o mês inteiro. A semana segue a mesma regra: segunda
--- até hoje x segunda até o mesmo dia da semana passada (e a média das 4
--- semanas anteriores). O banco calcula, a IA e as telas só mostram.
+-- até agora x segunda até o mesmo dia e hora da semana passada (e a média das
+-- 4 semanas anteriores). O banco calcula, a IA e as telas só mostram.
 -- =====================================================================
 
 -- Até que dia do mês comparar: hoje, no mês corrente; null = mês inteiro.
@@ -22,12 +23,21 @@ language sql stable as $$
               then extract(day from hoje_br())::int end
 $$;
 
--- Último dia da janela de um mês: o dia N (ou o fim do mês, se o mês for mais curto).
-create or replace function fim_janela_mes(p_mes date, p_ate_dia int) returns date
-language sql immutable as $$
-  select case when p_ate_dia is null then (date_trunc('month', p_mes) + interval '1 month - 1 day')::date
-              else least(date_trunc('month', p_mes)::date + (p_ate_dia - 1),
-                         (date_trunc('month', p_mes) + interval '1 month - 1 day')::date) end
+-- Começo de um mês no horário de Brasília.
+create or replace function inicio_mes_br(p_mes date) returns timestamptz
+language sql stable as $$
+  select (date_trunc('month', p_mes)::date)::timestamp at time zone 'America/Sao_Paulo'
+$$;
+
+-- Onde a janela de um mês termina (exclusivo) quando se olha o mês p_ref:
+-- se p_ref é o mês corrente, o mesmo momento do mês (dia e hora de agora),
+-- cortado no fim de meses mais curtos; se p_ref já fechou, o fim do mês.
+create or replace function corte_mes(p_mes date, p_ref date) returns timestamptz
+language sql stable as $$
+  select case when date_trunc('month', p_ref)::date = date_trunc('month', hoje_br())::date
+    then least(inicio_mes_br(p_mes) + ((now() at time zone 'America/Sao_Paulo') - (date_trunc('month', hoje_br())::date)::timestamp),
+               inicio_mes_br((date_trunc('month', p_mes) + interval '1 month')::date))
+    else inicio_mes_br((date_trunc('month', p_mes) + interval '1 month')::date) end
 $$;
 
 -- Variação de a sobre b (fração com 3 casas); null quando não há base.
@@ -36,9 +46,9 @@ language sql immutable as $$
   select round((a - b) / nullif(b, 0), 3)
 $$;
 
--- Números de um período (datas no horário de Brasília), com as permissões de
--- quem chama. Sem atendimento concluído no período: null.
-create or replace function metricas_periodo(p_barbeiro uuid, p_inicio date, p_fim date)
+-- Números de um período [p_inicio, p_fim), com as permissões de quem chama.
+-- Sem atendimento concluído no período: null.
+create or replace function metricas_periodo(p_barbeiro uuid, p_inicio timestamptz, p_fim timestamptz)
 returns jsonb language sql stable as $$
   select case when count(*) = 0 then null else jsonb_build_object(
     'inicio', p_inicio,
@@ -48,8 +58,7 @@ returns jsonb language sql stable as $$
     'ticket_medio', round(avg(valor_total), 2),
     'ratio_servicos_por_cliente', round(sum(qtd_servicos)::numeric / count(*), 2)) end
   from v_atendimento_resumo
-  where barbeiro_id = p_barbeiro
-    and (inicio at time zone 'America/Sao_Paulo')::date between p_inicio and p_fim
+  where barbeiro_id = p_barbeiro and inicio >= p_inicio and inicio < p_fim
 $$;
 
 -- A comparação do mês: o mesmo pedaço do mês passado, a média dos 3 meses
@@ -58,7 +67,7 @@ create or replace function comparacao_mes(p_barbeiro uuid, p_mes date default da
 returns jsonb language sql stable as $$
   with p as (select date_trunc('month', p_mes)::date as m, dia_comparavel(p_mes) as n),
   met as (
-    select k, mes, fim_janela_mes(mes, p.n) as fim, metricas_periodo(p_barbeiro, mes, fim_janela_mes(mes, p.n)) as v
+    select k, mes, corte_mes(mes, p.m) as fim, metricas_periodo(p_barbeiro, inicio_mes_br(mes), corte_mes(mes, p.m)) as v
     from p, generate_series(0, 3) k, lateral (select (p.m - make_interval(months => k))::date as mes) x
   ),
   media as (
@@ -95,13 +104,13 @@ returns jsonb language sql stable as $$
   ant as (select (c.j->'anterior') as v from c),
   med as (select (c.j->'media') as v from c),
   -- janela do mês anterior para o mix (o mesmo pedaço)
-  ja as (select (m - interval '1 month')::date as ini, fim_janela_mes((m - interval '1 month')::date, n) as fim from mes),
+  ja as (select inicio_mes_br((m - interval '1 month')::date) as ini, corte_mes((m - interval '1 month')::date, m) as fim from mes),
   mix_ant as (
     select i.servico_id, i.produto_id,
            sum(case when i.servico_id is not null then 1 else i.quantidade end) as qtd  -- como v_mix_*_mes
     from atendimentos a join atendimento_itens i on i.atendimento_id = a.id, ja
     where a.barbeiro_id = p_barbeiro and a.status = 'concluido'
-      and (a.inicio at time zone 'America/Sao_Paulo')::date between ja.ini and ja.fim
+      and a.inicio >= ja.ini and a.inicio < ja.fim
     group by 1, 2
   )
   select jsonb_build_object(
@@ -163,8 +172,8 @@ begin
     -- cada um dos 3 meses anteriores, no mesmo pedaço
     meses as (
       select k, mb.barbeiro_id,
-             metricas_periodo(mb.barbeiro_id, (v_mes - make_interval(months => k))::date,
-                              fim_janela_mes((v_mes - make_interval(months => k))::date, v_n)) as v
+             metricas_periodo(mb.barbeiro_id, inicio_mes_br((v_mes - make_interval(months => k))::date),
+                              corte_mes((v_mes - make_interval(months => k))::date, v_mes)) as v
       from membros mb, generate_series(1, 3) k
     ),
     ant as (select barbeiro_id, (v->>'faturamento')::numeric as faturamento from meses where k = 1),
@@ -232,13 +241,19 @@ end $$;
 -- ---------- Resumo da semana (redefinido): até o mesmo dia da semana ----------
 create or replace function resumo_semana() returns jsonb
 language sql stable as $$
-  with s as (select date_trunc('week', hoje_br())::date as ini, hoje_br() - date_trunc('week', hoje_br())::date as d),
+  with s as (select date_trunc('week', hoje_br())::date as ini,
+                    (now() at time zone 'America/Sao_Paulo') - (date_trunc('week', hoje_br())::date)::timestamp as decorrido),
   esta as (select * from financeiro((select ini from s), hoje_br(), 'total')),
-  ant  as (select * from financeiro((select ini from s) - 7, (select ini + d from s) - 7, 'total')),
+  -- as 4 semanas anteriores, cada uma de segunda até o mesmo dia e hora
   semanas as (
-    select k, f.faturamento, f.atendimentos
-    from s, generate_series(1, 4) k, lateral financeiro(s.ini - 7 * k, s.ini + s.d - 7 * k, 'total') f
+    select k, coalesce(sum(r.valor_total), 0) as faturamento, count(r.atendimento_id)::int as atendimentos
+    from s cross join generate_series(1, 4) k
+    left join v_atendimento_resumo r on r.barbeiro_id = auth.uid()
+      and r.inicio >= ((s.ini - 7 * k)::timestamp at time zone 'America/Sao_Paulo')
+      and r.inicio < (((s.ini - 7 * k)::timestamp + s.decorrido) at time zone 'America/Sao_Paulo')
+    group by k
   ),
+  ant as (select * from semanas where k = 1),
   med as (select round(avg(faturamento), 2) as faturamento, count(*) as semanas from semanas where faturamento > 0),
   dias as (select * from financeiro((select ini from s) - 7, hoje_br(), 'day'))
   select jsonb_build_object(
@@ -271,9 +286,9 @@ language sql stable as $$
     'perfil', b.ia_perfil - 'respostas',
     'mes_atual', (select to_jsonb(v) - 'barbeiro_id' from v_metricas_mes v
                    where v.barbeiro_id = b.id and v.mes = date_trunc('month', hoje_br())::date),
-    -- Compare sempre com o mesmo pedaço: do dia 1 até o dia de hoje.
+    -- Compare sempre com o mesmo pedaço: do dia 1 até este momento.
     'comparacao_mes', (select jsonb_build_object(
-                         'regra', 'mês atual do dia 1 até hoje x o mesmo pedaço dos meses anteriores',
+                         'regra', 'mês atual do dia 1 até agora x o mesmo pedaço (dia e hora) dos meses anteriores',
                          'ate_dia', c->'ate_dia',
                          'mes_passado_mesmo_periodo', c->'anterior',
                          'media_3_meses_mesmo_periodo', c->'media',

@@ -17,7 +17,7 @@ Adendos datados, o mais novo embaixo.
 
 ## 20/11/2026: comparações justas e dados de teste (App Barbeiros)
 
-- **Compare no mesmo pedaço do período:** no começo do mês, "mês até hoje x mês passado inteiro" deixa tudo vermelho e desanima. Calcule no banco a janela "dia 1 até hoje" e use a mesma nos meses anteriores, na média de 3 meses e nos gráficos; mês fechado compara inteiro. Mostre as duas linhas: "vs mês passado" e, embaixo, "acima/abaixo da média", com uma faixa de "na média" (3%).
+- **Compare no mesmo pedaço do período:** no começo do mês, "mês até hoje x mês passado inteiro" deixa tudo vermelho e desanima. Calcule no banco a janela "dia 1 até agora" (dia **e hora**: só o dia ainda deixa a manhã no vermelho) e use a mesma nos meses anteriores, na média de 3 meses e nos gráficos; mês fechado compara inteiro. Mostre as duas linhas: "vs mês passado" e, embaixo, "acima/abaixo da média", com uma faixa de "na média" (3%).
 - **Dados de teste com valores exatos e datas relativas:** gerador no seed que mede o que já existe no período e enche até o alvo (faturamento e quantidade), com `setseed` para repetir igual; os centavos vão como desconto na última visita.
 - **Não amarre teste a "amanhã":** escolha o próximo dia útil; e leia do banco os totais que mudam com o seed.
 

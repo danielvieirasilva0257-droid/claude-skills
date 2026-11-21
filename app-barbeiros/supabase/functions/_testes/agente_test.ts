@@ -32,7 +32,7 @@ Deno.test('o nome do cliente sai como "Cliente N" e volta só com o primeiro nom
 Deno.test('pergunta de número responde com o número do banco', async () => {
   const r = await falar({ mensagem: 'Quanto eu faturei no mês?' });
   assertEquals(r.ok, true);
-  assertMatch(r.texto, /R\$ \d+,\d{2}/);
+  assertMatch(r.texto, /R\$ [\d.]+,\d{2}/);
 });
 
 Deno.test('marcar horário prepara a ação; só a confirmação grava', async () => {
