@@ -292,6 +292,32 @@ O Daniel ouviu as amostras e escolheu o **Supertonic 3, vozes F2 e M1**.
 
 **Falta:** testar no celular do Daniel (velocidade, qualidade da versão int8 e bateria). Se a int8 soar pior que as amostras, dá para trocar para a versão fp32 (398 MB).
 
+## Uma IA só: Gemma 4 pensa e escreve, a voz fala junto (21/11/2026)
+
+Pedido: o Gemma 4 faz o texto do que a IA vai falar, a voz fala ao mesmo tempo pegando o que a IA escreve, e texto e voz funcionam como uma IA só; a voz é só uma ferramenta.
+
+1. **Cérebro no celular:** Gemma 4 E2B pela `react-native-executorch` (a mesma biblioteca da voz), versão XNNPACK 8da4w de ~3,2 GB, baixada uma vez. Sessão de conversa da biblioteca com ferramentas (`createLLMChatSession` + `toolOpts`), sem o "pensamento" do Gemma (resposta rápida) e no máximo 320 palavras-pedaço por resposta.
+2. **As mesmas regras e ferramentas da nuvem:** o celular pede ao `ia-agente` `{contexto: true}` (regras curtas para modelo pequeno, lista de ferramentas, data de hoje, perfil da entrevista e a lista de clientes para o "Cliente N") e executa cada ferramenta com `{ferramenta, entrada}`. Esses modos não chamam modelo no servidor: só conferem o plano, sem gastar a cota de IA.
+3. **Texto e voz juntos:** o Gemma escreve palavra por palavra; o filtro tira as chamadas de ferramenta e o resto que não é para o barbeiro; o texto aparece na bolha enquanto é escrito; cada frase completa vai para a voz (`criarFala`), que fala na ordem enquanto o Gemma escreve a próxima.
+4. **Uma conversa:** "Chat com a IA" faz a entrevista inicial (na primeira vez) e abre o mesmo assistente em modo texto (`/ia/voz?modo=texto`, voz desligada). Gaveta "IA e voz": onde a IA pensa (Gemma 4 no celular ou nuvem) e a voz.
+5. **Reserva:** sem o Gemma baixado, ou se ele falhar, a IA da nuvem responde aquela vez.
+6. **Demonstração:** a gravação guarda as regras e as respostas das ferramentas mais comuns, então o Gemma funciona no APK de demonstração (com o modelo baixado).
+
+**Teste com o Gemma 4 de verdade aqui (sem celular):** `scripts/gemma/validar.py` roda o Gemma 4 E2B (GGUF Q4_K_M de 3,1 GB no `llama.cpp`) com as regras e ferramentas do servidor local e o leitor de chamadas do próprio app. Comandos:
+`uv venv -p 3.12 .venv && CMAKE_ARGS="-DGGML_NATIVE=ON -DLLAMA_CURL=OFF" uv pip install --python .venv llama-cpp-python jinja2` (compila em ~15 min), modelo `unsloth/gemma-4-E2B-it-GGUF`, modelo de conversa `google/gemma-4-E2B-it/chat_template.jinja`.
+
+Resultado (7 pedidos): chama a ferramenta certa com os argumentos certos ("Cliente 2", data de amanhã, "10:00", ["Corte"]), o nome volta só na tela e na voz, prepara a mudança e pede confirmação, abre telas. Aqui gera 1 a 4 palavras-pedaço por segundo (processador do servidor, sem memória entre voltas); no celular top de linha a referência é 25 a 56.
+
+**Aprendizados (do teste com o modelo de verdade):**
+
+- **Parar no fim da chamada:** depois de `<tool_call|>` o Gemma começa uma "resposta da ferramenta" inventada. O app usa `stopRegex` para parar ali; sem isso, texto inventado iria para a tela e para a voz.
+- **Frase pronta nas ferramentas:** ele escreveu "7563.38 reais" e esqueceu a comparação. Com um campo `resumo` em português ("No mês, até hoje: R$ 7.563,38 em 37 atendimentos. Até o dia 21: 8,2% acima...") ele repete certo. A IA da nuvem também ganha.
+- **"Confirma?" sem preparar:** no começo ele pedia confirmação sem chamar a ferramenta (sem botão de confirmar). A regra "chame primeiro a ferramenta; nunca pergunte se confirma sem ter chamado" resolveu.
+- **Descrição dos campos importa:** "degradê baixo" foi parar na técnica da barba até a descrição dizer "técnica do CORTE DE CABELO (ex.: degradê…)".
+- **Teste o modelo pequeno com as regras reais antes do celular:** 15 minutos de compilação pouparam um ciclo de APK e mostraram 4 problemas que nenhum teste simulado pegaria.
+
+**Falta:** testar no celular (velocidade do Gemma com a voz ao mesmo tempo, memória, bateria); com 8 GB de RAM ou mais deve ficar bom.
+
 ## Pendências (fora do código)
 
 1. **Modelo da IA:** o padrão é `claude-opus-5-5` (regra da skill da API). Para o custo-alvo de R$ 0,50 a R$ 2 por barbeiro por mês, a troca para `claude-haiku-5-5` é decisão do Daniel (`LLM_MODEL`). Falta a chave da API nos secrets do Supabase.
