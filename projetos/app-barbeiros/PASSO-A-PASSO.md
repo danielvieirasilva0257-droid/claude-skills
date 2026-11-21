@@ -244,7 +244,9 @@ Pedido (por áudio): "75% menor que o mês passado" no começo do mês desanima.
    | 3 meses atrás | R$ 8.432,40 | 44 | R$ 191,65 | 16,3% abaixo da média |
    | 2 meses atrás | R$ 11.650,00 | 57 | R$ 204,39 | 15,6% acima |
    | mês passado | R$ 10.150,82 | 51 | R$ 199,04 | na média (+0,7%) |
-   | este mês (até o dia 21) | R$ 7.462,39 (às 9h) | 37 | R$ 201,69 | +8,2% vs mês passado, +9% vs média |
+   | este mês (até o dia 21) | R$ 7.465,15 (às 9h) | 37 | R$ 201,76 | +8,2% vs mês passado, +9% vs média |
+
+   Neste mês as visitas vão aumentando com os dias (rampa), então a semana também fica no verde (+2,7% vs a semana passada no mesmo momento).
 
 **Testes:** pgTAP 116 (16 novos em `comparacao_mesmo_periodo.test.sql`), Deno 21 (resposta do agente com a comparação), Jest 25.
 
@@ -252,6 +254,7 @@ Pedido (por áudio): "75% menor que o mês passado" no começo do mês desanima.
 
 - **Comparação justa:** número parcial contra número inteiro sempre parece queda. Defina a janela no banco (dia 1 até agora, cortada no fim de meses mais curtos) e use a mesma janela no mês passado, na média e no mix. Mês fechado compara inteiro.
 - **Corte pelo dia não basta, precisa da hora:** o primeiro print saiu com a semana em vermelho (▼ 18%) porque às 9h de sábado ainda não havia cliente, e a semana passada contava o sábado inteiro. Cortar no mesmo dia **e hora** resolveu (▲ 21,7%), e é o que o Daniel pediu ("até aquele momento").
+- **Dados de teste que "crescem":** sorteio puro deixou a semana passada mais forte que esta (▼ 15%). Para a história do teste, este mês tem rampa (mais visitas nos dias recentes). Encaixar as visitas em sequência (e não em horários sorteados soltos) coube mais gente por dia; com horários soltos, setembro perdeu 2 visitas por falta de espaço. Quando um dia lota, a visita vai para o dia anterior, não para o começo do período.
 - **"Na média" precisa de faixa:** sem ela, 0,7% acima vira "acima da média" e confunde. Até 3% de distância = "na média" (cor neutra, com o número entre parênteses).
 - **Seed que bate um valor exato com datas relativas:** como as datas mudam a cada dia, o gerador mede o que já existe no período e preenche até o alvo, guiando a escolha das combinações pelo valor que falta por visita; os centavos vão na última. Com `setseed` o resultado é o mesmo em cada reset.
 - **Testes presos ao dia:** dois testes de "pausa do almoço" usavam "amanhã" e falharam no sábado (domingo não tem pausa). Escolha o próximo dia útil (terça a sábado) em vez de "amanhã". Testes que contavam atendimentos fixos (16, meta de R$ 90) passaram a ler o número do banco.
