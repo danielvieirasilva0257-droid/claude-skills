@@ -31,11 +31,39 @@ reserva: IA da nuvem (agente atual) e a voz do próprio celular (expo-speech)
 
 Total download on the phone: ~2.6 GB (Gemma 4 E2B) + ~0.33 GB (Kokoro) ≈ 3 GB, Wi-Fi only.
 
+## Comparison of on-device TTS with Portuguese (21/11/2026, second round)
+
+Same 3 assistant lines for every model. Word accuracy = faster-whisper small, with numbers in the transcript turned into pt-BR words (the skill's `conferir_voz.py` counts "R$ 7.465" vs "sete mil..." as errors; all models were 64-76% there for that reason only). Gen time = ~20 s of audio on this container (4 CPUs, model already loaded).
+
+| Model | Size | License | Portuguese | Voices | Mobile path | Words | Gen time |
+|---|---|---|---|---|---|---|---|
+| Kokoro-82M | 82M params; 325 MB fp32 onnx (+28 MB voices) | Apache-2.0; pt phonemes via espeak-ng (GPL) | pt-BR | pf_dora, pm_alex, pm_santa | react-native-executorch (Portuguese pack ~332 MB, stream), sherpa-onnx | 100% | ~4 s |
+| Kitten TTS 2 nano | 17M per language; 17.4 MB int8 / 8.8 MB int4 per language | Apache-2.0; pt phonemes via espeak-ng (misaki EspeakG2P) | pt-BR | Juliana, Larissa, Gustavo, Caio | ONNX Runtime; text front end must be ported | 94-100% | ~1.7 s |
+| Kitten TTS 2 mini | 82M, 16 languages; 82.7 MB int8 / 47.5 MB int4 | Apache-2.0 | pt-BR | Beatriz, Camila, Rafael, Thiago (+ English voices speaking pt) | ONNX Runtime; same | 98% | ~6 s |
+| Supertonic 3 | 99M; 386 MB download | code MIT, weights OpenRAIL-M (use restrictions); repo archived 09/2026 | "pt" (variant not stated) | F1-F5, M1-M5 | ONNX, character input (no phonemizer); iOS and Flutter examples | 91-100% | ~5-6 s |
+| Pocket TTS (Kyutai) | 100M | code MIT, weights CC-BY-4.0 (credit); ungated repo has no voice cloning | "portuguese" (variant not stated) | 28 (rafael is the pt one) | PyTorch; community ONNX / LiteRT ports (~1x real time on Pixel 8a GPU) | 96-100% | ~13 s |
+| tiny-voca-ptbr (SemFence) | 4.5M; 21.4 MB onnx | weights CC-BY-4.0 (credit SemFence, Gustavo Toledo), code Apache-2.0 | pt-BR only | F_s4, M_sm4 | ONNX; front end dizione-ptbr (Python) to port; runs in browser | official samples only | - |
+| pivo-ptbr (SemFence) | 1.4M; 5.8 MB onnx | acoustic CC-BY-4.0, vocoder BSD-3, code Apache-2.0 | pt-BR only | F_s4, M_sm4 | same | official samples only | - |
+
+Left out: Phonon 40M pt (pt-BR, ~75 MB, ~100 voices, Android/iOS guides, but CC BY-NC and gated), Piper pt-BR (non-commercial voices, GPL engine), Chatterbox multilingual (500M, slow on CPU, watermark), Qwen3-TTS (0.6B+, needs GPU), NeuTTS (no Portuguese), XTTS-v2 / MMS-TTS / F5-TTS (non-commercial).
+
+Notes:
+- Installing SemFence's front end from GitHub (pip from git) was blocked by this session's safety rule; only their published audio samples were used.
+- Hugging Face downloads need `huggingface.co` plus the file CDN (`us.aws.cdn.hf.co`); both were added to the environment.
+- faster-whisper 1.x with the installed `av` failed to open files (`metadata_errors`); pass a numpy array (ffmpeg to f32le 16 kHz) instead.
+
 ## Samples
 
-`samples/kokoro-82m_<voz>_ia-do-app.mp3`: the same 3 assistant lines (agenda de hoje, números do mês com a comparação, confirmação de agendamento) in pf_dora, pm_alex, pm_santa.
+`samples/<modelo>_<voz>_ia-do-app.mp3`: the same 3 assistant lines (agenda de hoje, números do mês com a comparação, confirmação de agendamento): Kokoro (pf_dora, pm_alex, pm_santa), Kitten TTS 2 mini (Beatriz, Rafael), Kitten TTS 2 nano (Larissa, Gustavo), Supertonic 3 (F2, M1), Pocket TTS pt (rafael, vera). `samples/<modelo>_F-e-M_amostra-oficial.mp3`: the authors' own samples for tiny-voca-ptbr and pivo-ptbr (other sentences).
 
 ## Sources
+
+- https://huggingface.co/KittenML/kitten-tts-2-mini and https://huggingface.co/KittenML/kitten-tts-2-nano
+- https://github.com/supertone-inc/supertonic and https://huggingface.co/Supertone/supertonic-2
+- https://github.com/kyutai-labs/pocket-tts and https://huggingface.co/kyutai/pocket-tts-without-voice-cloning
+- https://huggingface.co/semfence/tiny-voca-ptbr and https://huggingface.co/semfence/pivo-ptbr
+- https://huggingface.co/gradium/phonon-40m-pt
+- https://huggingface.co/OpenVoiceOS/pipertts_pt-BR_dii
 
 - https://ai.google.dev/gemma/docs/capabilities/audio
 - https://repos.ecosyste.ms/hosts/GitHub/repositories/GaspardCulis%2Felevenlabs-unleashed
