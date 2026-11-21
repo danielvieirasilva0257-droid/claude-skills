@@ -407,6 +407,16 @@ Skills: `../skills/design/review-animations`, `../skills/design/web-design-guide
 - [x] Mesma regra no painel do dono, na semana dos Insights e no que a IA recebe
 - [x] Dados de teste no seed: 24 clientes e 4 meses com serviços sorteados (3 meses atrás abaixo da média, 2 meses atrás acima, mês passado na média com R$ 10.150,82 e ticket de R$ 199,04, e este mês uns 9% acima da média)
 
+### Voz da IA no celular (pedido do Daniel, 21/11/2026)
+- [x] Pesquisa de vozes que rodam no aparelho (Kokoro, Kitten TTS 2, Supertonic 3, Pocket TTS, tiny-voca, pivo); o Daniel escolheu o **Supertonic 3, vozes F2 (feminina) e M1 (masculina)**
+- [x] "Voz da IA" no Fale com a IA: voz do celular (padrão e reserva), Supertonic F2 ou M1; download único de ~144 MB (versão int8 da `react-native-executorch`, XNNPACK), com progresso e pausa; "Ouvir a voz"; aviso de que a voz é gerada por IA
+- [x] O texto passa por `textoParaFala` antes da voz (dinheiro, porcentagem, horas, datas e números por extenso), porque o Supertonic lia "R$ 7.466,39" errado
+- [x] Termos de Uso com as regras de uso da licença OpenRAIL-M do Supertonic; telemetria de download da biblioteca desligada
+- [ ] Testar no celular do Daniel (velocidade, qualidade da versão int8, consumo de bateria)
+- [ ] Depois: Gemma 4 no celular usando a mesma voz
+
+**Como ficou:** `src/features/voz/` (`supertonic.native.ts` com `react-native-executorch` + `expo-audio` + `expo-file-system`, `supertonic.ts` vazio para a web, `preferencia.ts`, `textoFala.ts`, `wav.ts`, `EscolherVoz.tsx`), `falar()` em `src/features/ia/voz.ts` escolhe a voz e volta para a do celular se a Supertonic não estiver baixada ou falhar. Android mínimo: 8.0 (SDK 26, exigência da biblioteca), por `expo-build-properties`.
+
 ### Depois do app
 - Site de venda: `../skills/combos/combo-site-premium`.
 - Vídeos e tutoriais: `../skills/combos/combo-video-explicativo`, `../skills/video/motion-video`, `../skills/video/blender-ia`.

@@ -46,6 +46,7 @@ O app ajuda barbeiros a organizar a agenda, lançar atendimentos, acompanhar fat
 - A IA pode errar. Use as sugestões como apoio, não como garantia de resultado.
 - As informações sobre MEI, impostos e comissão são informativas e não substituem um contador ou advogado.
 - O atendente de IA do WhatsApp e do Instagram pode ser assumido por você a qualquer momento.
+- **Voz da IA:** a voz Supertonic é gerada por inteligência artificial no seu próprio celular (modelo Supertonic 3, da Supertone, licença OpenRAIL-M). O áudio não sai do aparelho. Ao usá-la, você concorda em não usar a voz para: imitar outra pessoa sem o consentimento dela; espalhar informação falsa para prejudicar alguém; difamar, assediar ou discriminar pessoas; prejudicar menores de idade; divulgar o áudio como se não fosse gerado por máquina; ou qualquer fim ilegal.
 
 ## 8. O que não é permitido
 

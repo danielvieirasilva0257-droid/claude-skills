@@ -1,12 +1,16 @@
 // Voice on the phone: speech to text by the phone's own recognizer
 // (expo-speech-recognition: Android SpeechRecognizer / iOS Speech; Web Speech
-// API on the web) and text to speech by the phone's voice (expo-speech).
-// The audio never leaves the phone here; only the text goes to the agent.
-// Daniel plans to plug a voice AI later: this is the place to swap.
+// API on the web) and text to speech by the Supertonic voice (F2 or M1, on the
+// phone, chosen by Daniel on 21/11) or the phone's own voice (expo-speech, the
+// default and the fallback). The audio never leaves the phone; only the text
+// goes to the agent.
 import * as Speech from 'expo-speech';
 import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
 import { useRef, useState } from 'react';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
+
+import { vozDaIA } from '@/features/voz/preferencia';
+import { falarSupertonic, pararSupertonic, vozBaixada } from '@/features/voz/supertonic';
 
 export function reconhecimentoDisponivel(): boolean {
   try {
@@ -76,8 +80,10 @@ export function useOuvir(onFinal: (texto: string) => void) {
   return { ouvindo, parcial, erro, nivel, iniciar, parar };
 }
 
-/** Speak in Brazilian Portuguese with the phone's voice. */
-export function falar(texto: string, eventos: { onInicio?: () => void; onFim?: () => void }) {
+type Eventos = { onInicio?: () => void; onFim?: () => void };
+let vez = 0;
+
+function falarComOCelular(texto: string, eventos: Eventos) {
   Speech.stop();
   Speech.speak(texto, {
     language: 'pt-BR', rate: 1.02,
@@ -85,6 +91,30 @@ export function falar(texto: string, eventos: { onInicio?: () => void; onFim?: (
   });
 }
 
+/** Speak in Brazilian Portuguese: the chosen Supertonic voice, or the phone's voice when it is not there or fails. */
+export function falar(texto: string, eventos: Eventos) {
+  pararDeFalar();
+  const eu = ++vez;
+  const voz = vozDaIA();
+  if (voz === 'celular') return falarComOCelular(texto, eventos);
+  void (async () => {
+    let comecou = false;
+    try {
+      if (await vozBaixada()) {
+        await falarSupertonic(texto, voz, {
+          onInicio: () => { comecou = true; if (eu === vez) eventos.onInicio?.(); },
+          onFim: () => { if (comecou && eu === vez) eventos.onFim?.(); },
+        });
+      }
+    } catch {
+      // falls back to the phone's voice below
+    }
+    if (!comecou && eu === vez) falarComOCelular(texto, eventos);
+  })();
+}
+
 export function pararDeFalar() {
+  vez++;
   Speech.stop();
+  pararSupertonic();
 }

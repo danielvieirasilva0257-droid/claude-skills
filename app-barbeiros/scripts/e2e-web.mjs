@@ -502,6 +502,15 @@ export const fluxos = {
     await page.getByTestId('mais-hoje').waitFor({ timeout: 20_000 });
     await page.getByTestId('fale-com-ia').click();
     await page.getByTestId('orbe-ia').waitFor({ timeout: 20_000 });
+    // Voz da IA: the phone's voice by default; Supertonic F2 / M1 only in the phone app (disabled on the web).
+    await page.getByTestId('voz-escolher').click();
+    await page.getByTestId('sheet-voz').waitFor({ timeout: 10_000 });
+    esperar((await page.getByTestId('voz-opcao-celular').getAttribute('aria-checked')) === 'true', 'voz do celular é a padrão');
+    esperar((await page.getByTestId('voz-opcao-F2').innerText()).includes('Só no app do celular'), 'Supertonic só no celular');
+    await page.getByTestId('voz-ouvir').waitFor();
+    await print(page, 'm-08-voz-da-ia');
+    await page.getByRole('button', { name: 'Fechar' }).last().click();
+    await page.getByTestId('sheet-voz').waitFor({ state: 'detached', timeout: 10_000 });
     if (!(await page.getByTestId('voz-texto').isVisible().catch(() => false))) await page.getByTestId('voz-teclado').click();
     await page.getByTestId('voz-texto').fill('Marca o Rafael amanhã às 15 pra corte');
     await page.getByTestId('voz-enviar').click();

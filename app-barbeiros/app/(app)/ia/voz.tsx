@@ -22,6 +22,8 @@ import { NOME_IA } from '@/features/ia/FaleComIA';
 import { OrbeIA, type EstadoOrbe } from '@/features/ia/OrbeIA';
 import { falar, pararDeFalar, reconhecimentoDisponivel, useOuvir } from '@/features/ia/voz';
 import { PortaPlano } from '@/features/planos/PortaPlano';
+import { EscolherVoz, NOME_DA_VOZ } from '@/features/voz/EscolherVoz';
+import { useVozDaIA } from '@/features/voz/preferencia';
 import { vibrar } from '@/lib/haptics';
 import { color, radius, space } from '@/theme/tokens';
 
@@ -36,6 +38,8 @@ function ConversaPorVoz() {
   const [texto, setTexto] = useState('');
   const [som, setSom] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
+  const [vozAberta, setVozAberta] = useState(false);
+  const voz = useVozDaIA();
   const semNivel = useSharedValue(0);
   const rolagem = useRef<ComponentRef<typeof ScrollView>>(null);
   const ouvir = useOuvir((frase) => void enviar(frase));
@@ -112,8 +116,14 @@ function ConversaPorVoz() {
         <View style={styles.palco}>
           <OrbeIA estado={status} nivel={nivel} />
           <Texto peso="semibold" centro accessibilityLiveRegion="polite" testID="voz-estado">{ROTULO[status]}</Texto>
-          {ouvir.ouvindo && ouvir.parcial ? <Texto centro cor="textMuted" numberOfLines={2}>{ouvir.parcial}</Texto> : null}
+          {ouvir.ouvindo && ouvir.parcial ? <Texto centro cor="textMuted" numberOfLines={2}>{ouvir.parcial}</Texto> : (
+            <Pressable onPress={() => setVozAberta(true)} accessibilityRole="button" accessibilityLabel={`Voz da IA: ${NOME_DA_VOZ[voz]}. Trocar`}
+              style={styles.trocarVoz} testID="voz-escolher" hitSlop={4}>
+              <Texto variante="caption" cor="textMuted">Voz: {voz === 'celular' ? 'do celular' : NOME_DA_VOZ[voz]} ›</Texto>
+            </Pressable>
+          )}
         </View>
+        <EscolherVoz aberto={vozAberta} onFechar={() => setVozAberta(false)} />
 
         <ScrollView ref={rolagem} style={styles.conversa} contentContainerStyle={styles.conversaConteudo}
           onContentSizeChange={() => rolagem.current?.scrollToEnd({ animated: false })}>
@@ -186,6 +196,7 @@ const styles = StyleSheet.create({
   raiz: { flex: 1, backgroundColor: color.bg },
   flex: { flex: 1 },
   palco: { alignItems: 'center', gap: space[2], paddingTop: space[4] },
+  trocarVoz: { minHeight: 44, justifyContent: 'center', paddingHorizontal: space[3] },
   conversa: { flex: 1 },
   conversaConteudo: { padding: space[4], gap: space[2] },
   bolha: { maxWidth: '85%', paddingHorizontal: space[3], paddingVertical: space[2], borderRadius: radius.lg },
