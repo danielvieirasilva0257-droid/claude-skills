@@ -232,12 +232,16 @@ export const fluxos = {
       await page.getByTestId('entrevista-resposta').fill(i === 6 ? 'O Rafael eu chamo no WhatsApp' : `Resposta ${i + 1}`);
       await page.getByTestId('entrevista-continuar').click();
     }
-    await page.getByTestId('chat-pergunta').waitFor({ timeout: 20_000 });
-    await page.getByTestId('chat-pergunta').fill('Como faço o Rafael voltar mais vezes?');
-    await page.getByTestId('chat-enviar').click();
-    await page.getByTestId('msg-ia').getByText(/faturou/).waitFor({ timeout: 20_000 });
-    const resposta = await page.getByTestId('msg-ia').innerText();
-    esperar(resposta.includes('Rafael'), 'o nome do cliente volta só na tela');
+    // One AI: after the interview the chat is the same assistant as "Fale com a IA", typing, voice off.
+    await page.getByTestId('voz-texto').waitFor({ timeout: 20_000 });
+    esperar((await page.getByTestId('voz-som').getAttribute('aria-checked')) === 'false', 'no modo texto a voz começa desligada');
+    await page.getByTestId('voz-texto').fill('Quanto eu faturei no mês?');
+    await page.getByTestId('voz-enviar').click();
+    await page.getByTestId('voz-ia').getByText(/faturou/).waitFor({ timeout: 20_000 });
+    await page.getByTestId('voz-texto').fill('anota no Rafael que prefere degradê baixo');
+    await page.getByTestId('voz-enviar').click();
+    await page.getByTestId('voz-pendente').waitFor({ timeout: 20_000 });
+    esperar((await page.getByTestId('voz-pendente').innerText()).includes('Rafael'), 'o nome do cliente volta só na tela');
     await print(page, 'f3-12-chat');
 
     await page.goto(`${BASE}/coach`);
@@ -507,6 +511,8 @@ export const fluxos = {
     await page.getByTestId('sheet-voz').waitFor({ timeout: 10_000 });
     esperar((await page.getByTestId('voz-opcao-celular').getAttribute('aria-checked')) === 'true', 'voz do celular é a padrão');
     esperar((await page.getByTestId('voz-opcao-F2').innerText()).includes('Só no app do celular'), 'Supertonic só no celular');
+    esperar((await page.getByTestId('cerebro-opcao-nuvem').getAttribute('aria-checked')) === 'true', 'na web a IA pensa na nuvem');
+    esperar((await page.getByTestId('cerebro-opcao-celular').innerText()).includes('Só no app do celular'), 'Gemma 4 só no celular');
     await page.getByTestId('voz-ouvir').waitFor();
     await print(page, 'm-08-voz-da-ia');
     await page.getByRole('button', { name: 'Fechar' }).last().click();

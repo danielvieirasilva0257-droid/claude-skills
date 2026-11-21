@@ -1,10 +1,12 @@
-// "Fale com a IA" (final name by Daniel): tap and talk, the AI answers in
-// voice, the orb shows when it listens, thinks and talks. The AI reads and
-// changes the app through the agent's tools; every change shows up here as a
-// card to confirm (button or saying "sim"). Typing works too (no microphone,
-// or in a quiet place).
+// "Fale com a IA" (final name by Daniel): one AI for voice and text. The
+// brain is Gemma 4 on the phone (or the cloud model until it is downloaded):
+// it writes the answer token by token, the text shows up here as it is
+// written and the voice (a tool, never a second AI) speaks each sentence as
+// soon as it is complete. The AI reads and changes the app through the same
+// tools; every change shows up as a card to confirm (button or saying "sim").
+// Typing works too: ?modo=texto opens with the keyboard and the voice off.
 import { useQueryClient } from '@tanstack/react-query';
-import { router, Stack } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
 import { useRef, useState, type ComponentRef } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
@@ -18,11 +20,13 @@ import { DuoButton } from '@/components/DuoButton';
 import { SecondaryButton } from '@/components/SecondaryButton';
 import { Texto } from '@/components/Texto';
 import { confirmarAcao, falarComAgente, respostaDeConfirmacao, type Pendente, type Turno } from '@/features/ia/agente';
+import { cerebroLocalDisponivel, gemmaBaixado, pararGemma, responderComGemma } from '@/features/ia/assistente/cerebro';
+import { cerebroDaIA, useCerebroDaIA } from '@/features/ia/assistente/preferencia';
 import { NOME_IA } from '@/features/ia/FaleComIA';
 import { OrbeIA, type EstadoOrbe } from '@/features/ia/OrbeIA';
-import { falar, pararDeFalar, reconhecimentoDisponivel, useOuvir } from '@/features/ia/voz';
+import { criarFala, falar, pararDeFalar, reconhecimentoDisponivel, useOuvir } from '@/features/ia/voz';
 import { PortaPlano } from '@/features/planos/PortaPlano';
-import { EscolherVoz, NOME_DA_VOZ } from '@/features/voz/EscolherVoz';
+import { EscolherVoz, NOME_DA_VOZ, NOME_DO_CEREBRO } from '@/features/voz/EscolherVoz';
 import { useVozDaIA } from '@/features/voz/preferencia';
 import { vibrar } from '@/lib/haptics';
 import { color, radius, space } from '@/theme/tokens';
@@ -31,15 +35,19 @@ const ROTULO: Record<EstadoOrbe, string> = { parado: 'Toque no microfone e fale'
 
 function ConversaPorVoz() {
   const qc = useQueryClient();
+  const { modo } = useLocalSearchParams<{ modo?: string }>();
+  const modoTexto = modo === 'texto';
   const [estado, setEstado] = useState<EstadoOrbe>('parado');
   const [turnos, setTurnos] = useState<Turno[]>([]);
   const [pendente, setPendente] = useState<Pendente | null>(null);
-  const [digitando, setDigitando] = useState(!reconhecimentoDisponivel());
+  const [digitando, setDigitando] = useState(modoTexto || !reconhecimentoDisponivel());
   const [texto, setTexto] = useState('');
-  const [som, setSom] = useState(true);
+  const [som, setSom] = useState(!modoTexto);
   const [erro, setErro] = useState<string | null>(null);
   const [vozAberta, setVozAberta] = useState(false);
   const voz = useVozDaIA();
+  const cerebroEscolhido = useCerebroDaIA();
+  const cerebro = cerebroLocalDisponivel ? cerebroEscolhido : 'nuvem';
   const semNivel = useSharedValue(0);
   const rolagem = useRef<ComponentRef<typeof ScrollView>>(null);
   const ouvir = useOuvir((frase) => void enviar(frase));
@@ -90,6 +98,26 @@ function ConversaPorVoz() {
     const historico = turnos;
     setTurnos((t) => [...t, { role: 'user', content: limpo }]);
     setEstado('pensando');
+    // The brain on the phone: the text streams in and the voice speaks each sentence meanwhile.
+    if (cerebroDaIA() === 'celular' && cerebroLocalDisponivel && (await gemmaBaixado())) {
+      const fala = som ? criarFala({ onInicio: () => setEstado('falando'), onFim: () => setEstado('parado') }) : null;
+      setTurnos((t) => [...t, { role: 'assistant', content: '' }]);
+      const escrever = (conteudo: string) => setTurnos((t) => t.map((x, k) => (k === t.length - 1 ? { ...x, content: conteudo } : x)));
+      try {
+        const r = await responderComGemma(limpo, { onTexto: escrever, onFrase: (f) => fala?.frase(f) });
+        if (r.cancelado) { fala?.parar(); setEstado('parado'); return; }
+        escrever(r.texto);
+        fala?.terminar();
+        if (!fala) setEstado('parado');
+        setPendente(r.pendente ?? null);
+        if (r.navegar) router.navigate(r.navegar as never);
+        return;
+      } catch {
+        // Gemma could not answer: the cloud AI answers this turn (same tools, same rules).
+        fala?.parar();
+        setTurnos((t) => (t[t.length - 1]?.role === 'assistant' && !t[t.length - 1]?.content ? t.slice(0, -1) : t));
+      }
+    }
     try {
       await aplicar(await falarComAgente(limpo, historico));
     } catch (e) {
@@ -100,7 +128,7 @@ function ConversaPorVoz() {
 
   function tocarMicrofone() {
     vibrar.leve();
-    if (estado === 'falando') { pararDeFalar(); setEstado('parado'); return; }
+    if (estado === 'falando') { pararDeFalar(); pararGemma(); setEstado('parado'); return; }
     if (ouvir.ouvindo) { ouvir.parar(); return; }
     setEstado('ouvindo');
     ouvir.iniciar().catch(() => setEstado('parado'));
@@ -117,9 +145,10 @@ function ConversaPorVoz() {
           <OrbeIA estado={status} nivel={nivel} />
           <Texto peso="semibold" centro accessibilityLiveRegion="polite" testID="voz-estado">{ROTULO[status]}</Texto>
           {ouvir.ouvindo && ouvir.parcial ? <Texto centro cor="textMuted" numberOfLines={2}>{ouvir.parcial}</Texto> : (
-            <Pressable onPress={() => setVozAberta(true)} accessibilityRole="button" accessibilityLabel={`Voz da IA: ${NOME_DA_VOZ[voz]}. Trocar`}
+            <Pressable onPress={() => setVozAberta(true)} accessibilityRole="button"
+              accessibilityLabel={`IA e voz: ${NOME_DO_CEREBRO[cerebro]}, ${NOME_DA_VOZ[voz]}. Trocar`}
               style={styles.trocarVoz} testID="voz-escolher" hitSlop={4}>
-              <Texto variante="caption" cor="textMuted">Voz: {voz === 'celular' ? 'do celular' : NOME_DA_VOZ[voz]} ›</Texto>
+              <Texto variante="caption" cor="textMuted">{NOME_DO_CEREBRO[cerebro]} · {voz === 'celular' ? 'voz do celular' : NOME_DA_VOZ[voz]} ›</Texto>
             </Pressable>
           )}
         </View>

@@ -417,6 +417,16 @@ Skills: `../skills/design/review-animations`, `../skills/design/web-design-guide
 
 **Como ficou:** `src/features/voz/` (`supertonic.native.ts` com `react-native-executorch` + `expo-audio` + `expo-file-system`, `supertonic.ts` vazio para a web, `preferencia.ts`, `textoFala.ts`, `wav.ts`, `EscolherVoz.tsx`), `falar()` em `src/features/ia/voz.ts` escolhe a voz e volta para a do celular se a Supertonic não estiver baixada ou falhar. Android mínimo: 8.0 (SDK 26, exigência da biblioteca), por `expo-build-properties`.
 
+### Uma IA só: Gemma 4 pensa e escreve, a voz é ferramenta (pedido do Daniel, 21/11/2026)
+- [x] O cérebro é o **Gemma 4 E2B no celular** (`react-native-executorch`, ~3,2 GB, baixado uma vez); até baixar, ou se falhar, a IA da nuvem responde. As duas usam as **mesmas regras e as mesmas ferramentas**, que vêm do servidor (`ia-agente` com `{contexto}` e `{ferramenta}`)
+- [x] O Gemma escreve a resposta palavra por palavra: o texto aparece na tela enquanto é escrito e a voz (Supertonic F2/M1 ou a do celular) fala cada frase assim que ela termina. A voz nunca escreve nada: só fala o que a IA escreveu
+- [x] Falar ou digitar é a mesma conversa: o "Chat com a IA" faz a entrevista inicial na primeira vez e depois abre o mesmo assistente em modo texto (voz desligada)
+- [x] Gaveta "IA e voz": onde a IA pensa (Gemma 4 no celular ou nuvem) e a voz, com os downloads
+- [x] Mudanças continuam só com a confirmação do barbeiro; nomes de clientes viram "Cliente N" também para o Gemma
+- [ ] Testar no celular do Daniel: velocidade do Gemma 4 com a voz ao mesmo tempo, memória e bateria
+
+**Como ficou:** `src/features/ia/assistente/` (`cerebro.native.ts` com a sessão do Gemma e as ferramentas que chamam o servidor, `gemma4.ts` com o leitor das chamadas `<|tool_call>call:nome{…}<tool_call|>` e o filtro do que vai para a tela e a voz, `frases.ts`, `anonimizar.ts`, `preferencia.ts`); `criarFala()` em `src/features/ia/voz.ts` (fila de frases); servidor: `ferramentasParaCelular()` e `sistemaCelular()` em `_shared/agente.ts`.
+
 ### Depois do app
 - Site de venda: `../skills/combos/combo-site-premium`.
 - Vídeos e tutoriais: `../skills/combos/combo-video-explicativo`, `../skills/video/motion-video`, `../skills/video/blender-ia`.

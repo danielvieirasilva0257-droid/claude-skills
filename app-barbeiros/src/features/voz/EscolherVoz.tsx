@@ -1,6 +1,9 @@
-// "Voz da IA": the phone's own voice (default) or Supertonic F2 / M1 (on the
-// phone, one-time download of ~144 MB). The voice is AI-generated and says so
-// (OpenRAIL-M asks for it). On the web only the phone's voice exists.
+// "IA e voz": one AI, two settings. The brain (Gemma 4 on the phone, the
+// default once downloaded, or the cloud) and its voice (the phone's own voice
+// or Supertonic F2 / M1). The voice is only how the AI speaks: it never writes
+// anything itself. Downloads happen once, with progress and pause. The voice is
+// AI-generated and says so (OpenRAIL-M asks for it). On the web only the cloud
+// brain and the phone's voice exist.
 import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
@@ -10,6 +13,8 @@ import { Chip } from '@/components/Chip';
 import { DuoButton } from '@/components/DuoButton';
 import { SecondaryButton } from '@/components/SecondaryButton';
 import { Texto } from '@/components/Texto';
+import { baixarGemma, cerebroLocalDisponivel, gemmaBaixado, TAMANHO_GEMMA_GB } from '@/features/ia/assistente/cerebro';
+import { escolherCerebro, useCerebroDaIA, type CerebroDaIA } from '@/features/ia/assistente/preferencia';
 import { falar, pararDeFalar } from '@/features/ia/voz';
 import { color, radius, space } from '@/theme/tokens';
 
@@ -21,30 +26,24 @@ export const NOME_DA_VOZ: Record<VozDaIA, string> = {
   F2: `Supertonic · ${VOZES_SUPERTONIC.F2}`,
   M1: `Supertonic · ${VOZES_SUPERTONIC.M1}`,
 };
+export const NOME_DO_CEREBRO: Record<CerebroDaIA, string> = { celular: 'Gemma 4 no celular', nuvem: 'IA na nuvem' };
 
 const EXEMPLO = 'Oi! Eu sou a voz da IA do seu app. Hoje você tem 5 clientes, e o primeiro é às 10:30.';
 
-export function EscolherVoz({ aberto, onFechar }: { aberto: boolean; onFechar: () => void }) {
-  const voz = useVozDaIA();
-  const [baixada, setBaixada] = useState<boolean | null>(null);
+/** One-time download with progress and pause (it resumes where it stopped). */
+function Baixar({ titulo, texto, baixar, testID }: {
+  titulo: string; texto: string; baixar: (p: (x: number) => void, s: AbortSignal) => Promise<void>; testID: string;
+}) {
   const [progresso, setProgresso] = useState<number | null>(null);
   const [erro, setErro] = useState<string | null>(null);
-  const [ouvindo, setOuvindo] = useState(false);
   const cancelar = useRef<AbortController | null>(null);
-
-  useEffect(() => {
-    if (aberto) void vozBaixada().then(setBaixada);
-    else pararDeFalar();
-  }, [aberto]);
-
-  async function baixar() {
+  async function iniciar() {
     setErro(null);
     setProgresso(0);
     const c = new AbortController();
     cancelar.current = c;
     try {
-      await baixarVoz((p) => setProgresso(p), c.signal);
-      setBaixada(true);
+      await baixar((p) => setProgresso(p), c.signal);
     } catch {
       if (!c.signal.aborted) setErro('Não deu para baixar agora. Confira a internet e tente de novo: o download continua de onde parou.');
     } finally {
@@ -52,16 +51,65 @@ export function EscolherVoz({ aberto, onFechar }: { aberto: boolean; onFechar: (
       cancelar.current = null;
     }
   }
+  return (
+    <Cartao testID={testID}>
+      <Texto peso="semibold">{titulo}</Texto>
+      <Texto variante="caption" cor="textMuted">{texto}</Texto>
+      {progresso === null ? (
+        <DuoButton rotulo="Baixar" testID={`${testID}-botao`} onPress={() => void iniciar()} />
+      ) : (
+        <View style={styles.progresso}>
+          <View style={styles.trilho} accessibilityRole="progressbar"
+            accessibilityValue={{ min: 0, max: 100, now: Math.round(progresso * 100) }} accessibilityLabel={titulo}>
+            <View style={[styles.preenchido, { width: `${Math.round(progresso * 100)}%` }]} />
+          </View>
+          <Texto variante="caption" numero>Baixando… {Math.round(progresso * 100)}%</Texto>
+          <SecondaryButton compacto rotulo="Pausar" onPress={() => cancelar.current?.abort()} />
+        </View>
+      )}
+      {erro ? <Texto cor="warning" peso="medium" accessibilityRole="alert">⚠ {erro}</Texto> : null}
+    </Cartao>
+  );
+}
+
+export function EscolherVoz({ aberto, onFechar }: { aberto: boolean; onFechar: () => void }) {
+  const voz = useVozDaIA();
+  const cerebro = useCerebroDaIA();
+  const [vozPronta, setVozPronta] = useState<boolean | null>(null);
+  const [gemmaPronto, setGemmaPronto] = useState<boolean | null>(null);
+  const [ouvindo, setOuvindo] = useState(false);
+
+  useEffect(() => {
+    if (aberto) {
+      void vozBaixada().then(setVozPronta);
+      void gemmaBaixado().then(setGemmaPronto);
+    } else pararDeFalar();
+  }, [aberto]);
 
   function ouvir() {
     if (ouvindo) { pararDeFalar(); setOuvindo(false); return; }
     falar(EXEMPLO, { onInicio: () => setOuvindo(true), onFim: () => setOuvindo(false) });
   }
 
-  const precisaBaixar = voz !== 'celular' && disponivel && baixada === false;
-
   return (
-    <BottomSheet aberto={aberto} onFechar={onFechar} titulo="Voz da IA" testID="sheet-voz">
+    <BottomSheet aberto={aberto} onFechar={onFechar} titulo="IA e voz" testID="sheet-voz">
+      <Texto variante="caption" cor="textMuted">Uma IA só: ela pensa, escreve e fala. A voz é só o jeito de ela falar.</Texto>
+
+      <Texto peso="semibold" accessibilityRole="header">Onde a IA pensa</Texto>
+      <View style={styles.opcoes}>
+        <Chip rotulo={NOME_DO_CEREBRO.celular} detalhe={cerebroLocalDisponivel ? 'Grátis e privada, funciona sem internet para pensar' : 'Só no app do celular'}
+          desativado={!cerebroLocalDisponivel} selecionado={cerebro === 'celular' && cerebroLocalDisponivel}
+          onPress={() => escolherCerebro('celular')} testID="cerebro-opcao-celular" />
+        <Chip rotulo={NOME_DO_CEREBRO.nuvem} detalhe="Precisa de internet" selecionado={cerebro === 'nuvem' || !cerebroLocalDisponivel}
+          onPress={() => escolherCerebro('nuvem')} testID="cerebro-opcao-nuvem" />
+      </View>
+      {cerebro === 'celular' && cerebroLocalDisponivel && gemmaPronto === false ? (
+        <Baixar testID="cerebro-baixar" titulo={`Baixar o Gemma 4 (${TAMANHO_GEMMA_GB.toLocaleString('pt-BR')} GB)`}
+          texto="Uma vez só, no Wi-Fi. Até terminar, a IA da nuvem responde. Em celulares com pouca memória ela fica mais lenta."
+          baixar={async (p, s) => { await baixarGemma(p, s); setGemmaPronto(true); }} />
+      ) : null}
+
+      <Texto peso="semibold" accessibilityRole="header">Voz da IA</Texto>
       <View style={styles.opcoes}>
         <Chip rotulo={NOME_DA_VOZ.celular} detalhe="Funciona sempre, sem baixar nada" selecionado={voz === 'celular'}
           onPress={() => escolherVoz('celular')} testID="voz-opcao-celular" />
@@ -70,32 +118,15 @@ export function EscolherVoz({ aberto, onFechar }: { aberto: boolean; onFechar: (
             desativado={!disponivel} selecionado={voz === v} onPress={() => escolherVoz(v)} testID={`voz-opcao-${v}`} />
         ))}
       </View>
-
-      {precisaBaixar ? (
-        <Cartao testID="voz-baixar">
-          <Texto peso="semibold">Baixar a voz Supertonic ({TAMANHO_MB} MB)</Texto>
-          <Texto variante="caption" cor="textMuted">
-            Uma vez só, de preferência no Wi-Fi. Ela fica guardada no celular e a fala é gerada aqui mesmo, sem internet.
-          </Texto>
-          {progresso === null ? (
-            <DuoButton rotulo="Baixar a voz" testID="voz-baixar-botao" onPress={() => void baixar()} />
-          ) : (
-            <View style={styles.progresso}>
-              <View style={styles.trilho} accessibilityRole="progressbar"
-                accessibilityValue={{ min: 0, max: 100, now: Math.round(progresso * 100) }} accessibilityLabel="Baixando a voz">
-                <View style={[styles.preenchido, { width: `${Math.round(progresso * 100)}%` }]} />
-              </View>
-              <Texto variante="caption" numero>Baixando… {Math.round(progresso * 100)}%</Texto>
-              <SecondaryButton compacto rotulo="Pausar" onPress={() => cancelar.current?.abort()} />
-            </View>
-          )}
-        </Cartao>
+      {voz !== 'celular' && disponivel && vozPronta === false ? (
+        <Baixar testID="voz-baixar" titulo={`Baixar a voz Supertonic (${TAMANHO_MB} MB)`}
+          texto="Uma vez só, de preferência no Wi-Fi. Ela fica guardada no celular e a fala é gerada aqui mesmo, sem internet."
+          baixar={async (p, s) => { await baixarVoz(p, s); setVozPronta(true); }} />
       ) : null}
-      {erro ? <Texto cor="warning" peso="medium" accessibilityRole="alert">⚠ {erro}</Texto> : null}
 
       <SecondaryButton rotulo={ouvindo ? 'Parar' : 'Ouvir a voz'} testID="voz-ouvir" onPress={ouvir} />
       <Texto variante="caption" cor="textMuted">
-        {voz !== 'celular' && !baixada ? 'Até a voz baixar, a IA fala com a voz do celular. ' : ''}A voz da IA é gerada por inteligência artificial.
+        {voz !== 'celular' && !vozPronta ? 'Até a voz baixar, a IA fala com a voz do celular. ' : ''}A voz da IA é gerada por inteligência artificial.
       </Texto>
     </BottomSheet>
   );

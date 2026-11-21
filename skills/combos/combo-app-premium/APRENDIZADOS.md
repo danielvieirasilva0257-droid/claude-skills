@@ -21,3 +21,10 @@ Adendos datados, o mais novo embaixo.
 - **Dados de teste com valores exatos e datas relativas:** gerador no seed que mede o que já existe no período e enche até o alvo (faturamento e quantidade), com `setseed` para repetir igual; os centavos vão como desconto na última visita.
 - **Não amarre teste a "amanhã":** escolha o próximo dia útil; e leia do banco os totais que mudam com o seed.
 - **Versão do APK com `android/` já gerado:** o prebuild não roda de novo, então copie a versão do `app.json` para o `build.gradle` no script do build (senão o APK sai com a versão antiga e o celular pode recusar a atualização).
+
+## 21/11/2026: IA no celular com voz (App Barbeiros)
+
+- **Uma IA só, a voz como ferramenta:** um cérebro (Gemma 4 no celular, nuvem de reserva) escreve palavra por palavra; o app filtra o que é chamada de ferramenta, mostra o texto enquanto ele chega e manda cada frase completa para a voz (Supertonic), que fala na ordem enquanto a próxima é escrita.
+- **Regras e ferramentas num lugar só (servidor):** o celular pede as regras e a lista de ferramentas e executa cada ferramenta no servidor. A IA da nuvem e a do celular ficam iguais, e mudar uma regra não precisa de APK novo.
+- **Teste o modelo pequeno de verdade antes do celular:** o Gemma 4 em GGUF no `llama.cpp` (CPU) com as regras reais mostrou que ele inventa a resposta da ferramenta (pare no `<tool_call|>`), formata dinheiro em inglês (mande frase pronta em português), pede confirmação sem preparar a mudança (regra explícita) e confunde campos parecidos (descrição com exemplos).
+

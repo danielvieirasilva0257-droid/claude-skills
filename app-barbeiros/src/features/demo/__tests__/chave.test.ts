@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 
-import { chaveDaRequisicao, datasRelativas, deslocarDatas } from '../chave';
+import { chaveDaFerramenta, chaveDaRequisicao, datasRelativas, deslocarDatas } from '../chave';
 
 describe('demo: chaves e datas', () => {
   it('datas da requisição viram relativas a hoje (dia, mês e sem a hora)', () => {
@@ -28,5 +28,14 @@ describe('demo: chaves e datas', () => {
       .toBe('{"dia":"2026-12-03","inicio":"2026-12-04T18:30:00+00:00","mes":"2026-12-01"}');
     expect(deslocarDatas(texto, '2026-11-20', '2026-11-20')).toBe(texto);
     expect(deslocarDatas('"2026-12-01"', '2026-11-20', '2027-01-05')).toBe('"2027-02-01"');
+  });
+});
+
+describe('ferramentas do Gemma gravadas para a demonstração', () => {
+  it('mesma chave com outra ordem, nulos, maiúsculas e outro dia de uso', () => {
+    const gravada = chaveDaFerramenta('agendar_horario', { cliente: 'Cliente 2', servicos: ['Corte'], dia: '2026-11-22', hora: '10:00' }, '2026-11-21');
+    const noCelular = chaveDaFerramenta('agendar_horario', { hora: '10:00', dia: '2026-11-26', servicos: ['Corte'], cliente: 'cliente 2', obs: null }, '2026-11-25');
+    expect(noCelular).toBe(gravada);
+    expect(chaveDaFerramenta('resumo_do_dia', { dia: null }, '2026-11-21')).toBe('resumo_do_dia{}');
   });
 });

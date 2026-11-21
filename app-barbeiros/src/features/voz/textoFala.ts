@@ -87,6 +87,8 @@ export function textoParaFala(texto: string): string {
   // R$ 7.466,39 · R$45 · R$ 0,50
   t = t.replace(/R\$\s?(\d{1,3}(?:\.\d{3})+|\d+)(?:,(\d{1,2}))?/g, (_m, r: string, c?: string) =>
     dinheiro(inteiro(r), c ? Number(c.padEnd(2, '0')) : 0));
+  // 7563.38 reais (a model writing money the English way)
+  t = t.replace(/\b(\d+)\.(\d{2})\s*reais\b/g, (_m, r: string, c: string) => dinheiro(Number(r), Number(c)));
   // 8,2% · 9 %
   t = t.replace(/(\d+)(?:,(\d+))?\s?%/g, (_m, i: string, d?: string) =>
     `${porExtenso(Number(i))}${d ? ` vírgula ${digitos(d)}` : ''} por cento`);

@@ -10,7 +10,7 @@ import { useRef, useState } from 'react';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
 
 import { vozDaIA } from '@/features/voz/preferencia';
-import { falarSupertonic, pararSupertonic, vozBaixada } from '@/features/voz/supertonic';
+import { criarFilaSupertonic, pararSupertonic, vozBaixada, type FilaDeFala } from '@/features/voz/supertonic';
 
 export function reconhecimentoDisponivel(): boolean {
   try {
@@ -83,34 +83,62 @@ export function useOuvir(onFinal: (texto: string) => void) {
 type Eventos = { onInicio?: () => void; onFim?: () => void };
 let vez = 0;
 
-function falarComOCelular(texto: string, eventos: Eventos) {
-  Speech.stop();
-  Speech.speak(texto, {
-    language: 'pt-BR', rate: 1.02,
-    onStart: eventos.onInicio, onDone: eventos.onFim, onStopped: eventos.onFim, onError: eventos.onFim,
-  });
-}
+export type Fala = { frase: (texto: string) => void; terminar: () => void; parar: () => void };
 
-/** Speak in Brazilian Portuguese: the chosen Supertonic voice, or the phone's voice when it is not there or fails. */
-export function falar(texto: string, eventos: Eventos) {
+/**
+ * The AI's voice, a tool of the one AI (it never writes anything itself):
+ * receives each sentence while the AI is still writing and speaks them in
+ * order. Supertonic when it is chosen and downloaded; the phone's voice when
+ * it is not, or for a sentence Supertonic could not generate.
+ */
+export function criarFala(eventos: Eventos): Fala {
   pararDeFalar();
   const eu = ++vez;
   const voz = vozDaIA();
-  if (voz === 'celular') return falarComOCelular(texto, eventos);
+  let comecou = false;
+  let terminou = false;
+  let decidido = false;
+  let supertonicAcabou = true;
+  let noCelular = 0;
+  let fila: FilaDeFala | null = null;
+  const espera: string[] = [];
+  const inicio = () => { if (!comecou && eu === vez) { comecou = true; eventos.onInicio?.(); } };
+  const talvezFim = () => { if (terminou && decidido && supertonicAcabou && noCelular === 0 && eu === vez) { vez++; eventos.onFim?.(); } };
+  const pelaVozDoCelular = (t: string) => {
+    noCelular++;
+    const pronto = () => { noCelular = Math.max(0, noCelular - 1); talvezFim(); };
+    Speech.speak(t, { language: 'pt-BR', rate: 1.02, onStart: inicio, onDone: pronto, onError: pronto, onStopped: pronto });
+  };
+  const enviar = (t: string) => (fila ? fila.frase(t) : pelaVozDoCelular(t));
   void (async () => {
-    let comecou = false;
-    try {
-      if (await vozBaixada()) {
-        await falarSupertonic(texto, voz, {
-          onInicio: () => { comecou = true; if (eu === vez) eventos.onInicio?.(); },
-          onFim: () => { if (comecou && eu === vez) eventos.onFim?.(); },
-        });
-      }
-    } catch {
-      // falls back to the phone's voice below
+    let baixada = false;
+    if (voz !== 'celular') baixada = await vozBaixada().catch(() => false);
+    if (eu !== vez) return;
+    if (voz !== 'celular' && baixada) {
+      supertonicAcabou = false;
+      fila = criarFilaSupertonic(voz, {
+        onInicio: inicio,
+        onFim: () => { supertonicAcabou = true; talvezFim(); },
+        onErro: (t) => pelaVozDoCelular(t),
+      });
     }
-    if (!comecou && eu === vez) falarComOCelular(texto, eventos);
+    decidido = true;
+    espera.splice(0).forEach(enviar);
+    if (terminou) fila?.terminar();
+    talvezFim();
   })();
+  return {
+    frase: (t) => { if (eu !== vez || !t.trim()) return; if (decidido) enviar(t); else espera.push(t); },
+    terminar: () => { if (terminou) return; terminou = true; if (decidido) fila?.terminar(); talvezFim(); },
+    parar: () => pararDeFalar(),
+  };
+}
+
+/** Speak a whole answer (the cloud AI answers at once): the same voice tool. */
+export function falar(texto: string, eventos: Eventos) {
+  const fala = criarFala(eventos);
+  fala.frase(texto);
+  fala.terminar();
 }
 
 export function pararDeFalar() {

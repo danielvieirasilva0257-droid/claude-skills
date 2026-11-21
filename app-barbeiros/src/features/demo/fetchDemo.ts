@@ -2,11 +2,14 @@
 // the Edge Functions from gravacao.json. Unknown reads come back empty and
 // writes "succeed" without saving.
 import { CONTAS_DEMO } from './config';
-import { chaveDaRequisicao, deslocarDatas, hojeBrasilia } from './chave';
+import { chaveDaFerramenta, chaveDaRequisicao, deslocarDatas, hojeBrasilia } from './chave';
 import gravacao from './gravacao.json';
 
 type Gravada = { s: number; t?: string; r?: string; b: string };
-type Gravacao = { gravadoEm: string; usuarios: Record<string, Record<string, Gravada>>; chat: Record<string, string>; agente?: Record<string, unknown> };
+type Gravacao = {
+  gravadoEm: string; usuarios: Record<string, Record<string, Gravada>>; chat: Record<string, string>; agente?: Record<string, unknown>;
+  celular?: { contexto: unknown; ferramentas: Record<string, unknown> };
+};
 const G = gravacao as unknown as Gravacao;
 
 const ANO = 365 * 24 * 3600;
@@ -94,8 +97,16 @@ const normalFrase = (t: string) => t.normalize('NFD').replace(/\p{Diacritic}/gu,
 
 /** "Fale com a IA" in the demo: recorded answers for the examples; changes are never saved. */
 function agenteDemo(corpo: string): Response {
-  const pedido = JSON.parse(corpo || '{}') as { mensagem?: string; confirmar?: unknown };
+  const pedido = JSON.parse(corpo || '{}') as { mensagem?: string; confirmar?: unknown; contexto?: boolean; ferramenta?: string; entrada?: Record<string, unknown> };
   if (pedido.confirmar) return resposta(JSON.stringify({ ok: true, texto: 'Pronto! Na demonstração nada é salvo de verdade.' }));
+  // The phone brain (Gemma 4): recorded rules and tool answers.
+  const hoje = hojeBrasilia();
+  if (pedido.contexto && G.celular?.contexto) return resposta(deslocarDatas(JSON.stringify(G.celular.contexto), G.gravadoEm, hoje));
+  if (pedido.ferramenta) {
+    const gravada = G.celular?.ferramentas[chaveDaFerramenta(pedido.ferramenta, pedido.entrada ?? {}, hoje)];
+    if (gravada) return resposta(deslocarDatas(JSON.stringify(gravada), G.gravadoEm, hoje));
+    return resposta(JSON.stringify({ ok: true, conteudo: 'Na demonstração não tenho esse dado. Diga ao barbeiro que, com o app ligado ao servidor, você consulta isso.' }));
+  }
   const gravada = G.agente?.[normalFrase(pedido.mensagem ?? '')];
   if (gravada) return resposta(deslocarDatas(JSON.stringify(gravada), G.gravadoEm, hojeBrasilia()));
   return resposta(JSON.stringify({ ok: true, texto: 'Na demonstração eu respondo aos exemplos, como "quanto eu faturei hoje?" ou "marca o Bruno amanhã às 10 pra corte". Com o servidor ligado, eu entendo qualquer pedido e mexo no app.' }));

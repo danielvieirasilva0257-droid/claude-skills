@@ -68,3 +68,27 @@ Deno.test('números do mês: compara só até o mesmo dia, com o mês passado e 
   const dia = Number(new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' }).slice(8));
   assertMatch(r.texto, new RegExp(`Até o dia ${dia}: [\\d,]+% (acima|abaixo) do mês passado e ([\\d,]+% (acima|abaixo) da média|na média)`));
 });
+
+// ---------- The same AI on the phone (Gemma 4): context and tools from here ----------
+Deno.test('celular: contexto traz regras, ferramentas, hoje e a lista para o "Cliente N"', async () => {
+  const r = await falar({ contexto: true }) as unknown as {
+    ok: boolean; hoje: string; sistema: string; clientes: { id: string; nome: string }[];
+    ferramentas: { name: string; parameters: { properties: Record<string, { nullable?: boolean; type: string }>; required: string[] } }[];
+  };
+  assertEquals(r.ok, true);
+  assertMatch(r.sistema, /Hoje é .*\(\d{4}-\d{2}-\d{2}\)/);
+  assertMatch(r.sistema, /Cliente 1/);
+  const agendar = r.ferramentas.find((f) => f.name === 'agendar_horario')!;
+  assertEquals(agendar.parameters.properties.cliente!.nullable, true);
+  assert(agendar.parameters.required.includes('dia') && !agendar.parameters.required.includes('cliente'));
+  assert(r.clientes.some((c) => c.nome === 'Bruno Lima'), 'a lista vem para o celular montar o mesmo "Cliente N"');
+});
+
+Deno.test('celular: ferramenta de leitura devolve dados com "Cliente N"; mudança volta pendente', async () => {
+  const leitura = await falar({ ferramenta: 'agenda_do_dia', entrada: { dia: amanha() } }) as unknown as { ok: boolean; conteudo: string };
+  assertEquals(leitura.ok, true);
+  assertMatch(leitura.conteudo, /Cliente 2/);
+  assert(!/Bruno/.test(leitura.conteudo), 'nome real não vai para o modelo');
+  const mudanca = await falar({ ferramenta: 'agendar_horario', entrada: { cliente: 'Cliente 1', servicos: ['Corte'], dia: amanha(), hora: '11:00' } });
+  assertEquals(mudanca.pendente?.ferramenta, 'agendar_horario');
+});

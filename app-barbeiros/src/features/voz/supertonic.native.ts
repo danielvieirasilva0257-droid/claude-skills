@@ -81,28 +81,63 @@ function tocar(arquivo: File, eu: number): Promise<void> {
   });
 }
 
-/** Speaks with the Supertonic voice; the next chunk is generated while the previous one plays. */
-export async function falarSupertonic(texto: string, voz: VozSupertonic, eventos: { onInicio?: () => void; onFim?: () => void }) {
+export type FilaDeFala = { frase: (texto: string) => void; terminar: () => void; parar: () => void };
+
+/**
+ * Speaks sentence by sentence as they arrive (the AI is still writing): each
+ * sentence is generated after the previous one, and each generated chunk is
+ * played in order while the next one is generated. onErro gets a sentence the
+ * voice could not generate (the caller speaks it with the phone's voice).
+ */
+export function criarFilaSupertonic(
+  voz: VozSupertonic,
+  eventos: { onInicio?: () => void; onFim?: () => void; onErro?: (frase: string) => void },
+): FilaDeFala {
   pararSupertonic();
   const eu = ++geracao;
   let comecou = false;
-  let fila: Promise<void> = Promise.resolve();
-  try {
-    await setAudioModeAsync({ playsInSilentMode: true });
-    const tts = await carregar();
-    let n = 0;
-    for await (const pedaco of tts.synthesize(textoParaFala(texto), { voiceStyle: voz, lang: 'pt', speed: 1.05 })) {
-      if (eu !== geracao) break;
-      const arquivo = new File(Paths.cache, `voz-${eu}-${n++}.wav`);
-      arquivo.create({ overwrite: true });
-      arquivo.writeSync(wavPcm16(pedaco.audio, pedaco.sampleRate));
-      if (!comecou) { comecou = true; eventos.onInicio?.(); }
-      fila = fila.then(() => tocar(arquivo, eu));
-    }
-    await fila;
-  } finally {
-    if (eu === geracao) eventos.onFim?.();
-  }
+  let encerrada = false;
+  let n = 0;
+  let sintese: Promise<void> = setAudioModeAsync({ playsInSilentMode: true }).catch(() => undefined);
+  let toque: Promise<void> = Promise.resolve();
+  const frase = (texto: string) => {
+    sintese = sintese.then(async () => {
+      if (eu !== geracao) return;
+      try {
+        const tts = await carregar();
+        for await (const pedaco of tts.synthesize(textoParaFala(texto), { voiceStyle: voz, lang: 'pt', speed: 1.05 })) {
+          if (eu !== geracao) break;
+          const arquivo = new File(Paths.cache, `voz-${eu}-${n++}.wav`);
+          arquivo.create({ overwrite: true });
+          arquivo.writeSync(wavPcm16(pedaco.audio, pedaco.sampleRate));
+          if (!comecou) { comecou = true; eventos.onInicio?.(); }
+          toque = toque.then(() => tocar(arquivo, eu));
+        }
+      } catch {
+        if (eu === geracao) eventos.onErro?.(texto);
+      }
+    });
+  };
+  const terminar = () => {
+    if (encerrada) return;
+    encerrada = true;
+    void sintese.then(() => toque).then(() => { if (eu === geracao) eventos.onFim?.(); });
+  };
+  return { frase, terminar, parar: pararSupertonic };
+}
+
+/** Speaks a whole text with the Supertonic voice (the same queue, one text). */
+export async function falarSupertonic(texto: string, voz: VozSupertonic, eventos: { onInicio?: () => void; onFim?: () => void }) {
+  await new Promise<void>((resolve, reject) => {
+    let falhou = false;
+    const fila = criarFilaSupertonic(voz, {
+      onInicio: eventos.onInicio,
+      onFim: () => { eventos.onFim?.(); if (falhou) reject(new Error('voz')); else resolve(); },
+      onErro: () => { falhou = true; },
+    });
+    fila.frase(texto);
+    fila.terminar();
+  });
 }
 
 export function pararSupertonic() {

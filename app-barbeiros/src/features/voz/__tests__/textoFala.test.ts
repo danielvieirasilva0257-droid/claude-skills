@@ -27,6 +27,8 @@ describe('texto para a voz', () => {
     expect(textoParaFala('Até o dia 21: 8,2% acima do mês passado e 9% acima da média.'))
       .toBe('Até o dia vinte e um: oito vírgula dois por cento acima do mês passado e nove por cento acima da média.');
     expect(textoParaFala('Corte R$ 45,00 · Barba R$ 1,00')).toBe('Corte quarenta e cinco reais, Barba um real');
+    expect(textoParaFala('Seu faturamento no mês foi de 7563.38 reais.'))
+      .toBe('Seu faturamento no mês foi de sete mil quinhentos e sessenta e três reais e trinta e oito centavos.');
   });
   it('horas e datas', () => {
     expect(textoParaFala('Amanhã você tem 18:30 Bruno (Barba).')).toBe('Amanhã você tem dezoito e trinta Bruno (Barba).');

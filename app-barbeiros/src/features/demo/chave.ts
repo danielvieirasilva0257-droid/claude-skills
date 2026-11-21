@@ -79,3 +79,19 @@ function ordenar(v: unknown): unknown {
 export function hojeBrasilia(agora: Date = new Date()): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(agora);
 }
+
+/** "2026-11-20" + n days. */
+export function somarDiasIso(dia: string, n: number): string {
+  return iso(diaMs(dia) + n * DIA_MS);
+}
+
+/** Key of a recorded tool call of the phone brain: name + arguments (sorted, missing = null, dates relative). */
+export function chaveDaFerramenta(ferramenta: string, entrada: Record<string, unknown>, hoje: string): string {
+  const limpo = Object.keys(entrada).sort().reduce<Record<string, unknown>>((o, k) => {
+    const v = entrada[k];
+    if (v !== null && v !== undefined && !(Array.isArray(v) && v.length === 0)) o[k] = typeof v === 'string' ? v.trim().toLowerCase() : v;
+    return o;
+  }, {});
+  return datasRelativas(`${ferramenta}${JSON.stringify(limpo)}`, hoje);
+}
+

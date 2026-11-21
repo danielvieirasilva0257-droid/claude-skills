@@ -7,7 +7,7 @@ import { createRequire } from 'node:module';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
-import { chaveDaRequisicao, hojeBrasilia } from '../src/features/demo/chave.ts';
+import { chaveDaRequisicao, chaveDaFerramenta, hojeBrasilia, somarDiasIso } from '../src/features/demo/chave.ts';
 import { servir } from './servidor-estatico.mjs';
 
 const require = createRequire(import.meta.url);
@@ -171,7 +171,31 @@ for (const mensagem of EXEMPLOS) {
   if (r.ok) agente[normalFrase(mensagem)] = await r.json();
 }
 
+// The same AI on the phone (Gemma 4): its rules and the answers of the most common tools,
+// so the demo APK can run Gemma without a server. Keys: tool + arguments, dates relative to today.
+const celular = { contexto: null, ferramentas: {} };
+const pedirCelular = (corpo) => fetch(`${env.EXPO_PUBLIC_FUNCTIONS_URL}/ia-agente`, {
+  method: 'POST', headers: { Authorization: `Bearer ${login.access_token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(corpo),
+}).then((r) => (r.ok ? r.json() : null));
+celular.contexto = await pedirCelular({ contexto: true });
+const AMANHA = somarDiasIso(HOJE, 1);
+const ferramentasDemo = [
+  ['resumo_do_dia', { dia: null }], ['resumo_do_dia', { dia: HOJE }], ['resumo_do_dia', { dia: AMANHA }],
+  ['agenda_do_dia', { dia: null }], ['agenda_do_dia', { dia: HOJE }], ['agenda_do_dia', { dia: AMANHA }],
+  ['horarios_livres', { dia: AMANHA, duracao_min: null }], ['horarios_livres', { dia: HOJE, duracao_min: null }],
+  ['numeros_do_mes', {}], ['listar_servicos', {}],
+  ['ficha_cliente', { cliente: 'Cliente 1' }], ['ficha_cliente', { cliente: 'Cliente 2' }], ['ficha_cliente', { cliente: 'Cliente 3' }],
+  ['agendar_horario', { cliente: 'Cliente 2', servicos: ['Corte'], dia: AMANHA, hora: '10:00' }],
+  ['agendar_horario', { cliente: 'Cliente 1', servicos: ['Corte'], dia: AMANHA, hora: '15:00' }],
+  ['anotar_no_cliente', { cliente: 'Cliente 1', observacao: 'prefere degradê baixo', tecnica_cabelo: null, tecnica_barba: null }],
+  ['abrir_tela', { tela: 'financeiro', cliente: null }], ['abrir_tela', { tela: 'agenda', cliente: null }],
+];
+for (const [ferramenta, entrada] of ferramentasDemo) {
+  const r = await pedirCelular({ ferramenta, entrada });
+  if (r) celular.ferramentas[chaveDaFerramenta(ferramenta, entrada, HOJE)] = r;
+}
+
 const saida = join(root, 'src', 'features', 'demo', 'gravacao.json');
-writeFileSync(saida, `${JSON.stringify({ gravadoEm: HOJE, usuarios, chat, agente })}\n`);
+writeFileSync(saida, `${JSON.stringify({ gravadoEm: HOJE, usuarios, chat, agente, celular })}\n`);
 const n = Object.values(usuarios).reduce((t, u) => t + Object.keys(u).length, 0);
-console.log(`gravação: ${n} respostas, ${Object.keys(chat).length} perguntas do chat, ${Object.keys(agente).length} exemplos da IA · ${saida}`);
+console.log(`gravação: ${n} respostas, ${Object.keys(chat).length} perguntas do chat, ${Object.keys(agente).length} exemplos da IA, ${Object.keys(celular.ferramentas).length} ferramentas do Gemma · ${saida}`);

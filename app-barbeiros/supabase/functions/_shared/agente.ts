@@ -71,8 +71,10 @@ export const FERRAMENTAS: Anthropic.Beta.BetaTool[] = [
   { name: 'cancelar_horario', description: 'Prepara o cancelamento de um horário (id da agenda_do_dia).', strict: true,
     input_schema: obj({ atendimento_id: s('id do horário') }) },
   { name: 'anotar_no_cliente', description: 'Prepara uma anotação nas observações do cliente e/ou a troca da técnica do cabelo ou da barba.', strict: true,
-    input_schema: obj({ cliente: s(CLIENTE), observacao: sOuNulo('Texto a acrescentar nas observações; null = nada'),
-      tecnica_cabelo: sOuNulo('Nova técnica do cabelo; null = manter'), tecnica_barba: sOuNulo('Nova técnica da barba; null = manter') }) },
+    input_schema: obj({ cliente: s(CLIENTE),
+      observacao: sOuNulo('Texto a acrescentar nas observações (preferências, gostos, conversa). Na dúvida, use este campo. null = nada'),
+      tecnica_cabelo: sOuNulo('Técnica do CORTE DE CABELO (ex.: degradê, low fade, social na tesoura, máquina 2). null = manter'),
+      tecnica_barba: sOuNulo('Técnica da BARBA (ex.: barba desenhada, contorno na navalha, lenhador). null = manter') }) },
   { name: 'mudar_preco_servico', description: 'Prepara a troca do preço de um serviço.', strict: true,
     input_schema: obj({ servico: s('Nome do serviço'), preco: { type: 'number', description: 'Novo preço em reais' } }) },
   { name: 'registrar_gasto', description: 'Prepara o registro de um gasto de hoje.', strict: true,
@@ -121,6 +123,51 @@ const diaCurto = (d: string) => `${DIAS_SEMANA[new Date(`${d}T12:00:00Z`).getUTC
 const somarDias = (d: string, n: number) => new Date(Date.parse(`${d}T12:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10);
 const horaBr = (iso: string) => new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
 
+// ---------- The same AI on the phone (Gemma 4, on the device) ----------
+// The phone runs the model; the rules, the tools and their execution stay
+// here, so the cloud agent and the phone agent are the same AI.
+
+/** Tool list for the phone model: plain JSON Schema, optional fields marked nullable. */
+export function ferramentasParaCelular() {
+  const simplificar = (schema: Record<string, unknown>): Record<string, unknown> => {
+    const props = (schema.properties ?? {}) as Record<string, Record<string, unknown>>;
+    const properties: Record<string, unknown> = {};
+    const required: string[] = [];
+    for (const [k, v] of Object.entries(props)) {
+      const tipos = Array.isArray(v.type) ? (v.type as string[]) : [v.type as string];
+      const nulo = tipos.includes('null');
+      const { type: _t, enum: _e, ...resto } = v;
+      const en = Array.isArray(v.enum) ? (v.enum as unknown[]).filter((x) => x !== null) : undefined;
+      properties[k] = { ...resto, type: tipos.find((t) => t !== 'null') ?? 'string', ...(en ? { enum: en } : {}), ...(nulo ? { nullable: true } : {}) };
+      if (!nulo) required.push(k);
+    }
+    return { type: 'object', properties, required };
+  };
+  return FERRAMENTAS.map((f) => {
+    const t = f as unknown as { name: string; description: string; input_schema: Record<string, unknown> };
+    return { name: t.name, description: t.description, parameters: simplificar(t.input_schema) };
+  });
+}
+
+/** System prompt for the phone model: short rules for a small model, plus today and the barber's profile. */
+export function sistemaCelular(ctx: Contexto, barbeiro: { nome?: string | null; perfil?: unknown }): string {
+  const perfil = barbeiro.perfil && typeof barbeiro.perfil === 'object' ? JSON.stringify(barbeiro.perfil).slice(0, 1200) : '';
+  const nome = barbeiro.nome ? ` do barbeiro ${barbeiro.nome.split(' ')[0]}` : '';
+  return [
+    `Você é a IA do app de barbearia${nome}. Ele fala ou escreve com você: é a mesma conversa, e a sua resposta aparece na tela e é lida em voz alta.`,
+    `Hoje é ${diaCurto(ctx.hoje)} (${ctx.hoje}), horário de Brasília. Amanhã é ${somarDias(ctx.hoje, 1)}.`,
+    `Serviços: ${ctx.servicos.map((x) => x.nome).join(', ') || 'nenhum cadastrado'}.`,
+    'Regras:',
+    '1. Para números, agenda, clientes, horários ou serviços, chame uma ferramenta antes de responder. Nunca invente nem calcule números: repita os que a ferramenta mandar. Se ela mandar um "resumo", responda com as palavras dele. Dinheiro sempre como R$ 1.234,56.',
+    '2. Para comparar o mês, use só a "comparacao" de numeros_do_mes (mês passado e média, até o mesmo dia).',
+    '3. Para mudar algo (agendar, lançar, concluir, falta, cancelar, anotar, preço, gasto, meta, fechar caixa), chame primeiro a ferramenta da mudança: ela só prepara e mostra o botão de confirmar no app. Só depois diga em uma frase o que vai acontecer e pergunte se confirma. Nunca pergunte se confirma sem ter chamado a ferramenta. Uma mudança por vez.',
+    '4. Se faltar cliente, serviço, dia ou hora, pergunte em uma frase curta.',
+    '5. Clientes aparecem como "Cliente 1", "Cliente 2"... Use esse formato nas ferramentas. Nunca peça telefone nem dados pessoais.',
+    '6. Responda em português do Brasil simples, em no máximo 2 frases curtas, sem listas, sem markdown e sem emojis.',
+    ...(perfil ? [`Perfil do barbeiro (da entrevista): ${perfil}`] : []),
+  ].join('\n');
+}
+
 export function preparar(ctx: Contexto) {
   const anon = criarAnonimizador(ctx.clientes);
   // Same numbering as criarAnonimizador (sorted by id).
@@ -156,7 +203,12 @@ export async function executarFerramenta(ctx: Contexto, nome: string, entrada: R
   switch (nome) {
     case 'resumo_do_dia': {
       const { data, error } = await db.rpc('resumo_dia', { p_dia: dia(entrada.dia) });
-      return error ? erro('Não deu para ler o resumo.') : dados(Array.isArray(data) ? data[0] ?? null : data);
+      if (error) return erro('Não deu para ler o resumo.');
+      const r = (Array.isArray(data) ? data[0] ?? null : data) as Record<string, unknown> | null;
+      // A ready sentence in pt-BR (money as "R$ 1.234,56"): the model repeats it instead of formatting numbers.
+      const quando = dia(entrada.dia) === ctx.hoje ? 'Hoje' : `Em ${diaCurto(dia(entrada.dia))}`;
+      const resumo = r ? `${quando}: ${moeda(Number(r.faturamento ?? 0))} em ${Number(r.atendimentos ?? 0)} atendimento(s), lucro de ${moeda(Number(r.lucro ?? 0))}.` : `${quando}: nenhum atendimento.`;
+      return dados({ resumo, ...(r ?? {}) });
     }
     case 'agenda_do_dia': {
       const { data, error } = await db.rpc('agenda_grade', { p_dia: dia(entrada.dia) });
@@ -187,7 +239,11 @@ export async function executarFerramenta(ctx: Contexto, nome: string, entrada: R
       ]);
       const m = (meta.data ?? {}) as Record<string, unknown>;
       const c = (comp.data ?? {}) as Record<string, unknown>;
-      return dados({ mes: (fin.data as unknown[] | null)?.[0] ?? null,
+      const mesDados = (fin.data as Record<string, unknown>[] | null)?.[0] ?? null;
+      const resumo = `No mês, até hoje: ${moeda(Number(mesDados?.faturamento ?? 0))} em ${Number(mesDados?.atendimentos ?? 0)} atendimento(s).${frasesComparacao({
+        ate_dia: (c.ate_dia as number | null) ?? null, variacao_vs_mes_passado: (c.variacao_faturamento as number | null) ?? null,
+        variacao_vs_media_3_meses: (c.vs_media_faturamento as number | null) ?? null })}`;
+      return dados({ resumo, mes: mesDados,
         // Always the same period: day 1 to today, this month and the months before.
         comparacao: { ate_dia: c.ate_dia ?? null, variacao_vs_mes_passado: c.variacao_faturamento ?? null,
           variacao_vs_media_3_meses: c.vs_media_faturamento ?? null,

@@ -17,4 +17,14 @@ export async function falarSupertonic(_texto: string, _voz: VozSupertonic, event
   eventos.onFim?.();
 }
 
+export type FilaDeFala = { frase: (texto: string) => void; terminar: () => void; parar: () => void };
+
+export function criarFilaSupertonic(
+  _voz: VozSupertonic,
+  eventos: { onInicio?: () => void; onFim?: () => void; onErro?: (frase: string) => void },
+): FilaDeFala {
+  // Not on the web: every sentence goes back to the phone's voice.
+  return { frase: (t) => eventos.onErro?.(t), terminar: () => eventos.onFim?.(), parar: () => undefined };
+}
+
 export function pararSupertonic() {}
