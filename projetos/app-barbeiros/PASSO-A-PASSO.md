@@ -271,6 +271,27 @@ O Daniel quer uma IA aberta rodando no celular (como a Google AI Edge Gallery), 
 - **Fluxo proposto:** reconhecimento de voz do celular (texto ao vivo) → Gemma 4 com as funções e a confirmação → Kokoro falando frase por frase → a voz para se o barbeiro voltar a falar.
 - **Falta decidir (Daniel):** a voz (Dora, Alex ou Santa) e se faz o protótipo. Velocidade e acerto só dá para medir no celular dele.
 
+## Voz Supertonic no app (21/11/2026)
+
+O Daniel ouviu as amostras e escolheu o **Supertonic 3, vozes F2 e M1**.
+
+1. **Biblioteca:** `react-native-executorch` 0.11.1 (Software Mansion), que já traz o Supertonic 3 pronto. A versão int8 (XNNPACK) tem ~144 MB (a ONNX original tem 398 MB). Só as duas vozes escolhidas são baixadas. A telemetria de download da biblioteca fica desligada (`setTelemetryEnabled(false)`).
+2. **No app:** "Voz: … ›" no Fale com a IA abre a gaveta "Voz da IA" (voz do celular, F2 ou M1). Baixa uma vez, com progresso e pausa (continua de onde parou), e "Ouvir a voz". A fala é gerada no celular, pedaço por pedaço: o próximo pedaço é gerado enquanto o anterior toca (WAV no cache + `expo-audio`).
+3. **Reserva:** se a voz não estiver baixada ou der erro, a IA fala com a voz do celular (`expo-speech`), sem travar a conversa.
+4. **Números:** o Supertonic lê letra por letra e transformava "R$ 7.466,39" em "EDEO7 com a 6". O `textoParaFala` escreve por extenso dinheiro, porcentagem, horas, datas e números antes de falar (testes em Jest; conferido com o Supertonic e o Whisper).
+5. **Licença (OpenRAIL-M):** pode em app vendido. Os Termos de Uso ganharam as regras de uso (não imitar pessoas, não enganar, não assediar...), e o app avisa que a voz é gerada por IA.
+6. **Android mínimo 8.0 (SDK 26):** exigência da biblioteca, configurada pelo `expo-build-properties`. O `android/` foi recriado com `expo prebuild --clean`.
+
+**Comandos:** `npm install react-native-executorch@0.11.1 react-native-blob-util@0.24.11`, `EXPO_OFFLINE=1 npx expo install expo-audio expo-build-properties`, `EXPO_OFFLINE=1 CI=1 npx expo prebuild --platform android --clean --no-install`, `npm run apk`.
+
+**Aprendizados:**
+
+- **Voz que lê letra por letra precisa de números por extenso:** teste sempre com as frases reais do app (dinheiro, horas, porcentagem), não só com texto corrido.
+- **A web não roda a voz nativa:** arquivo `.native.ts` com a biblioteca e um `.ts` vazio para a web e os testes. Assim o build web e o E2E continuam funcionando.
+- **Instalar código de terceiros direto do GitHub** (pip com git) foi bloqueado pela regra de segurança da sessão. Use pacotes publicados (npm, PyPI) ou só os arquivos de dados (Hugging Face).
+
+**Falta:** testar no celular do Daniel (velocidade, qualidade da versão int8 e bateria). Se a int8 soar pior que as amostras, dá para trocar para a versão fp32 (398 MB).
+
 ## Pendências (fora do código)
 
 1. **Modelo da IA:** o padrão é `claude-opus-5-5` (regra da skill da API). Para o custo-alvo de R$ 0,50 a R$ 2 por barbeiro por mês, a troca para `claude-haiku-5-5` é decisão do Daniel (`LLM_MODEL`). Falta a chave da API nos secrets do Supabase.

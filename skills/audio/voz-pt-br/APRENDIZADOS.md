@@ -81,4 +81,5 @@ As outras (Despina, Autonoe, Pulcherrima e Aoede) não foram destacadas. As trê
 - **O `conferir_voz.py` conta número como erro:** o Whisper escreve "R$ 7.465" e "8%" no lugar das palavras do roteiro, e todas as vozes caíram para 64–76% só por isso. Com os números convertidos em palavras (`num2words`, `lang='pt_BR'`), ficaram entre 91% e 100%. Em roteiro com números, compare assim.
 - **faster-whisper com o `av` novo** falhou ao abrir arquivo (`metadata_errors`). Passe o áudio como array do numpy (ffmpeg para f32le 16 kHz), como o `conferir_voz.py` já faz.
 - **Hugging Face aqui:** precisa liberar `huggingface.co` e o servidor dos arquivos grandes (`us.aws.cdn.hf.co`).
+- **Supertonic 3 (escolhido para o App Barbeiros, vozes F2 e M1):** lê letra por letra e erra números escritos ("R$ 7.466,39" saiu como "EDEO7 com a 6"). Escreva dinheiro, porcentagem, horas e números por extenso antes (no app: `textoFala.ts`). No celular roda pela `react-native-executorch` (versão int8, ~144 MB).
 

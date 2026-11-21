@@ -52,6 +52,15 @@ Notes:
 - Hugging Face downloads need `huggingface.co` plus the file CDN (`us.aws.cdn.hf.co`); both were added to the environment.
 - faster-whisper 1.x with the installed `av` failed to open files (`metadata_errors`); pass a numpy array (ffmpeg to f32le 16 kHz) instead.
 
+## Decision (21/11/2026)
+
+Daniel picked **Supertonic 3, voices F2 and M1** (from the samples). Implemented with `react-native-executorch` 0.11.1, which ships Supertonic 3 as `.pte` (XNNPACK int8: vector estimator 66 MB, vocoder 39 MB, text encoder 36 MB, duration predictor 3.6 MB = ~144 MB; voice styles F1-M5 as JSON; languages include `pt`). The library's own pipeline mirrors the Python one (unicode indexer + `<pt>` tags, 8 flow-matching steps, speed 1.05, chunks up to 240 chars).
+
+- Supertonic reads digits badly ("R$ 7.466,39" -> "EDEO7 com a 6, 666 e 39"; "R$ 45,00" -> "e ebeles com 25"). The app writes money, percent, times, dates and numbers out in words first (`src/features/voz/textoFala.ts`); after that Whisper heard "18 e 30", "45 reais".
+- License OpenRAIL-M: royalty-free, commercial use OK, use restrictions (Attachment A) must be passed to users -> added to the Terms of Use; the app says the voice is AI-generated.
+- Library telemetry (anonymous download event) turned off.
+- Not checked here: int8 quality vs the fp32 ONNX samples (no ExecuTorch runtime run in the container) and speed on a real phone.
+
 ## Samples
 
 `samples/<modelo>_<voz>_ia-do-app.mp3`: the same 3 assistant lines (agenda de hoje, números do mês com a comparação, confirmação de agendamento): Kokoro (pf_dora, pm_alex, pm_santa), Kitten TTS 2 mini (Beatriz, Rafael), Kitten TTS 2 nano (Larissa, Gustavo), Supertonic 3 (F2, M1), Pocket TTS pt (rafael, vera). `samples/<modelo>_F-e-M_amostra-oficial.mp3`: the authors' own samples for tiny-voca-ptbr and pivo-ptbr (other sentences).
