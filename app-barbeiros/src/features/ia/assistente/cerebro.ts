@@ -2,10 +2,15 @@
 // is native). On the web the AI's brain is the cloud one (ia-agente).
 import type { Pendente } from '@/features/ia/agente';
 
-export const cerebroLocalDisponivel = false;
 export const TAMANHO_GEMMA_GB = 3.2;
 
 export type RespostaLocal = { texto: string; pendente?: Pendente; navegar?: string; cancelado?: boolean };
+
+export type DisponibilidadeGemma = { ok: boolean; motivo: string };
+
+export async function disponibilidadeGemma(): Promise<DisponibilidadeGemma> {
+  return { ok: false, motivo: 'Só no app do celular' };
+}
 
 export async function gemmaBaixado(): Promise<boolean> {
   return false;

@@ -14,8 +14,8 @@ import { chamarFuncao } from '@/lib/funcoes';
 import { criarAnonimizador, type ClienteNome } from './anonimizar';
 import { criarDivisorDeFrases } from './frases';
 import { criarFiltroDeFala, lerChamadasGemma4, textoVisivel } from './gemma4';
+import { MEMORIA_MINIMA_GB, memoriaDoCelularGB } from './memoria';
 
-export const cerebroLocalDisponivel = true;
 export const TAMANHO_GEMMA_GB = 3.2;
 
 setTelemetryEnabled(false);
@@ -28,6 +28,42 @@ type Ferramenta = { name: string; description: string; parameters: { type: strin
 type Contexto = { ok: boolean; hoje: string; sistema: string; ferramentas: Ferramenta[]; clientes: ClienteNome[] };
 type SaidaFerramenta = { ok: boolean; conteudo?: string; erro?: boolean; pendente?: Pendente; navegar?: string };
 type Sessao = { s: LLMChatSession; hoje: string; anon: ReturnType<typeof criarAnonimizador> };
+
+// Crash guard: "in use" is written before Gemma loads or writes and erased after.
+// If the app starts and finds it, the phone froze or killed the app while Gemma
+// ran (it happened on 21/11/2026): Gemma is then turned off on this phone.
+const CHAVE_EM_USO = 'gemma4-em-uso';
+const CHAVE_TRAVOU = 'gemma4-travou';
+const travouAqui: Promise<boolean> = (async () => {
+  try {
+    if (await AsyncStorage.getItem(CHAVE_EM_USO)) {
+      await AsyncStorage.setItem(CHAVE_TRAVOU, '1');
+      await AsyncStorage.removeItem(CHAVE_EM_USO);
+    }
+    return (await AsyncStorage.getItem(CHAVE_TRAVOU)) === '1';
+  } catch {
+    return false;
+  }
+})();
+
+async function marcarEmUso(sim: boolean) {
+  try {
+    if (sim) await AsyncStorage.setItem(CHAVE_EM_USO, '1');
+    else await AsyncStorage.removeItem(CHAVE_EM_USO);
+  } catch {
+    // no storage: no guard
+  }
+}
+
+export type DisponibilidadeGemma = { ok: boolean; motivo: string };
+
+/** Whether this phone can run Gemma 4, and the reason shown under the option. */
+export async function disponibilidadeGemma(): Promise<DisponibilidadeGemma> {
+  if (await travouAqui) return { ok: false, motivo: 'Travou neste celular. A IA pensa na nuvem.' };
+  const gb = memoriaDoCelularGB();
+  if (gb !== null && gb < MEMORIA_MINIMA_GB) return { ok: false, motivo: `Precisa de ${MEMORIA_MINIMA_GB} GB de memória. Este celular tem ${gb} GB.` };
+  return { ok: true, motivo: 'Experimental: usa muita memória e pode travar o celular' };
+}
 
 let local: Config | null = null;
 let sessao: Promise<Sessao> | null = null;
@@ -108,6 +144,15 @@ export type RespostaLocal = { texto: string; pendente?: Pendente; navegar?: stri
 
 /** One turn: streams the visible text (onTexto, the whole text so far) and each complete sentence (onFrase). */
 export async function responderComGemma(mensagem: string, eventos: { onTexto: (texto: string) => void; onFrase: (frase: string) => void }): Promise<RespostaLocal> {
+  await marcarEmUso(true);
+  try {
+    return await turnoComGemma(mensagem, eventos);
+  } finally {
+    await marcarEmUso(false);
+  }
+}
+
+async function turnoComGemma(mensagem: string, eventos: { onTexto: (texto: string) => void; onFrase: (frase: string) => void }): Promise<RespostaLocal> {
   const ss = await obterSessao();
   turno = {};
   const filtro = criarFiltroDeFala();

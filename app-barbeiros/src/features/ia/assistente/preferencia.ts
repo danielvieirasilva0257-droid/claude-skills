@@ -1,13 +1,17 @@
-// Where the one AI thinks: Gemma 4 on the phone (Daniel's choice, 21/11; used
-// once it is downloaded) or the cloud model. Until Gemma is on the phone, or
-// if it fails, the cloud answers: the conversation never stops.
+// Where the one AI thinks: the cloud model (the default) or Gemma 4 on the
+// phone (experimental, only on phones with enough memory, once downloaded).
+// Gemma on the phone froze Daniel's phone on 21/11/2026, so the default moved
+// to the cloud and the stored key changed (an old "celular" no longer applies).
+// If Gemma is not available or fails, the cloud answers: the talk never stops.
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useSyncExternalStore } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
+
+import { disponibilidadeGemma, type DisponibilidadeGemma } from './cerebro';
 
 export type CerebroDaIA = 'celular' | 'nuvem';
-const CHAVE = 'cerebro-da-ia';
+const CHAVE = 'cerebro-da-ia-v2';
 
-let atual: CerebroDaIA = 'celular';
+let atual: CerebroDaIA = 'nuvem';
 const ouvintes = new Set<() => void>();
 
 void AsyncStorage.getItem(CHAVE).then((v) => {
@@ -26,4 +30,15 @@ export function escolherCerebro(c: CerebroDaIA) {
 
 export function useCerebroDaIA(): CerebroDaIA {
   return useSyncExternalStore((f) => { ouvintes.add(f); return () => { ouvintes.delete(f); }; }, cerebroDaIA, cerebroDaIA);
+}
+
+/** Whether Gemma 4 can run on this phone (null while checking). */
+export function useDisponibilidadeGemma(): DisponibilidadeGemma | null {
+  const [d, setD] = useState<DisponibilidadeGemma | null>(null);
+  useEffect(() => {
+    let vivo = true;
+    void disponibilidadeGemma().then((x) => { if (vivo) setD(x); });
+    return () => { vivo = false; };
+  }, []);
+  return d;
 }

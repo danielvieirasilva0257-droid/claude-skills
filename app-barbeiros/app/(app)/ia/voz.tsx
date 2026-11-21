@@ -1,6 +1,5 @@
 // "Fale com a IA" (final name by Daniel): one AI for voice and text. The
-// brain is Gemma 4 on the phone (or the cloud model until it is downloaded):
-// it writes the answer token by token, the text shows up here as it is
+// brain is the cloud model (or Gemma 4 on the phone, experimental): it writes the answer token by token, the text shows up here as it is
 // written and the voice (a tool, never a second AI) speaks each sentence as
 // soon as it is complete. The AI reads and changes the app through the same
 // tools; every change shows up as a card to confirm (button or saying "sim").
@@ -20,8 +19,8 @@ import { DuoButton } from '@/components/DuoButton';
 import { SecondaryButton } from '@/components/SecondaryButton';
 import { Texto } from '@/components/Texto';
 import { confirmarAcao, falarComAgente, respostaDeConfirmacao, type Pendente, type Turno } from '@/features/ia/agente';
-import { cerebroLocalDisponivel, gemmaBaixado, pararGemma, responderComGemma } from '@/features/ia/assistente/cerebro';
-import { cerebroDaIA, useCerebroDaIA } from '@/features/ia/assistente/preferencia';
+import { disponibilidadeGemma, gemmaBaixado, pararGemma, responderComGemma } from '@/features/ia/assistente/cerebro';
+import { cerebroDaIA, useCerebroDaIA, useDisponibilidadeGemma } from '@/features/ia/assistente/preferencia';
 import { NOME_IA } from '@/features/ia/FaleComIA';
 import { OrbeIA, type EstadoOrbe } from '@/features/ia/OrbeIA';
 import { criarFala, falar, pararDeFalar, reconhecimentoDisponivel, useOuvir } from '@/features/ia/voz';
@@ -47,7 +46,8 @@ function ConversaPorVoz() {
   const [vozAberta, setVozAberta] = useState(false);
   const voz = useVozDaIA();
   const cerebroEscolhido = useCerebroDaIA();
-  const cerebro = cerebroLocalDisponivel ? cerebroEscolhido : 'nuvem';
+  const gemma = useDisponibilidadeGemma();
+  const cerebro = gemma?.ok ? cerebroEscolhido : 'nuvem';
   const semNivel = useSharedValue(0);
   const rolagem = useRef<ComponentRef<typeof ScrollView>>(null);
   const ouvir = useOuvir((frase) => void enviar(frase));
@@ -99,7 +99,7 @@ function ConversaPorVoz() {
     setTurnos((t) => [...t, { role: 'user', content: limpo }]);
     setEstado('pensando');
     // The brain on the phone: the text streams in and the voice speaks each sentence meanwhile.
-    if (cerebroDaIA() === 'celular' && cerebroLocalDisponivel && (await gemmaBaixado())) {
+    if (cerebroDaIA() === 'celular' && (await disponibilidadeGemma()).ok && (await gemmaBaixado())) {
       const fala = som ? criarFala({ onInicio: () => setEstado('falando'), onFim: () => setEstado('parado') }) : null;
       setTurnos((t) => [...t, { role: 'assistant', content: '' }]);
       const escrever = (conteudo: string) => setTurnos((t) => t.map((x, k) => (k === t.length - 1 ? { ...x, content: conteudo } : x)));

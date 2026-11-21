@@ -69,5 +69,8 @@ describe('cérebro no celular (Gemma 4 simulado)', () => {
     expect(textos.at(-1)).toBe('Vou marcar o Bruno amanhã às 10:00 para corte. Confirma?');
     expect(textos.join(' ')).not.toMatch(/tool|Cliente/);
     expect(r).toEqual({ texto: 'Vou marcar o Bruno amanhã às 10:00 para corte. Confirma?', pendente: expect.objectContaining({ ferramenta: 'agendar_horario' }), navegar: undefined });
+    // The crash guard is erased once the turn ends.
+    const AsyncStorage = require('@react-native-async-storage/async-storage');
+    expect(await AsyncStorage.getItem('gemma4-em-uso')).toBeNull();
   });
 });

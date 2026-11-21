@@ -1,5 +1,5 @@
-// "IA e voz": one AI, two settings. The brain (Gemma 4 on the phone, the
-// default once downloaded, or the cloud) and its voice (the phone's own voice
+// "IA e voz": one AI, two settings. The brain (the cloud, the default, or
+// Gemma 4 on the phone: experimental, only with enough memory) and its voice (the phone's own voice
 // or Supertonic F2 / M1). The voice is only how the AI speaks: it never writes
 // anything itself. Downloads happen once, with progress and pause. The voice is
 // AI-generated and says so (OpenRAIL-M asks for it). On the web only the cloud
@@ -13,8 +13,8 @@ import { Chip } from '@/components/Chip';
 import { DuoButton } from '@/components/DuoButton';
 import { SecondaryButton } from '@/components/SecondaryButton';
 import { Texto } from '@/components/Texto';
-import { baixarGemma, cerebroLocalDisponivel, gemmaBaixado, TAMANHO_GEMMA_GB } from '@/features/ia/assistente/cerebro';
-import { escolherCerebro, useCerebroDaIA, type CerebroDaIA } from '@/features/ia/assistente/preferencia';
+import { baixarGemma, gemmaBaixado, TAMANHO_GEMMA_GB } from '@/features/ia/assistente/cerebro';
+import { escolherCerebro, useCerebroDaIA, useDisponibilidadeGemma, type CerebroDaIA } from '@/features/ia/assistente/preferencia';
 import { falar, pararDeFalar } from '@/features/ia/voz';
 import { color, radius, space } from '@/theme/tokens';
 
@@ -75,6 +75,8 @@ function Baixar({ titulo, texto, baixar, testID }: {
 export function EscolherVoz({ aberto, onFechar }: { aberto: boolean; onFechar: () => void }) {
   const voz = useVozDaIA();
   const cerebro = useCerebroDaIA();
+  const gemma = useDisponibilidadeGemma();
+  const gemmaOk = gemma?.ok === true;
   const [vozPronta, setVozPronta] = useState<boolean | null>(null);
   const [gemmaPronto, setGemmaPronto] = useState<boolean | null>(null);
   const [ouvindo, setOuvindo] = useState(false);
@@ -97,15 +99,15 @@ export function EscolherVoz({ aberto, onFechar }: { aberto: boolean; onFechar: (
 
       <Texto peso="semibold" accessibilityRole="header">Onde a IA pensa</Texto>
       <View style={styles.opcoes}>
-        <Chip rotulo={NOME_DO_CEREBRO.celular} detalhe={cerebroLocalDisponivel ? 'Grátis e privada, funciona sem internet para pensar' : 'Só no app do celular'}
-          desativado={!cerebroLocalDisponivel} selecionado={cerebro === 'celular' && cerebroLocalDisponivel}
-          onPress={() => escolherCerebro('celular')} testID="cerebro-opcao-celular" />
-        <Chip rotulo={NOME_DO_CEREBRO.nuvem} detalhe="Precisa de internet" selecionado={cerebro === 'nuvem' || !cerebroLocalDisponivel}
+        <Chip rotulo={NOME_DO_CEREBRO.nuvem} detalhe="Recomendada · precisa de internet" selecionado={cerebro === 'nuvem' || !gemmaOk}
           onPress={() => escolherCerebro('nuvem')} testID="cerebro-opcao-nuvem" />
+        <Chip rotulo={NOME_DO_CEREBRO.celular} detalhe={gemma?.motivo ?? 'Conferindo o celular…'}
+          desativado={!gemmaOk} selecionado={cerebro === 'celular' && gemmaOk}
+          onPress={() => escolherCerebro('celular')} testID="cerebro-opcao-celular" />
       </View>
-      {cerebro === 'celular' && cerebroLocalDisponivel && gemmaPronto === false ? (
+      {cerebro === 'celular' && gemmaOk && gemmaPronto === false ? (
         <Baixar testID="cerebro-baixar" titulo={`Baixar o Gemma 4 (${TAMANHO_GEMMA_GB.toLocaleString('pt-BR')} GB)`}
-          texto="Uma vez só, no Wi-Fi. Até terminar, a IA da nuvem responde. Em celulares com pouca memória ela fica mais lenta."
+          texto="Uma vez só, no Wi-Fi. Até terminar, a IA da nuvem responde. Se o celular travar, o app volta sozinho para a nuvem."
           baixar={async (p, s) => { await baixarGemma(p, s); setGemmaPronto(true); }} />
       ) : null}
 
