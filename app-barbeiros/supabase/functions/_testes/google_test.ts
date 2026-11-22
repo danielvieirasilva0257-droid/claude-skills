@@ -87,3 +87,55 @@ Deno.test('stream: só o texto visível, linha por linha', async () => {
     f.restaurar();
   }
 });
+
+Deno.test('modelo ocupado (503): tenta de novo e depois usa a reserva', async () => {
+  Deno.env.set('LLM_MODELOS_RESERVA', 'reserva-a');
+  const ocupado = () => new Response(JSON.stringify({ error: { code: 503, message: 'high demand' } }), { status: 503 });
+  const f = falsoFetch([ocupado, ocupado, ocupado, () => ok({ candidates: [{ content: { parts: [{ text: 'Oi!' }] }, finishReason: 'STOP' }] })]);
+  try {
+    const texto = await rodarComFerramentas({ modelo: 'principal', system: 'R', contents: [{ role: 'user', parts: [{ text: 'Oi' }] }], ferramentas: [], executar: () => Promise.resolve('') });
+    assertEquals(texto, 'Oi!');
+    assertEquals(f.pedidos.map((x) => x.url.split('/models/')[1]), ['principal:generateContent', 'principal:generateContent', 'principal:generateContent', 'reserva-a:generateContent']);
+  } finally {
+    f.restaurar();
+    Deno.env.delete('LLM_MODELOS_RESERVA');
+  }
+});
+
+Deno.test('pensa o mínimo (rápido); modelo sem esse ajuste recebe o pedido sem ele', async () => {
+  const f = falsoFetch([
+    () => new Response(JSON.stringify({ error: { code: 400, message: 'Thinking level is not supported for this model.' } }), { status: 400 }),
+    () => ok({ candidates: [{ content: { parts: [{ text: 'Oi!' }] }, finishReason: 'STOP' }] }),
+  ]);
+  try {
+    await rodarComFerramentas({ modelo: 'm', system: 'R', contents: [{ role: 'user', parts: [{ text: 'Oi' }] }], ferramentas: [], executar: () => Promise.resolve('') });
+    const config = (c: Corpo) => (c as unknown as { generationConfig: Record<string, unknown> }).generationConfig;
+    assertEquals(config(f.pedidos[0]!.corpo).thinkingConfig, { thinkingLevel: 'minimal' });
+    assertEquals(config(f.pedidos[1]!.corpo).thinkingConfig, undefined);
+  } finally {
+    f.restaurar();
+  }
+});
+
+Deno.test('modelo lento: desiste depois do tempo máximo e a reserva responde', async () => {
+  Deno.env.set('LLM_TEMPO_MAX_MS', '50');
+  Deno.env.set('LLM_MODELOS_RESERVA', 'rapido');
+  const original = globalThis.fetch;
+  const usados: string[] = [];
+  globalThis.fetch = ((url: string, init: RequestInit) => {
+    usados.push(url.split('/models/')[1]!);
+    if (url.includes('/lento:')) {
+      return new Promise((_ok, falha) => init.signal!.addEventListener('abort', () => falha(new DOMException('abortado', 'AbortError'))));
+    }
+    return Promise.resolve(ok({ candidates: [{ content: { parts: [{ text: 'thought Pronto.' }] }, finishReason: 'STOP' }] }));
+  }) as typeof fetch;
+  try {
+    const texto = await rodarComFerramentas({ modelo: 'lento', system: 'R', contents: [{ role: 'user', parts: [{ text: 'Oi' }] }], ferramentas: [], executar: () => Promise.resolve('') });
+    assertEquals(texto, 'Pronto.');   // and without the stray "thought"
+    assertEquals(usados, ['lento:generateContent', 'rapido:generateContent']);
+  } finally {
+    globalThis.fetch = original;
+    Deno.env.delete('LLM_TEMPO_MAX_MS');
+    Deno.env.delete('LLM_MODELOS_RESERVA');
+  }
+});
