@@ -353,6 +353,8 @@ Pedido: o Gemma 4 no celular "não deu conta" (a tela apagou); colocar na nuvem,
 - **APK com servidor:** `.env.nuvem` (ignorado pelo git) e
   `set -a && . ./.env.nuvem && set +a && EXPO_NO_DOTENV=1 EXPO_PUBLIC_DEMO=0 npm run apk` (`EXPO_NO_DOTENV=1` para o `.env` local, que aponta para 127.0.0.1, não entrar no APK).
 
+- **Conta de desenvolvedor (pedido do Daniel):** plano novo `dev` ("Desenvolvedor"), acima de todos e nunca vendido: libera tudo do Premium Plus e o painel do dono (Barbearias), 500 perguntas por dia à IA. Migrations `0010_plano_desenvolvedor.sql` (só o valor novo do enum: ele não pode ser usado na mesma transação em que foi criado) e `0011_conta_desenvolvedor.sql` (as funções que conferem o plano pelo nome). No app, `src/lib/plano.ts` (o `dev` só aparece na tela de planos para quem tem) e `libera()` não quebra com um plano que a versão não conhece. A conta do Daniel ficou `dev` (`app_assinatura` com provedor `manual`) e virou a dona da "Barbearia Navalha" (o Dono Teste passou a barbeiro), para ver o painel do dono com equipe.
+
 **Aprendizados do servidor:**
 
 - **Token do Supabase agora é "com escopo":** na página Access Tokens, escolha "todos os projetos das organizações selecionadas" (o projeto ainda não existe), a organização e "Acesso total". O token continua começando com `sbp_`.

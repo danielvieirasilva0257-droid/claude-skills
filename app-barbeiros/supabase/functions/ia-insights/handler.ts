@@ -56,7 +56,7 @@ export async function handler(req: Request): Promise<Response> {
 
   if (ehServico(req) && corpo.todos) {
     // Paid plans in force, including barbers on a Barbearias team (0006).
-    const { data } = await admin.rpc('barbeiros_por_plano', { p_planos: ['pago', 'premium', 'plus', 'barbearias'] });
+    const { data } = await admin.rpc('barbeiros_por_plano', { p_planos: ['pago', 'premium', 'plus', 'barbearias', 'dev'] });
     const resultados = [];
     for (const barbeiro_id of (data ?? []) as string[]) resultados.push(await gerarInsights(admin, barbeiro_id));
     return json({ ok: true, resultados });

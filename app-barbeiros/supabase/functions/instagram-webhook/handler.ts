@@ -30,7 +30,7 @@ export async function handler(req: Request): Promise<Response> {
     if (!canal) continue;
     const barbeiro = canal.barbeiro_id as string;
     const { data: plano } = await admin.rpc('plano_efetivo', { p_barbeiro: barbeiro });
-    const plus = plano === 'plus';
+    const plus = plano === 'plus' || plano === 'dev';
 
     for (const mudanca of entrada.changes ?? []) {
       if (mudanca.field !== 'comments' || !mudanca.value.from) continue;

@@ -83,7 +83,7 @@ export default function Inicio() {
   const minha = useMinhaBarbearia();
   const assinatura = useMinhaAssinatura();
   const teste = assinatura.data?.status === 'teste' ? assinatura.data.teste_ate : null;
-  const dono = minha.data?.papel === 'dono' && meuPlano === 'barbearias';
+  const dono = minha.data?.papel === 'dono' && (meuPlano === 'barbearias' || meuPlano === 'dev');
   const totalMes = useFinanceiro(mes, hoje, 'total');
   const primeiro = comIA ? insights.data?.[0] : undefined;
   const primeiroNome = barbeiro.data?.nome.split(' ')[0] ?? '';

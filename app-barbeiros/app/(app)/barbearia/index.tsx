@@ -37,7 +37,7 @@ function SemBarbearia() {
   const criar = useCriarBarbearia();
   const [codigo, setCodigo] = useState('');
   const [nome, setNome] = useState('');
-  const podeCriar = plano.data === 'barbearias';
+  const podeCriar = plano.data === 'barbearias' || plano.data === 'dev';
 
   return (
     <TelaBase titulo="Barbearia" semTitulo>

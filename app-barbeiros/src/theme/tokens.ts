@@ -25,7 +25,7 @@ export const color = {
   bill: '#22C55E',        // notinhas
 } as const;
 
-export const plano = { gratis: '#8A8F98', pago: '#C5F23A', premium: '#9AA8FF', plus: '#F5C451', barbearias: '#F4F4F0' } as const;
+export const plano = { gratis: '#8A8F98', pago: '#C5F23A', premium: '#9AA8FF', plus: '#F5C451', barbearias: '#F4F4F0', dev: '#F5C451' } as const;
 
 
 // Aurora behind the top of the screens (atmosphere for the glass to refract).

@@ -26,6 +26,7 @@ const O_QUE_LIBERA: Record<Plano, string[]> = {
   premium: ['Tudo do Pago', 'WhatsApp com IA (responde e agenda)', 'Automações e lista de espera', '100 mensagens de marketing por mês'],
   plus: ['Tudo do Premium', 'Instagram com IA (comentários e direct)', 'Prospecção com origem por canal', 'Personalidade da IA'],
   barbearias: ['Tudo do Premium para a equipe', 'Painel do dono e agenda da equipe', 'Relatório por barbeiro'],
+  dev: ['Tudo liberado: o que o Premium Plus libera e o painel do dono', 'Conta de quem desenvolve o app (não é vendida)'],
 };
 
 const POR: Record<Periodo, string> = { mensal: 'mês', anual: 'ano' };
@@ -94,8 +95,8 @@ export default function Planos() {
       ) : null}
       {aviso ? <Texto peso="medium" cor={aviso.startsWith('⚠') ? 'warning' : 'text'} testID="aviso-compra">{aviso}</Texto> : null}
 
-      {(Object.keys(NOME_PLANO) as Plano[]).map((p) => {
-        const o = p === 'gratis' ? undefined : ofertaDe(p);
+      {(Object.keys(NOME_PLANO) as Plano[]).filter((p) => p !== 'dev' || atual.data === 'dev').map((p) => {
+        const o = p === 'gratis' || p === 'dev' ? undefined : ofertaDe(p);
         const meu = atual.data === p;
         return (
           <Cartao key={p} testID={`plano-${p}`} style={p === destaque ? styles.destaque : undefined}>

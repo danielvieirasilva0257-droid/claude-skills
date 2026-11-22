@@ -59,4 +59,16 @@ describe('plano', () => {
   it('cada atalho do Mais aponta para um recurso que algum plano pago libera', () => {
     for (const a of ATALHOS) expect(PLANOS.some((p) => p !== 'gratis' && libera(p, a.recurso))).toBe(true);
   });
+
+  it('conta de desenvolvedor libera tudo, inclusive o painel do dono, e não é vendida', () => {
+    for (const a of ATALHOS) expect(libera('dev', a.recurso)).toBe(true);
+    for (const r of ['instagram', 'personalidade', 'barbearia', 'whatsapp', 'clientes'] as Recurso[]) expect(libera('dev', r)).toBe(true);
+    expect(NOME_PLANO.dev).toBe('Desenvolvedor');
+    expect(limiteMensagensMarketing('dev')).toBe(100);
+    expect(planoNecessario('barbearia')).toBe('barbearias');
+  });
+
+  it('plano desconhecido (servidor mais novo) não derruba o app: só não libera', () => {
+    expect(libera('outro' as Plano, 'agenda')).toBe(false);
+  });
 });

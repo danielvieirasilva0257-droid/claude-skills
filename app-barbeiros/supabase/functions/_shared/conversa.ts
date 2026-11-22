@@ -4,7 +4,7 @@
 import { atender, codigoNoTexto } from './atendente.ts';
 import type { SupabaseClient } from './deps.ts';
 
-const PLANOS_COM_CANAIS = ['premium', 'plus', 'barbearias'];
+const PLANOS_COM_CANAIS = ['premium', 'plus', 'barbearias', 'dev'];
 
 type Entrada = {
   barbeiro: string;
@@ -60,7 +60,7 @@ export async function receber(admin: SupabaseClient, e: Entrada) {
     admin.from('canais').select('ia_ativa').eq('barbeiro_id', e.barbeiro).eq('tipo', e.canal).maybeSingle(),
   ]);
   // plano_efetivo already accounts for status, renewal and team membership (0006).
-  const permitido = typeof plano === 'string' && PLANOS_COM_CANAIS.includes(plano) && (e.canal === 'whatsapp' || plano === 'plus');
+  const permitido = typeof plano === 'string' && PLANOS_COM_CANAIS.includes(plano) && (e.canal === 'whatsapp' || plano === 'plus' || plano === 'dev');
   if (!permitido || !canal?.ia_ativa || !conversa.ia_ativa) return { ok: true, conversa: conversa.id, respondeu: false };
 
   const { data: historico } = await admin.from('mensagens').select('autor, texto').eq('conversa_id', conversa.id)

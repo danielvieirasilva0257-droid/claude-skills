@@ -1,7 +1,7 @@
 // Shared shape of the store bridge (loja.native.ts on phones, loja.ts on web).
 import type { Plano } from './plano';
 
-export type PlanoPago = Exclude<Plano, 'gratis'>;
+export type PlanoPago = Exclude<Plano, 'gratis' | 'dev'>;   // 'dev' is never sold
 export type Periodo = 'mensal' | 'anual';
 
 /** One subscription option as the store sells it (prices in the store's own words). */
