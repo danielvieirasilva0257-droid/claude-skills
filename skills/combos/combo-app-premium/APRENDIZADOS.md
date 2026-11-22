@@ -28,3 +28,9 @@ Adendos datados, o mais novo embaixo.
 - **Regras e ferramentas num lugar só (servidor):** o celular pede as regras e a lista de ferramentas e executa cada ferramenta no servidor. A IA da nuvem e a do celular ficam iguais, e mudar uma regra não precisa de APK novo.
 - **Teste o modelo pequeno de verdade antes do celular:** o Gemma 4 em GGUF no `llama.cpp` (CPU) com as regras reais mostrou que ele inventa a resposta da ferramenta (pare no `<tool_call|>`), formata dinheiro em inglês (mande frase pronta em português), pede confirmação sem preparar a mudança (regra explícita) e confunde campos parecidos (descrição com exemplos).
 
+## 22/11/2026: IA grátis na nuvem e modelo pesado no celular (App Barbeiros)
+
+- **Modelo de IA no celular trava aparelho comum:** o Gemma 4 E2B (3,2 GB) apagou a tela do celular do Daniel. Deixe a nuvem como padrão, ofereça o modelo local só a partir de 8 GB de memória (`expo-device`) e grave uma marca "em uso" antes de carregar: se o app abrir e achar a marca, desligue o modelo naquele aparelho.
+- **Nuvem grátis para testar:** Gemma 4 26B pelo Google AI Studio chama ferramentas nativamente; use `thinkingLevel: "minimal"` (1 a 2 s em vez de 6 s). O grátis responde 503/429 com frequência: tente de novo rápido, corte em 10 s e tenha o Gemini Flash-Lite como reserva.
+- **Valide com o modelo real antes do APK:** um script com 8 pedidos típicos pelo próprio handler (banco local) mostra tempo, ferramenta e mudança pendente de cada um.
+

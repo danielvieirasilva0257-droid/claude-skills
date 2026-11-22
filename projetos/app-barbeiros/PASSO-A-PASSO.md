@@ -318,9 +318,30 @@ Resultado (7 pedidos): chama a ferramenta certa com os argumentos certos ("Clien
 
 **Falta:** testar no celular (velocidade do Gemma com a voz ao mesmo tempo, memória, bateria); com 8 GB de RAM ou mais deve ficar bom.
 
+## IA na nuvem de graça e o celular sem travar (22/11/2026)
+
+Pedido: o Gemma 4 no celular "não deu conta" (a tela apagou); colocar na nuvem, de graça, para testar.
+
+1. **Celular sem travar:** a IA pensa na nuvem por padrão (chave nova da preferência, `cerebro-da-ia-v2`, então o "celular" antigo não vale mais). O Gemma 4 no celular virou experimental: só aparece com 8 GB de memória ou mais (`expo-device`, `memoria.ts` arredonda para o tamanho da caixa: 7,4 GiB = 8 GB). Trava de segurança: o app grava "em uso" antes de o Gemma carregar ou escrever e apaga depois; se abrir e achar a marca, o celular travou com ele e o Gemma fica desligado naquele aparelho ("Travou neste celular").
+2. **IA da nuvem grátis:** `LLM_PROVIDER=google` usa o Google AI Studio (API Gemini) com o **Gemma 4 26B** (`gemma-4-26b-a4b-it`), com as mesmas regras e ferramentas do Gemma no celular (`sistemaDoBarbeiro` e `ferramentasParaCelular`). Cliente REST próprio em `supabase/functions/_shared/google.ts` (ferramentas, JSON e stream), sem SDK.
+3. **Chave do Google:** guardada no container em `/root/.config/rotina/google-ai-studio.key` (nunca no git). Na nuvem vai como segredo `LLM_API_KEY` do Supabase.
+4. **Validação com o modelo de verdade:** `supabase/functions/_dev/validar-nuvem.ts` (8 pedidos típicos pelo `ia-agente` contra o banco local). Resultado: **8 de 8** (faturamento do dia e do mês com a comparação, agenda, marcar, anotar, preço, gasto, abrir tela). Comando:
+   `LLM_PROVIDER=google LLM_API_KEY=$(cat /root/.config/rotina/google-ai-studio.key) bash scripts/funcoes-env.sh deno run --config supabase/functions/deno.json -A supabase/functions/_dev/validar-nuvem.ts` (`LLM_DEBUG=1` mostra modelo, status e tempo de cada pedido).
+
+**Aprendizados:**
+
+- **O Gemma 4 na API do Google chama ferramentas de verdade** (`functionCall`), aceita instrução de sistema e devolve o "pensamento" separado (`thought: true`).
+- **Pensar o mínimo:** com o pensamento padrão ele leva ~6 s por pedido; com `thinkingConfig: { thinkingLevel: "minimal" }`, ~1 a 2 s, acertando igual. `thinkingBudget` e `thinkingLevel: "low"` são recusados nesse modelo.
+- **O grátis vive ocupado:** "high demand" (503) com frequência, limite por minuto (429) depois de uns 7 a 10 pedidos seguidos, e às vezes um pedido fica 30 a 50 s na fila. Solução: 2 novas tentativas rápidas no 503, limite de 10 s por modelo (`LLM_TEMPO_MAX_MS`) e reserva no **Gemini Flash-Lite** (`gemini-flash-lite-latest`, também grátis, ~0,6 s). O Gemma 4 31B levou 20 a 30 s e ficou fora da reserva. Com isso, os 8 pedidos ficaram entre 1,5 e 11 s.
+- **Palavra solta "thought":** às vezes o Gemma deixa a palavra "thought" antes da resposta; o `textoDe` tira.
+- **Rede do container:** `generativelanguage.googleapis.com` responde sem liberar nada no ambiente.
+- **O formulário de credencial do ambiente só guarda chave no cabeçalho `Authorization`:** a API do Google usa `x-goog-api-key`, então a chave ficou no arquivo do container.
+
+**Falta:** o token pessoal do Supabase (`sbp_…`, perfil › Access Tokens). Os 4 que foram salvos não eram desse tipo (a API responde "JWT could not be decoded"). Com ele: projeto grátis em São Paulo, migrations + seed, funções com `LLM_PROVIDER=google`, segredo da chave e o APK com servidor (`EXPO_PUBLIC_DEMO=0`).
+
 ## Pendências (fora do código)
 
-1. **Modelo da IA:** o padrão é `claude-opus-5-5` (regra da skill da API). Para o custo-alvo de R$ 0,50 a R$ 2 por barbeiro por mês, a troca para `claude-haiku-5-5` é decisão do Daniel (`LLM_MODEL`). Falta a chave da API nos secrets do Supabase.
+1. **Modelo da IA:** para testar, a nuvem usa o Gemma 4 grátis do Google AI Studio (com o Flash-Lite de reserva). Para lançar, decidir entre continuar no Google (plano pago tira os limites) ou voltar para o Claude (`LLM_PROVIDER=anthropic`).
 2. **Login com Google:** precisa das credenciais do Google Cloud.
 3. **WhatsApp e Instagram de verdade:** credenciais da Meta (app, número, tokens); hoje roda em modo simulado.
 4. **Assinaturas:** conta no RevenueCat, produtos nas lojas (entitlements `pago`, `premium`, `plus`, `barbearias`) e as chaves `EXPO_PUBLIC_REVENUECAT_*` e `REVENUECAT_WEBHOOK_AUTH`.
