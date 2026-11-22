@@ -337,7 +337,27 @@ Pedido: o Gemma 4 no celular "não deu conta" (a tela apagou); colocar na nuvem,
 - **Rede do container:** `generativelanguage.googleapis.com` responde sem liberar nada no ambiente.
 - **O formulário de credencial do ambiente só guarda chave no cabeçalho `Authorization`:** a API do Google usa `x-goog-api-key`, então a chave ficou no arquivo do container.
 
-**Falta:** o token pessoal do Supabase (`sbp_…`, perfil › Access Tokens). Os 4 que foram salvos não eram desse tipo (a API responde "JWT could not be decoded"). Com ele: projeto grátis em São Paulo, migrations + seed, funções com `LLM_PROVIDER=google`, segredo da chave e o APK com servidor (`EXPO_PUBLIC_DEMO=0`).
+### Servidor na nuvem (Supabase grátis), 22/11/2026
+
+- **Projeto:** `app-barbeiros`, ref `vhotfkqytzqbpyldkyuh`, região São Paulo (`sa-east-1`), plano Free, na organização do Daniel. Painel: `supabase.com/dashboard/project/vhotfkqytzqbpyldkyuh`. (Existe também um projeto vazio "danielvieirasilva0257-droid's Project" nos EUA, criado pelo Daniel; não é usado.)
+- **Token e segredos no container** (nunca no git), em `/root/.config/rotina/`: `supabase.token` (token pessoal `sbp_`, 30 dias), `supabase-app-barbeiros-db.pass` (senha do banco), `google-ai-studio.key`, `revenuecat-webhook-auth`.
+- **Como foi montado (tudo pela API de gestão, sem Docker):**
+  1. `POST /v1/projects` com `region: sa-east-1`.
+  2. Migrations e seed por `POST /v1/projects/<ref>/database/query` (um arquivo por chamada, em ordem) e registro das versões em `supabase_migrations.schema_migrations` (para o `supabase db push` saber o que já foi aplicado).
+  3. Segredos das funções: `LLM_PROVIDER=google`, `LLM_API_KEY`, `REVENUECAT_WEBHOOK_AUTH` (`POST /v1/projects/<ref>/secrets`).
+  4. Funções: `SUPABASE_ACCESS_TOKEN=$(cat /root/.config/rotina/supabase.token) SSL_CERT_FILE=/root/.ccr/ca-bundle.crt npx supabase functions deploy --use-api --remote=<ref> --yes <funções>` (o CLI 3.2 pede `--yes` quando roda por agente).
+  5. Auth: sem confirmação de e-mail (`mailer_autoconfirm`), `site_url` `appbarbeiros://` (`PATCH /v1/projects/<ref>/config/auth`).
+  6. Vault para as rotinas agendadas: `url_funcoes` e `chave_servico` (`vault.create_secret`).
+- **Contas de teste (do seed):** `barbeiro.teste@example.com`, `dono.teste@example.com` e `gratis.teste@example.com`, senha `senha-teste-123`.
+- **Teste na nuvem:** login + `ia-agente` ("Quanto eu faturei no mês?" → "R$ 7.910,87 em 39 atendimentos… 8,2% acima do mês passado e 9% acima da sua média"; agendamento preparado). Primeira chamada ~16 s (função fria), depois 7 a 13 s.
+- **APK com servidor:** `.env.nuvem` (ignorado pelo git) e
+  `set -a && . ./.env.nuvem && set +a && EXPO_NO_DOTENV=1 EXPO_PUBLIC_DEMO=0 npm run apk` (`EXPO_NO_DOTENV=1` para o `.env` local, que aponta para 127.0.0.1, não entrar no APK).
+
+**Aprendizados do servidor:**
+
+- **Token do Supabase agora é "com escopo":** na página Access Tokens, escolha "todos os projetos das organizações selecionadas" (o projeto ainda não existe), a organização e "Acesso total". O token continua começando com `sbp_`.
+- **Credencial salva no ambiente pode ficar presa:** o proxy continuou mandando uma chave antiga para `api.supabase.com` mesmo depois de salvar a nova várias vezes (resposta "JWT could not be decoded" e cabeçalho `X-Proxy-Error: upstream auth failed`). A saída foi um ambiente novo (`app-barbeiros`) sem segredo de rede e o token no arquivo do container.
+- **O host do projeto (`<ref>.supabase.co`) precisa ser liberado no ambiente** para testar login e funções daqui; o celular não depende disso.
 
 ## Pendências (fora do código)
 
@@ -351,6 +371,6 @@ Pedido: o Gemma 4 no celular "não deu conta" (a tela apagou); colocar na nuvem,
 
 ## Próximo passo
 
-1. Daniel instala o APK de demonstração, olha a logo e decide as pendências acima (o token do Supabase destrava o APK com servidor).
+1. Daniel instala o APK 0.6.0 (ligado ao servidor na nuvem), entra com `barbeiro.teste@example.com` / `senha-teste-123` e testa a IA por voz e por texto.
 2. Rodar os fluxos do Maestro (`app-barbeiros/.maestro/`) no celular.
 3. Depois do app: site de venda (`skills/combos/combo-site-premium`) e vídeos (`skills/combos/combo-video-explicativo`).
