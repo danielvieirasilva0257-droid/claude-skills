@@ -361,6 +361,27 @@ Pedido: o Gemma 4 no celular "não deu conta" (a tela apagou); colocar na nuvem,
 - **Credencial salva no ambiente pode ficar presa:** o proxy continuou mandando uma chave antiga para `api.supabase.com` mesmo depois de salvar a nova várias vezes (resposta "JWT could not be decoded" e cabeçalho `X-Proxy-Error: upstream auth failed`). A saída foi um ambiente novo (`app-barbeiros`) sem segredo de rede e o token no arquivo do container.
 - **O host do projeto (`<ref>.supabase.co`) precisa ser liberado no ambiente** para testar login e funções daqui; o celular não depende disso.
 
+## IA que fala enquanto escreve e tem controle total (22/11/2026)
+
+Pedido: a IA demorava porque gerava a resposta inteira e só depois falava; e não conseguia fazer contas de períodos (ex.: ticket médio dos últimos 4 dias), criar relatórios nem mudar uma comanda específica.
+
+1. **Falar enquanto escreve:** `ia-agente` com `stream: true` responde em Server-Sent Events: `{t:'ferramenta', nome}` quando a IA vai consultar algo, `{t:'texto', d}` enquanto escreve e `{t:'fim', ...}` no fim. O app (`falarComAgenteStream` + `criarDivisorDeFrases` + `criarFala`) mostra o texto chegando e fala cada frase assim que fecha. Enquanto consulta, diz uma frase de espera ("Vou olhar sua agenda.", `src/features/ia/assistente/espera.ts`).
+   - O servidor devolve o nome real sem cortar "Cliente 12" no meio (`criarRevelador`) e tira a palavra solta "thought" que o Gemma às vezes escreve.
+   - Medido (servidor local, modelo real): consulta aos 2 s, primeiras palavras aos 4,7 s, fim aos 5,3 s. Na nuvem, medido daqui (EUA): 4,6 s, 6,5 s e 7,0 s.
+2. **Controle total (migration `0012_ia_controle_total.sql`, 20 testes pgTAP):**
+   - `analisar_periodo`: qualquer período, com filtro (cliente, serviço, pagamento) e agrupamento (dia, semana, mês, dia da semana, hora, serviço, cliente, pagamento). O banco calcula; a IA recebe o dinheiro já escrito como "R$ 1.234,56".
+   - `listar_atendimentos`, `editar_atendimento` (serviços, valor total repartido na proporção, pagamento, dia e hora, cliente, observação; respeita o caixa fechado), `apagar_atendimento`, e a ferramenta `reabrir_caixa`.
+   - `relatorios_ia`: as páginas HTML que a IA monta (`criar_relatorio`, `_shared/relatorio.ts`), com os números do banco, guardadas e abertas na tela `/ia/relatorio/[id]` (WebView, botão "Compartilhar PDF"). Lista em "Relatórios da IA" (Mais).
+   - As regras da IA ganharam as datas prontas (ontem, últimos 7 dias, esta semana, semana passada, este mês, mês passado, este ano), porque o modelo erra ao contar dias.
+3. **Validação com o modelo real** (`_dev/validar-nuvem.ts`, 12 pedidos): todos certos, como "ticket médio dos últimos 4 dias" (R$ 212,00, igual ao banco), "dia da semana que mais faturou" (sexta) e "faz um relatório da semana passada". Também mudou a comanda do Lucas do dia 20/11 para pix, preparada com o botão de confirmar. `VALIDAR_SO="relatório|comanda"` roda só alguns. `_dev/medir-stream.ts "pergunta"` mede o tempo do stream.
+
+**Aprendizados:**
+
+- **O plano grátis do Google tem limite por minuto** (uns 15 pedidos por modelo), e cada pergunta gasta de 2 a 3 pedidos (consulta + resposta). Testes em sequência batem no limite: espere um minuto ou rode só alguns casos. Para um barbeiro só testando, dá.
+- **Gemma na API aceita stream** (`streamGenerateContent`) com ferramentas: a chamada da ferramenta vem nos pedaços do stream.
+- **Rotas tipadas do Expo Router** só se atualizam com o servidor de desenvolvimento ligado (`npx expo start` por uns segundos), não com `expo export`.
+- **Função que cria tabela temporária** não pode ser `stable` no Postgres ("INSERT is not allowed in a non-volatile function").
+
 ## Pendências (fora do código)
 
 1. **Modelo da IA:** para testar, a nuvem usa o Gemma 4 grátis do Google AI Studio (com o Flash-Lite de reserva). Para lançar, decidir entre continuar no Google (plano pago tira os limites) ou voltar para o Claude (`LLM_PROVIDER=anthropic`).

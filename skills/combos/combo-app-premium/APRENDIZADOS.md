@@ -34,3 +34,10 @@ Adendos datados, o mais novo embaixo.
 - **Nuvem grátis para testar:** Gemma 4 26B pelo Google AI Studio chama ferramentas nativamente; use `thinkingLevel: "minimal"` (1 a 2 s em vez de 6 s). O grátis responde 503/429 com frequência: tente de novo rápido, corte em 10 s e tenha o Gemini Flash-Lite como reserva.
 - **Valide com o modelo real antes do APK:** um script com 8 pedidos típicos pelo próprio handler (banco local) mostra tempo, ferramenta e mudança pendente de cada um.
 
+## 22/11/2026: assistente de voz rápido e com controle total (App Barbeiros)
+
+- **Fale enquanto escreve:** mande a resposta do modelo em stream (Server-Sent Events) e fale cada frase assim que ela fecha. Quando o modelo chamar uma ferramenta, diga uma frase de espera ("Vou olhar sua agenda."). A pessoa ouve algo em ~2 s, em vez de esperar a resposta inteira.
+- **Uma ferramenta de análise genérica vale mais que dez fixas:** período + filtros + agrupamento, calculado no banco, cobre "ticket médio dos últimos 4 dias", "dia da semana que mais fatura", "quanto o cliente X gastou". Mande o dinheiro já formatado para o modelo repetir.
+- **Dê ao modelo as datas prontas** (ontem, semana passada, mês passado): modelo pequeno erra a conta de dias.
+- **Relatório como página HTML montada no servidor** com os números do banco, e só o texto de leitura vindo da IA. Guarde a página e abra numa WebView com "Compartilhar PDF" (expo-print).
+
