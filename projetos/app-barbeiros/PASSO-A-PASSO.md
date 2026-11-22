@@ -348,7 +348,7 @@ Pedido: o Gemma 4 no celular "não deu conta" (a tela apagou); colocar na nuvem,
   4. Funções: `SUPABASE_ACCESS_TOKEN=$(cat /root/.config/rotina/supabase.token) SSL_CERT_FILE=/root/.ccr/ca-bundle.crt npx supabase functions deploy --use-api --remote=<ref> --yes <funções>` (o CLI 3.2 pede `--yes` quando roda por agente).
   5. Auth: sem confirmação de e-mail (`mailer_autoconfirm`), `site_url` `appbarbeiros://` (`PATCH /v1/projects/<ref>/config/auth`).
   6. Vault para as rotinas agendadas: `url_funcoes` e `chave_servico` (`vault.create_secret`).
-- **Contas de teste (do seed):** `barbeiro.teste@example.com`, `dono.teste@example.com` e `gratis.teste@example.com`, senha `senha-teste-123`.
+- **Contas de teste (do seed):** `dono.teste@example.com` e `gratis.teste@example.com`, senha `senha-teste-123`. A conta `barbeiro.teste` (plano Plus, 27 clientes, 194 atendimentos) passou a ser a do Daniel: entra com o Gmail e a senha que ele criou no app (a conta vazia que ele tinha criado foi apagada e o nome, a entrevista e a senha dela foram para a conta de teste). Para recriar a conta de teste num banco novo, rode o seed.
 - **Teste na nuvem:** login + `ia-agente` ("Quanto eu faturei no mês?" → "R$ 7.910,87 em 39 atendimentos… 8,2% acima do mês passado e 9% acima da sua média"; agendamento preparado). Primeira chamada ~16 s (função fria), depois 7 a 13 s.
 - **APK com servidor:** `.env.nuvem` (ignorado pelo git) e
   `set -a && . ./.env.nuvem && set +a && EXPO_NO_DOTENV=1 EXPO_PUBLIC_DEMO=0 npm run apk` (`EXPO_NO_DOTENV=1` para o `.env` local, que aponta para 127.0.0.1, não entrar no APK).
@@ -371,6 +371,6 @@ Pedido: o Gemma 4 no celular "não deu conta" (a tela apagou); colocar na nuvem,
 
 ## Próximo passo
 
-1. Daniel instala o APK 0.6.0 (ligado ao servidor na nuvem), entra com `barbeiro.teste@example.com` / `senha-teste-123` e testa a IA por voz e por texto.
+1. Daniel instala o APK 0.6.0 (ligado ao servidor na nuvem), entra com o Gmail dele (a conta com os dados de teste) e testa a IA por voz e por texto.
 2. Rodar os fluxos do Maestro (`app-barbeiros/.maestro/`) no celular.
 3. Depois do app: site de venda (`skills/combos/combo-site-premium`) e vídeos (`skills/combos/combo-video-explicativo`).
