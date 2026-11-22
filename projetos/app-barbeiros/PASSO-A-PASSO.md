@@ -377,6 +377,8 @@ Pedido: a IA demorava porque gerava a resposta inteira e só depois falava; e n�
 
 4. **Conversa mãos livres (0.7.1):** um toque no microfone e a conversa segue sozinha. Quando a IA termina de falar, o microfone abre de novo (depois de 350 ms, para não pegar o fim da voz dela). Tocar enquanto ela fala interrompe e escuta. Silêncio, abrir o teclado, abrir outra tela ou o botão "Encerrar" terminam a conversa. Interromper só falando por cima dela ficou para depois: o microfone do celular escuta a própria voz da IA.
 
+5. **A voz começa nas 5 primeiras palavras (pedido do Daniel):** `criarDivisorDeFrases` solta o primeiro pedaço assim que há 5 palavras completas (palavra completa = seguida de espaço, então um valor chegando nunca é cortado). Depois segue por frase, cortando na vírgula ou a cada 15 palavras numa frase longa. O pedaço nunca termina em "R$" nem em "Cliente" (o número do cliente vem depois).
+
 **Aprendizados:**
 
 - **O plano grátis do Google tem limite por minuto** (uns 15 pedidos por modelo), e cada pergunta gasta de 2 a 3 pedidos (consulta + resposta). Testes em sequência batem no limite: espere um minuto ou rode só alguns casos. Para um barbeiro só testando, dá.
