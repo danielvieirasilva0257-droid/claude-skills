@@ -1,0 +1,32 @@
+# Definir a meta do mês igual ao faturamento e ver "Meta batida!".
+appId: ${APP_ID}
+---
+- launchApp:
+    clearState: true
+- tapOn: { id: "entrar-email" }
+- inputText: "barbeiro.teste@example.com"
+- tapOn: { id: "entrar-senha" }
+- inputText: "senha-teste-123"
+- tapOn: { id: "entrar-botao" }
+- extendedWaitUntil:
+    visible: { id: "hoje-valor" }
+    timeout: 20000
+- tapOn: { id: "aba-mais" }
+- scrollUntilVisible:
+    element: { id: "atalho-meta" }
+- tapOn: { id: "atalho-meta" }
+- tapOn: { id: "meta-valor" }
+- eraseText
+- inputText: "90"
+- tapOn: "Salvar minha meta"
+- repeat:
+    while:
+      notVisible: "Meta batida!"
+    times: 3
+    commands:
+      - tapOn: { id: "comemorar" }
+- assertVisible: "Meta batida!"
+- tapOn: { id: "comemorar" }
+- assertVisible:
+    id: "meta-anel"
+    text: ".*100%.*"

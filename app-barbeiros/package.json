@@ -1,0 +1,109 @@
+{
+  "name": "app-barbeiros",
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "dependencies": {
+    "@expo-google-fonts/inter": "^0.4.2",
+    "@hookform/resolvers": "^7.0.7",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@supabase/supabase-js": "^2.119.2",
+    "@tanstack/react-query": "^5.108.1",
+    "date-fns": "^4.4.0",
+    "expo": "~58.0.26",
+    "expo-audio": "~58.0.12",
+    "expo-blur": "~58.0.6",
+    "expo-build-properties": "~58.0.12",
+    "expo-constants": "~58.0.16",
+    "expo-device": "~58.0.5",
+    "expo-file-system": "~58.0.14",
+    "expo-font": "~58.0.12",
+    "expo-glass-effect": "~58.0.5",
+    "expo-haptics": "~58.0.8",
+    "expo-linear-gradient": "~58.0.4",
+    "expo-linking": "~58.0.17",
+    "expo-print": "~58.0.9",
+    "expo-router": "~58.0.32",
+    "expo-sharing": "~58.0.23",
+    "expo-speech": "~58.0.4",
+    "expo-speech-recognition": "58.0.1",
+    "expo-splash-screen": "~58.0.14",
+    "expo-status-bar": "~58.0.5",
+    "expo-symbols": "~58.0.5",
+    "expo-system-ui": "~58.0.7",
+    "expo-web-browser": "~58.1.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-hook-form": "^7.92.0",
+    "react-native": "0.88.1",
+    "react-native-blob-util": "0.24.11",
+    "react-native-executorch": "0.11.1",
+    "react-native-gesture-handler": "~3.3.0",
+    "react-native-purchases": "11.0.1",
+    "react-native-reanimated": "4.7.1",
+    "react-native-safe-area-context": "~5.11.1",
+    "react-native-screens": "~4.30.1",
+    "react-native-svg": "15.16.0",
+    "react-native-url-polyfill": "^4.0.0",
+    "react-native-web": "~0.21.4",
+    "react-native-webview": "14.0.1",
+    "react-native-worklets": "0.13.0",
+    "zod": "^4.6.7",
+    "zustand": "^5.1.0"
+  },
+  "devDependencies": {
+    "@jest/globals": "^30.5.2",
+    "@testing-library/react-native": "^14.1.0",
+    "@types/react": "~19.3.0",
+    "axe-core": "4.14.0",
+    "deno": "^2.9.6",
+    "jest": "^30.5.2",
+    "jest-expo": "~58.0.15",
+    "supabase": "^3.2.0",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "db:start": "bash scripts/supabase-local.sh start",
+    "db:stop": "bash scripts/supabase-local.sh stop",
+    "db:reset": "bash scripts/supabase-local.sh db reset",
+    "db:status": "bash scripts/supabase-local.sh status",
+    "web:export": "expo export --platform web",
+    "smoke": "node scripts/smoke-web.mjs",
+    "test:db": "bash scripts/supabase-local.sh test db",
+    "galeria": "node scripts/galeria-prints.mjs",
+    "e2e": "node scripts/e2e-web.mjs",
+    "funcoes:dev": "bash scripts/funcoes-env.sh deno run --config supabase/functions/deno.json --allow-net --allow-env --allow-read supabase/functions/_dev/servidor.ts",
+    "test:funcoes": "bash scripts/funcoes-env.sh deno test --config supabase/functions/deno.json --allow-net --allow-env --allow-read supabase/functions/_testes/",
+    "legal": "node scripts/gerar-legal.mjs",
+    "a11y": "node scripts/acessibilidade-web.mjs",
+    "marca": "python3 scripts/gerar_marca.py && node scripts/renderizar-marca.mjs",
+    "demo:gravar": "node --experimental-strip-types scripts/gravar-demo.mjs",
+    "demo:web": "EXPO_PUBLIC_DEMO=1 EXPO_PUBLIC_GALERIA=0 EXPO_OFFLINE=1 expo export --platform web --output-dir dist-demo",
+    "demo:testar": "node scripts/testar-demo.mjs",
+    "apk": "bash scripts/apk/gerar-apk.sh"
+  },
+  "private": true,
+  "jest": {
+    "preset": "jest-expo",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/",
+      "/supabase/",
+      "/dist-demo/"
+    ]
+  },
+  "expo": {
+    "autolinking": {
+      "android": {
+        "exclude": [
+          "expo-blur"
+        ]
+      }
+    }
+  }
+}

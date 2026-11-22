@@ -1,0 +1,20 @@
+# Dono gera um convite; o código aparece com 6 letras.
+appId: ${APP_ID}
+---
+- launchApp:
+    clearState: true
+- tapOn: { id: "entrar-email" }
+- inputText: "dono.teste@example.com"
+- tapOn: { id: "entrar-senha" }
+- inputText: "senha-teste-123"
+- tapOn: { id: "entrar-botao" }
+- extendedWaitUntil:
+    visible: { id: "inicio-barbearia" }
+    timeout: 20000
+- tapOn: { id: "inicio-barbearia" }
+- assertVisible: { id: "painel-hoje-valor" }
+- tapOn: { id: "ir-equipe" }
+- tapOn: { id: "gerar-convite" }
+- assertVisible:
+    id: "codigo-gerado"
+    text: "[A-HJ-NP-Z2-9]{6}"
