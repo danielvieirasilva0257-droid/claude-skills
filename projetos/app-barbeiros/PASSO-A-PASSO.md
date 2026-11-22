@@ -375,6 +375,8 @@ Pedido: a IA demorava porque gerava a resposta inteira e só depois falava; e n�
    - As regras da IA ganharam as datas prontas (ontem, últimos 7 dias, esta semana, semana passada, este mês, mês passado, este ano), porque o modelo erra ao contar dias.
 3. **Validação com o modelo real** (`_dev/validar-nuvem.ts`, 12 pedidos): todos certos, como "ticket médio dos últimos 4 dias" (R$ 212,00, igual ao banco), "dia da semana que mais faturou" (sexta) e "faz um relatório da semana passada". Também mudou a comanda do Lucas do dia 20/11 para pix, preparada com o botão de confirmar. `VALIDAR_SO="relatório|comanda"` roda só alguns. `_dev/medir-stream.ts "pergunta"` mede o tempo do stream.
 
+4. **Conversa mãos livres (0.7.1):** um toque no microfone e a conversa segue sozinha. Quando a IA termina de falar, o microfone abre de novo (depois de 350 ms, para não pegar o fim da voz dela). Tocar enquanto ela fala interrompe e escuta. Silêncio, abrir o teclado, abrir outra tela ou o botão "Encerrar" terminam a conversa. Interromper só falando por cima dela ficou para depois: o microfone do celular escuta a própria voz da IA.
+
 **Aprendizados:**
 
 - **O plano grátis do Google tem limite por minuto** (uns 15 pedidos por modelo), e cada pergunta gasta de 2 a 3 pedidos (consulta + resposta). Testes em sequência batem no limite: espere um minuto ou rode só alguns casos. Para um barbeiro só testando, dá.
