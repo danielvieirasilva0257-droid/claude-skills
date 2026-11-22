@@ -73,3 +73,13 @@ As outras (Despina, Autonoe, Pulcherrima e Aoede) não foram destacadas. As trê
 - **Chave:** a primeira chave do Gemini respondeu 401; o script passou sozinho para a segunda. Nenhuma chave entrou no repositório.
 - **Transcrição (`conferir_voz.py`, modelo small):** 93,4% na voz sozinha e 95,6% no áudio final. Erros: "eu começo" virou "o começo", "Rotina" virou "rutina" e "anotou peso" saiu colado ("anotopeza"). O modelo `large-v3-turbo` quebrou no alinhamento de palavras do faster-whisper (`IndexError` em `find_alignment`); fique no small ou passe sem marcação de palavras.
 - Detalhes: `projetos/rotina/PASSO-A-PASSO.md` (item 6) e `reports/Vídeo Rotina v3, skills e combos usados (2026-10-12).md`.
+
+## 21/11/2026: vozes que rodam no celular (App Barbeiros)
+
+- **Modelos pequenos com português do Brasil e licença que permite app vendido:** Kokoro-82M (Apache-2.0), **Kitten TTS 2** nano (9 a 17 MB por idioma) e mini (48 a 83 MB), ambos Apache-2.0, com vozes pt-BR (nano: Juliana, Larissa, Gustavo, Caio; mini: Beatriz, Camila, Rafael, Thiago); Supertonic 3 (OpenRAIL-M, repositório arquivado em 09/2026); Pocket TTS da Kyutai (CC-BY 4.0, voz "rafael" em português); tiny-voca-ptbr (4,5 M) e pivo-ptbr (1,4 M) da SemFence (CC-BY 4.0, só pt-BR). Fora: Phonon pt (não comercial), Piper pt-BR, XTTS, MMS e F5 (não comerciais). Detalhes e amostras: `research_notes/Voz no celular 2026-11/`.
+- **Kitten TTS 2:** o pacote é `kittenml` (o `kittentts` do PyPI é o antigo, só inglês). As vozes pt mudam de nome entre nano e mini.
+- **O `conferir_voz.py` conta número como erro:** o Whisper escreve "R$ 7.465" e "8%" no lugar das palavras do roteiro, e todas as vozes caíram para 64–76% só por isso. Com os números convertidos em palavras (`num2words`, `lang='pt_BR'`), ficaram entre 91% e 100%. Em roteiro com números, compare assim.
+- **faster-whisper com o `av` novo** falhou ao abrir arquivo (`metadata_errors`). Passe o áudio como array do numpy (ffmpeg para f32le 16 kHz), como o `conferir_voz.py` já faz.
+- **Hugging Face aqui:** precisa liberar `huggingface.co` e o servidor dos arquivos grandes (`us.aws.cdn.hf.co`).
+- **Supertonic 3 (escolhido para o App Barbeiros, vozes F2 e M1):** lê letra por letra e erra números escritos ("R$ 7.466,39" saiu como "EDEO7 com a 6"). Escreva dinheiro, porcentagem, horas e números por extenso antes (no app: `textoFala.ts`). No celular roda pela `react-native-executorch` (versão int8, ~144 MB).
+

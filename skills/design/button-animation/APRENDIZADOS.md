@@ -36,3 +36,9 @@ Adendos datados. O mais novo fica embaixo. A skill original continua no `SKILL.m
 
 - Toque 1 → 0,96 → 1 com ondulação no ponto; check desenhado; "Salvar séries → Salvando… → ✓ Séries salvas" em sequência (12 quadros no "Salvando…"); seletor "Fixa | Pontual" com mola 650/40/0,5; botão "LINK NA BIO" que afunda (receita 12) no lugar do anel girando.
 - Tudo preso a palavras da voz (`voz.json`). Código: `src/v3/Tela.tsx` na branch `rotina-video`.
+
+## 20/11/2026: App Barbeiros (React Native com Reanimated 4)
+
+- Receitas usadas no app inteiro: botão 3D com lábio (`DuoButton`), status-button ("Salvar → Salvando… → ✓ Salvo", tremida de 4 px no erro), hold-to-confirm (2 s linear, solta em 200 ms) e o botão de conquista "pulo com dinheiro" (só em fechar o caixa e metas). Convertidas de CSS para `withTiming`/`withSpring` com `Easing.bezier`, sem perder os valores.
+- **No escuro, a face do botão precisa ser opaca:** com face translúcida (branco 6%) sobre o lábio vermelho, o vermelho aparecia através e o texto sumia ("Cancelar na loja"). Use uma cor opaca equivalente (`#141415` sobre fundo `#050506`).
+- "Reduzir movimento": botão afunda sem mola e a conquista vira só troca de cor de 150 ms.
