@@ -5,7 +5,7 @@
 //   { ferramenta, entrada }  runs one tool for the model on the phone (same tools, same rules)
 // The phone modes call no model here, so they do not spend AI uses; they only need the plan.
 import {
-  executarConfirmado, executarFerramenta, ferramentasParaCelular, rodarAgente, sistemaCelular,
+  executarConfirmado, executarFerramenta, ferramentasParaCelular, rodarAgente, sistemaDoBarbeiro,
   type Contexto, type Mensagem, type Pendente,
 } from '../_shared/agente.ts';
 import { clienteAdmin, clienteDoUsuario, consumir, cors, json, usuarioId } from '../_shared/http.ts';
@@ -44,9 +44,7 @@ export async function handler(req: Request): Promise<Response> {
 
   try {
     if (contexto) {
-      const { data: b } = await db.from('barbeiros').select('nome, ia_perfil').eq('id', id).maybeSingle();
-      const perfil = b?.ia_perfil && typeof b.ia_perfil === 'object' ? { ...(b.ia_perfil as Record<string, unknown>), respostas: undefined } : null;
-      return json({ ok: true, hoje: ctx.hoje, sistema: sistemaCelular(ctx, { nome: b?.nome, perfil }), ferramentas: ferramentasParaCelular(), clientes: ctx.clientes });
+      return json({ ok: true, hoje: ctx.hoje, sistema: await sistemaDoBarbeiro(ctx), ferramentas: ferramentasParaCelular(), clientes: ctx.clientes });
     }
     if (ferramenta) {
       const saida = await executarFerramenta(ctx, ferramenta, entrada ?? {});

@@ -7,6 +7,7 @@
 // LLM_PROVIDER=mock: a small rule-based agent that calls the same tools.
 import { criarAnonimizador } from './anonimizar.ts';
 import { Anthropic, type SupabaseClient } from './deps.ts';
+import { type Conteudo, declaracoes, ErroGoogle, rodarComFerramentas } from './google.ts';
 import { modelo, provedor } from './llm.ts';
 
 export type Mensagem = { role: 'user' | 'assistant'; content: string };
@@ -166,6 +167,13 @@ export function sistemaCelular(ctx: Contexto, barbeiro: { nome?: string | null; 
     '6. Responda em português do Brasil simples, em no máximo 2 frases curtas, sem listas, sem markdown e sem emojis.',
     ...(perfil ? [`Perfil do barbeiro (da entrevista): ${perfil}`] : []),
   ].join('\n');
+}
+
+/** The phone rules with the barber's first name and interview profile (used by Gemma, on the phone or in the cloud). */
+export async function sistemaDoBarbeiro(ctx: Contexto): Promise<string> {
+  const { data: b } = await ctx.db.from('barbeiros').select('nome, ia_perfil').eq('id', ctx.barbeiro).maybeSingle();
+  const perfil = b?.ia_perfil && typeof b.ia_perfil === 'object' ? { ...(b.ia_perfil as Record<string, unknown>), respostas: undefined } : null;
+  return sistemaCelular(ctx, { nome: b?.nome as string | null | undefined, perfil });
 }
 
 export function preparar(ctx: Contexto) {
@@ -419,6 +427,7 @@ function contextoDoDia(ctx: Contexto): string {
 export async function rodarAgente(ctx: Contexto, mensagem: string, historico: Mensagem[]): Promise<Resposta> {
   const { anon } = preparar(ctx);
   if (provedor() === 'mock') return agenteSimulado(ctx, anon.anonimizar(mensagem));
+  if (provedor() === 'google') return agenteGoogle(ctx, mensagem, historico);
 
   const mensagens: Anthropic.Beta.BetaMessageParam[] = [
     ...historico.slice(-8).map((m) => ({ role: m.role, content: anon.anonimizar(String(m.content).slice(0, 2000)) })),
@@ -462,6 +471,44 @@ export async function rodarAgente(ctx: Contexto, mensagem: string, historico: Me
     else if (e instanceof Anthropic.APIError) console.error('agente: erro da API', e.status, e.message);
     else throw e;
     return { texto: 'A IA não respondeu agora. Tente de novo em instantes.' };
+  }
+}
+
+// ---------- The loop with Gemma 4 in the cloud (LLM_PROVIDER=google) ----------
+// Same rules and tools as Gemma on the phone: one AI, wherever it runs.
+async function agenteGoogle(ctx: Contexto, mensagem: string, historico: Mensagem[]): Promise<Resposta> {
+  const { anon } = preparar(ctx);
+  const contents: Conteudo[] = [
+    ...historico.slice(-8).filter((m) => String(m.content).trim())
+      .map((m): Conteudo => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: anon.anonimizar(String(m.content).slice(0, 2000)) }] })),
+    { role: 'user', parts: [{ text: anon.anonimizar(mensagem.trim().slice(0, 1000)) }] },
+  ];
+  const ferramentas = ferramentasParaCelular();
+  let pendenteFinal: Pendente | undefined;
+  let navegar: string | undefined;
+  try {
+    const texto = await rodarComFerramentas({
+      modelo: modelo(),
+      system: await sistemaDoBarbeiro(ctx),
+      contents,
+      ferramentas: declaracoes(ferramentas),
+      executar: async (nome, args) => {
+        if (ALTERACOES.has(nome) && pendenteFinal) return 'Já existe uma mudança esperando confirmação. Uma por vez.';
+        // Optional fields the model left out go as null (null = "not given").
+        const entrada: Record<string, unknown> = { ...args };
+        for (const k of Object.keys(ferramentas.find((f) => f.name === nome)?.parameters.properties ?? {})) if (!(k in entrada)) entrada[k] = null;
+        const saida = await executarFerramenta(ctx, nome, entrada);
+        if (saida.pendente) pendenteFinal = saida.pendente;
+        if (saida.navegar) navegar = saida.navegar;
+        return saida.conteudo;
+      },
+    });
+    if (texto === null) return { texto: 'Não consegui terminar agora. Pode repetir de outro jeito?', pendente: pendenteFinal, navegar };
+    return { texto: anon.revelar(texto), pendente: pendenteFinal, navegar };
+  } catch (e) {
+    if (!(e instanceof ErroGoogle)) throw e;
+    console.error('agente: erro da API do Google', e.status, e.message);
+    return { texto: e.status === 429 ? 'A IA grátis chegou no limite de agora. Tente de novo em um minuto.' : 'A IA não respondeu agora. Tente de novo em instantes.' };
   }
 }
 

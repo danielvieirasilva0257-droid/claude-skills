@@ -1,13 +1,22 @@
-// LLM provider. LLM_PROVIDER = "anthropic" (official SDK) or "mock"
+// LLM provider. LLM_PROVIDER = "google" (Google AI Studio: Gemma 4 for free,
+// the cloud choice of 22/11/2026), "anthropic" (official SDK) or "mock"
 // (deterministic text built from the database numbers; for development and
-// tests, costs nothing). LLM_MODEL defaults to claude-opus-5-5.
-import { Anthropic, type z, zodOutputFormat } from './deps.ts';
+// tests, costs nothing). LLM_MODEL defaults to gemma-4-26b-a4b-it (google) or
+// claude-opus-5-5 (anthropic).
+import { Anthropic, z, zodOutputFormat } from './deps.ts';
+import { ErroGoogle, gerar, gerarStream, lerJSON, MODELO_GOOGLE, textoDe } from './google.ts';
 
 export type Mensagem = { role: 'user' | 'assistant'; content: string };
 type Esforco = 'low' | 'medium' | 'high';
 
 export const provedor = () => Deno.env.get('LLM_PROVIDER') ?? 'mock';
-export const modelo = () => Deno.env.get('LLM_MODEL') ?? 'claude-opus-5-5';
+export const modelo = () => Deno.env.get('LLM_MODEL') || (provedor() === 'google' ? MODELO_GOOGLE : 'claude-opus-5-5');
+
+/** JSON Schema of a zod schema, without the "$schema" key the Gemini API does not take. */
+function esquema(schema: z.ZodType): Record<string, unknown> {
+  const { $schema: _s, ...resto } = z.toJSONSchema(schema) as Record<string, unknown>;
+  return resto;
+}
 
 let cliente: Anthropic | null = null;
 function anthropic(): Anthropic {
@@ -31,6 +40,19 @@ export async function gerarJSON<S extends z.ZodType>(
   if (provedor() === 'mock') {
     const r = schema.safeParse(opcoes.mock());
     return r.success ? r.data : null;
+  }
+  if (provedor() === 'google') {
+    try {
+      const r = await gerar(modelo(), {
+        system, contents: [{ role: 'user', parts: [{ text: JSON.stringify(entrada) }] }], json: esquema(schema), maxTokens: 4096,
+      });
+      const v = schema.safeParse(lerJSON(textoDe(r.partes)));
+      if (!v.success) console.warn('llm: saída fora do formato', r.fim, v.error.message);
+      return v.success ? v.data : null;
+    } catch (e) {
+      if (e instanceof ErroGoogle) { console.error('llm: erro da API do Google', e.status, e.message); return null; }
+      throw e;
+    }
   }
   if (provedor() !== 'anthropic') throw new Error(`LLM_PROVIDER desconhecido: ${provedor()}`);
   try {
@@ -65,6 +87,18 @@ export async function* gerarTextoStream(
 ): AsyncGenerator<string> {
   if (provedor() === 'mock') {
     for (const palavra of opcoes.mock().split(/(?<=\s)/)) yield palavra;
+    return;
+  }
+  if (provedor() === 'google') {
+    try {
+      yield* gerarStream(modelo(), {
+        system, contents: mensagens.map((m) => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] })), maxTokens: 2048,
+      });
+    } catch (e) {
+      if (!(e instanceof ErroGoogle)) throw e;
+      console.error('llm: erro da API do Google', e.status, e.message);
+      yield e.status === 429 ? 'A IA grátis chegou no limite de agora. Tente de novo em um minuto.' : 'A IA não respondeu agora. Tente de novo em instantes.';
+    }
     return;
   }
   const stream = anthropic().beta.messages.stream({
