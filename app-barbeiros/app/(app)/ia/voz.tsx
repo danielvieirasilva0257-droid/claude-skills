@@ -4,10 +4,14 @@
 // soon as it is complete. The AI reads and changes the app through the same
 // tools; every change shows up as a card to confirm (button or saying "sim").
 // Typing works too: ?modo=texto opens with the keyboard and the voice off.
+// Hands-free conversation (Daniel, 22/11/2026): one tap on the microphone and
+// the talk goes on by itself. When the AI finishes speaking the microphone
+// opens again; tapping while she speaks interrupts her and listens; silence or
+// "Encerrar" ends it.
 import { useQueryClient } from '@tanstack/react-query';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
-import { useRef, useState, type ComponentRef } from 'react';
+import { useEffect, useRef, useState, type ComponentRef } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -32,7 +36,7 @@ import { useVozDaIA } from '@/features/voz/preferencia';
 import { vibrar } from '@/lib/haptics';
 import { color, radius, space } from '@/theme/tokens';
 
-const ROTULO: Record<EstadoOrbe, string> = { parado: 'Toque no microfone e fale', ouvindo: 'Ouvindo…', pensando: 'Pensando…', falando: 'Falando…' };
+const ROTULO: Record<EstadoOrbe, string> = { parado: 'Toque no microfone e converse', ouvindo: 'Pode falar…', pensando: 'Pensando…', falando: 'Falando…' };
 
 function ConversaPorVoz() {
   const qc = useQueryClient();
@@ -54,18 +58,54 @@ function ConversaPorVoz() {
   const cerebro = gemma?.ok ? cerebroEscolhido : 'nuvem';
   const semNivel = useSharedValue(0);
   const rolagem = useRef<ComponentRef<typeof ScrollView>>(null);
-  const ouvir = useOuvir((frase) => void enviar(frase));
+  // Hands-free conversation: on after the first tap on the microphone, off on silence or "Encerrar".
+  const [conversando, setConversando] = useState(false);
+  const conversa = useRef(false);
+  const ouviuAlgo = useRef(false);
+  const ouvir = useOuvir((frase) => { ouviuAlgo.current = true; void enviar(frase); });
   const nivel = estado === 'ouvindo' ? ouvir.nivel : semNivel;
+
+  function encerrarConversa() {
+    conversa.current = false;
+    setConversando(false);
+  }
+
+  function escutar() {
+    ouviuAlgo.current = false;
+    setEstado('ouvindo');
+    ouvir.iniciar().catch(() => { setEstado('parado'); encerrarConversa(); });
+  }
+
+  /** After the AI's turn: in a hands-free conversation the microphone opens again by itself. */
+  function proximaVez() {
+    setEstado('parado');
+    // A short pause so the microphone does not catch the end of her voice.
+    if (conversa.current) setTimeout(() => { if (conversa.current) escutar(); }, 350);
+  }
+
+  // Listening ended with nothing said (or an error): the hands-free conversation ends.
+  const ouvia = useRef(false);
+  useEffect(() => {
+    if (ouvia.current && !ouvir.ouvindo && !ouviuAlgo.current && conversa.current) {
+      encerrarConversa();
+      setEstado('parado');
+    }
+    ouvia.current = ouvir.ouvindo;
+  }, [ouvir.ouvindo]);
+  useEffect(() => { if (ouvir.erro) encerrarConversa(); }, [ouvir.erro]);
+  // Leaving the screen ends everything (no microphone or voice in the background).
+  useEffect(() => () => { conversa.current = false; ouvir.parar(); pararDeFalar(); pararGemma(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function responder(fala: string) {
     setTurnos((t) => [...t, { role: 'assistant', content: fala }]);
-    if (!som) { setEstado('parado'); return; }
-    falar(fala, { onInicio: () => setEstado('falando'), onFim: () => setEstado('parado') });
+    if (!som) { proximaVez(); return; }
+    falar(fala, { onInicio: () => setEstado('falando'), onFim: proximaVez });
   }
 
   async function aplicar(r: { texto: string; pendente?: Pendente; navegar?: string; atualizar?: string[] }) {
     if (r.atualizar?.length) await Promise.all(r.atualizar.map((k) => qc.invalidateQueries({ queryKey: [k] })));
     setPendente(r.pendente ?? null);
+    if (r.navegar) encerrarConversa();
     responder(r.texto);
     if (r.navegar) router.navigate(r.navegar as never);
   }
@@ -79,6 +119,7 @@ function ConversaPorVoz() {
       await aplicar(await confirmarAcao(p));
     } catch (e) {
       setEstado('parado');
+      encerrarConversa();
       setErro(e instanceof Error ? e.message : 'Não deu certo.');
     }
   }
@@ -104,15 +145,16 @@ function ConversaPorVoz() {
     setEstado('pensando');
     // The brain on the phone: the text streams in and the voice speaks each sentence meanwhile.
     if (cerebroDaIA() === 'celular' && (await disponibilidadeGemma()).ok && (await gemmaBaixado())) {
-      const fala = som ? criarFala({ onInicio: () => setEstado('falando'), onFim: () => setEstado('parado') }) : null;
+      const fala = som ? criarFala({ onInicio: () => setEstado('falando'), onFim: proximaVez }) : null;
       setTurnos((t) => [...t, { role: 'assistant', content: '' }]);
       const escrever = (conteudo: string) => setTurnos((t) => t.map((x, k) => (k === t.length - 1 ? { ...x, content: conteudo } : x)));
       try {
         const r = await responderComGemma(limpo, { onTexto: escrever, onFrase: (f) => fala?.frase(f) });
         if (r.cancelado) { fala?.parar(); setEstado('parado'); return; }
         escrever(r.texto);
+        if (r.navegar) encerrarConversa();
         fala?.terminar();
-        if (!fala) setEstado('parado');
+        if (!fala) proximaVez();
         setPendente(r.pendente ?? null);
         if (r.navegar) router.navigate(r.navegar as never);
         return;
@@ -124,7 +166,7 @@ function ConversaPorVoz() {
     }
     // The cloud brain, streaming: the text shows up as it is written and the voice speaks each
     // sentence as soon as it is complete. While it looks something up, it says what it is doing.
-    const fala = som ? criarFala({ onInicio: () => setEstado('falando'), onFim: () => setEstado('parado') }) : null;
+    const fala = som ? criarFala({ onInicio: () => setEstado('falando'), onFim: proximaVez }) : null;
     const divisor = criarDivisorDeFrases((f) => fala?.frase(f));
     let escrito = '';
     let avisou = false;
@@ -152,8 +194,9 @@ function ConversaPorVoz() {
       // Nothing streamed (demo or a short answer): speak the whole answer now.
       if (!escrito.trim()) fala?.frase(r.texto);
       escrever(r.texto);
+      if (r.navegar) encerrarConversa();
       fala?.terminar();
-      if (!fala) setEstado('parado');
+      if (!fala) proximaVez();
       if (r.atualizar?.length) await Promise.all(r.atualizar.map((k) => qc.invalidateQueries({ queryKey: [k] })));
       setPendente(r.pendente ?? null);
       if (r.navegar) router.navigate(r.navegar as never);
@@ -161,6 +204,7 @@ function ConversaPorVoz() {
       setFazendo(null);
       fala?.parar();
       setEstado('parado');
+      encerrarConversa();
       setTurnos((t) => (t[t.length - 1]?.role === 'assistant' && !t[t.length - 1]?.content ? t.slice(0, -1) : t));
       setErro(e instanceof Error ? e.message : 'A IA não respondeu agora.');
     }
@@ -168,10 +212,13 @@ function ConversaPorVoz() {
 
   function tocarMicrofone() {
     vibrar.leve();
-    if (estado === 'falando') { pararDeFalar(); pararGemma(); setEstado('parado'); return; }
-    if (ouvir.ouvindo) { ouvir.parar(); return; }
-    setEstado('ouvindo');
-    ouvir.iniciar().catch(() => setEstado('parado'));
+    // While she speaks: interrupt her and listen (the conversation goes on).
+    if (estado === 'falando') { pararDeFalar(); pararGemma(); escutar(); return; }
+    // While listening: stop and end the hands-free conversation.
+    if (ouvir.ouvindo) { encerrarConversa(); ouvir.parar(); return; }
+    conversa.current = true;
+    setConversando(true);
+    escutar();
   }
 
   const status = ouvir.ouvindo ? 'ouvindo' : estado === 'ouvindo' ? 'parado' : estado;
@@ -184,6 +231,13 @@ function ConversaPorVoz() {
         <View style={styles.palco}>
           <OrbeIA estado={status} nivel={nivel} />
           <Texto peso="semibold" centro accessibilityLiveRegion="polite" testID="voz-estado">{ROTULO[status]}</Texto>
+          {conversando ? (
+            <View style={styles.conversaAtiva}>
+              <Texto variante="caption" cor="textMuted">Conversa contínua · toque no microfone para interromper</Texto>
+              <SecondaryButton compacto rotulo="Encerrar" testID="voz-encerrar"
+                onPress={() => { encerrarConversa(); ouvir.parar(); pararDeFalar(); pararGemma(); setEstado('parado'); }} />
+            </View>
+          ) : null}
           {ouvir.ouvindo && ouvir.parcial ? <Texto centro cor="textMuted" numberOfLines={2}>{ouvir.parcial}</Texto> : (
             <Pressable onPress={() => setVozAberta(true)} accessibilityRole="button"
               accessibilityLabel={`IA e voz: ${NOME_DO_CEREBRO[cerebro]}, ${NOME_DA_VOZ[voz]}. Trocar`}
@@ -232,12 +286,12 @@ function ConversaPorVoz() {
         ) : null}
 
         <View style={styles.controles}>
-          <Pressable onPress={() => setDigitando((d) => !d)} accessibilityRole="button" accessibilityLabel={digitando ? 'Esconder o teclado' : 'Escrever em vez de falar'}
+          <Pressable onPress={() => { if (!digitando) { encerrarConversa(); ouvir.parar(); } setDigitando((d) => !d); }} accessibilityRole="button" accessibilityLabel={digitando ? 'Esconder o teclado' : 'Escrever em vez de falar'}
             style={styles.redondo} testID="voz-teclado">
             <SymbolView name={{ ios: 'keyboard', android: 'keyboard', web: 'keyboard' }} tintColor={color.text} size={22} />
           </Pressable>
           <Pressable onPress={tocarMicrofone} disabled={estado === 'pensando' || !reconhecimentoDisponivel()} testID="voz-microfone"
-            accessibilityRole="button" accessibilityLabel={ouvir.ouvindo ? 'Parar de ouvir' : estado === 'falando' ? 'Parar a fala' : 'Falar com a IA'}
+            accessibilityRole="button" accessibilityLabel={ouvir.ouvindo ? 'Parar de ouvir e encerrar a conversa' : estado === 'falando' ? 'Interromper e falar' : 'Começar a conversa por voz'}
             style={({ pressed }) => [styles.microfone, ouvir.ouvindo ? styles.microfoneAtivo : null, pressed ? styles.pressionado : null,
               !reconhecimentoDisponivel() ? styles.desativado : null]}>
             <SymbolView name={ouvir.ouvindo || estado === 'falando' ? { ios: 'stop.fill', android: 'stop', web: 'stop' } : { ios: 'mic.fill', android: 'mic', web: 'mic' }}
@@ -268,6 +322,7 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   palco: { alignItems: 'center', gap: space[2], paddingTop: space[4] },
   trocarVoz: { minHeight: 44, justifyContent: 'center', paddingHorizontal: space[3] },
+  conversaAtiva: { alignItems: 'center', gap: space[1] },
   conversa: { flex: 1 },
   conversaConteudo: { padding: space[4], gap: space[2] },
   bolha: { maxWidth: '85%', paddingHorizontal: space[3], paddingVertical: space[2], borderRadius: radius.lg },
