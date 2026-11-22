@@ -129,7 +129,7 @@ export async function gerar(modelo: string, p: Pedido): Promise<{ partes: Parte[
 /** Visible text of the parts (no thinking). */
 // Gemma sometimes leaves the bare word "thought" (its thinking channel's name) before the answer.
 export const textoDe = (partes: Parte[]) =>
-  partes.filter((x) => typeof x.text === 'string' && !x.thought).map((x) => x.text).join('').replace(/^\s*thought\b\s*/i, '').trim();
+  partes.filter((x) => typeof x.text === 'string' && !x.thought).map((x) => x.text).join('').replace(/^\s*thought\s*/i, '').trim();
 
 /** JSON inside a text that may come wrapped in ```json fences or with words around it. */
 export function lerJSON(texto: string): unknown {
@@ -209,6 +209,59 @@ export async function rodarComFerramentas(o: {
     const respostas: Parte[] = [];
     for (const c of chamadas) {
       const { id, name, args } = c.functionCall!;
+      const resultado = await o.executar(name, args ?? {});
+      respostas.push({ functionResponse: { ...(id ? { id } : {}), name, response: { resultado } } });
+    }
+    contents.push({ role: 'user', parts: respostas });
+  }
+  return null;
+}
+
+/**
+ * The same tool loop, streaming: every piece of visible text goes to onTexto
+ * as soon as the model writes it, and onFerramenta says which tool is about to
+ * run (the app can say "let me look at your schedule" meanwhile).
+ * Returns all the text written (null if it did not finish).
+ */
+export async function rodarComFerramentasStream(o: Parameters<typeof rodarComFerramentas>[0] & {
+  onTexto: (pedaco: string) => void;
+  onFerramenta?: (nome: string) => void;
+}): Promise<string | null> {
+  const contents = [...o.contents];
+  let tudo = '';
+  for (let volta = 0; volta < (o.voltas ?? 6); volta++) {
+    const r = await enviar(o.modelo, 'streamGenerateContent?alt=sse', { system: o.system, contents, ferramentas: o.ferramentas, maxTokens: o.maxTokens ?? 600 });
+    const leitor = r.body!.pipeThrough(new TextDecoderStream()).getReader();
+    const partes: Parte[] = [];
+    let texto = '';
+    let resto = '';
+    const ler = (linha: string) => {
+      if (!linha.startsWith('data:')) return;
+      let j: { candidates?: { content?: { parts?: Parte[] } }[] };
+      try { j = JSON.parse(linha.slice(5)); } catch { return; }
+      for (const parte of j.candidates?.[0]?.content?.parts ?? []) {
+        if (parte.functionCall) partes.push(parte);
+        else if (parte.thought) { if (parte.thoughtSignature) partes.push(parte); }
+        else if (typeof parte.text === 'string' && parte.text) { texto += parte.text; tudo += parte.text; o.onTexto(parte.text); }
+      }
+    };
+    for (;;) {
+      const { value, done } = await leitor.read();
+      if (done) break;
+      resto += value;
+      const linhas = resto.split('\n');
+      resto = linhas.pop() ?? '';
+      for (const l of linhas) ler(l.trim());
+    }
+    ler(resto.trim());
+    const chamadas = partes.filter((x) => x.functionCall);
+    if (!chamadas.length) return tudo.trim() || null;
+    // The model's turn goes back with its text and calls (signatures included).
+    contents.push({ role: 'model', parts: [...(texto ? [{ text: texto }] : []), ...partes] });
+    const respostas: Parte[] = [];
+    for (const c of chamadas) {
+      const { id, name, args } = c.functionCall!;
+      o.onFerramenta?.(name);
       const resultado = await o.executar(name, args ?? {});
       respostas.push({ functionResponse: { ...(id ? { id } : {}), name, response: { resultado } } });
     }

@@ -13,6 +13,15 @@ const { data, error } = await sb.auth.signInWithPassword({ email: 'barbeiro.test
 if (error) throw error;
 const token = data.session!.access_token;
 
+// A recent comanda with a client, paid by card, to ask for a change by name and day.
+const admin = createClient(URL_SB, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } });
+const { data: alvo } = await admin.from('atendimentos').select('inicio, cliente:clientes(nome)')
+  .eq('barbeiro_id', data.user!.id).eq('status', 'concluido').in('forma_pagamento', ['credito', 'debito']).not('cliente_id', 'is', null)
+  .lt('inicio', new Date().toISOString()).order('inicio', { ascending: false }).limit(1).single();
+const a = alvo as unknown as { inicio: string; cliente: { nome: string } };
+const diaAlvo = new Date(a.inicio).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit' });
+const comandaPedido = `Muda a comanda do ${a.cliente.nome.split(' ')[0]} do dia ${diaAlvo} para pagamento no pix`;
+
 type Resposta = { ok: boolean; texto?: string; erro?: string; pendente?: { ferramenta: string; entrada: Record<string, unknown>; resumo: string }; navegar?: string };
 async function falar(mensagem: string): Promise<{ r: Resposta; ms: number }> {
   const t0 = Date.now();
@@ -31,15 +40,23 @@ const casos: { pedido: string; conferir: (r: Resposta) => string | null }[] = [
   { pedido: 'Muda o preço da barba para 40 reais', conferir: (r) => (r.pendente?.ferramenta === 'mudar_preco_servico' && Number(r.pendente.entrada.preco) === 40 ? null : 'não preparou o preço') },
   { pedido: 'Gastei 30 reais com produtos', conferir: (r) => (r.pendente?.ferramenta === 'registrar_gasto' ? null : 'não preparou o gasto') },
   { pedido: 'Abre a tela de gastos', conferir: (r) => (r.navegar === '/gastos' ? null : 'não abriu a tela') },
+  // Full control (22/11/2026)
+  { pedido: 'Qual foi meu ticket médio dos últimos 4 dias?', conferir: (r) => (/ticket/i.test(r.texto ?? '') && /R\$ ?[\d.]+,\d{2}/.test(r.texto ?? '') ? null : 'sem o ticket médio em reais') },
+  { pedido: 'Qual dia da semana eu mais faturei nos últimos 30 dias?', conferir: (r) => (/(segunda|terça|quarta|quinta|sexta|sábado|domingo)/i.test(r.texto ?? '') ? null : 'não disse o dia da semana') },
+  { pedido: 'Faz um relatório da semana passada com os serviços e as formas de pagamento', conferir: (r) => (r.navegar?.startsWith('/ia/relatorio/') ? null : 'não abriu o relatório') },
+  { pedido: comandaPedido, conferir: (r) => (r.pendente?.ferramenta === 'editar_atendimento' && r.pendente.entrada.forma === 'pix' ? null : 'não preparou a mudança da comanda') },
 ];
 
+// VALIDAR_SO="relatório|comanda" runs only the matching requests (the free tier allows ~15 requests a minute).
+const so = Deno.env.get('VALIDAR_SO');
+const escolhidos = casos.filter((c) => !so || new RegExp(so, 'i').test(c.pedido));
 let falhas = 0;
-for (const c of casos) {
+for (const c of escolhidos) {
   const { r, ms } = await falar(c.pedido);
   const problema = r.ok ? c.conferir(r) : `erro ${r.erro}`;
   if (problema) falhas++;
   console.log(`${problema ? '✗' : '✓'} ${c.pedido}  (${(ms / 1000).toFixed(1)} s)`);
   console.log(`    → ${r.texto ?? ''}${r.pendente ? `  [pendente: ${r.pendente.resumo}]` : ''}${r.navegar ? `  [tela: ${r.navegar}]` : ''}${problema ? `  ← ${problema}` : ''}`);
 }
-console.log(falhas ? `${falhas} de ${casos.length} falharam` : `${casos.length} de ${casos.length} ok`);
+console.log(falhas ? `${falhas} de ${escolhidos.length} falharam` : `${escolhidos.length} de ${escolhidos.length} ok`);
 Deno.exit(falhas ? 1 : 0);

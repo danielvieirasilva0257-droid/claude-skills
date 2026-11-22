@@ -7,8 +7,9 @@
 // LLM_PROVIDER=mock: a small rule-based agent that calls the same tools.
 import { criarAnonimizador } from './anonimizar.ts';
 import { Anthropic, type SupabaseClient } from './deps.ts';
-import { type Conteudo, declaracoes, ErroGoogle, rodarComFerramentas } from './google.ts';
+import { type Conteudo, declaracoes, ErroGoogle, rodarComFerramentas, rodarComFerramentasStream } from './google.ts';
 import { modelo, provedor } from './llm.ts';
+import { montarRelatorio, SECOES, type DadosRelatorio, type Secao } from './relatorio.ts';
 
 export type Mensagem = { role: 'user' | 'assistant'; content: string };
 export type Pendente = { ferramenta: string; entrada: Record<string, unknown>; resumo: string };
@@ -33,6 +34,7 @@ const ROTA: Record<(typeof TELAS)[number], string> = {
   meta: '/meta', extrato: '/extrato', comissao: '/comissao', gastos: '/gastos', servicos: '/servicos', insights: '/insights',
   mei: '/mei', expediente: '/expediente', whatsapp: '/whatsapp', planos: '/planos', cliente: '/cliente',
 };
+const AGRUPAMENTOS = ['dia', 'semana', 'mes', 'dia_da_semana', 'hora', 'servico', 'cliente', 'forma_pagamento'] as const;
 const ATUALIZA_AGENDA = ['agenda_grade', 'agenda_mes', 'agenda_dia', 'resumo_dia', 'proximos', 'v_metricas_mes', 'financeiro', 'meta'];
 
 // ---------- Tool definitions (strict: every field required, null when not given) ----------
@@ -84,15 +86,43 @@ export const FERRAMENTAS: Anthropic.Beta.BetaTool[] = [
     input_schema: obj({ valor: { type: 'number', description: 'Meta em reais' } }) },
   { name: 'fechar_caixa', description: 'Prepara o fechamento do caixa de um dia.', strict: true,
     input_schema: obj({ dia: sOuNulo(`${DIA}; null = hoje`) }) },
+  // Full control (22/11/2026): any number of any period, any comanda, reports.
+  { name: 'analisar', description: 'Números de QUALQUER período, calculados pelo app: faturamento, atendimentos, ticket médio, clientes, lucro e gastos, com filtro opcional (cliente, serviço, forma de pagamento) e agrupamento opcional. Use para "ticket médio dos últimos 4 dias", "qual dia da semana fatura mais", "quanto o Cliente 3 gastou no ano", "serviço que mais vendeu em outubro". Calcule de e ate a partir das datas do contexto.', strict: true,
+    input_schema: obj({ de: s('Primeiro dia, AAAA-MM-DD'), ate: s('Último dia, AAAA-MM-DD (inclusive)'),
+      agrupar_por: { type: ['string', 'null'], enum: [...AGRUPAMENTOS, null], description: 'null = só o total' },
+      cliente: sOuNulo(`${CLIENTE}; null = todos`), servico: sOuNulo('Nome do serviço; null = todos'),
+      forma_pagamento: { type: ['string', 'null'], enum: [...FORMAS, null] } }) },
+  { name: 'listar_atendimentos', description: 'Comandas (atendimentos) de um período com id, dia, hora, cliente, itens, total, pagamento e status. Use para achar a comanda certa antes de editar ou apagar.', strict: true,
+    input_schema: obj({ de: s('Primeiro dia, AAAA-MM-DD'), ate: s('Último dia, AAAA-MM-DD'), cliente: sOuNulo(`${CLIENTE}; null = todos`),
+      status: { type: ['string', 'null'], enum: ['concluido', 'agendado', 'falta', 'cancelado', null] } }) },
+  { name: 'editar_atendimento', description: 'Prepara a mudança de uma comanda (id da listar_atendimentos ou da agenda_do_dia): serviços, valor total cobrado, forma de pagamento, dia e hora, cliente ou observação. Preencha só o que muda; o resto null. O barbeiro confirma no app.', strict: true,
+    input_schema: obj({ atendimento_id: s('id da comanda'),
+      servicos: { type: ['array', 'null'], items: { type: 'string' }, description: 'Nova lista de serviços (troca todos); null = manter' },
+      valor_total: { type: ['number', 'null'], description: 'Novo total cobrado em reais (ex.: desconto); null = manter' },
+      forma_pagamento: { type: ['string', 'null'], enum: [...FORMAS, null] },
+      dia: sOuNulo(`${DIA}; null = manter`), hora: sOuNulo('Hora HH:MM; null = manter'),
+      cliente: sOuNulo(`${CLIENTE}; null = manter`), observacao: sOuNulo('Nova observação da comanda; null = manter') }) },
+  { name: 'apagar_atendimento', description: 'Prepara apagar uma comanda lançada por engano (id da listar_atendimentos). O barbeiro confirma no app.', strict: true,
+    input_schema: obj({ atendimento_id: s('id da comanda') }) },
+  { name: 'reabrir_caixa', description: 'Prepara reabrir o caixa de um dia (para poder mudar comandas desse dia).', strict: true,
+    input_schema: obj({ dia: s(DIA) }) },
+  { name: 'criar_relatorio', description: 'Cria um relatório em página com os números do app e abre na tela do barbeiro (dá para compartilhar em PDF). Escolha o período e as seções. Em "analise" escreva de 2 a 4 frases curtas com a sua leitura, usando só números que vieram das ferramentas.', strict: true,
+    input_schema: obj({ titulo: s('Título curto, ex.: "Relatório de novembro"'), de: s('Primeiro dia, AAAA-MM-DD'), ate: s('Último dia, AAAA-MM-DD'),
+      secoes: { type: 'array', items: { type: 'string', enum: [...SECOES] }, description: 'Seções na ordem; use "resumo" primeiro' },
+      cliente: sOuNulo(`${CLIENTE}; null = todos`), servico: sOuNulo('Nome do serviço; null = todos'),
+      analise: sOuNulo('Sua leitura dos números, 2 a 4 frases; null = sem texto') }) },
 ] as Anthropic.Beta.BetaTool[];
 
 const ALTERACOES = new Set(['agendar_horario', 'lancar_atendimento', 'concluir_atendimento', 'marcar_falta', 'cancelar_horario',
-  'anotar_no_cliente', 'mudar_preco_servico', 'registrar_gasto', 'definir_meta', 'fechar_caixa']);
+  'anotar_no_cliente', 'mudar_preco_servico', 'registrar_gasto', 'definir_meta', 'fechar_caixa',
+  'editar_atendimento', 'apagar_atendimento', 'reabrir_caixa']);
 
 export const SISTEMA = `Você é a assistente de voz dentro de um app para barbeiros brasileiros. O barbeiro fala com você e você ouve e responde em voz.
 Você pode consultar e mexer no app usando as ferramentas. Regras:
 - Números (faturamento, lucro, preços, metas) só os que vierem das ferramentas, escritos do mesmo jeito. Nunca calcule nem invente.
 - Para comparar o mês, use só a "comparacao" de numeros_do_mes (o mês passado e a média, só até o mesmo dia). Nunca compare o mês pela metade com um mês inteiro.
+- Para números de qualquer período ou recorte (últimos dias, semana, mês passado, por dia da semana, por serviço, de um cliente), use analisar. Para relatório, criar_relatorio.
+- Para mudar uma comanda já lançada, ache o id com listar_atendimentos e use editar_atendimento ou apagar_atendimento.
 - Para mudar qualquer coisa, chame a ferramenta da mudança: ela só prepara a ação, e o barbeiro confirma no app. Diga em uma frase o que vai acontecer e peça para ele confirmar. Uma mudança por vez.
 - Se faltar informação (cliente, serviço, dia ou hora), pergunte em uma frase curta antes de preparar.
 - Clientes aparecem como "Cliente 1", "Cliente 2"... Use sempre esse formato. Nunca peça telefone nem dados pessoais.
@@ -150,6 +180,16 @@ export function ferramentasParaCelular() {
   });
 }
 
+/** Dates a small model gets wrong when it has to count: yesterday, this week, this and last month. */
+export function datasUteis(hoje: string): string {
+  const d = new Date(`${hoje}T12:00:00Z`);
+  const dow = (d.getUTCDay() + 6) % 7;   // monday = 0
+  const mes = hoje.slice(0, 8) + '01';
+  const anterior = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() - 1, 1)).toISOString().slice(0, 10);
+  const fimAnterior = somarDias(mes, -1);
+  return `Datas: ontem ${somarDias(hoje, -1)}; últimos 7 dias ${somarDias(hoje, -6)} a ${hoje}; esta semana ${somarDias(hoje, -dow)} a ${hoje}; semana passada ${somarDias(hoje, -dow - 7)} a ${somarDias(hoje, -dow - 1)}; este mês ${mes} a ${hoje}; mês passado ${anterior} a ${fimAnterior}; este ano ${hoje.slice(0, 4)}-01-01 a ${hoje}.`;
+}
+
 /** System prompt for the phone model: short rules for a small model, plus today and the barber's profile. */
 export function sistemaCelular(ctx: Contexto, barbeiro: { nome?: string | null; perfil?: unknown }): string {
   const perfil = barbeiro.perfil && typeof barbeiro.perfil === 'object' ? JSON.stringify(barbeiro.perfil).slice(0, 1200) : '';
@@ -157,11 +197,12 @@ export function sistemaCelular(ctx: Contexto, barbeiro: { nome?: string | null; 
   return [
     `Você é a IA do app de barbearia${nome}. Ele fala ou escreve com você: é a mesma conversa, e a sua resposta aparece na tela e é lida em voz alta.`,
     `Hoje é ${diaCurto(ctx.hoje)} (${ctx.hoje}), horário de Brasília. Amanhã é ${somarDias(ctx.hoje, 1)}.`,
+    datasUteis(ctx.hoje),
     `Serviços: ${ctx.servicos.map((x) => x.nome).join(', ') || 'nenhum cadastrado'}.`,
     'Regras:',
     '1. Para números, agenda, clientes, horários ou serviços, chame uma ferramenta antes de responder. Nunca invente nem calcule números: repita os que a ferramenta mandar. Se ela mandar um "resumo", responda com as palavras dele. Dinheiro sempre como R$ 1.234,56.',
-    '2. Para comparar o mês, use só a "comparacao" de numeros_do_mes (mês passado e média, até o mesmo dia).',
-    '3. Para mudar algo (agendar, lançar, concluir, falta, cancelar, anotar, preço, gasto, meta, fechar caixa), chame primeiro a ferramenta da mudança: ela só prepara e mostra o botão de confirmar no app. Só depois diga em uma frase o que vai acontecer e pergunte se confirma. Nunca pergunte se confirma sem ter chamado a ferramenta. Uma mudança por vez.',
+    '2. Para comparar o mês, use só a "comparacao" de numeros_do_mes (mês passado e média, até o mesmo dia). Para qualquer outro período ou recorte (últimos dias, uma semana, um mês, por dia da semana, por serviço, de um cliente), use analisar com as datas certas. Para relatório, use criar_relatorio e depois diga em uma frase o principal.',
+    '3. Para mudar algo (agendar, lançar, concluir, falta, cancelar, anotar, preço, gasto, meta, fechar ou reabrir caixa, editar ou apagar comanda), chame primeiro a ferramenta da mudança. Para mudar uma comanda já lançada, ache o id com listar_atendimentos e use editar_atendimento: ela só prepara e mostra o botão de confirmar no app. Só depois diga em uma frase o que vai acontecer e pergunte se confirma. Nunca pergunte se confirma sem ter chamado a ferramenta. Uma mudança por vez.',
     '4. Se faltar cliente, serviço, dia ou hora, pergunte em uma frase curta.',
     '5. Clientes aparecem como "Cliente 1", "Cliente 2"... Use esse formato nas ferramentas. Nunca peça telefone nem dados pessoais.',
     '6. Responda em português do Brasil simples, em no máximo 2 frases curtas, sem listas, sem markdown e sem emojis.',
@@ -207,6 +248,17 @@ export async function executarFerramenta(ctx: Contexto, nome: string, entrada: R
     pendente: p,
   });
   const { db } = ctx;
+  const diaOuNulo = (v: unknown) => (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : null);
+  // Optional filters of analisar / criar_relatorio: client, service, payment.
+  const filtros = async (e: Record<string, unknown>): Promise<{ rpc: { p_cliente: string | null; p_servico: string | null; p_forma: string | null }; texto: string } | string> => {
+    const c = e.cliente ? cliente(e.cliente as string) : null;
+    if (e.cliente && !c) return 'Cliente não encontrado. Use o formato "Cliente N".';
+    const sv = e.servico ? servicos([String(e.servico)]).ok[0] ?? null : null;
+    if (e.servico && !sv) return `Serviço não encontrado. Serviços: ${ctx.servicos.map((x) => x.nome).join(', ')}.`;
+    const forma = FORMAS.includes(e.forma_pagamento as never) ? String(e.forma_pagamento) : null;
+    const partes = [c ? `cliente ${anon.anonimizar(c.nome)}` : null, sv ? `serviço ${sv.nome}` : null, forma ? `pagamento ${forma}` : null].filter(Boolean);
+    return { rpc: { p_cliente: c?.id ?? null, p_servico: sv?.id ?? null, p_forma: forma }, texto: partes.length ? ` (${partes.join(', ')})` : '' };
+  };
 
   switch (nome) {
     case 'resumo_do_dia': {
@@ -270,6 +322,86 @@ export async function executarFerramenta(ctx: Contexto, nome: string, entrada: R
         return { conteudo: 'Tela aberta.', navegar: `/cliente/${c.id}` };
       }
       return { conteudo: 'Tela aberta.', navegar: ROTA[tela] };
+    }
+    case 'analisar': {
+      const de = diaOuNulo(entrada.de);
+      const ate = diaOuNulo(entrada.ate) ?? ctx.hoje;
+      if (!de) return erro('Informe o primeiro dia (de) no formato AAAA-MM-DD.');
+      const filtro = await filtros(entrada);
+      if (typeof filtro === 'string') return erro(filtro);
+      const agrupar = AGRUPAMENTOS.includes(entrada.agrupar_por as never) ? String(entrada.agrupar_por) : null;
+      const { data, error } = await db.rpc('analisar_periodo', { p_de: de, p_ate: ate, p_agrupar: agrupar, ...filtro.rpc });
+      if (error) return erro(`Não deu para analisar: ${error.message}`);
+      const r = data as { total: Record<string, number | null>; grupos: Record<string, unknown>[] | null };
+      const t = r.total;
+      const periodo = de === ate ? `Em ${diaCurto(de)}` : `De ${diaCurto(de)} a ${diaCurto(ate)}`;
+      const resumo = Number(t.atendimentos) === 0 ? `${periodo}${filtro.texto}: nenhum atendimento.`
+        : `${periodo}${filtro.texto}: ${moeda(Number(t.faturamento))} em ${t.atendimentos} atendimento(s), ticket médio de ${moeda(Number(t.ticket_medio))}, ${t.clientes_unicos} cliente(s).${t.lucro !== null ? ` Lucro de ${moeda(Number(t.lucro))}, com ${moeda(Number(t.gastos))} de gastos.` : ''}`;
+      // Money as "R$ 1.234,56" strings: the model repeats them instead of formatting numbers.
+      const grupos = (r.grupos ?? []).slice(0, 40).map((g) => Object.fromEntries(Object.entries(g).filter(([k]) => k !== 'ordem')
+        .map(([k, v]) => [k, ['faturamento', 'ticket_medio', 'preco_medio'].includes(k) ? moeda(Number(v)) : v])));
+      return dados({ resumo, de, ate, total: { ...t, faturamento: moeda(Number(t.faturamento)), ticket_medio: t.ticket_medio === null ? null : moeda(Number(t.ticket_medio)),
+        lucro: t.lucro === null ? null : moeda(Number(t.lucro)), gastos: t.gastos === null ? null : moeda(Number(t.gastos)),
+        faturamento_medio_por_dia_trabalhado: t.faturamento_medio_por_dia_trabalhado === null ? null : moeda(Number(t.faturamento_medio_por_dia_trabalhado)),
+        valor_do_servico_filtrado: t.valor_do_servico_filtrado === null ? null : moeda(Number(t.valor_do_servico_filtrado)), taxas_cartao: moeda(Number(t.taxas_cartao)) },
+        ...(agrupar ? { agrupado_por: agrupar, grupos } : {}) });
+    }
+    case 'listar_atendimentos': {
+      const de = diaOuNulo(entrada.de);
+      const ate = diaOuNulo(entrada.ate) ?? de;
+      if (!de || !ate) return erro('Informe o período (de e ate) no formato AAAA-MM-DD.');
+      const c = entrada.cliente ? cliente(entrada.cliente as string) : null;
+      if (entrada.cliente && !c) return erro('Cliente não encontrado. Use o formato "Cliente N".');
+      const status = ['concluido', 'agendado', 'falta', 'cancelado'].includes(entrada.status as string) ? entrada.status : null;
+      const { data, error } = await db.rpc('listar_atendimentos', { p_de: de, p_ate: ate, p_cliente: c?.id ?? null, p_status: status, p_limite: 41 });
+      if (error) return erro(`Não deu para listar: ${error.message}`);
+      const lista = (data ?? []) as { id: string; dia: string; hora: string; cliente: string | null; status: string; forma_pagamento: string | null; itens: { item: string; valor: number }[]; total: number; observacao: string | null }[];
+      return dados({ de, ate, ...(lista.length > 40 ? { aviso: 'Mais de 40 comandas: diminua o período para ver todas.' } : {}),
+        comandas: lista.slice(0, 40).map((a) => ({ id: a.id, dia: a.dia, hora: a.hora, cliente: a.cliente, itens: a.itens.map((i) => i.item).join(' + '),
+          total: moeda(a.total), pagamento: a.forma_pagamento, status: a.status, ...(a.observacao ? { observacao: a.observacao } : {}) })) });
+    }
+    case 'criar_relatorio': {
+      const de = diaOuNulo(entrada.de);
+      const ate = diaOuNulo(entrada.ate) ?? ctx.hoje;
+      if (!de) return erro('Informe o primeiro dia (de) no formato AAAA-MM-DD.');
+      if (ate < de) return erro('O último dia vem depois do primeiro.');
+      const filtro = await filtros(entrada);
+      if (typeof filtro === 'string') return erro(filtro);
+      const pedidas = ((entrada.secoes as string[] | null) ?? []).filter((x): x is Secao => SECOES.includes(x as Secao));
+      const secoes: Secao[] = [...new Set<Secao>(pedidas.length ? (pedidas[0] === 'resumo' ? pedidas : ['resumo', ...pedidas]) : ['resumo', 'comparacao', 'por_dia', 'por_servico', 'por_pagamento'])];
+      const AGRUPA: Partial<Record<Secao, string>> = { por_dia: 'dia', por_semana: 'semana', por_mes: 'mes', por_dia_da_semana: 'dia_da_semana',
+        por_hora: 'hora', por_servico: 'servico', por_cliente: 'cliente', por_pagamento: 'forma_pagamento' };
+      const dias = Math.round((Date.parse(`${ate}T12:00:00Z`) - Date.parse(`${de}T12:00:00Z`)) / 86_400_000) + 1;
+      const analisar = (p_de: string, p_ate: string, p_agrupar: string | null) =>
+        db.rpc('analisar_periodo', { p_de, p_ate, p_agrupar, ...filtro.rpc }).then((x) => {
+          if (x.error) throw new Error(x.error.message);
+          return x.data as { total: DadosRelatorio['total']; grupos: never[] | null };
+        });
+      try {
+        const [total, anterior, comandas, barbeiro, ...grupos] = await Promise.all([
+          analisar(de, ate, null),
+          secoes.includes('comparacao') ? analisar(somarDias(de, -dias), somarDias(de, -1), null) : Promise.resolve(null),
+          secoes.includes('comandas')
+            ? db.rpc('listar_atendimentos', { p_de: de, p_ate: ate, p_cliente: filtro.rpc.p_cliente, p_status: null, p_limite: 200 }).then((x) => x.data as DadosRelatorio['comandas'])
+            : Promise.resolve(null),
+          db.from('barbeiros').select('nome').eq('id', ctx.barbeiro).maybeSingle().then((x) => (x.data?.nome as string | undefined) ?? null),
+          ...secoes.filter((x) => AGRUPA[x]).map((x) => analisar(de, ate, AGRUPA[x]!).then((g) => [x, g.grupos ?? []] as const)),
+        ]);
+        const titulo = anon.revelar(String(entrada.titulo ?? 'Relatório').slice(0, 100)).trim() || 'Relatório';
+        const html = montarRelatorio({
+          titulo, barbeiro, de, ate, filtro: filtro.texto ? anon.revelar(filtro.texto.replace(/^ \(|\)$/g, '')) : null, secoes,
+          total: total.total, anterior: anterior?.total ?? null, grupos: Object.fromEntries(grupos), comandas,
+          analise: entrada.analise ? anon.revelar(String(entrada.analise).slice(0, 1500)) : null, geradoEm: new Date(),
+        });
+        const periodo = de === ate ? diaCurto(de) : `${diaCurto(de)} a ${diaCurto(ate)}`;
+        const { data: salvo, error } = await db.from('relatorios_ia').insert({ barbeiro_id: ctx.barbeiro, titulo, periodo, html }).select('id').single();
+        if (error || !salvo) return erro('Não deu para guardar o relatório.');
+        const t = total.total;
+        return { conteudo: anon.anonimizar(`Relatório "${titulo}" pronto e aberto na tela (${periodo}). Números principais: ${moeda(Number(t.faturamento))} em ${t.atendimentos} atendimento(s), ticket médio ${t.ticket_medio === null ? '—' : moeda(Number(t.ticket_medio))}. Diga em uma frase que o relatório abriu e o principal.`),
+          navegar: `/ia/relatorio/${salvo.id}` };
+      } catch (e) {
+        return erro(`Não deu para montar o relatório: ${e instanceof Error ? e.message : 'erro'}`);
+      }
     }
   }
 
@@ -352,6 +484,68 @@ export async function executarFerramenta(ctx: Contexto, nome: string, entrada: R
       const resumo = `Fechar o caixa de ${diaCurto(d)}`;
       return pendente({ ferramenta: nome, entrada: { dia: d }, resumo }, resumo);
     }
+    case 'reabrir_caixa': {
+      const d = dia(entrada.dia);
+      const resumo = `Reabrir o caixa de ${diaCurto(d)}`;
+      return pendente({ ferramenta: nome, entrada: { dia: d }, resumo }, resumo);
+    }
+    case 'editar_atendimento':
+    case 'apagar_atendimento': {
+      const { data } = await db.from('atendimentos')
+        .select('id, inicio, status, forma_pagamento, observacao, cliente:clientes(nome), itens:atendimento_itens(valor, servico:servicos(nome), produto:produtos(nome))')
+        .eq('id', String(entrada.atendimento_id ?? '')).maybeSingle();
+      const a = data as { id: string; inicio: string; status: string; forma_pagamento: string | null; observacao: string | null; cliente: { nome: string } | null;
+        itens: { valor: number; servico: { nome: string } | null; produto: { nome: string } | null }[] } | null;
+      if (!a) return erro('Comanda não encontrada. Use listar_atendimentos para pegar o id.');
+      const diaA = new Date(a.inicio).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+      const totalA = a.itens.reduce((x, i) => x + Number(i.valor), 0);
+      const quem = a.cliente?.nome.split(' ')[0] ?? 'sem cliente';
+      const desc = `Comanda de ${quem} · ${diaCurto(diaA)} às ${horaBr(a.inicio)} · ${a.itens.map((i) => i.servico?.nome ?? i.produto?.nome).join(' + ')} ${moeda(totalA)}`;
+      if (nome === 'apagar_atendimento') {
+        const resumo = `Apagar a ${desc.charAt(0).toLowerCase()}${desc.slice(1)}`;
+        return pendente({ ferramenta: nome, entrada: { atendimento_id: a.id }, resumo }, anon.anonimizar(resumo));
+      }
+      const mudancas: string[] = [];
+      const real: Record<string, unknown> = { atendimento_id: a.id };
+      if (Array.isArray(entrada.servicos) && entrada.servicos.length) {
+        const { ok, faltando } = servicos(entrada.servicos as string[]);
+        if (faltando.length || !ok.length) return erro(`Serviço não encontrado: ${faltando.join(', ')}. Serviços: ${ctx.servicos.map((x) => x.nome).join(', ')}.`);
+        real.servico_ids = ok.map((x) => x.id);
+        mudancas.push(`serviços: ${ok.map((x) => `${x.nome} ${moeda(Number(x.preco))}`).join(' + ')}`);
+      }
+      if (entrada.valor_total !== null && entrada.valor_total !== undefined) {
+        const v = Number(entrada.valor_total);
+        if (!(v >= 0 && v < 100000)) return erro('Valor inválido.');
+        real.valor_total = v;
+        mudancas.push(`total cobrado: ${moeda(v)}`);
+      }
+      if (FORMAS.includes(entrada.forma_pagamento as never)) {
+        real.forma = entrada.forma_pagamento;
+        mudancas.push(`pagamento: ${entrada.forma_pagamento}`);
+      }
+      const novoDia = diaOuNulo(entrada.dia);
+      const novaHora = typeof entrada.hora === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(entrada.hora) ? entrada.hora : null;
+      if (entrada.hora && !novaHora) return erro('Hora inválida: use HH:MM.');
+      if (novoDia || novaHora) {
+        const d = novoDia ?? diaA;
+        const h = novaHora ?? horaBr(a.inicio);
+        real.inicio = `${d}T${h}:00-03:00`;
+        mudancas.push(`para ${diaCurto(d)} às ${h}`);
+      }
+      if (entrada.cliente) {
+        const c = cliente(entrada.cliente as string);
+        if (!c) return erro('Cliente não encontrado. Use o formato "Cliente N".');
+        real.cliente_id = c.id;
+        mudancas.push(`cliente: ${c.nome.split(' ')[0]}`);
+      }
+      if (typeof entrada.observacao === 'string' && entrada.observacao.trim()) {
+        real.observacao = anon.revelar(entrada.observacao).slice(0, 300);
+        mudancas.push(`observação: "${String(real.observacao)}"`);
+      }
+      if (!mudancas.length) return erro('Diga o que mudar na comanda (serviços, valor, pagamento, dia, hora, cliente ou observação).');
+      const resumo = `${desc} → ${mudancas.join(' · ')}`;
+      return pendente({ ferramenta: nome, entrada: real, resumo }, anon.anonimizar(resumo));
+    }
   }
   return erro('Ferramenta desconhecida.');
 }
@@ -408,6 +602,21 @@ export async function executarConfirmado(ctx: Contexto, p: Pendente): Promise<Re
     case 'fechar_caixa': {
       const { error } = await db.rpc('fechar_caixa', { p_dia: e.dia });
       return error ? falhou(error.message) : ok('Pronto, caixa fechado.', ['agenda_grade', 'resumo_dia', 'caixas']);
+    }
+    case 'reabrir_caixa': {
+      const { error } = await db.rpc('reabrir_caixa', { p_dia: e.dia });
+      return error ? falhou(error.message) : ok('Pronto, caixa reaberto.', ['agenda_grade', 'resumo_dia', 'caixas']);
+    }
+    case 'editar_atendimento': {
+      const { error } = await db.rpc('editar_atendimento', {
+        p_atendimento: e.atendimento_id, p_servicos: e.servico_ids ?? null, p_valor_total: e.valor_total ?? null, p_forma: e.forma ?? null,
+        p_inicio: e.inicio ?? null, p_cliente: e.cliente_id ?? null, p_observacao: e.observacao ?? null,
+      });
+      return error ? falhou(error.message) : ok('Pronto, comanda alterada.', [...ATUALIZA_AGENDA, 'atendimentos', 'relatorio']);
+    }
+    case 'apagar_atendimento': {
+      const { error } = await db.rpc('apagar_atendimento', { p_atendimento: e.atendimento_id });
+      return error ? falhou(error.message) : ok('Pronto, comanda apagada.', [...ATUALIZA_AGENDA, 'atendimentos', 'relatorio']);
     }
   }
   return falhou('ação desconhecida');
@@ -476,7 +685,39 @@ export async function rodarAgente(ctx: Contexto, mensagem: string, historico: Me
 
 // ---------- The loop with Gemma 4 in the cloud (LLM_PROVIDER=google) ----------
 // Same rules and tools as Gemma on the phone: one AI, wherever it runs.
-async function agenteGoogle(ctx: Contexto, mensagem: string, historico: Mensagem[]): Promise<Resposta> {
+export type EventosStream = { onTexto: (pedaco: string) => void; onFerramenta: (nome: string) => void };
+
+/**
+ * Streamed text with the real first names back, never cut in the middle of a
+ * "Cliente 12": a piece that may still grow into a client marker waits for the next one.
+ * Also drops the stray word "thought" Gemma sometimes writes before the answer.
+ */
+export function criarRevelador(revelar: (t: string) => string, onTexto: (pedaco: string) => void) {
+  let guardado = '';
+  let inicio = true;
+  const PARCIAL = /C(?:l(?:i(?:e(?:n(?:t(?:e(?: \d*)?)?)?)?)?)?)?$/;
+  const soltar = (t: string) => { if (t) onTexto(revelar(t)); };
+  return {
+    empurrar(pedaco: string) {
+      guardado += pedaco;
+      if (inicio) {
+        if (guardado.trim().length < 8 && /^\s*t?h?o?u?g?h?t?\s*$/i.test(guardado)) return;
+        guardado = guardado.replace(/^\s*thought\s*/i, '');
+        inicio = false;
+      }
+      const m = guardado.match(PARCIAL);
+      const corte = m ? guardado.length - m[0].length : guardado.length;
+      soltar(guardado.slice(0, corte));
+      guardado = guardado.slice(corte);
+    },
+    terminar() {
+      soltar(inicio ? guardado.replace(/^\s*thought\s*/i, '') : guardado);
+      guardado = '';
+    },
+  };
+}
+
+async function agenteGoogle(ctx: Contexto, mensagem: string, historico: Mensagem[], eventos?: EventosStream): Promise<Resposta> {
   const { anon } = preparar(ctx);
   const contents: Conteudo[] = [
     ...historico.slice(-8).filter((m) => String(m.content).trim())
@@ -486,23 +727,32 @@ async function agenteGoogle(ctx: Contexto, mensagem: string, historico: Mensagem
   const ferramentas = ferramentasParaCelular();
   let pendenteFinal: Pendente | undefined;
   let navegar: string | undefined;
+  const opcoes = {
+    modelo: modelo(),
+    system: await sistemaDoBarbeiro(ctx),
+    contents,
+    ferramentas: declaracoes(ferramentas),
+    executar: async (nome: string, args: Record<string, unknown>) => {
+      if (ALTERACOES.has(nome) && pendenteFinal) return 'Já existe uma mudança esperando confirmação. Uma por vez.';
+      // Optional fields the model left out go as null (null = "not given").
+      const entrada: Record<string, unknown> = { ...args };
+      for (const k of Object.keys(ferramentas.find((f) => f.name === nome)?.parameters.properties ?? {})) if (!(k in entrada)) entrada[k] = null;
+      const saida = await executarFerramenta(ctx, nome, entrada);
+      if (saida.pendente) pendenteFinal = saida.pendente;
+      if (saida.navegar) navegar = saida.navegar;
+      return saida.conteudo;
+    },
+  };
   try {
-    const texto = await rodarComFerramentas({
-      modelo: modelo(),
-      system: await sistemaDoBarbeiro(ctx),
-      contents,
-      ferramentas: declaracoes(ferramentas),
-      executar: async (nome, args) => {
-        if (ALTERACOES.has(nome) && pendenteFinal) return 'Já existe uma mudança esperando confirmação. Uma por vez.';
-        // Optional fields the model left out go as null (null = "not given").
-        const entrada: Record<string, unknown> = { ...args };
-        for (const k of Object.keys(ferramentas.find((f) => f.name === nome)?.parameters.properties ?? {})) if (!(k in entrada)) entrada[k] = null;
-        const saida = await executarFerramenta(ctx, nome, entrada);
-        if (saida.pendente) pendenteFinal = saida.pendente;
-        if (saida.navegar) navegar = saida.navegar;
-        return saida.conteudo;
-      },
-    });
+    let texto: string | null;
+    if (eventos) {
+      const revelador = criarRevelador((t) => anon.revelar(t), eventos.onTexto);
+      texto = await rodarComFerramentasStream({ ...opcoes, onTexto: (p) => revelador.empurrar(p), onFerramenta: eventos.onFerramenta });
+      revelador.terminar();
+      if (texto !== null) texto = texto.replace(/^\s*thought\s*/i, '');
+    } else {
+      texto = await rodarComFerramentas(opcoes);
+    }
     if (texto === null) return { texto: 'Não consegui terminar agora. Pode repetir de outro jeito?', pendente: pendenteFinal, navegar };
     return { texto: anon.revelar(texto), pendente: pendenteFinal, navegar };
   } catch (e) {
@@ -510,6 +760,17 @@ async function agenteGoogle(ctx: Contexto, mensagem: string, historico: Mensagem
     console.error('agente: erro da API do Google', e.status, e.message);
     return { texto: e.status === 429 ? 'A IA grátis chegou no limite de agora. Tente de novo em um minuto.' : 'A IA não respondeu agora. Tente de novo em instantes.' };
   }
+}
+
+/**
+ * The agent, streaming. With Gemma in the cloud the text arrives as it is
+ * written; with the other providers the whole answer arrives at the end.
+ */
+export async function rodarAgenteStream(ctx: Contexto, mensagem: string, historico: Mensagem[], eventos: EventosStream): Promise<Resposta> {
+  if (provedor() === 'google') return agenteGoogle(ctx, mensagem, historico, eventos);
+  const r = await rodarAgente(ctx, mensagem, historico);
+  eventos.onTexto(r.texto);
+  return r;
 }
 
 // ---------- Simulated agent (LLM_PROVIDER=mock): rules that call the same tools ----------

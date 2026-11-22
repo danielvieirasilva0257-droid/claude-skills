@@ -2,7 +2,7 @@
   "expo": {
     "name": "App Barbeiros",
     "slug": "app-barbeiros",
-    "version": "0.6.1",
+    "version": "0.7.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "appbarbeiros",
@@ -21,7 +21,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "br.com.appbarbeiros",
-      "versionCode": 8
+      "versionCode": 9
     },
     "web": {
       "bundler": "metro",

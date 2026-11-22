@@ -63,21 +63,55 @@ export async function perguntarIA(
     const dados = (await resposta.json().catch(() => ({}))) as { erro?: string };
     throw new Error(MENSAGEM[dados.erro ?? ''] ?? 'Não deu para perguntar agora.');
   }
-  const leitor = resposta.body.getReader();
+  await lerEventos(resposta.body, (msg) => {
+    const m = msg as { texto?: string; erro?: string };
+    if (m.erro) throw new Error(m.erro);
+    if (m.texto) onTexto(m.texto);
+  });
+}
+
+/** Reads a Server-Sent Events body ("data: {json}" blocks) and hands each event over as it arrives. */
+async function lerEventos(corpo: ReadableStream<Uint8Array>, onEvento: (msg: unknown) => void): Promise<void> {
+  const leitor = corpo.getReader();
   const decodificar = new TextDecoder();
   let resto = '';
+  const ler = (bloco: string) => {
+    const linha = bloco.replace(/^data: /, '').trim();
+    if (linha) onEvento(JSON.parse(linha));
+  };
   for (;;) {
     const { value, done } = await leitor.read();
     if (done) break;
     resto += decodificar.decode(value, { stream: true });
     const eventos = resto.split('\n\n');
     resto = eventos.pop() ?? '';
-    for (const e of eventos) {
-      const linha = e.replace(/^data: /, '').trim();
-      if (!linha) continue;
-      const msg = JSON.parse(linha) as { texto?: string; fim?: boolean; erro?: string };
-      if (msg.erro) throw new Error(msg.erro);
-      if (msg.texto) onTexto(msg.texto);
-    }
+    for (const e of eventos) ler(e);
   }
+  ler(resto);
+}
+
+/**
+ * POST to an AI function that answers with Server-Sent Events (stream: true).
+ * Returns the final event ({t:'fim', ...}); each event before it goes to onEvento.
+ */
+export async function chamarFuncaoStream<T>(nome: string, corpo: Record<string, unknown>, onEvento: (msg: { t: string } & Record<string, unknown>) => void): Promise<T> {
+  let resposta: Response;
+  try {
+    resposta = await expoFetch(`${base}/${nome}`, { method: 'POST', headers: await cabecalhos(), body: JSON.stringify({ ...corpo, stream: true }) });
+  } catch {
+    throw new Error('Sem conexão. Tente de novo.');
+  }
+  if (!resposta.ok || !resposta.body) {
+    const dados = (await resposta.json().catch(() => ({}))) as { erro?: string };
+    throw new Error(MENSAGEM[dados.erro ?? ''] ?? 'Não deu certo. Tente de novo.');
+  }
+  let fim: T | null = null;
+  await lerEventos(resposta.body, (msg) => {
+    const m = msg as { t: string; erro?: string } & Record<string, unknown>;
+    if (m.t === 'erro') throw new Error(MENSAGEM[m.erro ?? ''] ?? 'Não deu certo. Tente de novo.');
+    if (m.t === 'fim') fim = m as T;
+    else onEvento(m);
+  });
+  if (!fim) throw new Error('A IA não terminou de responder. Tente de novo.');
+  return fim;
 }

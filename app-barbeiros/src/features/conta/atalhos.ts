@@ -9,6 +9,7 @@ export type Atalho = { rotulo: string; detalhe: string; rota: Href; recurso: Rec
 export const ATALHOS: Atalho[] = [
   { rotulo: 'Insights da IA', detalhe: 'Até 3 dicas por dia com os seus números', rota: '/insights', recurso: 'insights', testID: 'atalho-insights' },
   { rotulo: 'Chat com a IA', detalhe: 'Pergunte sobre o seu resultado', rota: '/ia/chat', recurso: 'chat', testID: 'atalho-chat' },
+  { rotulo: 'Relatórios da IA', detalhe: 'Páginas que a IA montou para você, com PDF', rota: '/ia/relatorios', recurso: 'chat', testID: 'atalho-relatorios-ia' },
   { rotulo: 'Coach de vendas', detalhe: 'Narrativas e mensagens prontas', rota: '/coach', recurso: 'coach', testID: 'atalho-coach' },
   { rotulo: 'Meta do mês', detalhe: 'Quanto falta e quantos cortes', rota: '/meta', recurso: 'meta', testID: 'atalho-meta' },
   { rotulo: 'Financeiro', detalhe: 'Faturamento, gastos e lucro', rota: '/financeiro', recurso: 'financeiro', testID: 'atalho-financeiro' },

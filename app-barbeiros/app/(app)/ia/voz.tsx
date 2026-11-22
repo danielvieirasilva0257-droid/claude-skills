@@ -18,8 +18,10 @@ import { Cartao } from '@/components/Cartao';
 import { DuoButton } from '@/components/DuoButton';
 import { SecondaryButton } from '@/components/SecondaryButton';
 import { Texto } from '@/components/Texto';
-import { confirmarAcao, falarComAgente, respostaDeConfirmacao, type Pendente, type Turno } from '@/features/ia/agente';
+import { confirmarAcao, falarComAgenteStream, respostaDeConfirmacao, type Pendente, type Turno } from '@/features/ia/agente';
 import { disponibilidadeGemma, gemmaBaixado, pararGemma, responderComGemma } from '@/features/ia/assistente/cerebro';
+import { falaDeEspera } from '@/features/ia/assistente/espera';
+import { criarDivisorDeFrases } from '@/features/ia/assistente/frases';
 import { cerebroDaIA, useCerebroDaIA, useDisponibilidadeGemma } from '@/features/ia/assistente/preferencia';
 import { NOME_IA } from '@/features/ia/FaleComIA';
 import { OrbeIA, type EstadoOrbe } from '@/features/ia/OrbeIA';
@@ -44,6 +46,8 @@ function ConversaPorVoz() {
   const [som, setSom] = useState(!modoTexto);
   const [erro, setErro] = useState<string | null>(null);
   const [vozAberta, setVozAberta] = useState(false);
+  // What the AI is doing while the answer has no words yet ("Vou olhar sua agenda.").
+  const [fazendo, setFazendo] = useState<string | null>(null);
   const voz = useVozDaIA();
   const cerebroEscolhido = useCerebroDaIA();
   const gemma = useDisponibilidadeGemma();
@@ -118,10 +122,46 @@ function ConversaPorVoz() {
         setTurnos((t) => (t[t.length - 1]?.role === 'assistant' && !t[t.length - 1]?.content ? t.slice(0, -1) : t));
       }
     }
+    // The cloud brain, streaming: the text shows up as it is written and the voice speaks each
+    // sentence as soon as it is complete. While it looks something up, it says what it is doing.
+    const fala = som ? criarFala({ onInicio: () => setEstado('falando'), onFim: () => setEstado('parado') }) : null;
+    const divisor = criarDivisorDeFrases((f) => fala?.frase(f));
+    let escrito = '';
+    let avisou = false;
+    setTurnos((t) => [...t, { role: 'assistant', content: '' }]);
+    const escrever = (conteudo: string) => setTurnos((t) => t.map((x, k) => (k === t.length - 1 ? { ...x, content: conteudo } : x)));
     try {
-      await aplicar(await falarComAgente(limpo, historico));
+      const r = await falarComAgenteStream(limpo, historico, {
+        onTexto: (pedaco) => {
+          escrito += pedaco;
+          setFazendo(null);
+          escrever(escrito);
+          divisor.empurrar(pedaco);
+        },
+        onFerramenta: (nome) => {
+          if (escrito.trim() || avisou) return;
+          const aviso = falaDeEspera(nome);
+          if (!aviso) return;
+          avisou = true;
+          setFazendo(aviso);
+          fala?.frase(aviso);
+        },
+      });
+      setFazendo(null);
+      divisor.terminar();
+      // Nothing streamed (demo or a short answer): speak the whole answer now.
+      if (!escrito.trim()) fala?.frase(r.texto);
+      escrever(r.texto);
+      fala?.terminar();
+      if (!fala) setEstado('parado');
+      if (r.atualizar?.length) await Promise.all(r.atualizar.map((k) => qc.invalidateQueries({ queryKey: [k] })));
+      setPendente(r.pendente ?? null);
+      if (r.navegar) router.navigate(r.navegar as never);
     } catch (e) {
+      setFazendo(null);
+      fala?.parar();
       setEstado('parado');
+      setTurnos((t) => (t[t.length - 1]?.role === 'assistant' && !t[t.length - 1]?.content ? t.slice(0, -1) : t));
       setErro(e instanceof Error ? e.message : 'A IA não respondeu agora.');
     }
   }
@@ -162,7 +202,9 @@ function ConversaPorVoz() {
             </Texto>
           ) : turnos.slice(-6).map((t, k) => (
             <View key={k} style={[styles.bolha, t.role === 'user' ? styles.minha : styles.dela]} testID={t.role === 'user' ? 'voz-eu' : 'voz-ia'}>
-              <Texto variante="bodySm" cor={t.role === 'user' ? 'onLight' : 'text'}>{t.content}</Texto>
+              {t.role === 'assistant' && !t.content
+                ? <Texto variante="bodySm" cor="textMuted" testID="voz-fazendo">{fazendo ?? 'Pensando…'}</Texto>
+                : <Texto variante="bodySm" cor={t.role === 'user' ? 'onLight' : 'text'}>{t.content}</Texto>}
             </View>
           ))}
           {pendente ? (
