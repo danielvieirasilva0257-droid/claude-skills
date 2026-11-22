@@ -48,6 +48,45 @@ describe('frases para a voz', () => {
   });
 });
 
+describe('a voz começa nas 5 primeiras palavras', () => {
+  it('fala as 5 primeiras palavras assim que estão escritas, depois segue por frase', () => {
+    const frases: string[] = [];
+    const d = criarDivisorDeFrases((x) => frases.push(x));
+    d.empurrar('Hoje você');
+    expect(frases).toEqual([]);
+    d.empurrar(' tem cinco clientes marcados');
+    expect(frases).toEqual(['Hoje você tem cinco clientes']);
+    d.empurrar(' e o primeiro é às 10:30. Quer que eu');
+    expect(frases).toEqual(['Hoje você tem cinco clientes', 'marcados e o primeiro é às 10:30.']);
+    d.empurrar(' confirme?');
+    d.terminar();
+    expect(frases.at(-1)).toBe('Quer que eu confirme?');
+  });
+
+  it('não corta "Cliente 12" (o número vem depois)', () => {
+    const frases: string[] = [];
+    const d = criarDivisorDeFrases((x) => frases.push(x));
+    d.empurrar('Marquei para o Cliente 12 amanhã');
+    expect(frases).toEqual(['Marquei para o Cliente 12']);
+  });
+
+  it('não começa no meio de um valor nem termina em "R$"', () => {
+    const frases: string[] = [];
+    const d = criarDivisorDeFrases((x) => frases.push(x));
+    d.empurrar('Você faturou ontem só R$ 1.2');
+    expect(frases).toEqual([]);
+    d.empurrar('34,56 com 7 atendimentos e');
+    expect(frases).toEqual(['Você faturou ontem só R$ 1.234,56']);
+  });
+
+  it('frase longa: corta na vírgula ou a cada 15 palavras', () => {
+    const frases: string[] = [];
+    const d = criarDivisorDeFrases((x) => frases.push(x));
+    d.empurrar('Pronto. O melhor dia da semana foi a sexta-feira, seguida do sábado com muitos cortes e barbas feitas durante toda a tarde de ontem ');
+    expect(frases).toEqual(['Pronto.', 'O melhor dia da semana foi a sexta-feira,']);
+  });
+});
+
 describe('"Cliente N" no celular (igual ao servidor)', () => {
   it('mesma numeração por id, nome inteiro antes do primeiro nome, volta só o primeiro nome', () => {
     const a = criarAnonimizador([{ id: 'b', nome: 'Bruno Lima' }, { id: 'a', nome: 'Rafael Souza' }]);

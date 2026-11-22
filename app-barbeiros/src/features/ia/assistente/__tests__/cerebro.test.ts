@@ -64,8 +64,8 @@ describe('cérebro no celular (Gemma 4 simulado)', () => {
     // Tool through the server, missing optional fields as null.
     expect(mockChamadas.find((c) => c.ferramenta)).toEqual({ ferramenta: 'agendar_horario', entrada: { cliente: 'Cliente 2', dia: '2026-11-22', hora: '10:00', servicos: ['Corte'], obs: null } });
     expect(mockRecebido.resultados[0]).toMatch(/Ação preparada/);
-    // Screen and voice: names back, no tool markup, sentence by sentence.
-    expect(frases).toEqual(['Vou marcar o Bruno amanhã às 10:00 para corte.', 'Confirma?']);
+    // Screen and voice: names back, no tool markup; the voice starts on the first 5 words.
+    expect(frases).toEqual(['Vou marcar o Bruno', 'amanhã às 10:00 para corte.', 'Confirma?']);
     expect(textos.at(-1)).toBe('Vou marcar o Bruno amanhã às 10:00 para corte. Confirma?');
     expect(textos.join(' ')).not.toMatch(/tool|Cliente/);
     expect(r).toEqual({ texto: 'Vou marcar o Bruno amanhã às 10:00 para corte. Confirma?', pendente: expect.objectContaining({ ferramenta: 'agendar_horario' }), navegar: undefined });
