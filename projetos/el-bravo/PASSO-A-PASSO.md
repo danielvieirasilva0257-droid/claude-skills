@@ -44,16 +44,19 @@ Redesenho da marca da hamburgueria El Bravo em 2D, com mascote, logofolio e conc
 ## O que já foi feito
 
 1. **25/11/2026:** 6 skills de marca entraram no repositório (`brand-identity`, `brandkit`, `canvas-design`, `theme-factory`, `brand-guidelines`, `tillwell-brand`). A `frontend-design` pedida já existia, igual à da origem. Projeto criado.
-2. **25/11/2026, etapa 1 e exploração 1 da etapa 2 (canvas de Design, esperando a escolha do Daniel):**
-   - Artboard **Direção** (`Main.dc.html`): logo atual, o que fica e o que muda, o que levamos de cada referência, regras do personagem e a personalidade proposta "Bravo no ringue, gente boa no balcão".
-   - Artboard **Cor e tipografia** (`Cor-e-Tipo.dc.html`): paleta Rojo Bravo #E2321F, Queso #FFC21A, Carbón #1B1512, Pan #F7E9D2, Piel #C98552 (só a pele) e Turquesa #13A89E (acento opcional); 3 climas de letra para o logotipo (Shrikhand, Bungee, Luckiest Guy) e Rubik para os textos.
-   - Artboard **Cabeça do mascote, 3 caminhos** (`Cabeca-Caminhos.dc.html`), desenhada em SVG (vetor editável): **A · Pão de gergelim** (topo da máscara é o pão com gergelim), **B · Peso-pesado** (MMA: orelha de lutador, nariz quebrado, dente faltando, curativo, faixa central), **C · Doidão** (cabeça torta, chamas na testa, olho arregalado, piscadinha, língua de fora). Nenhum tem estrela.
-   - Regras de contraste anotadas: texto pequeno só em carbón sobre pan ou amarelo; vermelho com amarelo só com contorno carbón no meio.
+2. **25/11/2026: primeira tentativa REPROVADA e APAGADA.** O Claude fez, sem ver as referências, uma direção, uma paleta, testes de letra e 3 cabeças em SVG. O Daniel não gostou ("tá muito ruim") e pediu para descartar tudo e recomeçar do zero. O canvas foi limpo (só ficou a imagem do logo antigo guardada como arquivo). **Não usar nada dessa tentativa como referência** (nem paleta, nem letras, nem os caminhos A/B/C).
 
 ## Aprendizados
 
 - O Behance não abre pela nuvem (o endereço não está liberado para o Claude). Para mostrar referências, mande as imagens no chat ou descreva o que gostou.
+- **Regra do Daniel:** se faltar material (referência que não abre, imagem que não chegou), **avisar e pedir antes de começar**. Nunca desenhar "no escuro".
+- **Regra do Daniel:** usar como referência **só** as imagens e os conceitos que ele mandou, nunca o que o Claude já fez antes.
+- **Ritmo:** uma parte por vez, na ordem do pedido: primeiro o mascote, depois o logo, depois as aplicações.
+- As referências ficam no **Google Drive** do Daniel. Para ler, é preciso o conector do Google Drive. Para as fotos das aplicações (mockups), a ideia é usar um banco de imagens (sugerido o conector Unsplash).
+- O Daniel aceita o mascote feito em código (vetor), desde que a qualidade chegue no nível das referências que ele mandar.
 
 ## Próximo passo
 
-O Daniel escolhe (ou mistura) o caminho da cabeça A, B ou C, a paleta e o clima de letra. Depois: refinar a cabeça escolhida e fazer a folha de expressões (cabeça em meio perfil para a direita), e só então o corpo inteiro interagindo com a comida (mascot folio).
+1. Daniel conecta o Google Drive e diz em qual pasta estão as referências.
+2. Claude lê as referências e faz a listagem: o que vai no logo, onde vai cada coisa, quais elementos existem e **todas as aplicações** que aparecem nas referências (para o Daniel ir atrás das fotos).
+3. Só depois, primeira parte do trabalho: o mascote (cabeça em meio perfil para a direita, sorrindo, expressões diferentes; sem estrela na testa).
