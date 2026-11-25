@@ -31,6 +31,11 @@ Cada pasta tem o `SKILL.md` (a skill original) e, quando houver, o `APRENDIZADOS
 | `frontend-design` | Plano curto de design contra o "visual de IA" (Anthropic, Apache-2.0) | `skills/design/frontend-design/` |
 | `animation-vocabulary` | Dar o nome certo a um efeito de movimento descrito pela sensação (Emil Kowalski, MIT) | `skills/design/animation-vocabulary/` |
 | `review-animations` | Revisar animação de interface contra 10 padrões, em tabela com veredito (Emil Kowalski, MIT) | `skills/design/review-animations/` |
+| `brand-identity` | Identidade visual completa: logo e versões, paleta, fontes, ilustração, ícones, movimento (RampStack, MIT) | `skills/design/brand-identity/` |
+| `brandkit` | Prompt de imagem por IA para prancha de apresentação da marca (Leonxlnx, MIT; gasta créditos) | `skills/design/brandkit/` |
+| `canvas-design` | Pôster e arte estática em PNG/PDF por código, com fontes prontas (Anthropic) | `skills/design/canvas-design/` |
+| `theme-factory` | Vestir slides, documentos e páginas com o tema (cores e fontes) da marca (Anthropic) | `skills/design/theme-factory/` |
+| `brand-guidelines`, `tillwell-brand` | **Moldes** de "skill de marca", para criar a skill da marca de um cliente no fim do projeto (Anthropic; Griffin Wooldridge) | `skills/design/brand-guidelines/`, `skills/design/tillwell-brand/` |
 | `referencia-sites` | Base de referência de sites e templates com código e licença | `skills/sites/referencia-sites/` |
 | `scroll-cinematico` | Animação premium que acompanha a rolagem do site | `skills/sites/scroll-cinematico/` |
 | `mcps-para-sites` | Manual dos MCPs para sites (shadcn, 21st, Chrome DevTools) | `skills/sites/mcps-para-sites/` |
