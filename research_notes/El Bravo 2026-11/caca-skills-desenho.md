@@ -25,3 +25,7 @@ Todas precisam de um gerador de imagem por IA (no container não há chave; cone
 - `JimLiu/baoyu-skills@baoyu-comic`: HQ "de conhecimento" com estilos de traço (ligne-claire = linha uniforme e cor chapada, estilo Tintin; manga; realista; nanquim; giz; minimalista) e tons. MIT, ~27 mil estrelas. As fichas de estilo (`references/art-styles/`) podem servir de vocabulário de traço.
 - `shinchven/nano-banana-skills@character-reference-sheet`: folha de referência do personagem mantendo a continuidade com as imagens de amostra (Nano Banana).
 - `mascot-character-sheet` (Aident/mycurelabs): folha de mascote em várias vistas (Fal).
+
+## 25/11/2026 (3ª rodada): processo de criação de personagem — todas salvas
+O Daniel pediu uma skill do processo de criação de personagem (das explorações até o final, e as vistas do personagem pronto) e depois mandou **salvar todas**, com e sem motor de imagem. Entraram em `skills/design/`: `concept-art` (Omer Metin; processo, sem motor), `ip-as-logo`, `baoyu-comic`, `character-reference-sheet`, `mascot-character-sheet`, `video-character-design` (todas com motor).
+Não salvas, porque dependem de um serviço pago próprio que não temos: `edhahn/agent-skills@concept-art` (ComfyUI num servidor com GPU; e tem o mesmo nome da `concept-art` instalada), `inference-sh/skills@character-design-sheet` (CLI inference.sh com login), `fal-ai-community/skills@character-design` (conta fal).
