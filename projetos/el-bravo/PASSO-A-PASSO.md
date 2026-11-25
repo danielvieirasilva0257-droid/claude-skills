@@ -6,7 +6,7 @@ Redesenho da marca da hamburgueria El Bravo em 2D, com mascote, logofolio e conc
 
 - **Trabalho visual:** artifact de Design do Claude (canvas): https://claude.ai/code/artifact/875462b9-6e1e-4bdf-ba13-297f78423d7c
 - **Logo antiga (ponto de partida):** imagem enviada pelo Daniel no chat de 25/11/2026 (lutador de lucha libre com máscara vermelha e dourada, estrela na testa, apontando para a frente e segurando um hambúrguer; "EL BRAVO" em letras amarelas gastas e a faixa "HAMBURGUERIA"; estilo ilustração detalhada com sombra e brilho, não 2D).
-- **Referências do Daniel:** moodboard no Behance: https://www.behance.net/moodboard/225594639/identidade-visual (o Claude não conseguiu abrir o link pela nuvem; ver "Aprendizados").
+- **Referências do Daniel:** 19 prints do Behance no Google Drive dele: https://drive.google.com/drive/folders/18Gt48xMml91-mNAo8uz16PBsG8GmKKZT (ler com o conector do Google Drive). Projetos: Korean Tiger (Viktoriia Kolosova), Guksu Café (Veranika Tsiareshchanka), I Scream (Elisa Voronova) e Ornico (Roomspace Creative Lab). Análise completa, print a print: `research_notes/El Bravo 2026-11/referencias.md`.
 
 ## Briefing (palavras do Daniel, resumidas)
 
@@ -46,6 +46,11 @@ Redesenho da marca da hamburgueria El Bravo em 2D, com mascote, logofolio e conc
 1. **25/11/2026:** 6 skills de marca entraram no repositório (`brand-identity`, `brandkit`, `canvas-design`, `theme-factory`, `brand-guidelines`, `tillwell-brand`). A `frontend-design` pedida já existia, igual à da origem. Projeto criado.
 2. **25/11/2026: primeira tentativa REPROVADA e APAGADA.** O Claude fez, sem ver as referências, uma direção, uma paleta, testes de letra e 3 cabeças em SVG. O Daniel não gostou ("tá muito ruim") e pediu para descartar tudo e recomeçar do zero. O canvas foi limpo (só ficou a imagem do logo antigo guardada como arquivo). **Não usar nada dessa tentativa como referência** (nem paleta, nem letras, nem os caminhos A/B/C).
 
+3. **25/11/2026, passo 1 refeito com as referências de verdade (esperando aprovação do Daniel):** no canvas, 3 artboards de trabalho (sem nenhum desenho da marca ainda):
+   - **Referências** (`Main.dc.html`): 14 recortes das 4 referências e o que levamos de cada uma.
+   - **O que vai no logo** (`Logo-Pecas.dc.html`): tabela peça por peça (ícone, nome, logo completo, selo, frase, cores, extra) das 4 referências e o "kit do logo do El Bravo" em 7 peças, com 2 jeitos de logo completo para testar (A: cabeça entrando pela borda de baixo, como Ornico; B: cabeça + divisória + nome, como Guksu e Korean Tiger).
+   - **Aplicações** (`Aplicacoes.dc.html`): 37 aplicações vistas nas referências, em 6 grupos, cada uma com a referência onde aparece e a foto que precisa ser achada para montar.
+
 ## Aprendizados
 
 - O Behance não abre pela nuvem (o endereço não está liberado para o Claude). Para mostrar referências, mande as imagens no chat ou descreva o que gostou.
@@ -57,6 +62,6 @@ Redesenho da marca da hamburgueria El Bravo em 2D, com mascote, logofolio e conc
 
 ## Próximo passo
 
-1. Daniel conecta o Google Drive e diz em qual pasta estão as referências.
-2. Claude lê as referências e faz a listagem: o que vai no logo, onde vai cada coisa, quais elementos existem e **todas as aplicações** que aparecem nas referências (para o Daniel ir atrás das fotos).
-3. Só depois, primeira parte do trabalho: o mascote (cabeça em meio perfil para a direita, sorrindo, expressões diferentes; sem estrela na testa).
+1. Daniel aprova a listagem e responde as perguntas do mascote (contorno e cores).
+2. Mascote, só a cabeça primeiro: meio perfil virado para a direita, sorrindo, sem estrela, no traço do Guksu. Depois a folha de rostos (Face 01, 02…), depois as poses de corpo inteiro com a comida.
+3. Depois do mascote: o kit do logo. Por último, as aplicações (com as fotos que o Daniel juntar ou do banco de imagens).
