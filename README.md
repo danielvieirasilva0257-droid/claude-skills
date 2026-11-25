@@ -35,6 +35,7 @@ Cada pasta tem o `SKILL.md` (a skill original) e, quando houver, o `APRENDIZADOS
 | `brandkit` | Prompt de imagem por IA para prancha de apresentação da marca (Leonxlnx, MIT; gasta créditos) | `skills/design/brandkit/` |
 | `canvas-design` | Pôster e arte estática em PNG/PDF por código, com fontes prontas (Anthropic) | `skills/design/canvas-design/` |
 | `theme-factory` | Vestir slides, documentos e páginas com o tema (cores e fontes) da marca (Anthropic) | `skills/design/theme-factory/` |
+| `character-design`, `image-to-svg`, `svg-creation` | Desenho de personagem: base de design de personagem, redesenhar em vetor um mascote ou logo que já existe e SVG limpo (terceiros, Apache-2.0 e MIT) | `skills/design/` |
 | `brand-guidelines`, `tillwell-brand` | **Moldes** de "skill de marca", para criar a skill da marca de um cliente no fim do projeto (Anthropic; Griffin Wooldridge) | `skills/design/brand-guidelines/`, `skills/design/tillwell-brand/` |
 | `referencia-sites` | Base de referência de sites e templates com código e licença | `skills/sites/referencia-sites/` |
 | `scroll-cinematico` | Animação premium que acompanha a rolagem do site | `skills/sites/scroll-cinematico/` |
