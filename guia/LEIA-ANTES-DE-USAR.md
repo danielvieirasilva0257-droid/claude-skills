@@ -86,7 +86,10 @@ claude-skills/
 │   │   ├── canvas-design/             pôster/arte em PNG/PDF (Anthropic), intacta (+ canvas-fonts/)          [25/11/2026]
 │   │   ├── theme-factory/             temas de cores e fontes (Anthropic), intacta (+ themes/)               [25/11/2026]
 │   │   ├── brand-guidelines/          MOLDE de skill de marca (Anthropic), intacta                           [25/11/2026]
-│   │   └── tillwell-brand/            MOLDE de skill de marca (exemplo fictício), intacta (+ references/, assets/) [25/11/2026]
+│   │   ├── tillwell-brand/            MOLDE de skill de marca (exemplo fictício), intacta (+ references/, assets/) [25/11/2026]
+│   │   ├── character-design/          design de personagem (Omer Metin, Apache-2.0), intacta (+ references/)  [25/11/2026]
+│   │   ├── image-to-svg/              redesenhar imagem em SVG (Paul Somers, MIT), intacta                    [25/11/2026]
+│   │   └── svg-creation/              SVG limpo (dvy1987, MIT), intacta (+ references/)                     [25/11/2026]
 │   ├── sites/
 │   │   ├── referencia-sites/          NOSSA: base de referência de sites e templates (índice + script de download)
 │   │   ├── mcps-para-sites/           NOSSA: manual dos MCPs (shadcn, 21st, Chrome DevTools)
@@ -161,7 +164,7 @@ Outras branches:
 |---|---|---|
 | `skills/video/` | fazer vídeos | `remotion-video`, `motion-video`, `blender-ia` |
 | `skills/audio/` | voz, música e som | `voz-pt-br`, `trilha-e-mixagem` |
-| `skills/design/` | animação e interface de sites e apps; marca, logo, mascote e identidade visual (desde 25/11/2026) | `motion-oficial`, `button-animation`, `thumbnail-carousel`, `ui-ux-pro-max`, `estilos-premium`, `taste-skill`, `image-to-code`, `web-design-guidelines`, `frontend-design`, `animation-vocabulary`, `review-animations`, `brand-identity`, `brandkit`, `canvas-design`, `theme-factory`, `brand-guidelines`, `tillwell-brand` |
+| `skills/design/` | animação e interface de sites e apps; marca, logo, mascote e identidade visual (desde 25/11/2026) | `motion-oficial`, `button-animation`, `thumbnail-carousel`, `ui-ux-pro-max`, `estilos-premium`, `taste-skill`, `image-to-code`, `web-design-guidelines`, `frontend-design`, `animation-vocabulary`, `review-animations`, `brand-identity`, `brandkit`, `canvas-design`, `theme-factory`, `brand-guidelines`, `tillwell-brand`, `character-design`, `image-to-svg`, `svg-creation` |
 | `skills/sites/` | fazer sites: planejar, construir, testar, auditar e publicar | `referencia-sites`, `mcps-para-sites`, `scroll-cinematico`, `site-architecture`, `shadcn`, `vercel-react-best-practices`, `cro`, `webapp-testing`, `playwright-cli`, `web-quality` (6), `deploy-to-vercel`, `seo-audit` |
 | `skills/texto/` | escrita | `copywriting`, `humanizer` |
 | `skills/ferramentas-de-skills/` | achar, instalar e manter skills | `find-skills` |
@@ -180,7 +183,7 @@ Outras branches:
   ```bash
   npx -y skills@1.7.2 add <caminho-do-repositório> --list
   ```
-  Em 25/11/2026, depois das 6 skills de marca, ele achava **46 itens**, sem nenhum "Skipped". Em 12/10/2026 ele achava **39 itens** (o pacote `web-quality` conta como 6, e a `taste-skill` aparece como `design-taste-frontend`), sem nenhum "Skipped".
+  Em 25/11/2026, depois das 6 skills de marca e das 3 de desenho, ele achava **49 itens**, sem nenhum "Skipped". Em 12/10/2026 ele achava **39 itens** (o pacote `web-quality` conta como 6, e a `taste-skill` aparece como `design-taste-frontend`), sem nenhum "Skipped".
 - **O que nunca fica na `main`:** código de projeto, áudios, vídeos, quadros renderizados, chaves.
 - **O que nunca fica numa branch de projeto:** cópias de skills. Lá entram só código e mídia do projeto.
 - Confira sempre o `guia/HABILIDADES.txt`, que é a fonte certa do que existe.

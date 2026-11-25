@@ -51,6 +51,9 @@ Redesenho da marca da hamburgueria El Bravo em 2D, com mascote, logofolio e conc
    - **O que vai no logo** (`Logo-Pecas.dc.html`): tabela peça por peça (ícone, nome, logo completo, selo, frase, cores, extra) das 4 referências e o "kit do logo do El Bravo" em 7 peças, com 2 jeitos de logo completo para testar (A: cabeça entrando pela borda de baixo, como Ornico; B: cabeça + divisória + nome, como Guksu e Korean Tiger).
    - **Aplicações** (`Aplicacoes.dc.html`): 37 aplicações vistas nas referências, em 6 grupos, cada uma com a referência onde aparece e a foto que precisa ser achada para montar.
 
+4. **25/11/2026, briefing do mascote fechado com o Daniel:** a cabeça do mascote mantém o **rosto do logo atual** (mesma máscara, mesmos ângulos, formas e cores), só **sem a estrela da testa**, sem acrescentar nenhum detalhe. Logo 2D com personagem 2D. A foto de comida abraçada pelo mascote e os adesivos foram só comentário (ele gostou), **não são para fazer agora**.
+5. **25/11/2026:** as tentativas de desenhar a cabeça à mão em SVG ficaram fracas (sem base). Parado a pedido do Daniel. Entraram 3 skills de desenho (`character-design`, `image-to-svg`, `svg-creation`); pesquisa em `research_notes/El Bravo 2026-11/caca-skills-desenho.md`. O Daniel acha que vamos precisar de um **motor de geração de imagem** para fazer o personagem.
+
 ## Aprendizados
 
 - O Behance não abre pela nuvem (o endereço não está liberado para o Claude). Para mostrar referências, mande as imagens no chat ou descreva o que gostou.
@@ -62,6 +65,6 @@ Redesenho da marca da hamburgueria El Bravo em 2D, com mascote, logofolio e conc
 
 ## Próximo passo
 
-1. Daniel aprova a listagem e responde as perguntas do mascote (contorno e cores).
-2. Mascote, só a cabeça primeiro: meio perfil virado para a direita, sorrindo, sem estrela, no traço do Guksu. Depois a folha de rostos (Face 01, 02…), depois as poses de corpo inteiro com a comida.
+1. **Esperar o Daniel** (ele pediu para não trabalhar ainda): escolher o motor de geração de imagem para o personagem. Já conectados: Higgsfield e OpenArt.
+2. Mascote, só a cabeça primeiro: o rosto do logo atual sem a estrela, em 2D, virado para a direita. Usar `image-to-svg` (sem subagentes) e `character-design`. Depois a folha de rostos e as poses.
 3. Depois do mascote: o kit do logo. Por último, as aplicações (com as fotos que o Daniel juntar ou do banco de imagens).
