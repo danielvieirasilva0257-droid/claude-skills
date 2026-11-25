@@ -18,3 +18,10 @@ Pedido do Daniel: skills de **desenho e design de personagem** (bases de desenho
 
 ## O que o Daniel destacou nas referências (25/11/2026)
 - Gostou muito do **mascote desenhado abraçando a foto real da comida** (Korean Tiger) e dos **adesivos** (stickers). Na listagem: aplicações 35 e 31/32.
+
+## 25/11/2026 (2ª rodada): skills de HQ e mascote que usam motor de imagem
+Todas precisam de um gerador de imagem por IA (no container não há chave; conectados: Higgsfield e OpenArt). Nenhuma foi instalada. O Daniel pediu para o foco continuar nas skills de desenho por código.
+- `s1dashu/ip-as-logo-skill`: mascote simples e fofo que vira logo, legível em 32 px; exige modelo de imagem de ponta (GPT Image 2, Nano Banana Pro/2) e nunca cai para SVG. ~4,7 mil estrelas.
+- `JimLiu/baoyu-skills@baoyu-comic`: HQ "de conhecimento" com estilos de traço (ligne-claire = linha uniforme e cor chapada, estilo Tintin; manga; realista; nanquim; giz; minimalista) e tons. MIT, ~27 mil estrelas. As fichas de estilo (`references/art-styles/`) podem servir de vocabulário de traço.
+- `shinchven/nano-banana-skills@character-reference-sheet`: folha de referência do personagem mantendo a continuidade com as imagens de amostra (Nano Banana).
+- `mascot-character-sheet` (Aident/mycurelabs): folha de mascote em várias vistas (Fal).
