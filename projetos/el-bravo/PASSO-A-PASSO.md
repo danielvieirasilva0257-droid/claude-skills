@@ -44,6 +44,11 @@ Redesenho da marca da hamburgueria El Bravo em 2D, com mascote, logofolio e conc
 ## O que já foi feito
 
 1. **25/11/2026:** 6 skills de marca entraram no repositório (`brand-identity`, `brandkit`, `canvas-design`, `theme-factory`, `brand-guidelines`, `tillwell-brand`). A `frontend-design` pedida já existia, igual à da origem. Projeto criado.
+2. **25/11/2026, etapa 1 e exploração 1 da etapa 2 (canvas de Design, esperando a escolha do Daniel):**
+   - Artboard **Direção** (`Main.dc.html`): logo atual, o que fica e o que muda, o que levamos de cada referência, regras do personagem e a personalidade proposta "Bravo no ringue, gente boa no balcão".
+   - Artboard **Cor e tipografia** (`Cor-e-Tipo.dc.html`): paleta Rojo Bravo #E2321F, Queso #FFC21A, Carbón #1B1512, Pan #F7E9D2, Piel #C98552 (só a pele) e Turquesa #13A89E (acento opcional); 3 climas de letra para o logotipo (Shrikhand, Bungee, Luckiest Guy) e Rubik para os textos.
+   - Artboard **Cabeça do mascote, 3 caminhos** (`Cabeca-Caminhos.dc.html`), desenhada em SVG (vetor editável): **A · Pão de gergelim** (topo da máscara é o pão com gergelim), **B · Peso-pesado** (MMA: orelha de lutador, nariz quebrado, dente faltando, curativo, faixa central), **C · Doidão** (cabeça torta, chamas na testa, olho arregalado, piscadinha, língua de fora). Nenhum tem estrela.
+   - Regras de contraste anotadas: texto pequeno só em carbón sobre pan ou amarelo; vermelho com amarelo só com contorno carbón no meio.
 
 ## Aprendizados
 
@@ -51,4 +56,4 @@ Redesenho da marca da hamburgueria El Bravo em 2D, com mascote, logofolio e conc
 
 ## Próximo passo
 
-Etapa 1 (direção) no canvas de Design, para o Daniel aprovar antes dos rascunhos do mascote.
+O Daniel escolhe (ou mistura) o caminho da cabeça A, B ou C, a paleta e o clima de letra. Depois: refinar a cabeça escolhida e fazer a folha de expressões (cabeça em meio perfil para a direita), e só então o corpo inteiro interagindo com a comida (mascot folio).
