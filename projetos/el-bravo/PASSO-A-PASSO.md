@@ -5,6 +5,7 @@ Redesenho da marca da hamburgueria El Bravo em 2D, com mascote, logofolio e conc
 ## Onde está cada coisa
 
 - **Trabalho visual:** artifact de Design do Claude (canvas): https://claude.ai/code/artifact/875462b9-6e1e-4bdf-ba13-297f78423d7c
+- **Código e arquivos do desenho:** branch `projeto-el-bravo`, pasta `el-bravo/vetor/` (scripts, SVG e PNG da cabeça, `LEIA.md` com a ordem dos comandos).
 - **Logo antiga (ponto de partida):** imagem enviada pelo Daniel no chat de 25/11/2026 (lutador de lucha libre com máscara vermelha e dourada, estrela na testa, apontando para a frente e segurando um hambúrguer; "EL BRAVO" em letras amarelas gastas e a faixa "HAMBURGUERIA"; estilo ilustração detalhada com sombra e brilho, não 2D).
 - **Referências do Daniel:** 19 prints do Behance no Google Drive dele: https://drive.google.com/drive/folders/18Gt48xMml91-mNAo8uz16PBsG8GmKKZT (ler com o conector do Google Drive). Projetos: Korean Tiger (Viktoriia Kolosova), Guksu Café (Veranika Tsiareshchanka), I Scream (Elisa Voronova) e Ornico (Roomspace Creative Lab). Análise completa, print a print: `research_notes/El Bravo 2026-11/referencias.md`.
 
@@ -54,6 +55,12 @@ Redesenho da marca da hamburgueria El Bravo em 2D, com mascote, logofolio e conc
 4. **25/11/2026, briefing do mascote fechado com o Daniel:** a cabeça do mascote mantém o **rosto do logo atual** (mesma máscara, mesmos ângulos, formas e cores), só **sem a estrela da testa**, sem acrescentar nenhum detalhe. Logo 2D com personagem 2D. A foto de comida abraçada pelo mascote e os adesivos foram só comentário (ele gostou), **não são para fazer agora**.
 5. **25/11/2026:** as tentativas de desenhar a cabeça à mão em SVG ficaram fracas (sem base). Parado a pedido do Daniel. Entraram 3 skills de desenho (`character-design`, `image-to-svg`, `svg-creation`); pesquisa em `research_notes/El Bravo 2026-11/caca-skills-desenho.md`. O Daniel acha que vamos precisar de um **motor de geração de imagem** para fazer o personagem.
 
+6. **25/11/2026, cabeça do mascote (Face 01) feita e no canvas (artboard "Mascote · Cabeça Face 01"), esperando a opinião do Daniel:**
+   - Rosto do logo atual redesenhado em 2D chapado, sem a estrela, mesma máscara, ângulo, formas e cores. Arquivo `el-bravo_mascote_cabeca_face01.svg` (37 caminhos, 54 KB).
+   - Método (skill `image-to-svg`, sem subagentes): cabeça recortada e ampliada 4x → silhueta separada do fundo → cada pixel classificado por cor (máscara, dourado, pele, preto, branco) → máscaras limpas por região → faixa da boca construída a partir de pontos medidos numa grade e conferidos coluna por coluna → olhos montados com íris, pupila e brilho nas posições medidas → imagem chapada com contornos uniformes → vetorizada com a vtracer → comparada lado a lado e em zoom com o original.
+   - Teste de tamanho pequeno da `character-design`: lê bem em 128, 64 e 32 px.
+   - Cores medidas: máscara #D7261E, dourado #F2AE2E, costura #8E1611, pele #C8743E, contorno #1A0D08, língua #E06A6E, dentes #FFF6E8.
+
 ## Aprendizados
 
 - O Behance não abre pela nuvem (o endereço não está liberado para o Claude). Para mostrar referências, mande as imagens no chat ou descreva o que gostou.
@@ -65,6 +72,6 @@ Redesenho da marca da hamburgueria El Bravo em 2D, com mascote, logofolio e conc
 
 ## Próximo passo
 
-1. **Esperar o Daniel** (ele pediu para não trabalhar ainda): escolher o motor de geração de imagem para o personagem. Já conectados: Higgsfield e OpenArt.
-2. Mascote, só a cabeça primeiro: o rosto do logo atual sem a estrela, em 2D, virado para a direita. Usar `image-to-svg` (sem subagentes) e `character-design`. Depois a folha de rostos e as poses.
+1. Daniel avalia a cabeça Face 01 e diz o que ajustar.
+2. Depois: folha de rostos (expressões diferentes, como Face 01, 02…), seguindo a `concept-art` (aprovação a cada etapa) e a `character-design`. Partindo deste SVG, cada expressão muda só olhos, sobrancelha da máscara e boca.
 3. Depois do mascote: o kit do logo. Por último, as aplicações (com as fotos que o Daniel juntar ou do banco de imagens).
