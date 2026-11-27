@@ -33,6 +33,15 @@ Redesenho da marca da hamburgueria El Bravo em 2D, com mascote, logofolio e conc
 | Manual e apresentação com as cores e fontes da marca | `theme-factory` | `skills/design/theme-factory/SKILL.md` |
 | Skill da marca no fim (`el-bravo-marca`) | molde `tillwell-brand` | `skills/design/tillwell-brand/SKILL.md` |
 
+## Textos e conceitos aprovados pelo Daniel (27/11/2026)
+
+- **Saquinho do lanche:** slogan principal **"EL BRAVO, VITÓRIA EM CADA MORDIDA!"**. Frases secundárias, que complementam e não substituem o slogan: "El Bravo, seu troféu vem com queijo e pão." e "Toda vitória merece El Bravo."
+- **Brinde do Bravo:** recompensa que acompanha o lanche (doce ou salgado). iFood: "Compre um lanche e ganhe um Brinde do Bravo!". Na caixa do brinde: "Parabéns! Ganhou um Brinde do Bravo!".
+- **Adesivo redondo da caixa de brindes:** mascote segurando um **presente**, nome BRINDE DO BRAVO, mesmo padrão para doce e salgado, frase muda conforme o conteúdo.
+- **Adesivo do brinde doce:** mascote segurando um **troféu**; destaque "CONQUISTOU!!!" e complemento "GANHOU DOCE DA CASA.".
+- **Adesivo do brinde salgado:** mesmo design do doce, com a frase do salgado (frase ainda não definida).
+- As duas imagens de referência que vieram junto com esse briefing (adesivos de Street Fighter e "Empaná y Vámonos") estão **erradas**, segundo o Daniel: não usar.
+
 ## Plano de etapas
 
 1. **Direção:** leitura das referências, palavras-chave, rumo do personagem, paleta e fontes iniciais.
